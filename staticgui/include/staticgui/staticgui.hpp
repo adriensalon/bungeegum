@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 
+/// @brief ddd
 namespace staticgui {
 
 struct context {

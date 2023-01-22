@@ -1,0 +1,14 @@
+PROJECT_NAME 			= staticgui
+GENERATE_LATEX 			= NO
+HTML_OUTPUT 			= build/doc/doxygen/
+ENABLE_PREPROCESSING   	= YES
+EXTRACT_ALL 			= YES
+RECURSIVE 				= YES
+FILE_PATTERNS        	= *.hpp
+INCLUDE_PATH         	= staticgui/include/staticgui/
+EXCLUDE 				= external/
+EXCLUDE_SYMBOLS 		= detail
+USE_MDFILE_AS_MAINPAGE 	= README.md
+GENERATE_TREEVIEW      	= YES
+HTML_EXTRA_STYLESHEET  	= external/doxygen-awesome/doxygen-awesome.css
+QUIET = YES
