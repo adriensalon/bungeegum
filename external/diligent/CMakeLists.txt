@@ -7,7 +7,6 @@
 #                           __/ |        
 #                          |___/         
 
-add_subdirectory("imgui")
-add_subdirectory("diligent")
-add_subdirectory("sdl")
-add_subdirectory("tree")
+set(DILIGENT_DEAR_IMGUI_PATH "${CMAKE_CURRENT_LIST_DIR}/../imgui/")
+add_subdirectory("diligentcore")
+add_subdirectory("diligenttools")

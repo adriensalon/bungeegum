@@ -11,5 +11,12 @@ project(staticgui)
 
 add_library(staticgui "source/staticgui.cpp")
 target_include_directories(staticgui PUBLIC "include")
+target_link_libraries(staticgui Diligent-GraphicsEngine)
+target_link_libraries(staticgui Diligent-GraphicsTools)
+target_link_libraries(staticgui Diligent-ShaderTools)
+target_link_libraries(staticgui Diligent-Imgui)
+target_link_libraries(staticgui imgui)
+target_link_libraries(staticgui sdl)
+target_link_libraries(staticgui tree)
 
 set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)
