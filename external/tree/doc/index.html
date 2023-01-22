@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+              "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta name="verify-v1"
+		content="LkU+jobePpu3F8I4GPuTiOjrTukmo1qpWT+dT6SeAfk=" />
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" /> 
+<meta name="description" content="The tree.hh library provides C++
+		programmers with a container class to store arbitrary data in
+		n-ary tree form. It is compatible with the STL and its
+		algorithms wherever possible. Available under the terms of the GPL." />  
+<meta name="keywords" content="data structure, C++, programming, STL,
+		open source, container class" />
+<title>tree.hh: an STL-like C++ tree class</title>
+<link rel="stylesheet" type="text/css" href="tree.css" /> 
+</head>
+<body>
+  <div id="container">
+	 <div id="title">
+		  <div id="share">
+<!-- AddThis Button BEGIN -->
+<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=250&amp;username=kpeeters"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=kpeeters"></script>
+<!-- AddThis Button END -->
+		  </div>
+		  <div id="plusone">
+<!-- Place this tag where you want the +1 button to render -->
+<g:plusone></g:plusone>
+
+<!-- Place this tag after the last plusone tag -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+		  </div>
+		  <div id="filler">
+		  <img id="treeimg" src="tree2.png" alt="[background image]"/>
+		</div>
+      <div id="titletxt">
+        <h1>tree.hh:&nbsp;an&nbsp;STL-like&nbsp;C++&nbsp;tree&nbsp;class</h1>
+        <h2 class="author">
+          <a href="http://maths.dur.ac.uk/users/kasper.peeters/">Kasper Peeters</a>, kasper.peeters (at) phi-sci.com
+        </h2>
+      </div>
+    </div>
+	 
+	 <ul id="menubar">
+		<li><a href="index.html">Overview</a></li>
+		<li><a href="download.html">Download</a></li>
+		<li><a href="documentation.html">Documentation</a></li>
+		<li><a href="projects.html">Projects using tree.hh</a></li>
+	 </ul>
+
+	 <div id="linkbar">
+		<script type="text/javascript"><!--
+													  google_ad_client = "pub-9577963716105989";
+													  /* tree linkbar */
+													  google_ad_slot = "0194609917";
+													  google_ad_width = 728;
+													  google_ad_height = 15;
+													  //-->
+		</script>
+		<script type="text/javascript"
+				  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+		</script>
+	 </div>
+
+	 <div id="main">
+	 
+		<div id="sidebar">
+		  <script type="text/javascript"><!--
+														 google_ad_client = "pub-9577963716105989";
+														 /* tree.hh vertical ads */
+														 google_ad_slot = "3744417434";
+														 google_ad_width = 120;
+														 google_ad_height = 600;
+														 //-->
+		  </script>
+		  <script type="text/javascript"
+					 src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+		  </script>
+		</div>
+
+		<h2>Overview</h2> 
+		
+		<div class="text">
+		  The <code>tree.hh</code> library for C++ provides an STL-like container class
+		  for <i>n</i>-ary trees, templated over the data stored at the nodes.  Various
+		  types of iterators are provided (post-order, pre-order, and
+		  others). Where possible the access methods are compatible with the STL
+		  or alternative algorithms are available. The library is available
+		  under the terms of the GNU General Public License version 2 or
+		  3 (see below).</div>
+		
+		<div class="text">Documentation is available in the form of
+		  a <a href="tree.pdf">pdf</a> file. See
+		  the <a href="documentation.html">documentation page</a> for
+		  more details and sample programs.
+		</div>
+		
+		<div class="text">The <code>tree.hh</code> library is meant for generic <i>n</i>-ary
+		  trees. For binary trees, AVL trees, quad trees and other data
+		  structures, you may want to look elsewhere. </div>
+
+		<div class="text">The library is available for free, but if it
+		helps you a lot, why not consider a small donation?
+		  <form id="donate"
+				  action="https://www.paypal.com/cgi-bin/webscr" method="post">
+			 <p>
+			 <input type="hidden" name="cmd" value="_s-xclick" />
+			 <input type="hidden" name="hosted_button_id"
+					  value="YVWFQTJRGD8SW" />
+			 <input type="image" 
+					  src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" 
+					  name="submit" 
+					  alt="PayPal - The safer, easier way to pay online!" />
+			 <img alt="" 
+					src="https://www.paypal.com/en_GB/i/scr/pixel.gif" 
+					width="1"
+					height="1" />
+			 </p>
+		  </form>
+		  Your contribution is greatly appreciated!
+		</div>
+
+		<div class="text">
+		  I have considered this class for inclusion in Boost. However,
+		  there are many ways to implement a tree container, and there
+		  is no good way to simultaneously satisfy everyone who would
+		  use it. See the discussion on the Boost mailing list in
+		  <a href="http://lists.boost.org/Archives/boost/2002/10/37383.php">2002</a>
+		  and <a href="http://lists.boost.org/Archives/boost/2009/07/153719.php">2009</a>.
+		</div>
+
+		<h2>License</h2> 
+		
+		<div class="text">In principle, the <code>tree.hh</code> code is
+		  available under the terms of the GNU General Public
+		  License <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">2</a>
+		  or <a href="http://www.gnu.org/copyleft/gpl.html">3</a>. However,
+		  if you would like to use <code>tree.hh</code> under different
+		  conditions, contact me and we will work something out.</div>
+		
+		<div class="license">
+		  This program is free software: you can redistribute it and/or modify
+		  it under the terms of the GNU General Public License as published by
+		  the Free Software Foundation, either version 2 of the License, or
+		  (at your option) any later version.
+		  
+		  This program is distributed in the hope that it will be useful,
+		  but WITHOUT ANY WARRANTY; without even the implied warranty of
+		  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		  GNU General Public License for more details.
+		  
+		  You should have received a copy of the GNU General Public
+		  License along with this program.  If not,
+		  see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.
+		</div>
+
+		<div class="text">If you use <code>tree.hh</code>,
+		  please satisfy my curiosity and write me a small email with
+		  a bit of explanation of your software and the role of my tree 
+		  class in it.</div>
+		
+	 </div>
+
+	 <div id="flush"></div>
+
+	 <p>
+		<a href="http://validator.w3.org/check?uri=referer">
+		  <img
+			  src="http://www.w3.org/Icons/valid-xhtml10"
+			  alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a>
+	 </p>
+	 
+	 <!-- Start of StatCounter Code -->
+	 <script type="text/javascript">
+		var sc_project=4068217; 
+		var sc_invisible=1; 
+		var sc_partition=50; 
+		var sc_click_stat=1; 
+		var sc_security="3f2419f9"; 
+	 </script>
+	 
+	 <script type="text/javascript"
+				src="http://www.statcounter.com/counter/counter_xhtml.js"></script>
+	 <noscript>
+		<div class="statcounter">
+		  <a title="blogspot statistics"
+			  class="statcounter"
+			  href="http://www.statcounter.com/blogger/">
+			 <img
+				 class="statcounter"
+				 src="http://c.statcounter.com/4068217/0/3f2419f9/1/"
+				 alt="blogspot statistics" /></a>
+		</div>
+	 </noscript>
+	 <!-- End of StatCounter Code -->
+
+  </div>
+
+</body>
+</html>
