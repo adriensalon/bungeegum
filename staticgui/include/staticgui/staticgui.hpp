@@ -24,10 +24,10 @@ struct context {
 
 template <typename child_widget_t>
 struct application {
-    application(const child_widget_t& child) { }
-    application& title(const std::string& title) { return *this; }
-    application& size(const unsigned int width, const unsigned int height) { return *this; }
-    application& on_resized(std::function<void()> callback) { return *this; }
+    application(const child_widget_t& child);
+    application& title(const std::string& title);
+    application& size(const unsigned int width, const unsigned int height);
+    application& on_resized(std::function<void()> callback);
 };
 
 template <typename child_widget_t>
@@ -68,11 +68,36 @@ template <typename widget_t>
 void mark_dirty(const widget_t& widget);
 }
 
+#include <staticgui/utils/app.hpp>
+#include <staticgui/utils/draw.hpp>
+
 namespace staticgui {
+
+template <typename child_widget_t>
+application<child_widget_t>::application(const child_widget_t& child)
+{
+}
+
+template <typename child_widget_t>
+application<child_widget_t>& application<child_widget_t>::title(const std::string& title)
+{
+    return *this;
+}
+
+template <typename child_widget_t>
+application<child_widget_t>& application<child_widget_t>::size(const unsigned int width, const unsigned int height)
+{
+    return *this;
+}
+
+template <typename child_widget_t>
+application<child_widget_t>& application<child_widget_t>::on_resized(std::function<void()> callback)
+{
+    return *this;
+}
 
 }
 
-// ifdef pour ca nn ?
 #include "widgets/center.hpp"
 #include "widgets/column.hpp"
 #include "widgets/image.hpp"

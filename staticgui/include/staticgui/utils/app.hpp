@@ -9,17 +9,10 @@
 
 #pragma once
 
-#include <staticgui/staticgui.hpp>
-
 namespace staticgui {
+namespace internal {
+    namespace app {
 
-/// @brief A widget that displays an image.
-struct image {
-    image()
-    {
     }
-    void draw(const context& context)
-    {
-    }
-};
+}
 }
