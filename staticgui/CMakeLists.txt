@@ -9,7 +9,12 @@
 
 project(staticgui)
 
-add_library(staticgui "source/staticgui.cpp")
+set(staticgui_source 
+	"source/staticgui.cpp"
+	"source/utils/app.cpp"
+	"source/utils/draw.cpp"
+)
+add_library(staticgui "${staticgui_source}")
 target_include_directories(staticgui PUBLIC "include")
 target_link_libraries(staticgui Diligent-GraphicsEngine)
 target_link_libraries(staticgui Diligent-GraphicsTools)

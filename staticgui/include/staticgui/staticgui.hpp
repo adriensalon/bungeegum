@@ -75,4 +75,5 @@ namespace staticgui {
 // ifdef pour ca nn ?
 #include "widgets/center.hpp"
 #include "widgets/column.hpp"
+#include "widgets/image.hpp"
 #include "widgets/list_view.hpp"
