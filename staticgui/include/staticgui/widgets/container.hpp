@@ -10,7 +10,6 @@
 #pragma once
 
 #include <staticgui/staticgui.hpp>
-#include <staticgui/widgets/image.hpp>
 
 namespace staticgui {
 namespace widgets {
@@ -24,21 +23,12 @@ namespace widgets {
     /// 2.0 then the width of this widget will always be twice its child's width.
     /// @tparam child_widget_t
     template <typename child_widget_t>
-    struct center {
-        center(const child_widget_t& child)
+    struct container {
+        container(const child_widget_t& child)
         {
-            build(image());
+            // build(image());
         }
-        center& width_factor(const float factor)
-        {
-            _width_factor = factor;
-            return *this;
-        }
-        center& height_factor(const float factor)
-        {
-            _height_factor = factor;
-            return *this;
-        }
+
         void draw(const renderer& context)
         {
         }

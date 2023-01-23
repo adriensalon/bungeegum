@@ -14,58 +14,59 @@
 #include <string>
 #include <vector>
 
-/// @brief ddd
+/// @brief
 namespace staticgui {
 
-struct context {
+/// @brief
+/// @tparam child_widget_t
+template <typename child_widget_t>
+struct application {
+
+    /// @brief
+    /// @param child
+    application(const child_widget_t& child);
+
+    /// @brief
+    /// @param title
+    /// @return
+    application& window_title(const std::string& title);
+
+    /// @brief
+    /// @param width
+    /// @param height
+    /// @return
+    application& window_size(const unsigned int width, const unsigned int height);
+
+    /// @brief
+    /// @param callback
+    /// @return
+    application& on_window_resized(std::function<void()> callback);
+};
+
+/// @brief
+/// @tparam root_widget_t
+/// @param app
+template <typename root_widget_t>
+void launch(const application<root_widget_t>& app);
+
+/// @brief
+/// @tparam root_widget_t
+/// @param root
+template <typename root_widget_t>
+void attach(const root_widget_t& root);
+
+/// @brief
+/// @tparam root_widget_t
+/// @param root
+template <typename root_widget_t>
+void build(const root_widget_t& root);
+
+/// @brief
+struct renderer {
     float get_available_width();
     float get_available_height();
 };
 
-template <typename child_widget_t>
-struct application {
-    application(const child_widget_t& child);
-    application& title(const std::string& title);
-    application& size(const unsigned int width, const unsigned int height);
-    application& on_resized(std::function<void()> callback);
-};
-
-template <typename child_widget_t>
-void start(const application<child_widget_t>& root_widget)
-{
-}
-
-void paint_child(); // et pas de register ?
-
-/// @brief
-/// @tparam parent_widget_t
-/// @tparam child_widget_t
-/// @param parent
-/// @param child
-template <typename parent_widget_t, typename child_widget_t>
-void register_child(parent_widget_t* parent, const child_widget_t& child) { }
-
-/// @brief
-/// @tparam parent_widget_t
-/// @tparam children_widgets_t
-/// @param parent
-/// @param children
-template <typename parent_widget_t, typename children_widgets_t>
-void register_children(parent_widget_t* parent, const std::initializer_list<children_widgets_t> children) { }
-
-/// @brief
-/// @tparam parent_widget_t
-/// @tparam ...children_widgets_t
-/// @param parent
-/// @param ...children
-template <typename parent_widget_t, typename... children_widgets_t>
-void register_children(parent_widget_t* parent, children_widgets_t&... children);
-
-/// @brief
-/// @tparam widget_t
-/// @param widget
-template <typename widget_t>
-void mark_dirty(const widget_t& widget);
 }
 
 #include <staticgui/utils/app.hpp>
@@ -79,21 +80,36 @@ application<child_widget_t>::application(const child_widget_t& child)
 }
 
 template <typename child_widget_t>
-application<child_widget_t>& application<child_widget_t>::title(const std::string& title)
+application<child_widget_t>& application<child_widget_t>::window_title(const std::string& title)
 {
     return *this;
 }
 
 template <typename child_widget_t>
-application<child_widget_t>& application<child_widget_t>::size(const unsigned int width, const unsigned int height)
+application<child_widget_t>& application<child_widget_t>::window_size(const unsigned int width, const unsigned int height)
 {
     return *this;
 }
 
 template <typename child_widget_t>
-application<child_widget_t>& application<child_widget_t>::on_resized(std::function<void()> callback)
+application<child_widget_t>& application<child_widget_t>::on_window_resized(std::function<void()> callback)
 {
     return *this;
+}
+
+template <typename root_widget_t>
+void launch(const application<root_widget_t>& app)
+{
+}
+
+template <typename root_widget_t>
+void attach(const root_widget_t& root)
+{
+}
+
+template <typename root_widget_t>
+void build(const root_widget_t& root)
+{
 }
 
 }

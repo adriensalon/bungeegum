@@ -12,14 +12,17 @@
 #include <staticgui/staticgui.hpp>
 
 namespace staticgui {
-template <typename item_widget_t>
-struct list_view {
-    list_view(std::initializer_list<item_widget_t> children)
-    {
-        register_children(this, children);
-    }
-    void draw(const context& context)
-    {
-    }
-};
+namespace widgets {
+
+    template <typename item_widget_t>
+    struct list_view {
+        list_view(std::initializer_list<item_widget_t> children)
+        {
+            // build(children);
+        }
+        void draw(const renderer& context)
+        {
+        }
+    };
+}
 }

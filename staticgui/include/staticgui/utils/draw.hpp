@@ -13,6 +13,8 @@ namespace staticgui {
 namespace internal {
     namespace draw {
 
+        void emplace_to_render_tree();
+
     }
 }
 }

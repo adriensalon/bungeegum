@@ -12,14 +12,17 @@
 #include <staticgui/staticgui.hpp>
 
 namespace staticgui {
+namespace widgets {
 
-/// @brief A widget that displays an image.
-struct image {
-    image()
-    {
-    }
-    void draw(const context& context)
-    {
-    }
-};
+    /// @brief A widget that displays an image.
+    struct image {
+        image()
+        {
+        }
+        void draw(const renderer& context)
+        {
+        }
+    };
+
+}
 }
