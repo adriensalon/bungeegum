@@ -152,6 +152,7 @@ namespace internal {
         };
 
         struct runtime_widget {
+            std::string typeid_name;
             bool is_stateless;
             bool is_advanced;
             std::any moved_data;
@@ -168,6 +169,7 @@ template <typename root_widget_t>
 application<root_widget_t>::application(root_widget_t&& child)
 {
     internal::detail::runtime_widget _widget;
+    _widget.typeid_name = typeid(root_widget_t).name();
     _widget.is_stateless = true;
     _widget.is_advanced = false;
     _widget.create_callback = [&](internal::detail::runtime_context& context) {
@@ -210,6 +212,7 @@ template <typename parent_widget_t, typename child_widget_t>
 static void build_stateless(parent_widget_t* parent, child_widget_t&& child)
 {
     internal::detail::runtime_widget _widget;
+    _widget.typeid_name = typeid(parent_widget_t).name();
     _widget.is_stateless = true;
     _widget.is_advanced = false;
     _widget.create_callback = [&](internal::detail::runtime_context& context) {
@@ -236,6 +239,7 @@ static void build_stateful(
 
     return_widget_t _created = create_widget_callback(std::forward<build_context&>(bb));
     internal::detail::runtime_widget _widget;
+    _widget.typeid_name = typeid(parent_widget_t).name();
     _widget.is_stateless = false;
     _widget.is_advanced = false;
     _widget.create_callback = [&](internal::detail::runtime_context& context) {

@@ -34,7 +34,7 @@ namespace widgets {
         future_builder(std::future<value_t>& future, const wait_widget_t& wait, complete_callback_t complete_callback)
         {
             build_stateful(this, [&](build_context& context) { 
-				_future_tracker = std::async([&]() {
+				std::future<void> _future_tracker = std::async([&]() { // out of scope ???
 					future.wait();
 					if constexpr (std::is_void_v<value_t>)
 						context.replace(wait, complete_callback());
@@ -46,7 +46,7 @@ namespace widgets {
         // do something in the desctructor ?
 
     private:
-        std::future<void> _future_tracker;
+        // std::future<void> _future_tracker;
     };
 
 }

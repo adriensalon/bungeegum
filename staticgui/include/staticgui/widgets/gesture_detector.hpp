@@ -19,9 +19,11 @@ namespace widgets {
 
         gesture_detector()
         {
-            build_advanced(this, [this](build_advanced_context& context) {
-                std::cout << "gesture\n";
-            });
+            std::cout << "gesture\n";
+            build_stateless(this, image());
+            // build_advanced(this, [this](build_advanced_context& context) {
+            //     std::cout << "gesture\n";
+            // });
         }
 
         gesture_detector on_tap(std::function<void()> tap_callback)

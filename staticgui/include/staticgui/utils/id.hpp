@@ -48,7 +48,6 @@ namespace internal {
         template <typename value_t>
         typename id_tree<value_t>::iterator prepare_in_tree(const id_int value_id)
         {
-            std::cout << "preparing node " << value_id << std::endl;
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
             return _static_tree.insert(_static_tree.begin(), { value_id, std::nullopt });
         }
@@ -57,6 +56,9 @@ namespace internal {
         typename id_tree<value_t>::iterator find_in_tree(const id_int value_id, const bool prepare_if_needed = false)
         {
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
+            for (auto& _tree_it : _static_tree) {
+                // std::cout << "find = " << _tree_it.first << std::endl;
+            }
             // find starting from head
             // if ==end() et prepare if needed go prepare
 
@@ -66,6 +68,7 @@ namespace internal {
         template <typename value_t>
         void assign_in_tree(const id_int value_id, value_t&& value)
         {
+            std::cout << "assign node " << value_id << " of type " << value.typeid_name << std::endl;
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
             id_tree<value_t>::iterator _value_it = find_in_tree<value_t>(value_id, true);
             _value_it->second = std::move(value);
