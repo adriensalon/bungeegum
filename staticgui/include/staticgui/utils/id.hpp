@@ -46,40 +46,55 @@ namespace internal {
         };
 
         template <typename value_t>
-        typename id_tree<value_t>::iterator prepare_in_tree(const id_int value_id)
+        typename id_tree<value_t>::iterator prepare_in_tree_head(const id_int value_id)
         {
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
             return _static_tree.insert(_static_tree.begin(), { value_id, std::nullopt });
         }
 
         template <typename value_t>
-        typename id_tree<value_t>::iterator find_in_tree(const id_int value_id, const bool prepare_if_needed = false)
+        typename id_tree<value_t>::iterator find_in_tree(const id_int value_id)
         {
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
-            for (auto& _tree_it : _static_tree) {
-                // std::cout << "find = " << _tree_it.first << std::endl;
+            id_tree<value_t>::iterator _it = _static_tree.begin();
+            while (_it != _static_tree.end()) {
+                id_int _id = _pair.first;
+                if (_id == value_id)
+                    return _it;
             }
-            // find starting from head
-            // if ==end() et prepare if needed go prepare
-
-            return _static_tree.begin();
+            return _static_tree.end();
         }
 
         template <typename value_t>
-        void assign_in_tree(const id_int value_id, value_t&& value)
+        typename id_tree<value_t>::iterator find_in_tree_head(const id_int value_id)
+        {
+            id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
+            id_tree<value_t>::sibling_iterator _sibling_it = _static_tree.begin();
+            while (_sibling_it != _static_tree.end()) {
+                id_int _id = _sibling_it->first;
+                if (_id == value_id)
+                    return _sibling_it;
+                _sibling_it++;
+            }
+            return prepare_in_tree_head<value_t>(value_id);
+        }
+
+        template <typename value_t>
+        void assign_in_tree_head(const id_int value_id, value_t&& value)
         {
             std::cout << "assign node " << value_id << " of type " << value.typeid_name << std::endl;
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
-            id_tree<value_t>::iterator _value_it = find_in_tree<value_t>(value_id, true);
+            id_tree<value_t>::iterator _value_it = find_in_tree_head<value_t>(value_id);
             _value_it->second = std::move(value);
         }
 
         template <typename value_t>
-        void reparent_in_tree(const id_int parent_id, const id_int child_id)
+        void reparent_in_tree_head(const id_int parent_id, const id_int child_id)
         {
+            std::cout << "reparent " << child_id << " -> " << parent_id << std::endl;
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
-            id_tree<value_t>::iterator _parent_it = find_in_tree<value_t>(parent_id, true);
-            id_tree<value_t>::iterator _child_it = find_in_tree<value_t>(child_id, true);
+            id_tree<value_t>::iterator _parent_it = find_in_tree_head<value_t>(parent_id);
+            id_tree<value_t>::iterator _child_it = find_in_tree_head<value_t>(child_id);
             _static_tree.reparent(_parent_it, _child_it);
         }
 

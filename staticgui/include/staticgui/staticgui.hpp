@@ -177,7 +177,7 @@ application<root_widget_t>::application(root_widget_t&& child)
     };
     _widget.update_callback = nullptr;
     _widget.moved_data = child;
-    internal::id::assign_in_tree(child.id, std::move(_widget));
+    internal::id::assign_in_tree_head(child.id, std::move(_widget));
 }
 
 template <typename root_widget_t>
@@ -220,9 +220,9 @@ static void build_stateless(parent_widget_t* parent, child_widget_t&& child)
     };
     _widget.update_callback = nullptr;
     _widget.moved_data = child;
-    internal::id::assign_in_tree(child.id, std::move(_widget));
-    internal::id::prepare_in_tree<internal::detail::runtime_widget>(parent->id);
-    internal::id::reparent_in_tree<internal::detail::runtime_widget>(parent->id, child.id);
+    internal::id::assign_in_tree_head(child.id, std::move(_widget));
+    internal::id::prepare_in_tree_head<internal::detail::runtime_widget>(parent->id);
+    internal::id::reparent_in_tree_head<internal::detail::runtime_widget>(parent->id, child.id);
 }
 
 template <typename parent_widget_t, typename create_widget_callback_t>
@@ -249,9 +249,9 @@ static void build_stateful(
     else {
     }
     _widget.moved_data = std::move(_created);
-    internal::id::assign_in_tree(_created.id, std::move(_widget));
-    internal::id::prepare_in_tree<internal::detail::runtime_widget>(parent->id);
-    internal::id::reparent_in_tree<internal::detail::runtime_widget>(parent->id, _created.id);
+    internal::id::assign_in_tree_head(_created.id, std::move(_widget));
+    internal::id::prepare_in_tree_head<internal::detail::runtime_widget>(parent->id);
+    internal::id::reparent_in_tree_head<internal::detail::runtime_widget>(parent->id, _created.id);
 }
 
 template <typename parent_widget_t>
@@ -263,7 +263,7 @@ static void build_advanced(
 {
 
     // internal::id::assign_in_tree(_created.id, std::move(_widget));
-    internal::id::prepare_in_tree<internal::detail::runtime_widget>(parent->id);
+    internal::id::prepare_in_tree_head<internal::detail::runtime_widget>(parent->id);
     // internal::id::reparent_in_tree<internal::detail::runtime_widget>(parent->id, _created.id);
 }
 
