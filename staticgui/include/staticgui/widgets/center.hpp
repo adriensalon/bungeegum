@@ -28,11 +28,23 @@ namespace widgets {
 
         center(child_widget_t&& child)
         {
-            build_stateless(this, child);
+            build_stateful(
+                this, [&](build_context& context) { return child; },
+                [&](build_context& context) { std::cout << "update" << std::endl; });
             // build_advanced(this, [this](build_advanced_context& context) {
             //     std::cout << "center\n";
             // });
         }
+
+        // center(center&& other) noexcept
+        // {
+        //     // return *this;
+        // }
+
+        // center& operator=(center&& other) noexcept
+        // {
+        //     return *this;
+        // }
 
         /// @brief
         /// @param factor
@@ -49,7 +61,7 @@ namespace widgets {
         center height_factor(const float factor)
         {
             _height_factor = factor;
-            return *this;
+            return std::ref(*this);
         }
 
     private:

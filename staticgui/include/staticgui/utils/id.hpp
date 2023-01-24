@@ -9,9 +9,23 @@
 
 #pragma once
 
+#include <any>
 #include <optional>
 
+template <typename value_t>
+std::ostream& operator<<(std::ostream& os, const std::optional<value_t>& o)
+{
+    return os << std::to_string(o.has_value());
+}
+
+template <typename value_left_t, typename value_right>
+std::ostream& operator<<(std::ostream& os, const std::pair<value_left_t, value_right>& o)
+{
+    return os << o.first << " " << o.second << std::endl;
+}
+
 #include <tree.hh>
+#include <tree_util.hh>
 
 namespace staticgui {
 namespace internal {
@@ -46,6 +60,43 @@ namespace internal {
         };
 
         template <typename value_t>
+        void print_tree()
+        {
+            // kptree::print_subtree_bracketed<std::pair<id_int, std::optional<value_t>>>(detail::get_static_id_tree<value_t>(), detail::get_static_id_tree<value_t>().begin());
+            id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
+            id_tree<value_t>::iterator _it = _static_tree.begin();
+            _it++;
+
+            // auto k1 = _static_tree.append_child(_it, { 11, std::nullopt });
+            // auto k2 = _static_tree.append_child(_it, { 22, std::nullopt });
+            // auto k3 = _static_tree.append_child(_it, { 33, std::nullopt });
+            // auto k4 = _static_tree.append_child(k2, { 44, std::nullopt });
+            // _static_tree.move_ontop(k4, k3);
+
+            std::cout << "application" << std::endl;
+            // while (_it != _static_tree.end()) {
+            //     _static_tree.reparent(k1, _it);
+            //     _it++;
+            // }
+
+            while (_it != _static_tree.end()) {
+
+                int _depth = _static_tree.depth(_it);
+                for (int _k = 0; _k < _depth; _k++)
+                    std::cout << "   ";
+                std::cout << "|__ index (" << _it->first << ")";
+
+                if (_it->second.has_value())
+                    std::cout << _it->second.value().typeid_name;
+
+                std::cout << std::endl;
+
+                // id_int _id = _it.first;
+                _it++;
+            }
+        }
+
+        template <typename value_t>
         typename id_tree<value_t>::iterator prepare_in_tree_head(const id_int value_id)
         {
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
@@ -58,9 +109,10 @@ namespace internal {
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
             id_tree<value_t>::iterator _it = _static_tree.begin();
             while (_it != _static_tree.end()) {
-                id_int _id = _pair.first;
+                id_int _id = _it->first;
                 if (_id == value_id)
                     return _it;
+                _it++;
             }
             return _static_tree.end();
         }
@@ -76,12 +128,15 @@ namespace internal {
                     return _sibling_it;
                 _sibling_it++;
             }
+            std::cout << "!!!\n";
             return prepare_in_tree_head<value_t>(value_id);
+            // return _static_tree.begin();
         }
 
         template <typename value_t>
         void assign_in_tree_head(const id_int value_id, value_t&& value)
         {
+            // print_tree<value_t>();
             std::cout << "assign node " << value_id << " of type " << value.typeid_name << std::endl;
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
             id_tree<value_t>::iterator _value_it = find_in_tree_head<value_t>(value_id);
@@ -95,31 +150,45 @@ namespace internal {
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
             id_tree<value_t>::iterator _parent_it = find_in_tree_head<value_t>(parent_id);
             id_tree<value_t>::iterator _child_it = find_in_tree_head<value_t>(child_id);
-            _static_tree.reparent(_parent_it, _child_it);
+            auto k4 = _static_tree.append_child(_parent_it, { 0, std::nullopt });
+            _static_tree.move_ontop(k4, _child_it);
         }
 
+        template <typename value_t>
+        void reparent_at_begin(const id_int child_id)
+        {
+            id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
+            id_tree<value_t>::iterator _child_it = find_in_tree_head<value_t>(child_id);
+            auto k4 = _static_tree.append_child(_static_tree.begin(), { 0, std::nullopt });
+            _static_tree.move_ontop(k4, _child_it);
+        }
         // traverse !!
 
-        // void test()
+        // template <typename value_t>
+        // void traverse_tree(std::function < void(std::optional<value_t> > callback))
         // {
-        //     struct ok {
-        //         int y = 4;
-        //         int z = 4;
-        //     };
-
-        //     ok _ok;
-        //     ok& _okr = _ok;
-        //     tree<ok> _t;
-        //     auto& _tr = _t.insert(_t.begin(), std::move(_ok));
-        //     _okr.y++;
-        //     std::cout << _okr.y << std::endl;
-
-        //     ok&& _ok2 = std::move(*_tr);
-        //     _okr.y++;
-        //     std::cout << _okr.y << std::endl;
-
-        //     _tr = _t.insert(_t.begin(), std::move(_ok));
         // }
+
+        void test()
+        {
+            struct ok {
+                int y = 4;
+                int z = 4;
+            };
+
+            ok _ok;
+            ok& _okr = _ok;
+            std::any _t;
+            _t = std::move(_ok);
+            _okr.y++;
+            std::cout << _okr.y << std::endl;
+
+            // ok&& _ok2 = std::move(*_tr);
+            // _okr.y++;
+            // std::cout << _okr.y << std::endl;
+
+            // _tr = _t.insert(_t.begin(), std::move(_ok));
+        }
 
     }
 }

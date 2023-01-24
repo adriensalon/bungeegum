@@ -31,16 +31,17 @@ namespace widgets {
         /// @param wait
         /// @param complete_callback
         template <typename value_t, typename wait_widget_t, typename complete_callback_t>
-        future_builder(std::future<value_t>& future, const wait_widget_t& wait, complete_callback_t complete_callback)
+        future_builder(std::future<value_t>& future, wait_widget_t&& wait, complete_callback_t complete_callback)
         {
             build_stateful(this, [&](build_context& context) { 
 				std::future<void> _future_tracker = std::async([&]() { // out of scope ???
 					future.wait();
-					if constexpr (std::is_void_v<value_t>)
-						context.replace(wait, complete_callback());
-					else 
-						context.replace(wait, complete_callback(std::forward<value_t>(future.get()))); });
-				return wait; });
+					// if constexpr (std::is_void_v<value_t>)
+					// 	context.replace(wait, complete_callback());
+					// else 
+					// 	context.replace(wait, complete_callback(std::forward<value_t>(future.get()))); 
+						});
+				return std::move(wait); });
         }
 
         // do something in the desctructor ?
