@@ -34,7 +34,7 @@ namespace internal {
         using id_int = unsigned long long;
 
         template <typename value_t>
-        using id_tree = tree<std::pair<id_int, std::optional<value_t>>>;
+        using id_tree = tree<std::pair<id_int, value_t>>;
 
         namespace detail {
             template <typename value_t>
@@ -65,7 +65,7 @@ namespace internal {
             // kptree::print_subtree_bracketed<std::pair<id_int, std::optional<value_t>>>(detail::get_static_id_tree<value_t>(), detail::get_static_id_tree<value_t>().begin());
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
             id_tree<value_t>::iterator _it = _static_tree.begin();
-            _it++;
+            // _it++;
 
             // auto k1 = _static_tree.append_child(_it, { 11, std::nullopt });
             // auto k2 = _static_tree.append_child(_it, { 22, std::nullopt });
@@ -86,8 +86,8 @@ namespace internal {
                     std::cout << "   ";
                 std::cout << "|__ index (" << _it->first << ")";
 
-                if (_it->second.has_value())
-                    std::cout << _it->second.value().typeid_name;
+                // if (_it->second.has_value())
+                std::cout << _it->second.typeid_name;
 
                 std::cout << std::endl;
 
@@ -97,10 +97,26 @@ namespace internal {
         }
 
         template <typename value_t>
+        value_t& emplace_in_tree(const id_int value_id)
+        {
+            id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
+
+            static bool _f = false;
+            if (!_f) {
+                _static_tree.set_head({ 444, {} });
+                _f = true;
+            }
+
+            id_tree<value_t>::iterator _it = _static_tree.append_child(_static_tree.begin());
+            _it->first = value_id;
+            return _it->second;
+        }
+
+        template <typename value_t>
         typename id_tree<value_t>::iterator prepare_in_tree_head(const id_int value_id)
         {
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
-            return _static_tree.insert(_static_tree.begin(), { value_id, std::nullopt });
+            return _static_tree.insert(_static_tree.begin(), { value_id, value_t {} });
         }
 
         template <typename value_t>
@@ -133,15 +149,15 @@ namespace internal {
             // return _static_tree.begin();
         }
 
-        template <typename value_t>
-        void assign_in_tree_head(const id_int value_id, value_t&& value)
-        {
-            // print_tree<value_t>();
-            std::cout << "assign node " << value_id << " of type " << value.typeid_name << std::endl;
-            id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
-            id_tree<value_t>::iterator _value_it = find_in_tree_head<value_t>(value_id);
-            _value_it->second = std::move(value);
-        }
+        // template <typename value_t>
+        // void assign_in_tree_head(const id_int value_id, value_t&& value)
+        // {
+        //     // print_tree<value_t>();
+        //     std::cout << "assign node " << value_id << " of type " << value.typeid_name << std::endl;
+        //     id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
+        //     id_tree<value_t>::iterator _value_it = find_in_tree_head<value_t>(value_id);
+        //     _value_it->second = std::move(value);
+        // }
 
         template <typename value_t>
         void reparent_in_tree_head(const id_int parent_id, const id_int child_id)
@@ -150,18 +166,18 @@ namespace internal {
             id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
             id_tree<value_t>::iterator _parent_it = find_in_tree_head<value_t>(parent_id);
             id_tree<value_t>::iterator _child_it = find_in_tree_head<value_t>(child_id);
-            auto k4 = _static_tree.append_child(_parent_it, { 0, std::nullopt });
+            auto k4 = _static_tree.append_child(_parent_it, { 999, value_t {} });
             _static_tree.move_ontop(k4, _child_it);
         }
 
-        template <typename value_t>
-        void reparent_at_begin(const id_int child_id)
-        {
-            id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
-            id_tree<value_t>::iterator _child_it = find_in_tree_head<value_t>(child_id);
-            auto k4 = _static_tree.append_child(_static_tree.begin(), { 0, std::nullopt });
-            _static_tree.move_ontop(k4, _child_it);
-        }
+        // template <typename value_t>
+        // void reparent_at_begin(const id_int child_id)
+        // {
+        //     id_tree<value_t>& _static_tree = detail::get_static_id_tree<value_t>();
+        //     id_tree<value_t>::iterator _child_it = find_in_tree_head<value_t>(child_id);
+        //     auto k4 = _static_tree.append_child(_static_tree.begin(), { 0, std::nullopt });
+        //     _static_tree.move_ontop(k4, _child_it);
+        // }
         // traverse !!
 
         // template <typename value_t>

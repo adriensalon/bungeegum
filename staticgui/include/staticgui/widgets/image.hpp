@@ -17,11 +17,19 @@ namespace widgets {
     /// @brief A widget that displays an image.
     struct image : base_widget {
 
+        auto create(build_context& context)
+        {
+            return *this;
+        };
+
+        void update(build_context& context)
+        {
+        }
+
+        float _x = 0.f;
         image()
         {
-            build_advanced(this, [this](build_advanced_context& context) {
-                std::cout << "image\n";
-            });
+            build2(this);
         }
     };
 

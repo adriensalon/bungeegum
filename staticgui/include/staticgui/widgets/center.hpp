@@ -26,11 +26,24 @@ namespace widgets {
     template <typename child_widget_t>
     struct center : base_widget {
 
-        center(child_widget_t&& child)
+        auto create(build_context& context)
         {
-            build_stateful(
-                this, [&](build_context& context) { return child; },
-                [&](build_context& context) { std::cout << "update" << std::endl; });
+            return image();
+        }
+
+        void update(build_context& context)
+        {
+            std::cout << "width factor = " << _width_factor << std::endl;
+        }
+
+        float _x;
+        center(child_widget_t&& child)
+            : _cr(build2(this))
+        {
+
+            // build_stateful(
+            //     this, [&](build_context& context) { return child; },
+            //     [&](build_context& context) { std::cout << "update" << std::endl; });
             // build_advanced(this, [this](build_advanced_context& context) {
             //     std::cout << "center\n";
             // });
@@ -51,7 +64,7 @@ namespace widgets {
         /// @return
         center width_factor(const float factor)
         {
-            _width_factor = factor;
+            _cr._width_factor = factor;
             return *this;
         }
 
@@ -60,11 +73,12 @@ namespace widgets {
         /// @return
         center height_factor(const float factor)
         {
-            _height_factor = factor;
+            _cr._height_factor = factor;
             return std::ref(*this);
         }
 
     private:
+        center& _cr;
         float _width_factor = 1.f;
         float _height_factor = 1.f;
     };

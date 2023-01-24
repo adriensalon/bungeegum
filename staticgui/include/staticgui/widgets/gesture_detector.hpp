@@ -20,7 +20,7 @@ namespace widgets {
         gesture_detector()
         {
             std::cout << "gesture\n";
-            build_stateless(this, image());
+            // build_stateless(this, image());
             // build_advanced(this, [this](build_advanced_context& context) {
             //     std::cout << "gesture\n";
             // });

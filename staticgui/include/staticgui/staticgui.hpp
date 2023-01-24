@@ -94,22 +94,22 @@ struct build_context {
     // rebuild
 };
 
-/// @brief
-/// @tparam parent_widget_t
-/// @tparam child_widget_t
-/// @param parent
-/// @param child
-template <typename parent_widget_t, typename child_widget_t>
-void build_stateless(parent_widget_t* parent, child_widget_t&& child);
+// /// @brief
+// /// @tparam parent_widget_t
+// /// @tparam child_widget_t
+// /// @param parent
+// /// @param child
+// template <typename parent_widget_t, typename child_widget_t>
+// void build_stateless(parent_widget_t* parent, child_widget_t&& child);
 
-/// @brief
-/// @tparam parent_widget_t
-/// @tparam create_widget_callback_t
-/// @param parent
-/// @param create_widget_callback
-/// @param update_widgets_callback
-template <typename parent_widget_t, typename create_widget_callback_t>
-void build_stateful(parent_widget_t* parent, create_widget_callback_t create_widget_callback, std::function<void(build_context&)> update_widgets_callback = nullptr);
+// /// @brief
+// /// @tparam parent_widget_t
+// /// @tparam create_widget_callback_t
+// /// @param parent
+// /// @param create_widget_callback
+// /// @param update_widgets_callback
+// template <typename parent_widget_t, typename create_widget_callback_t>
+// void build_stateful(parent_widget_t* parent, create_widget_callback_t create_widget_callback, std::function<void(build_context&)> update_widgets_callback = nullptr);
 
 /// @brief
 struct build_advanced_context : public build_context {
@@ -120,13 +120,13 @@ struct build_advanced_context : public build_context {
     static void append(const root_widget_t& root) { }
 };
 
-/// @brief
-/// @tparam parent_widget_t
-/// @param parent
-/// @param build_callback
-/// @param maintain_callback
-template <typename parent_widget_t>
-static void build_advanced(parent_widget_t* parent, std::function<void(build_advanced_context&)> build_callback, std::function<void(build_advanced_context&)> maintain_callback = nullptr);
+// /// @brief
+// /// @tparam parent_widget_t
+// /// @param parent
+// /// @param build_callback
+// /// @param maintain_callback
+// template <typename parent_widget_t>
+// static void build_advanced(parent_widget_t* parent, std::function<void(build_advanced_context&)> build_callback, std::function<void(build_advanced_context&)> maintain_callback = nullptr);
 
 /// @brief
 struct base_widget : public internal::id::id_interface {
@@ -141,7 +141,7 @@ private:
     friend struct application;
 
     template <typename parent_widget_t>
-    friend void build2(parent_widget_t* parent);
+    friend parent_widget_t& build2(parent_widget_t* parent);
 
     template <typename parent_widget_t, typename child_widget_t>
     friend void build_stateless(parent_widget_t*, child_widget_t&&);
@@ -175,11 +175,11 @@ namespace internal {
 
         struct runtime_widget {
             std::string typeid_name;
-            bool is_stateless;
-            bool is_advanced;
-            std::any moved_data;
-            std::function<void(runtime_context&)> create_callback;
-            std::function<void(runtime_context&)> update_callback;
+            // bool is_stateless;
+            // bool is_advanced;
+            std::any moved_data = nullptr;
+            std::function<void(runtime_context&)> create_callback = nullptr;
+            std::function<void(runtime_context&)> update_callback = nullptr;
         };
 
         std::ostream& operator<<(std::ostream& os, const runtime_widget& o)
@@ -210,11 +210,41 @@ application<root_widget_t>::application(root_widget_t&& child)
 
     print_build_tree();
 
-    auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(3);
-    internal::detail::runtime_context bb;
-    std::cout << it->second.value().typeid_name << std::endl;
-    auto _val = it->second.value();
-    _val.update_callback(bb);
+    auto k = std::async(std::launch::async, [&]() {
+        std::this_thread::sleep_for(std::chrono::seconds { 1 });
+
+        auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
+        // build_context b;
+        internal::detail::runtime_context bb;
+        // child.update(b);
+        std::cout << it->second.typeid_name << std::endl;
+        auto _val = it->second;
+        std::any_cast<mywidget&>(_val.moved_data).set_x(666.f);
+        _val.update_callback(bb);
+    });
+
+    auto k2 = std::async(std::launch::async, [&]() {
+        std::this_thread::sleep_for(std::chrono::seconds { 2 });
+
+        auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
+        // build_context b;
+        internal::detail::runtime_context bb;
+        // child.update(b);
+        std::cout << it->second.typeid_name << std::endl;
+        auto _val = it->second;
+        _val.update_callback(bb);
+    });
+    auto k3 = std::async(std::launch::async, [&]() {
+        std::this_thread::sleep_for(std::chrono::seconds { 3 });
+
+        auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
+        // build_context b;
+        internal::detail::runtime_context bb;
+        // child.update(b);
+        std::cout << it->second.typeid_name << std::endl;
+        auto _val = it->second;
+        _val.update_callback(bb);
+    });
 }
 
 template <typename root_widget_t>
@@ -251,120 +281,33 @@ void attach(root_widget_t&& root)
 {
 }
 
-template <typename parent_widget_t, typename child_widget_t>
-void build_stateless(parent_widget_t* parent, child_widget_t&& child)
-{
-    internal::detail::runtime_widget _widget;
-    _widget.typeid_name = typeid(parent_widget_t).name();
-    _widget.is_stateless = true;
-    _widget.is_advanced = false;
-    _widget.create_callback = [&](internal::detail::runtime_context& context) {
-
-    };
-    _widget.update_callback = _widget.update_callback = [&](internal::detail::runtime_context& context) {
-
-    };
-    _widget.moved_data = child;
-    internal::id::assign_in_tree_head(child.id, std::move(_widget));
-    if constexpr (!std::is_same_v<parent_widget_t, application<child_widget_t>>) {
-        std::cout << "parent = " << typeid(parent_widget_t).name() << ", child = " << typeid(child_widget_t).name() << std::endl;
-        internal::id::prepare_in_tree_head<internal::detail::runtime_widget>(parent->id);
-        internal::id::reparent_in_tree_head<internal::detail::runtime_widget>(parent->id, child.id);
-    } else
-        std::cout << "YES\n";
-}
-
 template <typename parent_widget_t>
-void build2(parent_widget_t* parent)
+parent_widget_t& build2(parent_widget_t* parent)
 {
-    build_context b;
-    build_context& bb(b);
-    using return_widget_t = decltype(parent->create(std::forward<build_context&>(bb)));
+    build_context _context;
+    using child_widget_t = decltype(parent->create(_context));
+    child_widget_t& _child = parent->create(_context); // trigger build on descendants
 
-    parent->on_update(bb);
-    // std::move(_created);
-    internal::detail::runtime_widget _widget;
+    std::cout << "build2 - " << typeid(parent_widget_t).name() << std::endl;
+
+    internal::detail::runtime_widget& _widget = internal::id::emplace_in_tree<internal::detail::runtime_widget>(parent->id);
+
+    // internal::detail::runtime_widget& _widget_ref;
     _widget.typeid_name = typeid(parent_widget_t).name();
-    _widget.is_stateless = false;
-    _widget.is_advanced = false;
-    _widget.moved_data.emplace<return_widget_t>(parent->create((bb)));
-    auto& _child_data = std::any_cast<return_widget_t&>(_widget.moved_data);
-    parent->on_update(bb);
-
+    _widget.moved_data.emplace<parent_widget_t&>(std::ref(*parent));
+    std::cout << (parent)->_x << std::endl;
+    parent = &(std::any_cast<parent_widget_t&>(_widget.moved_data));
     _widget.update_callback = [&](internal::detail::runtime_context& context) {
-        parent->on_update(bb);
-        // _widget.moved_data
-        // build_context b;
+        std::any_cast<parent_widget_t&>(_widget.moved_data).update(_context);
         std::cout << "update stateful\n";
-        // update_widgets_callback(b);
+        std::any_cast<parent_widget_t&>(_widget.moved_data)._x += 5.f;
     };
 
-    internal::id::assign_in_tree_head(_child_data.id, std::move(_widget));
-    internal::id::prepare_in_tree_head<internal::detail::runtime_widget>(parent->id);
-    internal::id::reparent_in_tree_head<internal::detail::runtime_widget>(parent->id, _child_data.id);
-
-    // internal::detail::runtime_context ctx;
-
-    // _widget.create_callback(ctx);
-    // if (!update_widgets_callback)
-    //     _widget.update_callback = nullptr;
-    // else {
-
-    // }
-}
-
-template <typename parent_widget_t, typename create_widget_callback_t>
-void build_stateful(
-    parent_widget_t* parent,
-    create_widget_callback_t create_widget_callback,
-    std::function<void(build_context&)> update_widgets_callback)
-{
-    std::cout << "parent id = " << parent->id << std::endl;
-    build_context b;
-    build_context& bb(b);
-    using return_widget_t = decltype(create_widget_callback(std::forward<build_context&>(bb)));
-    // build_stateless(parent, _created_widget);
-
-    internal::detail::runtime_widget _widget;
-    _widget.moved_data = create_widget_callback(std::forward<build_context&>(bb));
-    return_widget_t& _data = std::any_cast<return_widget_t&>(_widget.moved_data);
-    _widget.typeid_name = typeid(parent_widget_t).name();
-    _widget.is_stateless = false;
-    _widget.is_advanced = false;
-    // std::move(_created);
-    _widget.create_callback = [&](internal::detail::runtime_context& context) {
-    };
-    if (!update_widgets_callback)
-        _widget.update_callback = nullptr;
-    else {
-        _widget.update_callback = [&](internal::detail::runtime_context& context) {
-            // _widget.moved_data
-            // build_context b;
-            std::cout << "update stateful\n";
-            update_widgets_callback(b);
-        };
-    }
-
-    internal::id::assign_in_tree_head(_data.id, std::move(_widget));
-    if constexpr (!std::is_same_v<parent_widget_t, application<return_widget_t>>) {
-        std::cout << "parent = " << typeid(parent_widget_t).name() << ", child = " << typeid(return_widget_t).name() << std::endl;
-        internal::id::prepare_in_tree_head<internal::detail::runtime_widget>(parent->id);
-        internal::id::reparent_in_tree_head<internal::detail::runtime_widget>(parent->id, _data.id);
-    } else
-        std::cout << "YES\n";
-}
-
-template <typename parent_widget_t>
-void build_advanced(
-    parent_widget_t* parent,
-    std::function<void(build_advanced_context&)>
-        build_callback,
-    std::function<void(build_advanced_context&)> maintain_callback)
-{
-
-    // internal::id::assign_in_tree(_created.id, std::move(_widget));
-    // internal::id::prepare_in_tree_head<internal::detail::runtime_widget>(parent->id, child.id);
-    // internal::id::reparent_in_tree<internal::detail::runtime_widget>(parent->id, _created.id);
+    // internal::id::reparent_in_tree_head<internal::detail::runtime_widget>(parent->id, _child.id);
+    parent = &(std::any_cast<parent_widget_t&>(_widget.moved_data));
+    // internal::id::prepare_in_tree_head<internal::detail::runtime_widget>(parent->id);
+    // internal::id::assign_in_tree_head(parent->id, _widget);
+    return (std::any_cast<parent_widget_t&>(_widget.moved_data));
 }
 
 #if defined(STATICGUI_DEBUG)
@@ -372,6 +315,8 @@ void build_advanced(
 void print_build_tree()
 {
     internal::id::print_tree<internal::detail::runtime_widget>();
+    // internal::detail::runtime_context _rc;
+    // _it->second.update_callback(_rc);
 }
 
 #endif
