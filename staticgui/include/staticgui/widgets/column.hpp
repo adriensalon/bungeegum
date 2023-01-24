@@ -23,19 +23,13 @@ namespace widgets {
     /// consider using 'align' or 'center' to position the child.
     /// @tparam ...children_widgets_t
     template <typename... children_widgets_t>
-    struct column {
+    struct column : widget_base {
         column(const children_widgets_t&... children)
-            : _children(children...)
         {
-            // staticgui::register_child(this, staticgui::list_view({ button(button_style()).okok().on_pressed([&]() {}), button(button_style()).okok().on_pressed([&]() {}) }));
+            build_advanced(this, [this](build_advanced_context& context) {
+                std::cout << "column\n";
+            });
         }
-        void lol()
-        {
-            std::cout << "lol\n";
-        }
-
-    private:
-        std::tuple<children_widgets_t...> _children;
     };
 
 }

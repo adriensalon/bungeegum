@@ -23,24 +23,32 @@ namespace widgets {
     /// be the product of the child's dimension and the size factor. For example if 'width_factor' is
     /// 2.0 then the width of this widget will always be twice its child's width.
     /// @tparam child_widget_t
-    template <typename child_widget_t>
-    struct center {
-        center(const child_widget_t& child)
+    struct center : widget_base {
+
+        template <typename child_widget_t>
+        center(child_widget_t&& child)
         {
-            build(image());
+            build_advanced(this, [this](build_advanced_context& context) {
+                std::cout << "center\n";
+            });
         }
-        center& width_factor(const float factor)
+
+        /// @brief
+        /// @param factor
+        /// @return
+        center width_factor(const float factor)
         {
             _width_factor = factor;
             return *this;
         }
-        center& height_factor(const float factor)
+
+        /// @brief
+        /// @param factor
+        /// @return
+        center height_factor(const float factor)
         {
             _height_factor = factor;
             return *this;
-        }
-        void draw(const renderer& context)
-        {
         }
 
     private:

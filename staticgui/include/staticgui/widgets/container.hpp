@@ -23,18 +23,19 @@ namespace widgets {
     /// 2.0 then the width of this widget will always be twice its child's width.
     /// @tparam child_widget_t
     template <typename child_widget_t>
-    struct container {
-        container(const child_widget_t& child)
-        {
-            // build(image());
-        }
+    struct container : widget_base {
 
-        void draw(const renderer& context)
+        container(child_widget_t&& child)
         {
+            build_advanced(this, [this](build_advanced_context& context) {
+                std::cout << "container\n";
+                context.append(child);
+            });
         }
 
     private:
-        float _width_factor = 1.f;
+        float _width_factor
+            = 1.f;
         float _height_factor = 1.f;
     };
 

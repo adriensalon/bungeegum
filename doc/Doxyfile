@@ -11,4 +11,7 @@ EXCLUDE_SYMBOLS 		= internal detail
 USE_MDFILE_AS_MAINPAGE 	= README.md
 GENERATE_TREEVIEW      	= YES
 HTML_EXTRA_STYLESHEET  	= external/doxygen-awesome/doxygen-awesome.css
+DOT_GRAPH_MAX_NODES = 2
+MAX_DOT_GRAPH_DEPTH = 0
+HAVE_DOT 				= NO
 QUIET = YES

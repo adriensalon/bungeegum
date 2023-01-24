@@ -15,13 +15,10 @@ namespace staticgui {
 namespace widgets {
 
     template <typename item_widget_t>
-    struct list_view {
+    struct list_view : widget_base {
         list_view(std::initializer_list<item_widget_t> children)
         {
             // build(children);
-        }
-        void draw(const renderer& context)
-        {
         }
     };
 }
