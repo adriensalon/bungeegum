@@ -15,7 +15,7 @@ namespace staticgui {
 namespace widgets {
 
     template <typename item_widget_t>
-    struct list_view : widget_base {
+    struct list_view : base_widget {
         list_view(std::initializer_list<item_widget_t> children)
         {
             // build(children);

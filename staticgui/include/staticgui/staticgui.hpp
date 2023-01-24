@@ -15,6 +15,11 @@
 #include <string>
 #include <vector>
 
+#include <staticgui/utils/app.hpp>
+#include <staticgui/utils/draw.hpp>
+#include <staticgui/utils/id.hpp>
+#include <staticgui/utils/transform.hpp>
+
 /// @brief
 namespace staticgui {
 
@@ -88,7 +93,7 @@ struct build_context {
 /// @param parent
 /// @param child
 template <typename parent_widget_t, typename child_widget_t>
-static void build_stateless(parent_widget_t* parent, const child_widget_t& child);
+static void build_stateless(parent_widget_t* parent, child_widget_t&& child);
 
 /// @brief
 /// @tparam parent_widget_t
@@ -97,10 +102,7 @@ static void build_stateless(parent_widget_t* parent, const child_widget_t& child
 /// @param create_widget_callback
 /// @param update_widgets_callback
 template <typename parent_widget_t, typename create_widget_callback_t>
-static void build_stateful(
-    parent_widget_t* parent,
-    create_widget_callback_t create_widget_callback,
-    std::function<void(build_context&)> update_widgets_callback = nullptr);
+static void build_stateful(parent_widget_t* parent, create_widget_callback_t create_widget_callback, std::function<void(build_context&)> update_widgets_callback = nullptr);
 
 /// @brief
 struct build_advanced_context : public build_context {
@@ -108,9 +110,7 @@ struct build_advanced_context : public build_context {
     // cursor etc
 
     template <typename root_widget_t>
-    static void append(const root_widget_t& root)
-    {
-    }
+    static void append(const root_widget_t& root) { }
 };
 
 /// @brief
@@ -119,22 +119,17 @@ struct build_advanced_context : public build_context {
 /// @param build_callback
 /// @param maintain_callback
 template <typename parent_widget_t>
-static void build_advanced(
-    parent_widget_t* parent,
-    std::function<void(build_advanced_context&)> build_callback,
-    std::function<void(build_advanced_context&)> maintain_callback = nullptr);
+static void build_advanced(parent_widget_t* parent, std::function<void(build_advanced_context&)> build_callback, std::function<void(build_advanced_context&)> maintain_callback = nullptr);
 
 /// @brief
-struct widget_base {
-
-    widget_base();
+struct base_widget : public internal::id::id_interface {
 
 private:
-    unsigned long long _id;
-    inline static unsigned long long _count = 0;
+    template <typename root_widget_t>
+    friend struct application;
 
     template <typename parent_widget_t, typename child_widget_t>
-    friend static void build_stateless(parent_widget_t*, const child_widget_t&);
+    friend static void build_stateless(parent_widget_t*, child_widget_t&&);
 
     template <typename parent_widget_t, typename create_widget_callback_t>
     friend static void build_stateful(parent_widget_t*, create_widget_callback_t, std::function<void(build_context&)>);
@@ -145,15 +140,42 @@ private:
 
 }
 
-#include <staticgui/utils/app.hpp>
-#include <staticgui/utils/draw.hpp>
-#include <staticgui/utils/transform.hpp>
+#include <any>
 
 namespace staticgui {
+
+namespace internal {
+    namespace detail {
+
+        struct runtime_context {
+            // hidden behind contexts
+        };
+
+        struct runtime_widget {
+            bool is_stateless;
+            bool is_advanced;
+            std::any moved_data;
+            std::function<void(runtime_context&)> create_callback;
+            std::function<void(runtime_context&)> update_callback;
+        };
+
+        // tree functions
+
+    }
+}
 
 template <typename root_widget_t>
 application<root_widget_t>::application(root_widget_t&& child)
 {
+    internal::detail::runtime_widget _widget;
+    _widget.is_stateless = true;
+    _widget.is_advanced = false;
+    _widget.create_callback = [&](internal::detail::runtime_context& context) {
+
+    };
+    _widget.update_callback = nullptr;
+    _widget.moved_data = child;
+    internal::id::assign_in_tree(child.id, std::move(_widget));
 }
 
 template <typename root_widget_t>
@@ -185,8 +207,19 @@ void attach(root_widget_t&& root)
 }
 
 template <typename parent_widget_t, typename child_widget_t>
-static void build_stateless(parent_widget_t* parent, const child_widget_t& child)
+static void build_stateless(parent_widget_t* parent, child_widget_t&& child)
 {
+    internal::detail::runtime_widget _widget;
+    _widget.is_stateless = true;
+    _widget.is_advanced = false;
+    _widget.create_callback = [&](internal::detail::runtime_context& context) {
+
+    };
+    _widget.update_callback = nullptr;
+    _widget.moved_data = child;
+    internal::id::assign_in_tree(child.id, std::move(_widget));
+    internal::id::prepare_in_tree<internal::detail::runtime_widget>(parent->id);
+    internal::id::reparent_in_tree<internal::detail::runtime_widget>(parent->id, child.id);
 }
 
 template <typename parent_widget_t, typename create_widget_callback_t>
@@ -195,16 +228,26 @@ static void build_stateful(
     create_widget_callback_t create_widget_callback,
     std::function<void(build_context&)> update_widgets_callback)
 {
-    std::cout << "parent id = " << parent->_id << std::endl;
+    std::cout << "parent id = " << parent->id << std::endl;
     build_context b;
     build_context& bb(b);
-
     using return_widget_t = decltype(create_widget_callback(std::forward<build_context&>(bb)));
+    // build_stateless(parent, _created_widget);
 
-    const return_widget_t& _r = create_widget_callback(std::forward<build_context&>(bb));
-
-    // au lieu de build stateless mettre fonction internal
-    build_stateless(parent, _r);
+    return_widget_t _created = create_widget_callback(std::forward<build_context&>(bb));
+    internal::detail::runtime_widget _widget;
+    _widget.is_stateless = false;
+    _widget.is_advanced = false;
+    _widget.create_callback = [&](internal::detail::runtime_context& context) {
+    };
+    if (!update_widgets_callback)
+        _widget.update_callback = nullptr;
+    else {
+    }
+    _widget.moved_data = std::move(_created);
+    internal::id::assign_in_tree(_created.id, std::move(_widget));
+    internal::id::prepare_in_tree<internal::detail::runtime_widget>(parent->id);
+    internal::id::reparent_in_tree<internal::detail::runtime_widget>(parent->id, _created.id);
 }
 
 template <typename parent_widget_t>
@@ -214,12 +257,10 @@ static void build_advanced(
         build_callback,
     std::function<void(build_advanced_context&)> maintain_callback)
 {
-}
 
-widget_base::widget_base()
-{
-    _id = _count;
-    _count++;
+    // internal::id::assign_in_tree(_created.id, std::move(_widget));
+    internal::id::prepare_in_tree<internal::detail::runtime_widget>(parent->id);
+    // internal::id::reparent_in_tree<internal::detail::runtime_widget>(parent->id, _created.id);
 }
 
 }

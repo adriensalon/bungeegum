@@ -15,7 +15,7 @@ namespace staticgui {
 namespace widgets {
 
     /// @brief A widget that displays an image.
-    struct gesture_detector : widget_base {
+    struct gesture_detector : base_widget {
 
         gesture_detector()
         {

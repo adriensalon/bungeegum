@@ -15,7 +15,7 @@ namespace staticgui {
 namespace widgets {
 
     /// @brief A widget that displays an image.
-    struct image : widget_base {
+    struct image : base_widget {
 
         image()
         {

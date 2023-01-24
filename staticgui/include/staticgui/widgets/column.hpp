@@ -23,7 +23,7 @@ namespace widgets {
     /// consider using 'align' or 'center' to position the child.
     /// @tparam ...children_widgets_t
     template <typename... children_widgets_t>
-    struct column : widget_base {
+    struct column : base_widget {
         column(const children_widgets_t&... children)
         {
             build_advanced(this, [this](build_advanced_context& context) {

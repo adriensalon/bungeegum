@@ -23,7 +23,7 @@ namespace widgets {
     /// 2.0 then the width of this widget will always be twice its child's width.
     /// @tparam child_widget_t
     template <typename child_widget_t>
-    struct container : widget_base {
+    struct container : base_widget {
 
         container(child_widget_t&& child)
         {

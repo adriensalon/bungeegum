@@ -21,7 +21,7 @@ namespace widgets {
 
     /// @brief A widget that replaces its content by another widget based on the result of a 'std::future'
     /// @details
-    struct future_builder : widget_base {
+    struct future_builder : base_widget {
 
         /// @brief
         /// @tparam wait_widget_t
