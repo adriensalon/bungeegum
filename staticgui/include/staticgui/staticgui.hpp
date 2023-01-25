@@ -26,47 +26,59 @@
 namespace staticgui {
 
 /// @brief
-/// @tparam child_widget_t
-template <typename root_widget_t>
 struct application {
-
-    /// @brief
-    /// @param child
-    application(root_widget_t&& child);
 
     /// @brief
     /// @param title
     /// @return
-    application window_title(const std::string& title);
+    application& window_title(const std::string& title);
 
     /// @brief
     /// @param width
     /// @param height
     /// @return
-    application window_size(const unsigned int width, const unsigned int height);
+    application& window_size(const unsigned int width, const unsigned int height);
 
     /// @brief
     /// @param callback
     /// @return
-    application on_window_resized(std::function<void()> callback);
+    application& on_window_resized(std::function<void()> callback);
 
     /// @brief
     /// @param stream
     /// @return
-    application debug_stream(const std::ostream& stream = std::cerr);
+    application& debug_stream(const std::ostream& stream = std::cerr);
 };
 
 /// @brief
-/// @tparam root_widget_t
-/// @param app
-template <typename root_widget_t>
-void launch(const application<root_widget_t>& app);
+/// @tparam widget_t
+/// @param widget
+/// @return
+template <typename widget_t>
+application& launch(widget_t& widget);
 
 /// @brief
-/// @tparam root_widget_t
-/// @param root
-template <typename root_widget_t>
-void attach(const root_widget_t& root);
+/// @tparam widget_t
+/// @param widget
+/// @return
+template <typename widget_t>
+application& attach(widget_t& widget);
+
+/// @brief
+/// @tparam widget_t
+/// @tparam ...widget_args_t
+/// @param ...widget_args
+/// @return
+template <typename widget_t, typename... widget_args_t>
+widget_t& make(widget_args_t&&... widget_args);
+
+/// @brief
+/// @tparam widget_t
+/// @tparam child_widget_t
+/// @param widget
+/// @param child_widget
+template <typename widget_t, typename child_widget_t>
+void build(widget_t* widget, child_widget_t& child_widget);
 
 /// @brief
 struct build_context {
@@ -94,23 +106,6 @@ struct build_context {
     // rebuild
 };
 
-// /// @brief
-// /// @tparam parent_widget_t
-// /// @tparam child_widget_t
-// /// @param parent
-// /// @param child
-// template <typename parent_widget_t, typename child_widget_t>
-// void build_stateless(parent_widget_t* parent, child_widget_t&& child);
-
-// /// @brief
-// /// @tparam parent_widget_t
-// /// @tparam create_widget_callback_t
-// /// @param parent
-// /// @param create_widget_callback
-// /// @param update_widgets_callback
-// template <typename parent_widget_t, typename create_widget_callback_t>
-// void build_stateful(parent_widget_t* parent, create_widget_callback_t create_widget_callback, std::function<void(build_context&)> update_widgets_callback = nullptr);
-
 /// @brief
 struct build_advanced_context : public build_context {
 
@@ -119,14 +114,6 @@ struct build_advanced_context : public build_context {
     template <typename root_widget_t>
     static void append(const root_widget_t& root) { }
 };
-
-// /// @brief
-// /// @tparam parent_widget_t
-// /// @param parent
-// /// @param build_callback
-// /// @param maintain_callback
-// template <typename parent_widget_t>
-// static void build_advanced(parent_widget_t* parent, std::function<void(build_advanced_context&)> build_callback, std::function<void(build_advanced_context&)> maintain_callback = nullptr);
 
 /// @brief
 struct base_widget : public internal::id::id_interface {
@@ -175,77 +162,68 @@ namespace internal {
 
         struct runtime_widget {
             std::string typeid_name;
-            // bool is_stateless;
-            // bool is_advanced;
-            std::any moved_data = nullptr;
+            std::any moved_data = nullptr; // instance
             std::function<void(runtime_context&)> create_callback = nullptr;
             std::function<void(runtime_context&)> update_callback = nullptr;
         };
 
-        std::ostream& operator<<(std::ostream& os, const runtime_widget& o)
-        {
-            return os << o.typeid_name;
-        }
-
-        // tree functions
-
     }
 }
 
-template <typename root_widget_t>
-application<root_widget_t>::application(root_widget_t&& child)
-{
-    // internal::detail::runtime_widget _widget;
-    // _widget.typeid_name = typeid(root_widget_t).name();
-    // _widget.is_stateless = true;
-    // _widget.is_advanced = false;
-    // _widget.create_callback = [&](internal::detail::runtime_context& context) {
+// template <typename root_widget_t>
+// application<root_widget_t>::application(root_widget_t&& child)
+// {
+//     // internal::detail::runtime_widget _widget;
+//     // _widget.typeid_name = typeid(root_widget_t).name();
+//     // _widget.is_stateless = true;
+//     // _widget.is_advanced = false;
+//     // _widget.create_callback = [&](internal::detail::runtime_context& context) {
 
-    // };
-    // _widget.update_callback = nullptr;
-    // _widget.moved_data = std::move(child);
-    // internal::id::assign_in_tree_head(child.id, std::move(_widget));
+//     // };
+//     // _widget.update_callback = nullptr;
+//     // _widget.moved_data = std::move(child);
+//     // internal::id::assign_in_tree_head(child.id, std::move(_widget));
 
-    // internal::id::reparent_at_begin<internal::detail::runtime_widget>(child.id);
+//     // internal::id::reparent_at_begin<internal::detail::runtime_widget>(child.id);
 
-    print_build_tree();
+//     print_build_tree();
 
-    auto k = std::async(std::launch::async, [&]() {
-        std::this_thread::sleep_for(std::chrono::seconds { 1 });
+//     auto k = std::async(std::launch::async, [&]() {
+//         std::this_thread::sleep_for(std::chrono::seconds { 1 });
 
-        auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
-        // build_context b;
-        internal::detail::runtime_context bb;
-        // child.update(b);
-        std::cout << it->second.typeid_name << std::endl;
-        auto _val = it->second;
-        std::any_cast<mywidget&>(_val.moved_data).set_x(666.f);
-        _val.update_callback(bb);
-    });
+//         auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
+//         // build_context b;
+//         internal::detail::runtime_context bb;
+//         // child.update(b);
+//         std::cout << it->second.typeid_name << std::endl;
+//         auto _val = it->second;
+//         std::any_cast<mywidget&>(_val.moved_data).set_x(666.f);
+//         _val.update_callback(bb);
+//     });
 
-    auto k2 = std::async(std::launch::async, [&]() {
-        std::this_thread::sleep_for(std::chrono::seconds { 2 });
+//     auto k2 = std::async(std::launch::async, [&]() {
+//         std::this_thread::sleep_for(std::chrono::seconds { 2 });
 
-        auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
-        // build_context b;
-        internal::detail::runtime_context bb;
-        // child.update(b);
-        std::cout << it->second.typeid_name << std::endl;
-        auto _val = it->second;
-        _val.update_callback(bb);
-    });
-    auto k3 = std::async(std::launch::async, [&]() {
-        std::this_thread::sleep_for(std::chrono::seconds { 3 });
+//         auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
+//         // build_context b;
+//         internal::detail::runtime_context bb;
+//         // child.update(b);
+//         std::cout << it->second.typeid_name << std::endl;
+//         auto _val = it->second;
+//         _val.update_callback(bb);
+//     });
+//     auto k3 = std::async(std::launch::async, [&]() {
+//         std::this_thread::sleep_for(std::chrono::seconds { 3 });
 
-        auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
-        // build_context b;
-        internal::detail::runtime_context bb;
-        // child.update(b);
-        std::cout << it->second.typeid_name << std::endl;
-        auto _val = it->second;
-        _val.update_callback(bb);
-    });
-}
+//         auto it = internal::id::find_in_tree<internal::detail::runtime_widget>(2);
+//         // build_context b;
+//         internal::detail::runtime_context bb;
+//         // child.update(b);
+//         std::cout << it->second.typeid_name << std::endl;
+//         auto _val = it->second;
+//         _val.update_callback(bb);
+//     });
+// }
 
 template <typename root_widget_t>
 application<root_widget_t> application<root_widget_t>::window_title(const std::string& title)
@@ -271,13 +249,27 @@ application<root_widget_t> application<root_widget_t>::debug_stream(const std::o
     return *this;
 }
 
-template <typename root_widget_t>
-void launch(application<root_widget_t>&& app)
+template <typename widget_t>
+application& launch(widget_t& widget)
 {
 }
 
-template <typename root_widget_t>
-void attach(root_widget_t&& root)
+template <typename widget_t>
+application& attach(widget_t& widget)
+{
+}
+
+template <typename widget_t, typename... widget_args_t>
+widget_t& make(widget_args_t&&... widget_args)
+{
+    // allocates a new widget inside the runtime_widget
+    internal::detail::runtime_widget& _widget = internal::id::emplace_in_tree<internal::detail::runtime_widget>(0);
+
+    return std::any_cast<widget_t&>(_widget.moved_data);
+}
+
+template <typename widget_t, typename child_widget_t>
+void build(widget_t* widget, child_widget_t& child_widget)
 {
 }
 
