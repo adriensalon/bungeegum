@@ -46,6 +46,11 @@ namespace widgets {
         //     *this = std::move(other);
         // }
 
+        float ok()
+        {
+            return _width_factor;
+        }
+
         ~center_widget()
         {
             std::cout << "center out\n";
