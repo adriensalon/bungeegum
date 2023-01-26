@@ -21,19 +21,10 @@ namespace widgets {
 
     /// @brief A widget that replaces its content by another widget based on the result of a 'std::future'
     /// @details
-    template <typename value_t, typename wait_widget_t, typename complete_callback_t>
-    struct future_builder : base_widget {
 
-        auto create(build_context& context)
-        {
-            return _wait_widget;
-        }
+    struct future_builder {
 
-        void update(build_context& context)
-        {
-        }
-        float _x = 0.f;
-
+        template <typename value_t, typename wait_widget_t, typename complete_callback_t>
         future_builder(std::future<value_t>& future, wait_widget_t&& wait, complete_callback_t complete_callback)
             : _wait_widget(wait)
         {
@@ -44,13 +35,13 @@ namespace widgets {
                 // else
                 // 	context.replace(wait, complete_callback(std::forward<value_t>(future.get())));
             });
-            build2(this);
+            build(this, wait);
         }
 
         // do something in the desctructor ?
 
     private:
-        wait_widget_t& _wait_widget;
+        // wait_widget_t& _wait_widget;
         // std::future<void> _future_tracker;
     };
 

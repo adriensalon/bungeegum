@@ -8,3 +8,51 @@
 //                          |___/
 
 #include <staticgui/staticgui.hpp>
+
+namespace staticgui {
+
+namespace internal {
+    namespace detail {
+
+        application& get_application()
+        {
+            // static std::optional<application> _application = std::nullopt;
+            static application _application;
+            return _application;
+        }
+
+    }
+}
+
+application& application::title(const std::string& window_title)
+{
+    return *this;
+}
+
+application& application::size(const unsigned int window_width, const unsigned int window_height)
+{
+    return *this;
+}
+
+application& application::on_resized(std::function<void()> on_window_resized_callback)
+{
+    return *this;
+}
+
+application& application::debug_stream(const std::ostream& stream)
+{
+    return *this;
+}
+
+#if defined(STATICGUI_DEBUG)
+
+void print_build_tree()
+{
+    // internal::id::print_tree<internal::detail::runtime_widget>();
+    // internal::detail::runtime_context _rc;
+    // _it->second.update_callback(_rc);
+}
+
+#endif
+
+}

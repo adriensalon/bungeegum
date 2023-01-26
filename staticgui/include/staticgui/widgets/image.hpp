@@ -15,23 +15,33 @@ namespace staticgui {
 namespace widgets {
 
     /// @brief A widget that displays an image.
-    struct image : base_widget {
+    struct image_widget {
+        constexpr static char* internal_name = "image";
+        STATICGUI_WIDGET(image_widget)
 
-        auto create(build_context& context)
+        image_widget()
         {
-            return *this;
-        };
+            std::cout << "image ctor\n";
+            build(this, [&](context::advanced::painter& p) {
 
-        void update(build_context& context)
-        {
+            });
         }
 
-        float _x = 0.f;
-        image()
+        ~image_widget()
         {
-            build2(this);
+            std::cout << "image dtor\n";
+        }
+
+        float x = 0.f;
+
+        image_widget& set(float xx)
+        {
+            x = xx;
+            return *this;
         }
     };
 
 }
 }
+
+#define image(...) staticgui::make<staticgui::widgets::image_widget>(__VA_ARGS__)

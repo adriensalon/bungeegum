@@ -22,15 +22,18 @@ namespace widgets {
     /// using a 'list_view'. For a horizontal variant see 'row'. If you only have one child, then
     /// consider using 'align' or 'center' to position the child.
     /// @tparam ...children_widgets_t
-    template <typename... children_widgets_t>
-    struct column : base_widget {
-        column(const children_widgets_t&... children)
+    struct column_widget {
+
+        template <typename... children_widgets_t>
+        column_widget(const children_widgets_t&... children)
         {
-            build_advanced(this, [this](build_advanced_context& context) {
-                std::cout << "column\n";
-            });
+            // build_advanced(this, [this](build_advanced_context& context) {
+            //     std::cout << "column\n";
+            // });
         }
     };
 
 }
 }
+
+#define column(...) staticgui::make<staticgui::widgets::column_widget>(__VA_ARGS__)

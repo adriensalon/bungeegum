@@ -23,64 +23,65 @@ namespace widgets {
     /// be the product of the child's dimension and the size factor. For example if 'width_factor' is
     /// 2.0 then the width of this widget will always be twice its child's width.
     /// @tparam child_widget_t
-    struct center : base_widget {
-
-        auto create(build_context& context)
-        {
-            return image();
-            // return child;
-        }
-
-        void update(build_context& context)
-        {
-            std::cout << "width factor = " << _width_factor << std::endl;
-        }
-
-        float _x;
+    struct center_widget {
 
         template <typename child_widget_t>
-        center(child_widget_t&& child)
-            : _cr(build2(this))
+        center_widget(child_widget_t& child)
         {
-
-            // build_stateful(
-            //     this, [&](build_context& context) { return child; },
-            //     [&](build_context& context) { std::cout << "update" << std::endl; });
-            // build_advanced(this, [this](build_advanced_context& context) {
-            //     std::cout << "center\n";
-            // });
+            std::cout << "ctor\n";
+            // child_widget_t& ref;
+            // auto& cc = image().set(88.f);
+            // std::cout << cc.x << std::endl;
+            build(this, child);
+            // std::cout << cc.x << std::endl;
         }
-
-        // center(center&& other) noexcept
+        // center_widget& operator=(center_widget&& other)
         // {
-        //     // return *this;
-        // }
-
-        // center& operator=(center&& other) noexcept
-        // {
+        //     _width_factor = other._width_factor;
         //     return *this;
         // }
 
-        /// @brief
-        /// @param factor
-        /// @return
-        center width_factor(const float factor)
+        // center_widget(center_widget&& other) noexcept
+        // {
+        //     *this = std::move(other);
+        // }
+
+        ~center_widget()
         {
-            _cr._width_factor = factor;
+            std::cout << "center out\n";
+        }
+
+        float x = 0.f;
+
+        center_widget& set(float xx)
+        {
+            x = xx;
             return *this;
         }
 
         /// @brief
         /// @param factor
         /// @return
-        center height_factor(const float factor)
+        center_widget& width_factor(const float factor)
         {
-            _cr._height_factor = factor;
-            return std::ref(*this);
+            _width_factor = factor;
+            return *this;
         }
 
+        /// @brief
+        /// @param factor
+        /// @return
+        center_widget& height_factor(const float factor)
+        {
+            std::cout << "previous = " << _height_factor << std::endl;
+            _height_factor = factor;
+            return *this;
+        }
+
+        STATICGUI_WIDGET(center_widget)
+        constexpr static char* internal_name = "center";
+
     private:
-        center& _cr;
         float _width_factor = 1.f;
         float _height_factor = 1.f;
     };
@@ -88,6 +89,7 @@ namespace widgets {
 }
 }
 
-#define Widget(widget_t, ...) staticgui::make<staticgui::widgets::widget_t>(__VA_ARGS__)
+#define center(child_widget) staticgui::make<staticgui::widgets::center_widget>(child_widget)
 
-#define Center(...) Widget(center, __VA_ARGS__)
+// template <typename child_widget_t>
+// using center = staticgui::make<staticgui::widgets::center_widget, child_widget_t>;

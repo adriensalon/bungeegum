@@ -15,21 +15,21 @@ namespace staticgui {
 namespace widgets {
 
     /// @brief A widget that displays an image.
-    struct gesture_detector : base_widget {
+    struct gesture_detector {
 
         gesture_detector()
         {
-            std::cout << "gesture\n";
-            // build_stateless(this, image());
-            // build_advanced(this, [this](build_advanced_context& context) {
-            //     std::cout << "gesture\n";
-            // });
+            build(this, [&](context::advanced::painter& p) {
+
+            });
         }
 
-        gesture_detector on_tap(std::function<void()> tap_callback)
+        gesture_detector& on_tap(std::function<void()> tap_callback)
         {
             return *this;
         }
+
+        STATICGUI_WIDGET(gesture_detector)
     };
 
 }
