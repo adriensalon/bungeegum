@@ -11,6 +11,7 @@
 
 #include <any>
 #include <optional>
+#include <thread>
 #include <tree.hh>
 #include <unordered_map>
 
@@ -62,7 +63,10 @@ application& launch(widget_t& widget)
         };
     _emplace(all_widgets.begin(), _launcher.internal_data.children_ids[0]);
 
-    internal::id::print_tree<runtime_widget>(all_widgets);
+    while (true) {
+        internal::id::print_tree<runtime_widget>(all_widgets);
+        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    }
     return app;
 }
 
@@ -74,12 +78,13 @@ application& attach(widget_t& widget)
 template <typename widget_t, typename... widget_args_t>
 widget_t& make(widget_args_t&&... widget_args)
 {
+    std::cout << "making " << typeid(widget_t).name() << std::endl;
     using namespace internal::detail;
     std::any _any_widget = std::make_any<widget_t>(std::forward<widget_args_t>(widget_args)...);
     widget_t& _widget = std::any_cast<widget_t&>(_any_widget);
     runtime_widget& _runtime_widget = made_widgets[_widget.internal_data.this_id];
     _runtime_widget.data = std::move(_any_widget);
-    _runtime_widget.display_typename = widget_t::internal_name;
+    _runtime_widget.display_typename = typeid(widget_t).name();
 
     _widget = std::any_cast<widget_t&>(_runtime_widget.data);
     _runtime_widget.widget_data = std::any_cast<widget_t&>(_runtime_widget.data).internal_data;
@@ -88,13 +93,13 @@ widget_t& make(widget_args_t&&... widget_args)
 }
 
 template <typename widget_t, typename child_widget_t>
-void build(widget_t* widget, child_widget_t& child_widget)
+void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_root_widgets)
 {
     widget->internal_data.children_ids.emplace_back(child_widget.internal_data.this_id);
 }
 
 template <typename widget_t, typename... children_widgets_t>
-void build(widget_t* widget, children_widgets_t&... children, std::function<void(context::advanced::painter&)> paint_callback)
+void build(widget_t* widget, children_widgets_t&... children, std::function<void(context::advanced::painter&)> paint_callback, const bool is_above_root_widgets)
 {
     widget->internal_data.paint_callback = paint_callback;
 }

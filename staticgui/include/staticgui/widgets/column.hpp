@@ -12,6 +12,7 @@
 #include <variant>
 
 #include <staticgui/staticgui.hpp>
+#include <staticgui/widgets/center.hpp>
 
 template <size_t start_t, size_t end_t, size_t increment_t, typename function_t>
 inline constexpr void static_for(function_t&& f)
@@ -45,7 +46,7 @@ namespace widgets {
             static_for<0, children_count, 1>([&](auto index) {
                 using child_type_t = std::variant_alternative_t<index, std::variant<children_widgets_t...>>;
                 auto& _child = *std::get<index>(_tuple_children);
-                build(this, _child);
+                build(this, center(_child));
             });
             // build_advanced(this, [this](build_advanced_context& context) {
             //     std::cout << "column\n";
@@ -56,4 +57,4 @@ namespace widgets {
 }
 }
 
-#define column(...) staticgui::make<staticgui::widgets::column_widget>(__VA_ARGS__)
+#define column staticgui::make<staticgui::widgets::column_widget>

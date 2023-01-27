@@ -28,40 +28,7 @@ namespace widgets {
         template <typename child_widget_t>
         center_widget(child_widget_t& child)
         {
-            std::cout << "ctor\n";
-            // child_widget_t& ref;
-            // auto& cc = image().set(88.f);
-            // std::cout << cc.x << std::endl;
             build(this, child);
-            // std::cout << cc.x << std::endl;
-        }
-        // center_widget& operator=(center_widget&& other)
-        // {
-        //     _width_factor = other._width_factor;
-        //     return *this;
-        // }
-
-        // center_widget(center_widget&& other) noexcept
-        // {
-        //     *this = std::move(other);
-        // }
-
-        float ok()
-        {
-            return _width_factor;
-        }
-
-        ~center_widget()
-        {
-            std::cout << "center out\n";
-        }
-
-        float x = 0.f;
-
-        center_widget& set(float xx)
-        {
-            x = xx;
-            return *this;
         }
 
         /// @brief
@@ -83,8 +50,6 @@ namespace widgets {
             return *this;
         }
 
-        constexpr static char* internal_name = "center";
-
     private:
         float _width_factor = 1.f;
         float _height_factor = 1.f;
@@ -95,7 +60,4 @@ namespace widgets {
 }
 }
 
-#define center(child_widget) staticgui::make<staticgui::widgets::center_widget>(child_widget)
-
-// template <typename child_widget_t>
-// using center = staticgui::make<staticgui::widgets::center_widget, child_widget_t>;
+#define center staticgui::make<staticgui::widgets::center_widget>
