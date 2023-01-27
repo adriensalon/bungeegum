@@ -83,12 +83,13 @@ namespace widgets {
             return *this;
         }
 
-        STATICGUI_WIDGET(center_widget)
         constexpr static char* internal_name = "center";
 
     private:
         float _width_factor = 1.f;
         float _height_factor = 1.f;
+
+        STATICGUI_WIDGET(center_widget)
     };
 
 }

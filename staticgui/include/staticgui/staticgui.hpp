@@ -18,12 +18,6 @@
 #include <vector>
 
 /// @brief
-/// @details
-#define STATICGUI_WIDGET(widget_t)                                                                 \
-    staticgui::internal::id::id_int internal_id = staticgui::internal::id::id_generator::create(); \
-    std::vector<staticgui::internal::id::id_int> internal_children_ids;
-
-/// @brief
 namespace staticgui {
 
 /// @brief
@@ -114,8 +108,8 @@ void build(widget_t* widget, child_widget_t& child_widget);
 /// @tparam parent_widget_t
 /// @param  widget
 /// @param  paint_callback
-template <typename widget_t>
-void build(widget_t* widget, std::function<void(context::advanced::painter&)> paint_callback);
+template <typename widget_t, typename... children_widgets_t>
+void build(widget_t* widget, children_widgets_t&... children, std::function<void(context::advanced::painter&)> paint_callback);
 
 #if defined(STATICGUI_DEBUG)
 
@@ -125,5 +119,23 @@ void print_build_tree();
 #endif
 
 }
+
+/// @brief
+/// @details
+#define STATICGUI_WIDGET(widget_t)                                  \
+    staticgui::internal::detail::runtime_widget_data internal_data; \
+                                                                    \
+    template <typename widget_t>                                    \
+    friend staticgui::application& staticgui::launch(widget_t&);    \
+                                                                    \
+    template <typename widget_t, typename... widget_args_t>         \
+    friend widget_t& staticgui::make(widget_args_t&&...);           \
+                                                                    \
+    template <typename widget_t, typename child_widget_t>           \
+    friend void staticgui::build(widget_t*, child_widget_t&);       \
+                                                                    \
+    template <typename widget_t, typename... children_widgets_t>    \
+    friend void staticgui::build(widget_t*, children_widgets_t&..., \
+        std::function<void(staticgui::context::advanced::painter&)>);
 
 #include "staticgui.inl"

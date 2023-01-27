@@ -119,7 +119,9 @@ namespace internal {
                 std::cout << "|__ ";
 
                 // if (_it->second.has_value())
-                std::cout << _it->display;
+                std::cout << _it->display_typename;
+                if (_it->widget_data.paint_callback)
+                    std::cout << " [painter]";
 
                 std::cout << std::endl;
 
