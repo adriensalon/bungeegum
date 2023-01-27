@@ -14,8 +14,11 @@ set(staticgui_source
 	"source/utils/app.cpp"
 	"source/utils/draw.cpp"
 )
+
 add_library(staticgui "${staticgui_source}")
+
 target_include_directories(staticgui PUBLIC "include")
+
 target_link_libraries(staticgui Diligent-GraphicsEngine)
 target_link_libraries(staticgui Diligent-GraphicsTools)
 target_link_libraries(staticgui Diligent-ShaderTools)
@@ -23,5 +26,6 @@ target_link_libraries(staticgui Diligent-Imgui)
 target_link_libraries(staticgui imgui)
 target_link_libraries(staticgui SDL2-static)
 target_link_libraries(staticgui tree)
+target_link_libraries(staticgui EnTT)
 
 set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)

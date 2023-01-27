@@ -9,43 +9,52 @@
 
 #pragma once
 
-// 										1. application
-// 										2. context
-// 										3. value
-// 										4. debug
-// 										5. internal
-
 #define STATICGUI_DEBUG
+#include <iostream>
 
 #include <array>
 #include <functional>
 #include <future>
-#include <iostream>
 #include <string>
 #include <variant>
 #include <vector>
 
-// hide !!!!!!!
-
-template <typename first_value_t, typename... other_values_t>
-struct event_args {
-    using type = first_value_t;
-};
+/// @brief
+/// @details
+#define STATICGUI_WIDGET(widget_t)
 
 /// @brief
 namespace staticgui {
+
+struct color {
+};
 
 /// @brief
 /// @tparam ...values_t
 template <typename... values_t>
 struct event {
 
+    event() = delete;
+
+    event(const event& other) = delete;
+
+    event& operator=(const event& other) = delete;
+
+    event(event&& other);
+
+    event& operator=(event&& other);
+
+    template <typename first_value_t = typename std::enable_if_t<sizeof...(values_t) == 1>, typename... other_values_t>
+    struct unique_value {
+        using type = first_value_t;
+    };
+
     /// @brief
     /// @param trigger_callback
     /// @return
     event& on_trigger(std::function<void(const values_t&...)> trigger_callback);
 
-    event& clear_callbacks();
+    event& clear();
 
     /// @brief
     /// @param ...values
@@ -59,7 +68,7 @@ struct event {
     /// @brief
     /// @param future_value
     template <typename = typename std::enable_if_t<sizeof...(values_t) == 1>>
-    void trigger(const std::future<typename event_args<values_t...>::type>& future_value);
+    void trigger(const std::future<typename unique_value<values_t...>::type>& future_value);
 
     /// @brief
     /// @param future_value
@@ -68,22 +77,43 @@ struct event {
 };
 
 /// @brief
+/// @details
+/// @tparam value_t
+template <typename value_t>
+value_t lerp(const value_t& min, const value_t& max, const float t);
+
+template <typename value_t>
 struct curve {
+
+    curve(const value_t& min, const value_t& max);
+
+    std::vector<std::pair<float, value_t>>& get_points();
+
+    const std::vector<std::pair<float, value_t>>& get_points() const;
+
+    value_t get_value(const float t);
+
+private:
+    // curve_impl _impl;
 };
 
 template <typename... values_t>
 struct animation {
 
-    animation(const curve& all_curves);
+    animation(const curve<values_t>&... curves);
 
-    template <unsigned int count_t, typename = typename std::enable_if_t<sizeof...(values_t) >= 2 && sizeof...(values_t) == count_t>>
-    animation(const std::array<curve, count_t>& curves) { }
+    animation(const animation& other) = delete;
 
-    animation& value_curve(const unsigned int index, const curve& replacing_curve);
+    animation& operator=(const animation& other) = delete;
+
+    animation(animation&& other);
+
+    animation& operator=(animation&& other);
 
     animation& on_value_changed(std::function<void(const values_t&...)> value_changed_callback);
 
-    animation& start_after(const animation& previous);
+    template <typename... other_values_t>
+    animation& start_after(const animation<other_values_t...>& previous);
 
     void start();
 
@@ -94,6 +124,7 @@ private:
 
 template <typename value_t>
 struct value {
+
     value(const animation<value_t>& animated_value);
 
     value(const value_t& static_value);
@@ -138,7 +169,7 @@ struct application {
 
     application& on_navigate_from(const std::string& root_widget_name, std::function<void(const float)> navigate_callback);
 
-    application& navigate(const std::string& root_widget_name, const curve& transition_curve, const float duration);
+    application& navigate(const std::string& root_widget_name, const curve<float>& transition_curve, const float duration);
 
     // input avec callbacks pareil
 
@@ -231,22 +262,13 @@ void print_build_tree();
 #endif
 }
 
-/// @brief
-/// @details
-#define STATICGUI_WIDGET(widget_t)                                        \
-    staticgui::internal::detail::runtime_widget_data internal_data;       \
-                                                                          \
-    template <typename widget_t>                                          \
-    friend staticgui::application& staticgui::launch(widget_t&);          \
-                                                                          \
-    template <typename widget_t, typename... widget_args_t>               \
-    friend widget_t& staticgui::make(widget_args_t&&...);                 \
-                                                                          \
-    template <typename widget_t, typename child_widget_t>                 \
-    friend void staticgui::build(widget_t*, child_widget_t&, const bool); \
-                                                                          \
-    template <typename widget_t, typename... children_widgets_t>          \
-    friend void staticgui::build(widget_t*, children_widgets_t&...,       \
-        std::function<void(staticgui::context::advanced::painter&)>, const bool);
-
 #include "staticgui.inl"
+
+#include <staticgui/impl/animation.inl>
+#include <staticgui/impl/build.inl>
+#include <staticgui/impl/curve.inl>
+#include <staticgui/impl/event.inl>
+#include <staticgui/impl/lerp.inl>
+#include <staticgui/impl/make.inl>
+#include <staticgui/impl/value.inl>
+#include <staticgui/impl/widgets.inl>

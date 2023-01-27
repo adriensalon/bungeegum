@@ -105,11 +105,3 @@ void build(widget_t* widget, children_widgets_t&... children, std::function<void
 }
 
 }
-
-#include "widgets/center.hpp"
-#include "widgets/column.hpp"
-#include "widgets/container.hpp"
-#include "widgets/future_builder.hpp"
-#include "widgets/gesture_detector.hpp"
-#include "widgets/image.hpp"
-#include "widgets/list_view.hpp"
