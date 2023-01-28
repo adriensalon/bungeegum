@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <memory>
 #include <optional>
 
 #include <entt/entt.hpp>
@@ -23,9 +24,9 @@ namespace internal {
 
             registry();
 
-            registry(const registry& other) = delete;
+            registry(const registry& other);
 
-            registry& operator=(const registry& other) = delete;
+            registry& operator=(const registry& other);
 
             registry(registry&& other);
 
@@ -40,7 +41,7 @@ namespace internal {
             void iterate_entities_components(function_t&& iterate_function);
 
         private:
-            entt::registry _registry; // shared ptr
+            std::shared_ptr<entt::registry> _registry;
             friend struct entity;
         };
 
@@ -54,9 +55,9 @@ namespace internal {
 
             entity& operator=(const entity& other);
 
-            entity(entity&& other) = delete;
+            entity(entity&& other);
 
-            entity& operator=(entity&& other) = delete;
+            entity& operator=(entity&& other);
 
             template <typename component_t>
             [[nodiscard]] bool has_component() const;
@@ -78,7 +79,7 @@ namespace internal {
 
             // private:
             entt::entity _entity;
-            entt::registry* _registry_ptr; // shared ptr
+            std::shared_ptr<entt::registry> _registry;
         };
 
     }

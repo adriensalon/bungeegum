@@ -21,16 +21,16 @@ namespace internal {
 
 context::context() { }
 
-template <typename widget_t>
-context::destroy(widget_t& widget, const bool destroy_children)
-{
-    using namespace internal::impl;
-    // destroy component
-    // widgets_container.destroy()
+// template <typename widget_t>
+// context::destroy(widget_t& widget, const bool destroy_children)
+// {
+//     using namespace internal::impl;
+//     // destroy component
+//     // widgets_container.destroy()
 
-    // destroy in tree
-    // widgets_ptrs_container.
-}
+//     // destroy in tree
+//     // widgets_ptrs_container.
+// }
 
 context& get_context()
 {
