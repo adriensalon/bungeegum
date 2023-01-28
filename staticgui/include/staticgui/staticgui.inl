@@ -27,8 +27,8 @@ namespace internal {
     namespace impl {
 
         struct runtime_widget_data {
-            id::id_int this_id = id::id_generator::create();
-            std::vector<id::id_int> children_ids;
+            id::integer this_id = id::id_generator::create();
+            std::vector<id::integer> children_ids;
             std::function<void(layout&)> paint_callback = nullptr;
         };
 
@@ -39,7 +39,7 @@ namespace internal {
         };
 
         // inline static application app;
-        inline static std::unordered_map<id::id_int, runtime_widget> made_widgets;
+        inline static std::unordered_map<id::integer, runtime_widget> made_widgets;
         inline static std::tree<runtime_widget> all_widgets;
     }
 }
@@ -54,8 +54,8 @@ void launch(widget_t& widget)
     application_launcher _launcher;
     build(&_launcher, widget); // besoin de la struct degueu pour ca ?
     all_widgets.insert(all_widgets.begin(), {});
-    std::function<void(std::tree<runtime_widget>::iterator, const internal::id::id_int)> _emplace =
-        [&](std::tree<runtime_widget>::iterator parent_it, const internal::id::id_int parent_id) {
+    std::function<void(std::tree<runtime_widget>::iterator, const internal::id::integer)> _emplace =
+        [&](std::tree<runtime_widget>::iterator parent_it, const internal::id::integer parent_id) {
             runtime_widget& _runtime_parent_widget = made_widgets[parent_id];
             parent_it = all_widgets.append_child(parent_it, std::move(_runtime_parent_widget));
             for (auto& _child_id : parent_it->widget_data.children_ids)
