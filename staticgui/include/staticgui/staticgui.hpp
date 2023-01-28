@@ -17,7 +17,7 @@
 #include <variant>
 #include <vector>
 
-#include <staticgui/utils/traits.hpp>
+// #include <staticgui/utils/traits.hpp>
 
 /// @brief
 /// @details
@@ -36,6 +36,7 @@ namespace internal {
     }
 }
 
+/// @brief
 namespace tools {
 
     /// @brief
@@ -65,11 +66,59 @@ namespace tools {
 }
 
 /// @brief
+namespace traits {
+
+    template <typename... values_t>
+    struct first_value;
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    constexpr bool has_add();
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    constexpr bool has_float_multiply();
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    constexpr bool is_lerpable = (has_float_multiply<value_t>() && has_add<value_t>());
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    using lerpable_value_t = typename std::enable_if_t<traits::is_lerpable<value_t>, value_t>;
+}
+
+/// @brief
+/// @details
+/// @tparam value_t
+template <typename value_t>
+traits::lerpable_value_t<value_t> lerp(const value_t& min, const value_t& max, const float t) { return value_t {}; }
+
+/// @brief
 struct color {
 
     color operator+(const color& other);
 
     color operator*(const float multiplier);
+};
+
+template <typename value_t>
+struct curve {
+
+    curve(const traits::lerpable_value_t<value_t>& min, const value_t& max);
+
+    std::vector<std::pair<float, value_t>>& get_points();
+
+    const std::vector<std::pair<float, value_t>>& get_points() const;
+
+    value_t get_value(const float t);
+
+private:
+    internal::impl::curve_impl _impl;
 };
 
 /// @brief
@@ -106,7 +155,7 @@ struct event {
     /// @brief
     /// @param future_value
     template <typename = typename std::enable_if_t<sizeof...(values_t) == 1>>
-    void trigger(const std::future<typename traits::unique_value<values_t...>::type>& future_value);
+    void trigger(const std::future<typename traits::first_value<values_t...>::type>& future_value);
 
     /// @brief
     /// @param future_value
@@ -115,41 +164,6 @@ struct event {
 
 private:
     internal::impl::event_impl _impl;
-};
-
-/// @brief
-namespace traits {
-
-    /// @brief
-    /// @tparam value_t
-    template <typename value_t>
-    inline constexpr bool is_lerpable = (has_float_multiply<value_t> && has_add<value_t>);
-
-    /// @brief
-    /// @tparam value_t
-    template <typename value_t>
-    using lerpable_value_t = typename std::enable_if_t<traits::is_lerpable<value_t>, value_t>;
-}
-
-/// @brief
-/// @details
-/// @tparam value_t
-template <typename value_t>
-traits::lerpable_value_t<value_t> lerp(const value_t& min, const value_t& max, const float t) { return value_t {}; }
-
-template <typename value_t>
-struct curve {
-
-    curve(const traits::lerpable_value_t<value_t>& min, const value_t& max);
-
-    std::vector<std::pair<float, value_t>>& get_points();
-
-    const std::vector<std::pair<float, value_t>>& get_points() const;
-
-    value_t get_value(const float t);
-
-private:
-    internal::impl::curve_impl _impl;
 };
 
 /// @brief
@@ -343,5 +357,6 @@ void print_build_tree();
 #include <staticgui/impl/lerp.inl>
 #include <staticgui/impl/make.inl>
 #include <staticgui/impl/tools.inl>
+#include <staticgui/impl/traits.inl>
 #include <staticgui/impl/value.inl>
 #include <staticgui/impl/widgets.inl>
