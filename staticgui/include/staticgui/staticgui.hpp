@@ -9,15 +9,16 @@
 
 #pragma once
 
-#define STATICGUI_DEBUG
-#include <iostream>
-
 #include <array>
 #include <functional>
 #include <future>
+#include <iostream>
 #include <string>
 #include <variant>
 #include <vector>
+
+#include <staticgui/detail/forward.hpp>
+#include <staticgui/detail/traits.hpp>
 
 /// @brief
 /// @details
@@ -74,7 +75,19 @@ struct event {
     /// @param future_value
     template <typename = typename std::enable_if_t<sizeof...(values_t) >= 2>>
     void trigger(const std::future<std::tuple<values_t...>>& future_value);
+
+private:
+    internal::detail::event_impl _impl;
 };
+
+/// @brief
+namespace traits {
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    inline constexpr bool is_lerpable = has_add<value_t> && (has_float_left_multiply<value_t> || has_float_right_multiply<value_t>);
+}
 
 /// @brief
 /// @details
@@ -94,7 +107,7 @@ struct curve {
     value_t get_value(const float t);
 
 private:
-    // curve_impl _impl;
+    internal::detail::curve_impl _impl;
 };
 
 template <typename... values_t>
@@ -120,6 +133,7 @@ struct animation {
     void stop();
 
 private:
+    internal::detail::animation_impl _impl;
 };
 
 template <typename value_t>
@@ -132,8 +146,7 @@ struct value {
     void assign(value_t& target_value); // sets or registers animation callback ^^
 
 private:
-    bool _is_animated;
-    std::variant<value_t, animation<value_t>> _value;
+    internal::detail::value_impl _impl;
 };
 
 /// @brief
@@ -254,21 +267,20 @@ void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_r
 template <typename widget_t, typename... children_widgets_t>
 void build(widget_t* widget, children_widgets_t&... children, std::function<void(context::advanced::painter&)> paint_callback, const bool is_above_root_widgets = false);
 
-#if defined(STATICGUI_DEBUG)
+// #if defined(STATICGUI_DEBUG)
 
 /// @brief
 void print_build_tree();
 
-#endif
+// #endif
 }
-
 #include "staticgui.inl"
 
-#include <staticgui/impl/animation.inl>
-#include <staticgui/impl/build.inl>
-#include <staticgui/impl/curve.inl>
-#include <staticgui/impl/event.inl>
-#include <staticgui/impl/lerp.inl>
-#include <staticgui/impl/make.inl>
-#include <staticgui/impl/value.inl>
-#include <staticgui/impl/widgets.inl>
+#include <staticgui/detail/animation.inl>
+#include <staticgui/detail/build.inl>
+#include <staticgui/detail/curve.inl>
+#include <staticgui/detail/event.inl>
+#include <staticgui/detail/lerp.inl>
+#include <staticgui/detail/make.inl>
+#include <staticgui/detail/value.inl>
+#include <staticgui/detail/widgets.inl>

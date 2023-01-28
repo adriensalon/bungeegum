@@ -12,6 +12,13 @@
 #include <staticgui/staticgui.hpp>
 
 namespace staticgui {
+namespace internal {
+    namespace detail {
+
+        struct animation_impl {
+        };
+    }
+}
 
 template <typename... values_t>
 animation<values_t...>::animation(const curve<values_t>&... curves)
