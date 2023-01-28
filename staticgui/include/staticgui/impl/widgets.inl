@@ -8,16 +8,6 @@
 //                          |___/     v0.0
 
 #pragma once
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
-#pragma once
 
 #include <any>
 #include <memory>
@@ -33,7 +23,7 @@ namespace internal {
     namespace impl {
 
         struct runtime_widget_data {
-            id::integer this_id = id::id_generator::create();
+            id::integer this_id = id::generator::create();
             std::vector<id::integer> children_ids;
             std::function<void(layout&)> paint_callback = nullptr;
         };

@@ -9,23 +9,7 @@
 
 #pragma once
 
-#include <any>
-#include <optional>
-
-template <typename value_t>
-std::ostream& operator<<(std::ostream& os, const std::optional<value_t>& o)
-{
-    return os << std::to_string(o.has_value());
-}
-
-template <typename value_left_t, typename value_right>
-std::ostream& operator<<(std::ostream& os, const std::pair<value_left_t, value_right>& o)
-{
-    return os << o.first << " " << o.second << std::endl;
-}
-
-// #include <tree.hh>
-// #include <tree_util.hh>
+#include <vector>
 
 namespace staticgui {
 namespace internal {
@@ -33,57 +17,18 @@ namespace internal {
 
         using integer = unsigned long long;
 
-        struct id_generator {
-            static integer create()
-            {
-                integer _retval;
-                if (!_deleted.empty()) {
-                    _retval = _deleted.back();
-                    _deleted.pop_back();
-                } else
-                    _retval = _count++;
-                return _retval;
-            }
+        struct generator {
+            static integer create();
 
-            static integer next()
-            {
-                integer _retval;
-                if (!_deleted.empty()) {
-                    _retval = _deleted.back();
-                } else
-                    _retval = _count + 1;
-                return _retval;
-            }
+            static integer next();
 
-            static void destroy(const integer id)
-            {
-                _deleted.emplace_back(id);
-            }
+            static void destroy(const integer id);
 
         private:
             inline static integer _count = 0;
             inline static std::vector<integer> _deleted;
         };
 
-        template <typename value_t>
-        void print_tree(const std::tree<value_t>& tree)
-        {
-            std::tree<value_t>::iterator _it = tree.begin();
-            _it++;
-            std::cout << "application" << std::endl;
-            while (_it != tree.end()) {
-
-                int _depth = tree.depth(_it);
-                for (int _k = 0; _k < _depth; _k++)
-                    std::cout << "   ";
-                std::cout << "|__ ";
-                std::cout << (*_it)->typeindex->name();
-                if ((*_it)->data.paint_callback)
-                    std::cout << " [painter]";
-                std::cout << std::endl;
-                _it++;
-            }
-        }
     }
 }
 }

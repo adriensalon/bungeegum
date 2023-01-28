@@ -14,6 +14,7 @@ set(staticgui_source
 	"source/utils/app.cpp"
 	"source/utils/draw.cpp"
 	"source/utils/ecs.cpp"
+	"source/utils/id.cpp"
 )
 
 add_library(staticgui "${staticgui_source}")

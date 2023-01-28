@@ -19,17 +19,6 @@ namespace staticgui {
 namespace internal {
     namespace ecs {
 
-        struct registry;
-        struct entity;
-
-        // template <typename... tags_t>
-        // struct tags_filter : public typelist::strong_typelist<tags_filter, tags_t...> {
-        // };
-
-        // template <typename... tags_ts>
-        // struct tags_exclude_filter : public typelist::strong_typelist<tags_filter, tags_ts...> {
-        // };
-
         struct registry {
 
             registry();
@@ -52,7 +41,7 @@ namespace internal {
             void iterate_entities_components(function_t&& iterate_function);
 
         private:
-            entt::registry _registry;
+            entt::registry _registry; // shared ptr
             friend struct entity;
         };
 
@@ -90,7 +79,7 @@ namespace internal {
 
             // private:
             entt::entity _entity;
-            entt::registry* _registry_ptr;
+            entt::registry* _registry_ptr; // shared ptr
         };
 
     }

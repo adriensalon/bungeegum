@@ -43,10 +43,9 @@ namespace widgets {
         /// @brief
         /// @param factor
         /// @return
-        center_widget& height_factor(const float factor)
+        center_widget& height_factor(const value<float>& factor)
         {
-            std::cout << "previous = " << _height_factor << std::endl;
-            _height_factor = factor;
+            factor.assign(_height_factor);
             return *this;
         }
 

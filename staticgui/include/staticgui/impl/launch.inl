@@ -9,6 +9,27 @@
 
 #pragma once
 
+#include <tree.hh>
+template <typename value_t>
+void print_tree(const std::tree<value_t>& tree)
+{
+    std::tree<value_t>::iterator _it = tree.begin();
+    _it++;
+    std::cout << "application" << std::endl;
+    while (_it != tree.end()) {
+
+        int _depth = tree.depth(_it);
+        for (int _k = 0; _k < _depth; _k++)
+            std::cout << "   ";
+        std::cout << "|__ ";
+        std::cout << (*_it)->typeindex->name();
+        if ((*_it)->data.paint_callback)
+            std::cout << " [painter]";
+        std::cout << std::endl;
+        _it++;
+    }
+}
+
 namespace staticgui {
 
 template <typename widget_t>
@@ -32,7 +53,7 @@ void launch(widget_t& widget)
     _emplace(widgets_ptrs_container.begin(), _launcher.internal_data.children_ids[0]);
 
     while (true) {
-        internal::id::print_tree<runtime_widget_component*>(widgets_ptrs_container);
+        print_tree<runtime_widget_component*>(widgets_ptrs_container);
         std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     }
 }
