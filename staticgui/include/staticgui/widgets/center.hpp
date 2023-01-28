@@ -34,9 +34,9 @@ namespace widgets {
         /// @brief
         /// @param factor
         /// @return
-        center_widget& width_factor(const float factor)
+        center_widget& width_factor(const value<float>& factor)
         {
-            _width_factor = factor;
+            factor.assign(_width_factor);
             return *this;
         }
 

@@ -20,21 +20,25 @@ namespace internal {
             bool _is_animated;
             // std::variant<value_t, animation<value_t>> _value;
         };
+
+        static value_impl _NO3;
     }
 }
 
 template <typename value_t>
 value<value_t>::value(const animation<traits::lerpable_value_t<value_t>>& animated_value)
+    : _impl(internal::impl::_NO3)
 {
 }
 
 template <typename value_t>
 value<value_t>::value(const traits::lerpable_value_t<value_t>& static_value)
+    : _impl(internal::impl::_NO3)
 {
 }
 
 template <typename value_t>
-void value<value_t>::assign(value_t& target_value)
+void value<value_t>::assign(value_t& target_value) const
 {
 }
 

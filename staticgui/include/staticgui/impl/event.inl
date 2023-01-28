@@ -17,13 +17,18 @@ namespace internal {
 
         struct event_impl {
         };
+
+        static internal::impl::event_impl _NO5;
     }
 }
 
-// template <typename... values_t>
-// event<values_t...>::event(std::function<void(const values_t&...)> trigger_callback)
-// {
-//     std::cout << "YES \n";
-// }
+template <typename... values_t>
+template <typename function_t>
+event<values_t...>::event(function_t&& function)
+    : _impl(internal::impl::_NO5)
+{
+    static_assert(std::is_invocable_v<function_t, values_t...>); // we have to rely on static assert
+    std::cout << "YEEEEEEEEES \n";
+}
 
 }

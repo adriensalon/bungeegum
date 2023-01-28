@@ -17,11 +17,14 @@ namespace internal {
 
         struct animation_impl {
         };
+
+        static animation_impl _NO;
     }
 }
 
 template <typename value_t>
 animation<value_t>::animation(const curve<value_t>& bezier_curve)
+    : _impl(internal::impl::_NO)
 {
 }
 

@@ -29,7 +29,7 @@ namespace internal {
         struct runtime_widget_data {
             id::id_int this_id = id::id_generator::create();
             std::vector<id::id_int> children_ids;
-            std::function<void(advanced_context&)> paint_callback = nullptr;
+            std::function<void(layout&)> paint_callback = nullptr;
         };
 
         struct runtime_widget {
@@ -98,7 +98,7 @@ void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_r
 }
 
 template <typename widget_t, typename... children_widgets_t>
-void build(widget_t* widget, children_widgets_t&... children, std::function<void(advanced_context&)> paint_callback, const bool is_above_root_widgets)
+void build_advanced(widget_t* widget, children_widgets_t&... children, std::function<void(layout&)> paint_callback, const bool is_above_root_widgets)
 {
     widget->internal_data.paint_callback = paint_callback;
 }

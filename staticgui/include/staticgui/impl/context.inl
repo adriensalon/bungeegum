@@ -12,25 +12,14 @@
 #include <staticgui/staticgui.hpp>
 
 namespace staticgui {
-namespace widgets {
+namespace internal {
+    namespace impl {
 
-    /// @brief A widget that displays an image.
-    struct gesture_detector {
+        struct context_impl {
 
-        gesture_detector()
-        {
-            build_advanced(this, [&](layout& ctx) {
-
-            });
-        }
-
-        gesture_detector& on_tap(std::function<void()> tap_callback)
-        {
-            return *this;
-        }
-
-        STATICGUI_WIDGET(gesture_detector)
-    };
-
+            float j;
+        };
+    }
 }
+
 }

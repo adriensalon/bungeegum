@@ -22,7 +22,7 @@ namespace widgets {
         image_widget()
         {
             std::cout << "image ctor\n";
-            build(this, [&](advanced_context& ctx) {
+            build_advanced(this, [&](const layout& ctx) {
 
             });
         }
@@ -44,4 +44,4 @@ namespace widgets {
 }
 }
 
-#define image(...) staticgui::make<staticgui::widgets::image_widget>(__VA_ARGS__)
+#define image staticgui::make<staticgui::widgets::image_widget>

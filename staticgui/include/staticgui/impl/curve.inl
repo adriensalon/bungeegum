@@ -17,11 +17,14 @@ namespace internal {
 
         struct curve_impl {
         };
+
+        static curve_impl _NO2;
     }
 }
 
 template <typename value_t>
 curve<value_t>::curve(const traits::lerpable_value_t<value_t>& min, const value_t& max)
+    : _impl(internal::impl::_NO2)
 {
 }
 

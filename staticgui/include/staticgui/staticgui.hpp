@@ -111,6 +111,8 @@ namespace internal {
         struct curve_impl;
         struct animation_impl;
         struct value_impl;
+        struct context_impl;
+        struct layout_impl;
     }
 }
 
@@ -140,7 +142,7 @@ struct curve {
     value_t get_value(const float t);
 
 private:
-    internal::impl::curve_impl _impl;
+    internal::impl::curve_impl& _impl;
 };
 
 /// @brief
@@ -151,11 +153,7 @@ struct event {
     event();
 
     template <typename function_t>
-    event(function_t&& function)
-    {
-        static_assert(std::is_invocable_v<function_t, values_t...>); // we have to rely on static assert
-        std::cout << "YEEEEEEEEES \n";
-    }
+    event(function_t&& function);
 
     event(const event& other) = delete;
 
@@ -192,7 +190,7 @@ struct event {
     void trigger(const std::future<std::tuple<values_t...>>& future_value);
 
 private:
-    internal::impl::event_impl _impl;
+    internal::impl::event_impl& _impl;
 };
 
 /// @brief
@@ -230,7 +228,7 @@ struct animation {
     void stop();
 
 private:
-    internal::impl::animation_impl _impl;
+    internal::impl::animation_impl& _impl;
 };
 
 /// @brief
@@ -248,10 +246,10 @@ struct value {
 
     /// @brief
     /// @param target_value
-    void assign(value_t& target_value); // sets or registers animation callback ^^
+    void assign(value_t& target_value) const; // sets or registers animation callback ^^
 
 private:
-    internal::impl::value_impl _impl;
+    internal::impl::value_impl& _impl;
 };
 
 /// @brief
@@ -271,12 +269,7 @@ struct context {
     /// @brief
     /// @param window_resized_event
     /// @return
-    context& on_window_resized(event<float, float>& window_resized_event);
-
-    /// @brief
-    /// @param on_window_resized_callback
-    /// @return
-    context& on_window_resized(std::function<void()> on_window_resized_callback);
+    context& on_window_resized(const event<float, float>& window_resized_event);
 
     /// @brief
     /// @param stream
@@ -286,47 +279,46 @@ struct context {
     /// @brief
     /// @tparam widget_t
     /// @param named_route_widget
-    /// @return
     template <typename widget_t>
     context& create_route(std::pair<std::string, widget_t&> named_route_widget);
 
     /// @brief
     /// @param named_route
-    /// @return
     context& destroy_route(const std::string& named_route);
 
     /// @brief
-    /// @param navigate_callback
-    /// @return
-    context& on_navigate_to(std::function<void(const float)> navigate_callback);
+    /// @param navigate_event
+    context& on_navigate_to(const event<float>& navigate_event);
 
     /// @brief
-    /// @param root_widget_name
-    /// @param navigate_callback
-    /// @return
-    context& on_navigate_to(const std::string& root_widget_name, std::function<void(const float)> navigate_callback);
+    /// @param named_route
+    /// @param navigate_event
+    context& on_navigate_to(const std::string& named_route, const animation<float>& navigate_event);
 
     /// @brief
-    /// @param navigate_callback
-    /// @return
-    context& on_navigate_from(std::function<void(const float)> navigate_callback);
+    /// @param navigate_event
+    context& on_navigate_from(const event<float>& navigate_event);
 
     /// @brief
-    /// @param root_widget_name
-    /// @param navigate_callback
-    /// @return
-    context& on_navigate_from(const std::string& root_widget_name, std::function<void(const float)> navigate_callback);
+    /// @param named_route
+    /// @param navigate_event
+    context& on_navigate_from(const std::string& named_route, const animation<float>& navigate_event);
 
     /// @brief
-    /// @param root_widget_name
-    /// @param transition_curve
-    /// @param duration
-    /// @return
-    context& navigate_forwards(const std::string& root_widget_name, const curve<float>& transition_curve, const float duration);
+    /// @param named_route
+    /// @param transition_animation
+    context& navigate_forwards(const std::string& named_route);
+
+    /// @brief
+    /// @param named_route
+    /// @param transition_animation
+    context& navigate_backwards();
 
     // input avec callbacks pareil
 
-    context& on_key_pressed(std::function<void()> key_pressed_callback);
+    context& show_virtual_keyboard(const bool show);
+
+    context& on_key_pressed(const event<void>& key_pressed_callback);
 
     // navigation ?
 
@@ -351,17 +343,20 @@ struct context {
     inline void maintain_children() { }
 
     // rebuild
+private:
+    internal::impl::context_impl& _impl;
 };
 
-struct advanced_context {
+struct layout {
     //     // cursor etc
 
     //     // im gui api here
 
     template <typename widget_t>
-    advanced_context& append(widget_t& widget);
+    layout& build_here(widget_t& widget);
 
 private:
+    internal::impl::layout_impl& _impl;
 };
 
 /// @brief
@@ -396,14 +391,20 @@ context& get_context();
 /// @param widget
 /// @param child_widget
 template <typename widget_t, typename child_widget_t>
-void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_root_widgets = false);
+void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_navigation = false);
+
+// template <typename widget_t, typename child_widget_t>
+// void build(widget_t& widget, child_widget_t& child_widget);
 
 /// @brief
 /// @tparam parent_widget_t
 /// @param  widget
 /// @param  paint_callback
 template <typename widget_t, typename... children_widgets_t>
-void build(widget_t* widget, children_widgets_t&... children, std::function<void(advanced_context&)> paint_callback, const bool is_above_root_widgets = false);
+void build_advanced(widget_t* widget, children_widgets_t&... children_widgets, std::function<void(layout&)> context_callback, const bool is_above_root_widgets = false);
+
+// template <typename widget_t, typename... children_widgets_t>
+// void build_advanced(widget_t& widget, children_widgets_t&... children_widgets, const event<layout&> context_callback);
 
 // #if defined(STATICGUI_DEBUG)
 
@@ -412,15 +413,19 @@ void print_build_tree();
 
 // #endif
 }
+
 #include "staticgui.inl"
 
 #include <staticgui/impl/animation.inl>
 #include <staticgui/impl/build.inl>
+#include <staticgui/impl/context.inl>
 #include <staticgui/impl/curve.inl>
 #include <staticgui/impl/event.inl>
+#include <staticgui/impl/layout.inl>
 #include <staticgui/impl/lerp.inl>
 #include <staticgui/impl/make.inl>
 #include <staticgui/impl/tools.inl>
 #include <staticgui/impl/traits.inl>
 #include <staticgui/impl/value.inl>
 #include <staticgui/impl/widgets.inl>
+
