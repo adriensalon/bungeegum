@@ -39,21 +39,21 @@ namespace tools {
     template <unsigned int start_t, unsigned int end_t, unsigned int increment_t, typename function_t>
     constexpr void constexpr_for(function_t&& function);
 
-    // /// @brief
-    // /// @tparam ...values_t
-    // /// @tparam function_t
-    // /// @param function
-    // /// @param ...values
-    // template <typename... values_t, typename function_t>
-    // constexpr void constexpr_foreach(function_t&& function, values_t&... values);
-
     /// @brief
     /// @tparam ...values_t
     /// @tparam function_t
     /// @param function
     /// @param ...values
     template <typename... values_t, typename function_t>
-    constexpr void constexpr_foreach(function_t&& function, const values_t&... values);
+    constexpr void constexpr_foreach(function_t&& function, values_t&... values);
+
+    // /// @brief
+    // /// @tparam ...values_t
+    // /// @tparam function_t
+    // /// @param function
+    // /// @param ...values
+    // template <typename... values_t, typename function_t>
+    // constexpr void constexpr_foreach(function_t&& function, const values_t&... values);
 }
 
 /// @brief
@@ -256,6 +256,9 @@ private:
 
 /// @brief
 struct context {
+
+    template <typename widget_t>
+    context& destroy(widget_t& widget, const bool destroy_children = true);
 
     /// @brief
     /// @param title

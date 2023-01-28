@@ -34,8 +34,6 @@ namespace internal {
 
             registry& operator=(registry&& other);
 
-            // entity create();
-
             // destroy(const entity& ent);
 
             // iterate entities only

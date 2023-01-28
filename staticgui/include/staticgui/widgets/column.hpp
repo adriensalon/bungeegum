@@ -11,6 +11,7 @@
 
 #include <staticgui/staticgui.hpp>
 #include <staticgui/widgets/center.hpp>
+#include <staticgui/widgets/image.hpp>
 
 namespace staticgui {
 namespace widgets {
@@ -33,6 +34,7 @@ namespace widgets {
                 build(this, center(_child));
             },
                 children...);
+            // build(this, children)...;
         }
     };
 }
