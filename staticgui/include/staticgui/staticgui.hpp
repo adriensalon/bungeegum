@@ -17,15 +17,44 @@
 #include <variant>
 #include <vector>
 
-#include <staticgui/impl/forward.hpp>
-#include <staticgui/impl/traits.hpp>
+#include <staticgui/utils/traits.hpp>
 
 /// @brief
 /// @details
 #define STATICGUI_WIDGET(widget_t)
 
 /// @brief
+/// @details
 namespace staticgui {
+
+namespace internal {
+    namespace detail {
+
+        struct event_impl;
+
+        struct curve_impl;
+
+        struct animation_impl;
+
+        struct value_impl;
+    }
+}
+
+struct color;
+
+template <typename... values_t>
+struct event;
+
+template <typename value_t>
+struct curve;
+
+template <typename... values_t>
+struct animation;
+
+template <typename value_t>
+struct value;
+
+// struct context;
 
 /// @brief
 struct color {
@@ -50,11 +79,6 @@ struct event {
 
     event& operator=(event&& other);
 
-    template <typename first_value_t = typename std::enable_if_t<sizeof...(values_t) == 1>, typename... other_values_t>
-    struct unique_value {
-        using type = first_value_t;
-    };
-
     /// @brief
     /// @param trigger_callback
     /// @return
@@ -74,7 +98,7 @@ struct event {
     /// @brief
     /// @param future_value
     template <typename = typename std::enable_if_t<sizeof...(values_t) == 1>>
-    void trigger(const std::future<typename unique_value<values_t...>::type>& future_value);
+    void trigger(const std::future<typename traits::unique_value<values_t...>::type>& future_value);
 
     /// @brief
     /// @param future_value
@@ -108,7 +132,7 @@ traits::lerpable_value_t<value_t> lerp(const value_t& min, const value_t& max, c
 template <typename value_t>
 struct curve {
 
-    curve(const value_t& min, const value_t& max);
+    curve(const traits::lerpable_value_t<value_t>& min, const value_t& max);
 
     std::vector<std::pair<float, value_t>>& get_points();
 
@@ -120,9 +144,13 @@ private:
     internal::detail::curve_impl _impl;
 };
 
+/// @brief
+/// @tparam ...values_t
 template <typename... values_t>
 struct animation {
 
+    /// @brief
+    /// @param ...curves
     animation(const curve<values_t>&... curves);
 
     animation(const animation& other) = delete;
@@ -133,11 +161,19 @@ struct animation {
 
     animation& operator=(animation&& other);
 
+    /// @brief
+    /// @param value_changed_callback
+    /// @return
     animation& on_value_changed(std::function<void(const values_t&...)> value_changed_callback);
 
+    /// @brief
+    /// @tparam ...other_values_t
+    /// @param previous
+    /// @return
     template <typename... other_values_t>
     animation& start_after(const animation<other_values_t...>& previous);
 
+    /// @brief
     void start();
 
     void stop();
@@ -146,13 +182,21 @@ private:
     internal::detail::animation_impl _impl;
 };
 
+/// @brief
+/// @tparam value_t
 template <typename value_t>
 struct value {
 
-    value(const animation<value_t>& animated_value);
+    /// @brief
+    /// @param animated_value
+    value(const animation<traits::lerpable_value_t<value_t>>& animated_value);
 
-    value(const value_t& static_value);
+    /// @brief
+    /// @param static_value
+    value(const traits::lerpable_value_t<value_t>& static_value);
 
+    /// @brief
+    /// @param target_value
     void assign(value_t& target_value); // sets or registers animation callback ^^
 
 private:
@@ -214,9 +258,23 @@ template <typename widget_t>
 application& attach(widget_t& widget);
 
 /// @brief
-namespace context {
+/// @tparam widget_t
+/// @tparam ...widget_args_t
+/// @param ...widget_args
+/// @return
+template <typename widget_t, typename... widget_args_t>
+[[nodiscard]] widget_t& make(widget_args_t&&... widget_args);
 
-    application& get_application();
+/// @brief
+/// @tparam widget_t
+/// @tparam child_widget_t
+/// @param widget
+/// @param child_widget
+template <typename widget_t, typename child_widget_t>
+void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_root_widgets = false);
+
+/// @brief
+namespace context {
 
     // navigation ?
 
@@ -253,22 +311,6 @@ namespace context {
 
     }
 };
-
-/// @brief
-/// @tparam widget_t
-/// @tparam ...widget_args_t
-/// @param ...widget_args
-/// @return
-template <typename widget_t, typename... widget_args_t>
-[[nodiscard]] widget_t& make(widget_args_t&&... widget_args);
-
-/// @brief
-/// @tparam widget_t
-/// @tparam child_widget_t
-/// @param widget
-/// @param child_widget
-template <typename widget_t, typename child_widget_t>
-void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_root_widgets = false);
 
 /// @brief
 /// @tparam parent_widget_t

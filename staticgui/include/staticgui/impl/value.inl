@@ -23,12 +23,12 @@ namespace internal {
 }
 
 template <typename value_t>
-value<value_t>::value(const animation<value_t>& animated_value)
+value<value_t>::value(const animation<traits::lerpable_value_t<value_t>>& animated_value)
 {
 }
 
 template <typename value_t>
-value<value_t>::value(const value_t& static_value)
+value<value_t>::value(const traits::lerpable_value_t<value_t>& static_value)
 {
 }
 
