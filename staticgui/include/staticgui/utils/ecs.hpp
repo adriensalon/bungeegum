@@ -24,11 +24,11 @@ namespace internal {
         struct entity;
 
         template <typename... tags_t>
-        struct tags_filter : public typelist::strong_typelist<tags_filter_type, tags_t...> {
+        struct tags_filter : public typelist::strong_typelist<tags_filter, tags_t...> {
         };
 
         template <typename... tags_ts>
-        struct tags_exclude_filter : public typelist::strong_typelist<tags_exclude_filter, tags_ts...> {
+        struct tags_exclude_filter : public typelist::strong_typelist<tags_filter, tags_ts...> {
         };
 
         template <typename value_t>
@@ -47,10 +47,10 @@ namespace internal {
             entity<value_t>& create_entity();
 
             template <typename... tags_t, typename... exclude_tags_t, typename... components_t>
-            void iterate_components(tags_filter_type<tags_t...> tags, tags_exclude_filter<exclude_tags_t...> exclude_tags, std::function<void(components_t&...)> iterate_function);
+            void iterate_components(tags_filter<tags_t...> tags, tags_exclude_filter<exclude_tags_t...> exclude_tags, std::function<void(components_t&...)> iterate_function);
 
             template <typename... tags_t, typename... exclude_tags_t, typename... components_t>
-            void iterate_entities_and_components(tags_filter_type<tags_t...> tags, tags_exclude_filter<exclude_tags_t...> exclude_tags, std::function<void(entity<value_t>&, components_t&...)> iterate_function);
+            void iterate_entities_and_components(tags_filter<tags_t...> tags, tags_exclude_filter<exclude_tags_t...> exclude_tags, std::function<void(entity<value_t>&, components_t&...)> iterate_function);
 
         private:
             entt::registry _registry;
@@ -59,7 +59,7 @@ namespace internal {
         template <typename value_t>
         struct entity {
 
-            entity(const registry<value_t>& reg);
+            entity(const registry<value_t>& reg, const value_t& value);
 
             entity(const entity& other) = delete;
 
@@ -69,9 +69,7 @@ namespace internal {
 
             entity& operator=(entity&& other);
 
-            [[nodiscard]] value_t& get_data();
-
-            [[nodiscard]] bool is_enabled() const;
+            [[nodiscard]] value_t& get_value();
 
             registry<value_t>& get_registry() const;
 
