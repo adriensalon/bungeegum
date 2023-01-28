@@ -9,18 +9,12 @@
 
 #pragma once
 
-#include <staticgui/staticgui.hpp>
 #include <staticgui/utils/ecs.hpp>
 
 namespace staticgui {
 namespace internal {
-    namespace impl {
+    namespace ecs {
 
-        struct context_impl {
-
-            float j;
-        };
     }
 }
-
 }
