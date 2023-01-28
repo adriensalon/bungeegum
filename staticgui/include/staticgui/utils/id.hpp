@@ -77,8 +77,8 @@ namespace internal {
                 for (int _k = 0; _k < _depth; _k++)
                     std::cout << "   ";
                 std::cout << "|__ ";
-                std::cout << _it->display_typename;
-                if (_it->widget_data.paint_callback)
+                std::cout << (*_it)->display_typename;
+                if ((*_it)->widget_data.paint_callback)
                     std::cout << " [painter]";
                 std::cout << std::endl;
                 _it++;

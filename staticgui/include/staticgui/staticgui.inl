@@ -18,6 +18,7 @@
 #include <staticgui/staticgui.hpp>
 #include <staticgui/utils/app.hpp>
 #include <staticgui/utils/draw.hpp>
+#include <staticgui/utils/ecs.hpp>
 #include <staticgui/utils/id.hpp>
 #include <staticgui/utils/transform.hpp>
 
@@ -39,8 +40,9 @@ namespace internal {
         };
 
         // inline static application app;
-        inline static std::unordered_map<id::integer, runtime_widget> made_widgets;
-        inline static std::tree<runtime_widget> all_widgets;
+        inline static ecs::registry widgets_registry;
+        inline static std::unordered_map<id::integer, runtime_widget*> made_widgets;
+        inline static std::tree<runtime_widget*> all_widgets;
     }
 }
 
@@ -54,17 +56,18 @@ void launch(widget_t& widget)
     application_launcher _launcher;
     build(&_launcher, widget); // besoin de la struct degueu pour ca ?
     all_widgets.insert(all_widgets.begin(), {});
-    std::function<void(std::tree<runtime_widget>::iterator, const internal::id::integer)> _emplace =
-        [&](std::tree<runtime_widget>::iterator parent_it, const internal::id::integer parent_id) {
-            runtime_widget& _runtime_parent_widget = made_widgets[parent_id];
-            parent_it = all_widgets.append_child(parent_it, std::move(_runtime_parent_widget));
-            for (auto& _child_id : parent_it->widget_data.children_ids)
+
+    std::function<void(std::tree<runtime_widget*>::iterator, const internal::id::integer)> _emplace =
+        [&](std::tree<runtime_widget*>::iterator parent_it, const internal::id::integer parent_id) {
+            runtime_widget* _runtime_parent_widget = made_widgets[parent_id];
+            parent_it = all_widgets.append_child(parent_it, _runtime_parent_widget);
+            for (auto& _child_id : (*parent_it)->widget_data.children_ids)
                 _emplace(parent_it, _child_id);
         };
     _emplace(all_widgets.begin(), _launcher.internal_data.children_ids[0]);
 
     while (true) {
-        internal::id::print_tree<runtime_widget>(all_widgets);
+        internal::id::print_tree<runtime_widget*>(all_widgets);
         std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     }
 }
@@ -79,16 +82,17 @@ widget_t& make(widget_args_t&&... widget_args)
 {
     std::cout << "making " << typeid(widget_t).name() << std::endl;
     using namespace internal::impl;
-    std::any _any_widget = std::make_any<widget_t>(std::forward<widget_args_t>(widget_args)...);
-    widget_t& _widget = std::any_cast<widget_t&>(_any_widget);
-    runtime_widget& _runtime_widget = made_widgets[_widget.internal_data.this_id];
-    _runtime_widget.data = std::move(_any_widget);
+
+    internal::ecs::entity _entity(internal::impl::widgets_registry);
+    runtime_widget& _runtime_widget = _entity.create_component<runtime_widget>();
     _runtime_widget.display_typename = typeid(widget_t).name();
+    _runtime_widget.data = std::make_any<widget_t>(std::forward<widget_args_t>(widget_args)...);
 
-    _widget = std::any_cast<widget_t&>(_runtime_widget.data);
-    _runtime_widget.widget_data = std::any_cast<widget_t&>(_runtime_widget.data).internal_data;
+    widget_t& _widget = std::any_cast<widget_t&>(_runtime_widget.data);
+    _runtime_widget.widget_data = _widget.internal_data;
+    made_widgets[_widget.internal_data.this_id] = &_runtime_widget;
 
-    return std::any_cast<widget_t&>(_runtime_widget.data);
+    return _widget;
 }
 
 template <typename widget_t, typename child_widget_t>
