@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <variant>
-
 #include <staticgui/staticgui.hpp>
 #include <staticgui/widgets/center.hpp>
 
@@ -31,16 +29,10 @@ namespace widgets {
         template <typename... children_widgets_t>
         column_widget(children_widgets_t&... children)
         {
-            std::tuple<children_widgets_t*...> _tuple_children(std::forward<children_widgets_t*>(&children)...);
-            constexpr size_t children_count = std::variant_size_v<std::variant<children_widgets_t...>>;
-            tools::constexpr_for<0, children_count, 1>([&](auto index) {
-                using child_type_t = std::variant_alternative_t<index, std::variant<children_widgets_t...>>;
-                auto& _child = *std::get<index>(_tuple_children);
+            tools::constexpr_foreach([&](auto& _child) {
                 build(this, center(_child));
-            });
-            // build_advanced(this, [this](build_advanced_context& context) {
-            //     std::cout << "column\n";
-            // });
+            },
+                children...);
         }
     };
 }

@@ -26,11 +26,11 @@ namespace tools {
     template <typename... values_t, typename function_t>
     constexpr void constexpr_foreach(function_t&& function, values_t&... values)
     {
-        std::tuple<values_t&...> _tuple(std::forward<values_t&>(values)...);
+        std::tuple<values_t&...> _tuple((values)...);
         constexpr size_t _count = std::variant_size_v<std::variant<values_t...>>;
         constexpr_for<0, _count, 1>([&](auto _index) {
             // using child_type_t = std::variant_alternative_t<_index, std::variant<values_t...>>;
-            auto& _child = (std::get<_index>(_tuple));
+            auto& _child = std::get<_index>(_tuple);
             function(_child);
         });
     }
@@ -42,7 +42,7 @@ namespace tools {
         constexpr size_t _count = std::variant_size_v<std::variant<values_t...>>;
         constexpr_for<0, _count, 1>([&](auto _index) {
             // using child_type_t = std::variant_alternative_t<_index, std::variant<values_t...>>;
-            auto& _child = (std::get<_index>(_tuple));
+            auto& _child = std::get<_index>(_tuple);
             function(_child);
         });
     }
