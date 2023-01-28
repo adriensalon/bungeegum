@@ -17,8 +17,8 @@
 #include <variant>
 #include <vector>
 
-#include <staticgui/detail/forward.hpp>
-#include <staticgui/detail/traits.hpp>
+#include <staticgui/impl/forward.hpp>
+#include <staticgui/impl/traits.hpp>
 
 /// @brief
 /// @details
@@ -27,7 +27,12 @@
 /// @brief
 namespace staticgui {
 
+/// @brief
 struct color {
+
+    color operator+(const color& other);
+
+    color operator*(const float multiplier);
 };
 
 /// @brief
@@ -86,14 +91,19 @@ namespace traits {
     /// @brief
     /// @tparam value_t
     template <typename value_t>
-    inline constexpr bool is_lerpable = has_add<value_t> && (has_float_left_multiply<value_t> || has_float_right_multiply<value_t>);
+    inline constexpr bool is_lerpable = (has_float_multiply<value_t> && has_add<value_t>);
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    using lerpable_value_t = typename std::enable_if_t<traits::is_lerpable<value_t>, value_t>;
 }
 
 /// @brief
 /// @details
 /// @tparam value_t
 template <typename value_t>
-value_t lerp(const value_t& min, const value_t& max, const float t);
+traits::lerpable_value_t<value_t> lerp(const value_t& min, const value_t& max, const float t) { return value_t {}; }
 
 template <typename value_t>
 struct curve {
@@ -276,11 +286,11 @@ void print_build_tree();
 }
 #include "staticgui.inl"
 
-#include <staticgui/detail/animation.inl>
-#include <staticgui/detail/build.inl>
-#include <staticgui/detail/curve.inl>
-#include <staticgui/detail/event.inl>
-#include <staticgui/detail/lerp.inl>
-#include <staticgui/detail/make.inl>
-#include <staticgui/detail/value.inl>
-#include <staticgui/detail/widgets.inl>
+#include <staticgui/impl/animation.inl>
+#include <staticgui/impl/build.inl>
+#include <staticgui/impl/curve.inl>
+#include <staticgui/impl/event.inl>
+#include <staticgui/impl/lerp.inl>
+#include <staticgui/impl/make.inl>
+#include <staticgui/impl/value.inl>
+#include <staticgui/impl/widgets.inl>
