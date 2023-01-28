@@ -53,7 +53,7 @@ namespace internal {
 
 namespace traits {
 
-    template <typename first_value_t = typename std::enable_if_t<sizeof...(values_t) == 1>, typename... other_values_t>
+    template <typename first_value_t, typename... other_values_t>
     struct unique_value {
         using type = first_value_t;
     };

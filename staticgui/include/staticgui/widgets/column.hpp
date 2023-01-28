@@ -33,7 +33,6 @@ namespace widgets {
     /// line of widgets and want them to be able to scroll if there is insufficient room, consider
     /// using a 'list_view'. For a horizontal variant see 'row'. If you only have one child, then
     /// consider using 'align' or 'center' to position the child.
-    /// @tparam ...children_widgets_t
     struct column_widget {
         constexpr static char* internal_name = "column";
         STATICGUI_WIDGET(column_widget)
@@ -55,6 +54,16 @@ namespace widgets {
     };
 
 }
-}
 
-#define column staticgui::make<staticgui::widgets::column_widget>
+/// @cond DO_NOT_DOCUMENT
+/// @brief A widget that displays its children in a vertical array.
+/// @tparam ...children_widgets_t
+/// @param ...children_widgets
+template <typename... children_widgets_t>
+widgets::column_widget& column(children_widgets_t&... children_widgets)
+{
+    return make<widgets::column_widget>(children_widgets...);
+}
+/// @endcond
+
+}

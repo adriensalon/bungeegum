@@ -35,16 +35,6 @@ namespace internal {
         struct value_impl;
     }
 }
-// struct color;
-// template <typename... values_t>
-// struct event;
-// template <typename value_t>
-// struct curve;
-// template <typename... values_t>
-// struct animation;
-// template <typename value_t>
-// struct value;
-// struct context;
 
 /// @brief
 struct color {
@@ -59,7 +49,7 @@ struct color {
 template <typename... values_t>
 struct event {
 
-    event() = delete;
+    event(std::function<void(const values_t&...)> trigger_callback);
 
     event(const event& other) = delete;
 
@@ -234,36 +224,6 @@ struct application {
 };
 
 /// @brief
-/// @tparam widget_t
-/// @param widget
-/// @return
-template <typename widget_t>
-application& launch(widget_t& widget);
-
-/// @brief
-/// @tparam widget_t
-/// @param widget
-/// @return
-template <typename widget_t>
-application& attach(widget_t& widget);
-
-/// @brief
-/// @tparam widget_t
-/// @tparam ...widget_args_t
-/// @param ...widget_args
-/// @return
-template <typename widget_t, typename... widget_args_t>
-[[nodiscard]] widget_t& make(widget_args_t&&... widget_args);
-
-/// @brief
-/// @tparam widget_t
-/// @tparam child_widget_t
-/// @param widget
-/// @param child_widget
-template <typename widget_t, typename child_widget_t>
-void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_root_widgets = false);
-
-/// @brief
 namespace context {
 
     // navigation ?
@@ -301,6 +261,36 @@ namespace context {
 
     }
 };
+
+/// @brief
+/// @tparam widget_t
+/// @param widget
+/// @return
+template <typename widget_t>
+application& launch(widget_t& widget);
+
+/// @brief
+/// @tparam widget_t
+/// @param widget
+/// @return
+template <typename widget_t>
+application& attach(widget_t& widget);
+
+/// @brief
+/// @tparam widget_t
+/// @tparam ...widget_args_t
+/// @param ...widget_args
+/// @return
+template <typename widget_t, typename... widget_args_t>
+[[nodiscard]] widget_t& make(widget_args_t&&... widget_args);
+
+/// @brief
+/// @tparam widget_t
+/// @tparam child_widget_t
+/// @param widget
+/// @param child_widget
+template <typename widget_t, typename child_widget_t>
+void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_root_widgets = false);
 
 /// @brief
 /// @tparam parent_widget_t
