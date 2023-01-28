@@ -112,7 +112,9 @@ namespace internal {
         struct animation_impl;
         struct value_impl;
         struct context_impl;
+        struct context_manager;
         struct layout_impl;
+        struct layout_manager;
     }
 }
 
@@ -344,7 +346,9 @@ struct context {
 
     // rebuild
 private:
+    context();
     internal::impl::context_impl& _impl;
+    friend struct internal::impl::context_manager;
 };
 
 struct layout {
@@ -356,7 +360,9 @@ struct layout {
     layout& build_here(widget_t& widget);
 
 private:
+    layout();
     internal::impl::layout_impl& _impl;
+    friend struct internal::impl::layout_manager;
 };
 
 /// @brief
@@ -428,4 +434,3 @@ void print_build_tree();
 #include <staticgui/impl/traits.inl>
 #include <staticgui/impl/value.inl>
 #include <staticgui/impl/widgets.inl>
-

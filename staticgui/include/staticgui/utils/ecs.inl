@@ -15,98 +15,57 @@ namespace staticgui {
 namespace internal {
     namespace ecs {
 
-        template <typename value_t>
-        registry<value_t>::registry()
+        // iterate_entities
+
+        template <typename... components_t>
+        void registry::iterate_components(std::function<void(components_t&...)> iterate_function)
         {
+            auto& _view = _registry.view<components_t...>();
+            _view.each([&](components_t&... _components) {
+                iterate_function(_components...);
+            });
         }
 
-        template <typename value_t>
-        registry<value_t>::registry(registry&& other)
+        // template <typename... components_t>
+        template <typename... components_t, typename function_t>
+        void registry::iterate_entities_components(function_t&& iterate_function)
         {
+            // static_assert(std::is_invocable_v<function_t, const components_t&...>);
+            auto& _view = _registry.view<components_t...>();
+            _view.each([&](entt::entity _raw_ent, components_t&... _components) {
+                entity _ent(*this, _raw_ent);
+                iterate_function(_ent, _components...);
+            });
         }
 
-        template <typename value_t>
-        registry<value_t>& registry<value_t>::operator=(registry&& other)
-        {
-            return *this;
-        }
-
-        template <typename value_t>
-        entity<value_t>& registry<value_t>::create_entity()
-        {
-        }
-
-        template <typename value_t>
-        template <typename... tags_t, typename... exclude_tags_t, typename... components_t>
-        void registry<value_t>::iterate_components(tags_filter<tags_t...> tags, tags_exclude_filter<exclude_tags_t...> exclude_tags, std::function<void(components_t&...)> iterate_function)
-        {
-        }
-
-        template <typename value_t>
-        template <typename... tags_t, typename... exclude_tags_t, typename... components_t>
-        void registry<value_t>::iterate_entities_and_components(tags_filter<tags_t...> tags, tags_exclude_filter<exclude_tags_t...> exclude_tags, std::function<void(entity<value_t>&, components_t&...)> iterate_function)
-        {
-        }
-
-        template <typename value_t>
-        entity<value_t>::entity(const registry<value_t>& reg, const value_t& value)
-        {
-        }
-
-        template <typename value_t>
-        entity<value_t>::entity(entity&& other)
-        {
-        }
-
-        template <typename value_t>
-        entity<value_t>& entity<value_t>::operator=(entity&& other)
-        {
-            return *this;
-        }
-
-        template <typename value_t>
-        value_t& entity<value_t>::get_value()
-        {
-        }
-
-        template <typename value_t>
-        registry<value_t>& entity<value_t>::get_registry() const
-        {
-        }
-
-        template <typename value_t>
         template <typename component_t>
-        bool entity<value_t>::has_component() const
+        bool entity::has_component() const
         {
         }
 
-        template <typename value_t>
+        template <typename component_t, typename... args_t>
+        component_t& entity::create_component(args_t&&... args)
+        {
+            return _registry_ptr->emplace<component_t>(_entity, std::forward<args_t>(args)...);
+        }
+
         template <typename component_t>
-        component_t& entity<value_t>::create_component()
+        component_t& entity::get_component()
         {
         }
 
-        template <typename value_t>
         template <typename component_t>
-        component_t& entity<value_t>::get_component()
+        const component_t& entity::get_component() const
         {
         }
 
-        template <typename value_t>
         template <typename component_t>
-        const component_t& entity<value_t>::get_component() const
+        component_t& entity::get_or_create_component()
         {
         }
 
-        template <typename value_t>
         template <typename component_t>
-        component_t& entity<value_t>::get_or_create_component()
-        {
-        }
-
-        template <typename value_t>
-        template <typename component_t>
-        const component_t& entity<value_t>::get_or_create_component() const
+        const component_t& entity::get_or_create_component() const
         {
         }
     }

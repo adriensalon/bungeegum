@@ -13,6 +13,7 @@ set(staticgui_source
 	"source/staticgui.cpp"
 	"source/utils/app.cpp"
 	"source/utils/draw.cpp"
+	"source/utils/ecs.cpp"
 )
 
 add_library(staticgui "${staticgui_source}")

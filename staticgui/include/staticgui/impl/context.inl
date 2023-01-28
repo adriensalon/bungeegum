@@ -9,6 +9,9 @@
 
 #pragma once
 
+#include <tree.hh>
+#include <unordered_map>
+
 #include <staticgui/staticgui.hpp>
 #include <staticgui/utils/ecs.hpp>
 
@@ -16,11 +19,47 @@ namespace staticgui {
 namespace internal {
     namespace impl {
 
+        struct entity_impl {
+        };
+
         struct context_impl {
 
-            float j;
+            inline static ecs::registry events_registry;
+            inline static ecs::registry curves_registry;
+            inline static ecs::registry animations_registry;
+            inline static ecs::registry styles_registry;
+            inline static ecs::registry widgets_registry;
+
+            inline static std::unordered_map<id::id_int, ecs::entity> widgets_staging_map;
+            inline static std::tree<ecs::entity> widgets_tree;
+
+            inline static context_impl& get_context_impl()
+            {
+                static context_impl _context_impl;
+                return _context_impl;
+            }
         };
+
+        struct context_manager {
+
+            inline static context& get_context()
+            {
+                static context _context;
+                return _context;
+            }
+        };
+
     }
+}
+
+context::context()
+    : _impl(internal::impl::context_impl::get_context_impl())
+{
+}
+
+context& get_context()
+{
+    return internal::impl::context_manager::get_context();
 }
 
 }
