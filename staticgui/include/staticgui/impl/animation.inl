@@ -13,7 +13,7 @@
 
 namespace staticgui {
 namespace internal {
-    namespace detail {
+    namespace impl {
 
         struct animation_impl {
         };

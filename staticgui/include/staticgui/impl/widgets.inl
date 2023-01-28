@@ -11,7 +11,7 @@
 
 #undef STATICGUI_WIDGET
 #define STATICGUI_WIDGET(widget_t)                                        \
-    staticgui::internal::detail::runtime_widget_data internal_data;       \
+    staticgui::internal::impl::runtime_widget_data internal_data;         \
                                                                           \
     template <typename widget_t>                                          \
     friend staticgui::application& staticgui::launch(widget_t&);          \

@@ -12,7 +12,7 @@
 namespace staticgui {
 
 namespace internal {
-    namespace detail {
+    namespace impl {
 
         application& get_application()
         {

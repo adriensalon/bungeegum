@@ -13,7 +13,7 @@
 
 namespace staticgui {
 namespace internal {
-    namespace detail {
+    namespace impl {
 
         struct value_impl {
             bool _is_animated;

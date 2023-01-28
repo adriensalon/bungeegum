@@ -24,7 +24,7 @@
 namespace staticgui {
 
 namespace internal {
-    namespace detail {
+    namespace impl {
 
         struct runtime_widget_data {
             id::id_int this_id = id::id_generator::create();
@@ -47,7 +47,7 @@ namespace internal {
 template <typename widget_t>
 application& launch(widget_t& widget)
 {
-    using namespace internal::detail;
+    using namespace internal::impl;
     struct application_launcher {
         runtime_widget_data internal_data;
     };
@@ -79,7 +79,7 @@ template <typename widget_t, typename... widget_args_t>
 widget_t& make(widget_args_t&&... widget_args)
 {
     std::cout << "making " << typeid(widget_t).name() << std::endl;
-    using namespace internal::detail;
+    using namespace internal::impl;
     std::any _any_widget = std::make_any<widget_t>(std::forward<widget_args_t>(widget_args)...);
     widget_t& _widget = std::any_cast<widget_t&>(_any_widget);
     runtime_widget& _runtime_widget = made_widgets[_widget.internal_data.this_id];

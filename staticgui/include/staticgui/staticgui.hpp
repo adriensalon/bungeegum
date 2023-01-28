@@ -28,32 +28,22 @@
 namespace staticgui {
 
 namespace internal {
-    namespace detail {
-
+    namespace impl {
         struct event_impl;
-
         struct curve_impl;
-
         struct animation_impl;
-
         struct value_impl;
     }
 }
-
-struct color;
-
-template <typename... values_t>
-struct event;
-
-template <typename value_t>
-struct curve;
-
-template <typename... values_t>
-struct animation;
-
-template <typename value_t>
-struct value;
-
+// struct color;
+// template <typename... values_t>
+// struct event;
+// template <typename value_t>
+// struct curve;
+// template <typename... values_t>
+// struct animation;
+// template <typename value_t>
+// struct value;
 // struct context;
 
 /// @brief
@@ -106,7 +96,7 @@ struct event {
     void trigger(const std::future<std::tuple<values_t...>>& future_value);
 
 private:
-    internal::detail::event_impl _impl;
+    internal::impl::event_impl _impl;
 };
 
 /// @brief
@@ -141,7 +131,7 @@ struct curve {
     value_t get_value(const float t);
 
 private:
-    internal::detail::curve_impl _impl;
+    internal::impl::curve_impl _impl;
 };
 
 /// @brief
@@ -179,7 +169,7 @@ struct animation {
     void stop();
 
 private:
-    internal::detail::animation_impl _impl;
+    internal::impl::animation_impl _impl;
 };
 
 /// @brief
@@ -200,7 +190,7 @@ struct value {
     void assign(value_t& target_value); // sets or registers animation callback ^^
 
 private:
-    internal::detail::value_impl _impl;
+    internal::impl::value_impl _impl;
 };
 
 /// @brief
