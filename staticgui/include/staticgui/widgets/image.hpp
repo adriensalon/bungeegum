@@ -22,7 +22,7 @@ namespace widgets {
         image_widget()
         {
             std::cout << "image ctor\n";
-            build(this, [&](context::advanced::painter& p) {
+            build(this, [&](advanced_context& ctx) {
 
             });
         }

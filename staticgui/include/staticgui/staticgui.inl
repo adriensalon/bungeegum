@@ -29,7 +29,7 @@ namespace internal {
         struct runtime_widget_data {
             id::id_int this_id = id::id_generator::create();
             std::vector<id::id_int> children_ids;
-            std::function<void(context::advanced::painter&)> paint_callback = nullptr;
+            std::function<void(advanced_context&)> paint_callback = nullptr;
         };
 
         struct runtime_widget {
@@ -38,14 +38,14 @@ namespace internal {
             std::any data = nullptr;
         };
 
-        inline static application app;
+        // inline static application app;
         inline static std::unordered_map<id::id_int, runtime_widget> made_widgets;
         inline static std::tree<runtime_widget> all_widgets;
     }
 }
 
 template <typename widget_t>
-application& launch(widget_t& widget)
+void launch(widget_t& widget)
 {
     using namespace internal::impl;
     struct application_launcher {
@@ -67,11 +67,10 @@ application& launch(widget_t& widget)
         internal::id::print_tree<runtime_widget>(all_widgets);
         std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     }
-    return app;
 }
 
 template <typename widget_t>
-application& attach(widget_t& widget)
+void attach(widget_t& widget)
 {
 }
 
@@ -99,7 +98,7 @@ void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_r
 }
 
 template <typename widget_t, typename... children_widgets_t>
-void build(widget_t* widget, children_widgets_t&... children, std::function<void(context::advanced::painter&)> paint_callback, const bool is_above_root_widgets)
+void build(widget_t* widget, children_widgets_t&... children, std::function<void(advanced_context&)> paint_callback, const bool is_above_root_widgets)
 {
     widget->internal_data.paint_callback = paint_callback;
 }

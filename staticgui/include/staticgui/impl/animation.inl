@@ -20,29 +20,31 @@ namespace internal {
     }
 }
 
-template <typename... values_t>
-animation<values_t...>::animation(const curve<values_t>&... curves)
+template <typename value_t>
+animation<value_t>::animation(const curve<value_t>& bezier_curve)
 {
 }
 
-template <typename... values_t>
-animation<values_t...>& animation<values_t...>::on_value_changed(std::function<void(const values_t&...)> value_changed_callback)
+template <typename value_t>
+animation<value_t>& animation<value_t>::on_value_changed(const event<value_t>& value_changed_event)
+{
+    std::cout << "YES 2 \n";
+    return *this;
+}
+
+template <typename value_t>
+template <typename other_value_t>
+animation<value_t>& animation<value_t>::start_after(const animation<other_value_t>& previous)
 {
 }
 
-template <typename... values_t>
-template <typename... other_values_t>
-animation<values_t...>& animation<values_t...>::start_after(const animation<other_values_t...>& previous)
+template <typename value_t>
+void animation<value_t>::start()
 {
 }
 
-template <typename... values_t>
-void animation<values_t...>::start()
-{
-}
-
-template <typename... values_t>
-void animation<values_t...>::stop()
+template <typename value_t>
+void animation<value_t>::stop()
 {
 }
 

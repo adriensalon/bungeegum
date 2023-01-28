@@ -14,35 +14,35 @@ namespace staticgui {
 namespace internal {
     namespace impl {
 
-        application& get_application()
-        {
-            // static std::optional<application> _application = std::nullopt;
-            static application _application;
-            return _application;
-        }
+        // application& get_application()
+        // {
+        //     // static std::optional<application> _application = std::nullopt;
+        //     static application _application;
+        //     return _application;
+        // }
 
     }
 }
 
-application& application::title(const std::string& window_title)
-{
-    return *this;
-}
+// application& application::title(const std::string& window_title)
+// {
+//     return *this;
+// }
 
-application& application::size(const unsigned int window_width, const unsigned int window_height)
-{
-    return *this;
-}
+// application& application::size(const unsigned int window_width, const unsigned int window_height)
+// {
+//     return *this;
+// }
 
-application& application::on_resized(std::function<void()> on_window_resized_callback)
-{
-    return *this;
-}
+// application& application::on_resized(std::function<void()> on_window_resized_callback)
+// {
+//     return *this;
+// }
 
-application& application::debug_stream(const std::ostream& stream)
-{
-    return *this;
-}
+// application& application::debug_stream(const std::ostream& stream)
+// {
+//     return *this;
+// }
 
 #if defined(STATICGUI_DEBUG)
 

@@ -19,7 +19,7 @@ namespace widgets {
 
         gesture_detector()
         {
-            build(this, [&](context::advanced::painter& p) {
+            build(this, [&](advanced_context& ctx) {
 
             });
         }

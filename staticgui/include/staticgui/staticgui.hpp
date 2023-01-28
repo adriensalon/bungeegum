@@ -27,15 +27,6 @@
 /// @details
 namespace staticgui {
 
-namespace internal {
-    namespace impl {
-        struct event_impl;
-        struct curve_impl;
-        struct animation_impl;
-        struct value_impl;
-    }
-}
-
 /// @brief
 namespace tools {
 
@@ -68,28 +59,59 @@ namespace tools {
 /// @brief
 namespace traits {
 
-    template <typename... values_t>
-    struct first_value;
+    // template <typename... values_t>
+    // struct first_value;
+
+    template <typename first_value_t, typename... other_values_t>
+    struct first_value_impl {
+        using type = first_value_t;
+    };
+
+    // /// @brief
+    // /// @tparam value_t
+    // template <typename value_t>
+    // constexpr bool has_add();
+
+    // /// @brief
+    // /// @tparam value_t
+    // template <typename value_t>
+    // constexpr bool has_float_multiply();
+
+    template <typename value_t>
+    constexpr bool has_add_v = (internal::traits::has_outside_add<value_t> || internal::traits::has_inside_add<value_t>);
+
+    template <typename value_t>
+    constexpr bool has_float_multiply_v = (internal::traits::has_outside_float_left_multiply<value_t> || internal::traits::has_outside_float_right_multiply<value_t> || internal::traits::has_inside_float_multiply<value_t>);
 
     /// @brief
     /// @tparam value_t
     template <typename value_t>
-    constexpr bool has_add();
+    constexpr bool is_lerpable = (has_float_multiply_v<value_t> && has_add_v<value_t>);
 
     /// @brief
     /// @tparam value_t
     template <typename value_t>
-    constexpr bool has_float_multiply();
+    using lerpable_value_t = typename std::enable_if_t<is_lerpable<value_t>, value_t>;
+
+    /// @brief
+    /// @tparam function_t
+    /// @tparam ...args_t
+    template <typename function_t, typename... values_t>
+    constexpr bool is_convertible_to_callback();
 
     /// @brief
     /// @tparam value_t
-    template <typename value_t>
-    constexpr bool is_lerpable = (has_float_multiply<value_t>() && has_add<value_t>());
+    template <typename function_t, typename... values_t>
+    using callback_function_t = typename std::enable_if_t<is_convertible_to_callback<function_t, values_t...>, function_t>;
+}
 
-    /// @brief
-    /// @tparam value_t
-    template <typename value_t>
-    using lerpable_value_t = typename std::enable_if_t<traits::is_lerpable<value_t>, value_t>;
+namespace internal {
+    namespace impl {
+        struct event_impl;
+        struct curve_impl;
+        struct animation_impl;
+        struct value_impl;
+    }
 }
 
 /// @brief
@@ -126,7 +148,14 @@ private:
 template <typename... values_t>
 struct event {
 
-    event(std::function<void(const values_t&...)> trigger_callback);
+    event();
+
+    template <typename function_t>
+    event(function_t&& function)
+    {
+        static_assert(std::is_invocable_v<function_t, values_t...>); // we have to rely on static assert
+        std::cout << "YEEEEEEEEES \n";
+    }
 
     event(const event& other) = delete;
 
@@ -145,7 +174,7 @@ struct event {
 
     /// @brief
     /// @param ...values
-    void trigger(const values_t&... values);
+    void trigger(const values_t&... values) const;
 
     /// @brief
     /// @param future_value
@@ -155,7 +184,7 @@ struct event {
     /// @brief
     /// @param future_value
     template <typename = typename std::enable_if_t<sizeof...(values_t) == 1>>
-    void trigger(const std::future<typename traits::first_value<values_t...>::type>& future_value);
+    void trigger(const std::future<typename traits::first_value_impl<values_t...>::type>& future_value);
 
     /// @brief
     /// @param future_value
@@ -167,13 +196,13 @@ private:
 };
 
 /// @brief
-/// @tparam ...values_t
-template <typename... values_t>
+/// @tparam value_t
+template <typename value_t>
 struct animation {
 
     /// @brief
     /// @param ...curves
-    animation(const curve<values_t>&... curves);
+    animation(const curve<value_t>& bezier_curve);
 
     animation(const animation& other) = delete;
 
@@ -184,16 +213,16 @@ struct animation {
     animation& operator=(animation&& other);
 
     /// @brief
-    /// @param value_changed_callback
+    /// @param value_changed_event
     /// @return
-    animation& on_value_changed(std::function<void(const values_t&...)> value_changed_callback);
+    animation& on_value_changed(const event<value_t>& value_changed_event);
 
     /// @brief
-    /// @tparam ...other_values_t
+    /// @tparam other_value_t
     /// @param previous
     /// @return
-    template <typename... other_values_t>
-    animation& start_after(const animation<other_values_t...>& previous);
+    template <typename other_value_t>
+    animation& start_after(const animation<other_value_t>& previous);
 
     /// @brief
     void start();
@@ -226,47 +255,78 @@ private:
 };
 
 /// @brief
-struct application {
+struct context {
 
     /// @brief
     /// @param title
     /// @return
-    application& title(const std::string& window_title);
+    context& window_title(const std::string& title);
 
     /// @brief
-    application& size(const unsigned int window_width, const unsigned int window_height);
+    /// @param width
+    /// @param height
+    /// @return
+    context& window_size(const unsigned int width, const unsigned int height);
 
-    application& on_resized(std::function<void()> on_window_resized_callback);
+    /// @brief
+    /// @param window_resized_event
+    /// @return
+    context& on_window_resized(event<float, float>& window_resized_event);
 
-    application& debug_stream(const std::ostream& stream = std::cerr);
+    /// @brief
+    /// @param on_window_resized_callback
+    /// @return
+    context& on_window_resized(std::function<void()> on_window_resized_callback);
 
-    template <typename... root_widgets_t>
-    application(std::pair<std::string, root_widgets_t&>... named_root_widgets) { }
+    /// @brief
+    /// @param stream
+    /// @return
+    context& debug_stream(const std::ostream& stream = std::cerr);
 
-    // move all navigation to context::replace !!! ^^
+    /// @brief
+    /// @tparam widget_t
+    /// @param named_route_widget
+    /// @return
+    template <typename widget_t>
+    context& create_route(std::pair<std::string, widget_t&> named_route_widget);
 
-    template <typename root_widget_t>
-    application& create_root(std::pair<std::string, root_widget_t&> named_root_widget);
+    /// @brief
+    /// @param named_route
+    /// @return
+    context& destroy_route(const std::string& named_route);
 
-    application& destroy_root(const std::string& named_root_widget);
+    /// @brief
+    /// @param navigate_callback
+    /// @return
+    context& on_navigate_to(std::function<void(const float)> navigate_callback);
 
-    application& on_navigate_to(std::function<void(const float)> navigate_callback);
+    /// @brief
+    /// @param root_widget_name
+    /// @param navigate_callback
+    /// @return
+    context& on_navigate_to(const std::string& root_widget_name, std::function<void(const float)> navigate_callback);
 
-    application& on_navigate_to(const std::string& root_widget_name, std::function<void(const float)> navigate_callback);
+    /// @brief
+    /// @param navigate_callback
+    /// @return
+    context& on_navigate_from(std::function<void(const float)> navigate_callback);
 
-    application& on_navigate_from(std::function<void(const float)> navigate_callback);
+    /// @brief
+    /// @param root_widget_name
+    /// @param navigate_callback
+    /// @return
+    context& on_navigate_from(const std::string& root_widget_name, std::function<void(const float)> navigate_callback);
 
-    application& on_navigate_from(const std::string& root_widget_name, std::function<void(const float)> navigate_callback);
-
-    application& navigate(const std::string& root_widget_name, const curve<float>& transition_curve, const float duration);
+    /// @brief
+    /// @param root_widget_name
+    /// @param transition_curve
+    /// @param duration
+    /// @return
+    context& navigate_forwards(const std::string& root_widget_name, const curve<float>& transition_curve, const float duration);
 
     // input avec callbacks pareil
 
-    application& on_key_pressed(std::function<void()> key_pressed_callback);
-};
-
-/// @brief
-namespace context {
+    context& on_key_pressed(std::function<void()> key_pressed_callback);
 
     // navigation ?
 
@@ -291,17 +351,17 @@ namespace context {
     inline void maintain_children() { }
 
     // rebuild
+};
 
-    namespace advanced {
+struct advanced_context {
+    //     // cursor etc
 
-        struct painter {
-        };
+    //     // im gui api here
 
-        // cursor etc
+    template <typename widget_t>
+    advanced_context& append(widget_t& widget);
 
-        // im gui api here
-
-    }
+private:
 };
 
 /// @brief
@@ -309,14 +369,14 @@ namespace context {
 /// @param widget
 /// @return
 template <typename widget_t>
-application& launch(widget_t& widget);
+void launch(widget_t& widget);
 
 /// @brief
 /// @tparam widget_t
 /// @param widget
 /// @return
 template <typename widget_t>
-application& attach(widget_t& widget);
+void attach(widget_t& widget);
 
 /// @brief
 /// @tparam widget_t
@@ -325,6 +385,10 @@ application& attach(widget_t& widget);
 /// @return
 template <typename widget_t, typename... widget_args_t>
 [[nodiscard]] widget_t& make(widget_args_t&&... widget_args);
+
+/// @brief
+/// @return
+context& get_context();
 
 /// @brief
 /// @tparam widget_t
@@ -339,7 +403,7 @@ void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_r
 /// @param  widget
 /// @param  paint_callback
 template <typename widget_t, typename... children_widgets_t>
-void build(widget_t* widget, children_widgets_t&... children, std::function<void(context::advanced::painter&)> paint_callback, const bool is_above_root_widgets = false);
+void build(widget_t* widget, children_widgets_t&... children, std::function<void(advanced_context&)> paint_callback, const bool is_above_root_widgets = false);
 
 // #if defined(STATICGUI_DEBUG)
 

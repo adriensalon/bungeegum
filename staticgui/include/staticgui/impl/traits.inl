@@ -48,25 +48,43 @@ namespace internal {
         template <typename value_t>
         constexpr bool has_inside_float_multiply<value_t, std::void_t<decltype(std::declval<value_t>().operator*(std::declval<float>()))>> = true;
 
+        // function (pas mal la syntaxe)
+
+        template <typename value_t, typename = std::void_t<>>
+        struct is_callable : std::is_function<value_t> {
+        };
+
+        template <typename value_t>
+        struct is_callable<value_t, typename std::enable_if_t<std::is_same_v<decltype(void(&value_t::operator())), void>>> : std::true_type {
+        };
     }
-}
 
-namespace traits {
+    namespace traits {
 
-    template <typename first_value_t, typename... other_values_t>
-    struct first_value_impl {
-        using type = first_value_t;
-    };
+        // template <typename first_value_t, typename... other_values_t>
+        // struct first_value_impl {
+        //     using type = first_value_t;
+        // };
 
-    template <typename... values_t>
-    struct first_value {
-        using type = typename first_value_impl<values_t...>::type;
-    };
+        // template <typename... values_t>
+        // struct first_value {
+        //     template <typename = typename std::enable_if_t<sizeof...(values_t) >= 1>>
+        //     first_value() { }
 
-    template <typename value_t>
-    constexpr bool has_add() { return (internal::traits::has_outside_add<value_t> || internal::traits::has_inside_add<value_t>); }
+        //     using type = typename first_value_impl<values_t...>::type;
+        // };
 
-    template <typename value_t>
-    constexpr bool has_float_multiply() { return (internal::traits::has_outside_float_left_multiply<value_t> || internal::traits::has_outside_float_right_multiply<value_t> || internal::traits::has_inside_float_multiply<value_t>); }
+        // template <typename value_t>
+        // constexpr bool has_add_v = (internal::traits::has_outside_add<value_t> || internal::traits::has_inside_add<value_t>);
+
+        // template <typename value_t>
+        // constexpr bool has_float_multiply_v = (internal::traits::has_outside_float_left_multiply<value_t> || internal::traits::has_outside_float_right_multiply<value_t> || internal::traits::has_inside_float_multiply<value_t>);
+
+        // template <typename value_t>
+        // constexpr bool is_lerpable = (has_float_multiply<value_t>() && has_add<value_t>());
+
+        template <typename function_t, typename... values_t>
+        constexpr bool is_convertible_to_callback() { return std::is_invocable_v<function_t, values_t...>; }
+    }
 }
 }

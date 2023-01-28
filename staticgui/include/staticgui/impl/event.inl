@@ -10,3 +10,20 @@
 #pragma once
 
 #include <staticgui/staticgui.hpp>
+
+namespace staticgui {
+namespace internal {
+    namespace impl {
+
+        struct event_impl {
+        };
+    }
+}
+
+// template <typename... values_t>
+// event<values_t...>::event(std::function<void(const values_t&...)> trigger_callback)
+// {
+//     std::cout << "YES \n";
+// }
+
+}

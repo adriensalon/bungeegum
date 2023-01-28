@@ -15,8 +15,6 @@ namespace staticgui {
 namespace internal {
     namespace ecs {
 
-        void emplace_to_render_tree();
-
     }
 }
 }
