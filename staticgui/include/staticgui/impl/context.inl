@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <memory>
 #include <tree.hh>
 #include <unordered_map>
 
@@ -19,7 +20,10 @@ namespace staticgui {
 namespace internal {
     namespace impl {
 
-        struct entity_impl {
+        struct runtime_widget_component {
+            std::unique_ptr<std::type_info> typeinfo = nullptr;
+            std::any untyped = nullptr;
+            runtime_widget_data data;
         };
 
         struct context_impl {
@@ -30,8 +34,8 @@ namespace internal {
             inline static ecs::registry styles_registry;
             inline static ecs::registry widgets_registry;
 
-            inline static std::unordered_map<id::id_int, ecs::entity> widgets_staging_map;
-            inline static std::tree<ecs::entity> widgets_tree;
+            inline static std::unordered_map<id::id_int, runtime_widget_component*> widgets_staging_map;
+            inline static std::tree<runtime_widget_component*> widgets_tree;
 
             inline static context_impl& get_context_impl()
             {

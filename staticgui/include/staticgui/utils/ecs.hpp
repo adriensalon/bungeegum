@@ -58,12 +58,6 @@ namespace internal {
 
         struct entity {
 
-            // GET ID !! avec static_cast izi
-
-            entity();
-
-            bool is_valid() const;
-
             entity(registry& reg);
 
             entity(registry& reg, const entt::entity raw_ent);
@@ -95,7 +89,6 @@ namespace internal {
             [[nodiscard]] const component_t& get_or_create_component() const;
 
             // private:
-            bool _is_valid;
             entt::entity _entity;
             entt::registry* _registry_ptr;
         };

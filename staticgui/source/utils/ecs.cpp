@@ -28,27 +28,14 @@ namespace internal {
             return *this;
         }
 
-        entity::entity()
-        {
-            _is_valid = false;
-            _registry_ptr = nullptr;
-        }
-
-        bool entity::is_valid() const
-        {
-            return _is_valid;
-        }
-
         entity::entity(registry& reg)
         {
-            _is_valid = true;
             _entity = reg._registry.create();
             _registry_ptr = &(reg._registry);
         }
 
         entity::entity(registry& reg, const entt::entity raw_ent)
         {
-            _is_valid = true;
             _entity = raw_ent;
             _registry_ptr = &(reg._registry);
         }
@@ -60,7 +47,6 @@ namespace internal {
 
         entity& entity::operator=(const entity& other)
         {
-            _is_valid = other._is_valid;
             _entity = other._entity;
             _registry_ptr = other._registry_ptr;
             return *this;
