@@ -36,6 +36,34 @@ namespace internal {
     }
 }
 
+namespace tools {
+
+    /// @brief
+    /// @tparam function_t
+    /// @tparam start_t
+    /// @tparam end_t
+    /// @tparam increment_t
+    /// @param function
+    template <unsigned int start_t, unsigned int end_t, unsigned int increment_t, typename function_t>
+    constexpr void constexpr_for(function_t&& function);
+
+    /// @brief
+    /// @tparam ...values_t
+    /// @tparam function_t
+    /// @param function
+    /// @param ...values
+    template <typename... values_t, typename function_t>
+    constexpr void constexpr_foreach(function_t&& function, values_t&... values);
+
+    /// @brief
+    /// @tparam ...values_t
+    /// @tparam function_t
+    /// @param function
+    /// @param ...values
+    template <typename... values_t, typename function_t>
+    constexpr void constexpr_foreach(function_t&& function, const values_t&... values);
+}
+
 /// @brief
 struct color {
 
@@ -314,5 +342,6 @@ void print_build_tree();
 #include <staticgui/impl/event.inl>
 #include <staticgui/impl/lerp.inl>
 #include <staticgui/impl/make.inl>
+#include <staticgui/impl/tools.inl>
 #include <staticgui/impl/value.inl>
 #include <staticgui/impl/widgets.inl>
