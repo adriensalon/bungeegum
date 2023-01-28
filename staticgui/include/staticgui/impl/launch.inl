@@ -47,6 +47,7 @@ void launch(widget_t& widget)
         [&](std::tree<runtime_widget_component*>::iterator parent_it, const internal::id::integer parent_id) {
             runtime_widget_component* _runtime_parent_widget = widgets_ptrs_staging_container[parent_id];
             parent_it = widgets_ptrs_container.append_child(parent_it, _runtime_parent_widget);
+            widgets_ptrs_staging_container.erase(parent_id);
             for (auto& _child_id : (*parent_it)->data.children_ids)
                 _emplace(parent_it, _child_id);
         };

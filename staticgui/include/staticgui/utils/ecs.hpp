@@ -31,12 +31,11 @@ namespace internal {
 
             registry& operator=(registry&& other);
 
-            // iterate entities
+            // iterate entities only
 
             template <typename... components_t>
             void iterate_components(std::function<void(components_t&...)> iterate_function);
 
-            // template <typename... components_t>
             template <typename... components_t, typename function_t>
             void iterate_entities_components(function_t&& iterate_function);
 

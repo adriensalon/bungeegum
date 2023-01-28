@@ -21,6 +21,9 @@ template <typename widget_t, typename... children_widgets_t>
 void build_advanced(widget_t* widget, children_widgets_t&... children, std::function<void(layout&)> paint_callback, const bool is_above_root_widgets)
 {
     widget->internal_data.paint_callback = paint_callback;
+    tools::constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {
+        widget->internal_data.children_ids.emplace_back(_child_widget.internal_data.this_id);
+    });
 }
 
 }
