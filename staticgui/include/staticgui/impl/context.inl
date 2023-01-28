@@ -14,20 +14,27 @@ namespace internal {
     namespace impl {
 
         struct context_manager {
-            inline static context& get_context()
-            {
-                static context _context;
-                return _context;
-            }
+            inline static context immediate_context;
         };
     }
 }
 
 context::context() { }
 
+template <typename widget_t>
+context::destroy(widget_t& widget, const bool destroy_children)
+{
+    using namespace internal::impl;
+    // destroy component
+    // widgets_container.destroy()
+
+    // destroy in tree
+    // widgets_ptrs_container.
+}
+
 context& get_context()
 {
-    return internal::impl::context_manager::get_context();
+    return internal::impl::context_manager::immediate_context;
 }
 
 }

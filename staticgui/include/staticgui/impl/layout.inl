@@ -16,12 +16,7 @@ namespace internal {
     namespace impl {
 
         struct layout_manager {
-
-            inline static layout& get_layout()
-            {
-                static layout _layout;
-                return _layout;
-            }
+            inline static layout immediate_layout;
         };
     }
 }
