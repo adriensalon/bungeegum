@@ -9,15 +9,23 @@
 
 #pragma once
 
-#include <staticgui/staticgui.hpp>
+// #include <staticgui/staticgui.hpp>
 
 namespace staticgui {
 namespace internal {
     namespace impl {
 
-        struct layout_impl {
+        struct layout_manager {
+
+            inline static layout& get_layout()
+            {
+                static layout _layout;
+                return _layout;
+            }
         };
     }
 }
+
+layout::layout() { }
 
 }

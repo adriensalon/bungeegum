@@ -15,6 +15,9 @@ namespace staticgui {
 namespace internal {
     namespace impl {
 
+        struct runtime_curve_component {
+        };
+
         struct curve_impl {
         };
 

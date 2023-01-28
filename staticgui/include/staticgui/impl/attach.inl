@@ -9,25 +9,11 @@
 
 #pragma once
 
-#include <any>
-#include <optional>
-#include <thread>
-#include <tree.hh>
-#include <unordered_map>
-
-#include <staticgui/staticgui.hpp>
-#include <staticgui/utils/app.hpp>
-#include <staticgui/utils/draw.hpp>
-#include <staticgui/utils/ecs.hpp>
-#include <staticgui/utils/id.hpp>
-#include <staticgui/utils/transform.hpp>
-
 namespace staticgui {
 
-namespace internal {
-    namespace impl {
-
-    }
+template <typename widget_t>
+void attach(widget_t& widget)
+{
 }
 
 }

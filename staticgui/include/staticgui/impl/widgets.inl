@@ -8,6 +8,48 @@
 //                          |___/     v0.0
 
 #pragma once
+//       _        _   _                 _
+//      | |      | | (_)               (_)
+//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
+//  / __| __/ _` | __| |/ __/ _` | | | | |
+//  \__ \ || (_| | |_| | (_| (_| | |_| | |
+//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
+//                           __/ |
+//                          |___/     v0.0
+
+#pragma once
+
+#include <any>
+#include <memory>
+#include <tree.hh>
+#include <typeindex>
+#include <unordered_map>
+
+#include <staticgui/utils/ecs.hpp>
+#include <staticgui/utils/id.hpp>
+
+namespace staticgui {
+namespace internal {
+    namespace impl {
+
+        struct runtime_widget_data {
+            id::integer this_id = id::id_generator::create();
+            std::vector<id::integer> children_ids;
+            std::function<void(layout&)> paint_callback = nullptr;
+        };
+
+        struct runtime_widget_component {
+            std::unique_ptr<std::type_index> typeindex = nullptr;
+            std::any untyped = nullptr;
+            runtime_widget_data data;
+        };
+
+        inline static ecs::registry widgets_container;
+        inline static std::unordered_map<id::integer, runtime_widget_component*> widgets_ptrs_staging_container;
+        inline static std::tree<runtime_widget_component*> widgets_ptrs_container;
+    }
+}
+}
 
 #undef STATICGUI_WIDGET
 #define STATICGUI_WIDGET(widget_t)                                           \

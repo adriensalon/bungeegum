@@ -9,11 +9,24 @@
 
 #pragma once
 
+#include <any>
+
 #include <staticgui/staticgui.hpp>
 
 namespace staticgui {
 namespace internal {
     namespace impl {
+
+        struct runtime_event_component {
+            std::vector<std::type_info> typeinfos;
+            std::any untyped = nullptr;
+
+            // template <typename... values_t>
+            // std::function<void(values_t&...)> trigger = nullptr;
+
+            // template <typename... values_t>
+            // std::function<void(std::function<void(values_t&...)>)> on_trigger = nullptr;
+        };
 
         struct event_impl {
         };

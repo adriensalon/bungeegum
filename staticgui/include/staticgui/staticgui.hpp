@@ -347,7 +347,6 @@ struct context {
     // rebuild
 private:
     context();
-    internal::impl::context_impl& _impl;
     friend struct internal::impl::context_manager;
 };
 
@@ -361,7 +360,6 @@ struct layout {
 
 private:
     layout();
-    internal::impl::layout_impl& _impl;
     friend struct internal::impl::layout_manager;
 };
 
@@ -420,13 +418,15 @@ void print_build_tree();
 // #endif
 }
 
-#include "staticgui.inl"
+// #include "staticgui.inl"
 
 #include <staticgui/impl/animation.inl>
+#include <staticgui/impl/attach.inl>
 #include <staticgui/impl/build.inl>
 #include <staticgui/impl/context.inl>
 #include <staticgui/impl/curve.inl>
 #include <staticgui/impl/event.inl>
+#include <staticgui/impl/launch.inl>
 #include <staticgui/impl/layout.inl>
 #include <staticgui/impl/lerp.inl>
 #include <staticgui/impl/make.inl>
