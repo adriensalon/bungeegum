@@ -35,8 +35,8 @@ namespace internal {
         };
 
         inline static ecs::registry widgets_container;
-        inline static std::unordered_map<id::integer, runtime_widget_component*> widgets_ptrs_staging_container;
-        inline static std::tree<runtime_widget_component*> widgets_ptrs_container;
+        inline static std::unordered_map<id::integer, std::shared_ptr<runtime_widget_component>> widgets_ptrs_staging_container;
+        inline static std::tree<std::shared_ptr<runtime_widget_component>> widgets_ptrs_container;
     }
 }
 }

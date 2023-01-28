@@ -20,6 +20,8 @@ namespace staticgui {
 namespace internal {
     namespace ecs {
 
+        struct entity;
+
         struct registry {
 
             registry();
@@ -31,6 +33,10 @@ namespace internal {
             registry(registry&& other);
 
             registry& operator=(registry&& other);
+
+            // entity create();
+
+            // destroy(const entity& ent);
 
             // iterate entities only
 
