@@ -9,15 +9,34 @@
 
 #pragma once
 
+#include <any>
 #include <array>
 #include <functional>
 #include <future>
 #include <iostream>
 #include <string>
+#include <type_traits>
+#include <typeindex>
 #include <variant>
 #include <vector>
 
-// #include <staticgui/utils/traits.hpp>
+#include <staticgui/glue/containers.hpp>
+#include <staticgui/glue/meta.hpp>
+#include <staticgui/glue/traits.hpp>
+
+namespace internal {
+namespace impl {
+    // struct any_function_impl;
+    struct event_impl;
+    struct curve_impl;
+    struct animation_impl;
+    struct value_impl;
+    struct context_impl;
+    struct context_manager;
+    struct layout_impl;
+    struct layout_manager;
+}
+}
 
 /// @brief
 /// @details
@@ -29,6 +48,37 @@ namespace staticgui {
 
 /// @brief
 namespace tools {
+
+    typedef void (*void_function_t)(void);
+
+    /// @brief
+    struct any_function {
+    public:
+        any_function() noexcept;
+
+        any_function(nullptr_t) noexcept;
+
+        any_function(const any_function& other);
+
+        any_function& operator=(const any_function& other);
+
+        any_function(any_function&& other) noexcept;
+
+        any_function& operator=(any_function&& other) noexcept;
+
+        template <typename return_t, typename... args_t>
+        any_function& operator=(const std::function<return_t(args_t...)>& function);
+
+        template <typename return_t, typename... args_t>
+        std::function<return_t(args_t...)>& get();
+
+        template <typename return_t, typename... args_t>
+        return_t operator()(args_t&&... args);
+
+    private: // go private impl
+        std::any _untyped;
+        std::shared_ptr<std::type_index> _typeindex;
+    };
 
     /// @brief
     /// @tparam function_t
@@ -97,25 +147,13 @@ namespace traits {
     /// @tparam function_t
     /// @tparam ...args_t
     template <typename function_t, typename... values_t>
-    constexpr bool is_convertible_to_callback();
+    // constexpr bool is_convertible_to_callback = std::conjunction_v<std::negation<std::is_same<std::decay_t<function_t>, std::function<void(values_t...)>>>, std::is_invocable_r<void, function_t, values_t...>>;
+    constexpr bool is_convertible_to_callback = std::is_constructible_v<std::function<void(values_t...)>, values_t...>;
 
-    /// @brief
-    /// @tparam value_t
+    // /// @brief
+    // /// @tparam value_t
     template <typename function_t, typename... values_t>
-    using callback_function_t = typename std::enable_if_t<is_convertible_to_callback<function_t, values_t...>, function_t>;
-}
-
-namespace internal {
-    namespace impl {
-        struct event_impl;
-        struct curve_impl;
-        struct animation_impl;
-        struct value_impl;
-        struct context_impl;
-        struct context_manager;
-        struct layout_impl;
-        struct layout_manager;
-    }
+    using callback_function_t = typename std::enable_if_t<is_convertible_to_callback<function_t, values_t...>>;
 }
 
 /// @brief
@@ -154,12 +192,11 @@ struct event {
 
     event();
 
-    template <typename function_t>
-    event(function_t&& function);
+    event(const std::function<void(values_t...)>& trigger_callback);
 
-    event(const event& other) = delete;
+    event(const event& other);
 
-    event& operator=(const event& other) = delete;
+    event& operator=(const event& other);
 
     event(event&& other);
 
@@ -168,7 +205,7 @@ struct event {
     /// @brief
     /// @param trigger_callback
     /// @return
-    event& on_trigger(std::function<void(const values_t&...)> trigger_callback);
+    event& on_trigger(const std::function<void(const values_t&...)>& trigger_callback);
 
     event& clear();
 
@@ -195,6 +232,9 @@ private:
     internal::impl::event_impl& _impl;
 };
 
+template <typename... values_t>
+event(std::function<void(values_t...)>) -> event<values_t...>;
+
 /// @brief
 /// @tparam value_t
 template <typename value_t>
@@ -204,9 +244,9 @@ struct animation {
     /// @param ...curves
     animation(const curve<value_t>& bezier_curve);
 
-    animation(const animation& other) = delete;
+    animation(const animation& other);
 
-    animation& operator=(const animation& other) = delete;
+    animation& operator=(const animation& other);
 
     animation(animation&& other);
 
@@ -348,9 +388,9 @@ struct context {
     inline void maintain_children() { }
 
     // rebuild
-private:
+    // private:
     context();
-    friend struct internal::impl::context_manager;
+    friend context& get_context();
 };
 
 struct layout {

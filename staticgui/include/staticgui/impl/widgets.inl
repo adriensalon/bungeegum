@@ -22,28 +22,29 @@ namespace staticgui {
 namespace internal {
     namespace impl {
 
-        struct runtime_widget_data {
+        struct widget_data {
             id::integer this_id = id::generator::create();
             std::vector<id::integer> children_ids;
             std::function<void(layout&)> paint_callback = nullptr;
         };
 
-        struct runtime_widget_component {
+        struct widget_impl {
             std::unique_ptr<std::type_index> typeindex = nullptr;
             std::any untyped = nullptr;
-            runtime_widget_data data;
+            // ecs::entity owner;
+            widget_data data;
         };
 
         inline static ecs::registry widgets_container;
-        inline static std::unordered_map<id::integer, std::shared_ptr<runtime_widget_component>> widgets_ptrs_staging_container;
-        inline static std::tree<std::shared_ptr<runtime_widget_component>> widgets_ptrs_container;
+        inline static std::unordered_map<id::integer, std::reference_wrapper<widget_impl>> widgets_refs_staging_container;
+        inline static std::tree<widget_impl*> widgets_ptrs_container;
     }
 }
 }
 
 #undef STATICGUI_WIDGET
 #define STATICGUI_WIDGET(widget_t)                                           \
-    staticgui::internal::impl::runtime_widget_data internal_data;            \
+    staticgui::internal::impl::widget_data internal_data;                    \
                                                                              \
     template <typename widget_t>                                             \
     friend void staticgui::launch(widget_t&);                                \

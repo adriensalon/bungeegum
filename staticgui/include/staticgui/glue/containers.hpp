@@ -9,23 +9,49 @@
 
 #pragma once
 
+#include <any>
 #include <memory>
 #include <optional>
 
 #include <entt/entt.hpp>
+#include <tree.hh>
 
-// #include <staticgui/utils/typelist.hpp>
+#include <staticgui/glue/meta.hpp>
 
 namespace staticgui {
-namespace internal {
-    namespace ecs {
+namespace glue {
+    namespace containers {
 
-        // using entity = entt::entity;
+        struct any_function {
+            any_function() noexcept;
 
-        struct entity;
+            any_function(nullptr_t) noexcept;
+
+            any_function(const any_function& other);
+
+            any_function& operator=(const any_function& other);
+
+            any_function(any_function&& other) noexcept;
+
+            any_function& operator=(any_function&& other) noexcept;
+
+            template <typename return_t, typename... args_t>
+            any_function& operator=(const std::function<return_t(args_t...)>& function);
+
+            template <typename return_t, typename... args_t>
+            std::function<return_t(args_t...)>& get();
+
+            template <typename return_t, typename... args_t>
+            return_t operator()(args_t&&... args);
+
+        private:
+            std::any _untyped;
+            std::shared_ptr<std::type_index> _typeindex;
+        };
+
+        using entity = entt::entity;
 
         struct registry {
-
             registry();
 
             registry(const registry& other);
@@ -70,48 +96,19 @@ namespace internal {
 
         private:
             std::shared_ptr<entt::registry> _registry;
-            friend struct entity;
+            // friend struct entity;
         };
 
-        struct entity { // juste go using et move les methods dans le reg
+        template <typename node_t, typename node_allocator_t = std::allocator<tree_node_<node_t>>>
+        struct tree {
+        };
 
-            entity(registry& reg);
-
-            entity(registry& reg, const entt::entity raw_ent);
-
-            entity(const entity& other);
-
-            entity& operator=(const entity& other);
-
-            entity(entity&& other);
-
-            entity& operator=(entity&& other);
-
-            template <typename component_t>
-            [[nodiscard]] bool has_component() const;
-
-            template <typename component_t, typename... args_t>
-            component_t& create_component(args_t&&... args);
-
-            template <typename component_t>
-            [[nodiscard]] component_t& get_component();
-
-            template <typename component_t>
-            [[nodiscard]] const component_t& get_component() const;
-
-            template <typename component_t>
-            [[nodiscard]] component_t& get_or_create_component();
-
-            template <typename component_t>
-            [[nodiscard]] const component_t& get_or_create_component() const;
-
-            // private:
-            entt::entity _entity;
-            std::shared_ptr<entt::registry> _registry;
+        template <typename node_t>
+        struct tree<std::reference_wrapper<node_t>> {
         };
 
     }
 }
 }
 
-#include <staticgui/utils/ecs.inl>
+#include <staticgui/glue/containers.inl>

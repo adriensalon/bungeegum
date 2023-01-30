@@ -7,21 +7,19 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#pragma once
+#include <staticgui/staticgui.hpp>
+#include <staticgui/utils/ecs.hpp>
 
 namespace staticgui {
+namespace internal {
+    namespace impl {
 
-template <typename widget_t>
-context& context::destroy(widget_t& widget, const bool destroy_children)
-{
-    using namespace internal::impl;
-    // destroy component
-    // widgets_container.destroy()
+        event_impl& create_event_impl()
+        {
+            ecs::entity _entity(events_container);
+            return _entity.create_component<event_impl>();
+        }
 
-    // destroy in tree
-    // widgets_ptrs_container.
-
-    return *this;
+    }
 }
-
 }

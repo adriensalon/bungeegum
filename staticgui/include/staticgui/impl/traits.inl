@@ -84,7 +84,11 @@ namespace internal {
         // constexpr bool is_lerpable = (has_float_multiply<value_t>() && has_add<value_t>());
 
         template <typename function_t, typename... values_t>
-        constexpr bool is_convertible_to_callback() { return std::is_invocable_v<function_t, values_t...>; }
+        constexpr bool is_convertible_to_callback()
+        {
+            return std::conjunction_v<std::negation<std::is_same<std::decay_t<function_t>, std::function<void(values_t...)>>>, std::is_invocable_r<void, function_t, values_t...>>;
+            // return std::is_invocable_v<function_t, values_t...>;
+        }
     }
 }
 }

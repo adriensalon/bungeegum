@@ -9,12 +9,16 @@
 
 project(staticgui)
 
-set(staticgui_source 
-	"source/staticgui.cpp"
+set(staticgui_source
 	"source/utils/app.cpp"
 	"source/utils/draw.cpp"
 	"source/utils/ecs.cpp"
 	"source/utils/id.cpp"
+
+	"source/impl/context.cpp"
+	"source/impl/event.cpp"
+	"source/impl/layout.cpp"	
+	"source/impl/tools.cpp"	
 )
 
 add_library(staticgui "${staticgui_source}")

@@ -10,38 +10,41 @@
 #pragma once
 
 #include <any>
+#include <typeindex>
 
 #include <staticgui/staticgui.hpp>
+#include <staticgui/utils/ecs.hpp>
 
 namespace staticgui {
 namespace internal {
     namespace impl {
 
-        struct runtime_event_component {
-            std::vector<std::type_info> typeinfos;
-            std::any untyped = nullptr;
-
-            // template <typename... values_t>
-            // std::function<void(values_t&...)> trigger = nullptr;
-
-            // template <typename... values_t>
-            // std::function<void(std::function<void(values_t&...)>)> on_trigger = nullptr;
-        };
-
         struct event_impl {
+            std::vector<std::type_index> typeinfos;
+            std::vector<tools::any_function> callbacks;
+            // ecs::entity owner;
         };
 
-        static internal::impl::event_impl _NO5;
+        inline static ecs::registry events_container;
+
+        event_impl& create_event_impl();
+        void destroy_event_impl(event_impl& event);
     }
 }
 
 template <typename... values_t>
-template <typename function_t>
-event<values_t...>::event(function_t&& function)
-    : _impl(internal::impl::_NO5)
+event<values_t...>::event(const std::function<void(values_t...)>& trigger_callback)
+    : _impl(internal::impl::create_event_impl())
 {
-    static_assert(std::is_invocable_v<function_t, values_t...>); // we have to rely on static assert
-    std::cout << "YEEEEEEEEES \n";
 }
+
+// template <typename... values_t>
+// template <typename function_t = typename std::enable_if_t<is_convertible_to_callback<function_t, values_t...>>>
+// event<values_t...>::event(function_t&& function)
+//     : _impl(internal::impl::create_event_impl())
+// {
+//     // static_assert(traits::is_convertible_to_callback<function_t, values_t...>); // we have to rely on static assert
+//     std::cout << "YEEEEEEEEES \n";
+// }
 
 }

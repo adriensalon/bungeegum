@@ -48,7 +48,7 @@ namespace internal {
 
 void print_build_tree()
 {
-    // internal::id::print_tree<internal::detail::runtime_widget_component>();
+    // internal::id::print_tree<internal::detail::widget_impl>();
     // internal::detail::runtime_context _rc;
     // _it->second.update_callback(_rc);
 }

@@ -10,10 +10,16 @@
 #pragma once
 
 namespace staticgui {
-namespace internal {
+namespace glue {
+    namespace meta {
 
-    namespace typelist {
-        namespace impl {
+        template <unsigned int start_t, unsigned int end_t, unsigned int increment_t, typename function_t>
+        constexpr void constexpr_for(function_t&& function);
+
+        template <typename... values_t, typename function_t>
+        constexpr void constexpr_foreach(function_t&& function, values_t&... values);
+
+        namespace detail {
             template <typename typelist_t>
             struct front_helper;
 
@@ -38,29 +44,28 @@ namespace internal {
 
         template <typename... types_t>
         struct typelist {
-
             template <template <typename...> typename typelist_t>
             using as_type = typelist_t<types_t...>;
 
             template <template <typename> typename wrapper_type_t>
             using wrap_type = typelist<wrapper_type_t<types_t>...>;
 
-            using front_type = typename impl::front_helper<typelist<types_t...>>::type_t;
+            using front_type = typename detail::front_helper<typelist<types_t...>>::type_t;
 
-            using pop_front_type = typename impl::pop_front_helper<typelist>::type_t;
+            using pop_front_type = typename detail::pop_front_helper<typelist>::type_t;
 
             template <typename new_type_t>
-            using push_front_type = typename impl::push_front_helper<typelist, new_type_t>::type_t;
+            using push_front_type = typename detail::push_front_helper<typelist, new_type_t>::type_t;
 
             template <unsigned int index_t>
-            using at_type = typename impl::at_helper<index_t, typelist>::type_t;
+            using at_type = typename detail::at_helper<index_t, typelist>::type_t;
 
-            using back_type = typename impl::back_helper<typelist>::type_t;
+            using back_type = typename detail::back_helper<typelist>::type_t;
 
-            using pop_back_type = typename impl::pop_back_helper<typelist>::type_t;
+            using pop_back_type = typename detail::pop_back_helper<typelist>::type_t;
 
             template <typename new_type_t>
-            using push_back_type = typename impl::push_back_helper<typelist, new_type_t>::type_t;
+            using push_back_type = typename detail::push_back_helper<typelist, new_type_t>::type_t;
 
             template <template <typename...> typename typelist_t>
             [[nodiscard]] static constexpr as_type<typelist_t> as();
@@ -92,7 +97,6 @@ namespace internal {
 
         template <template <typename...> typename typelist_t, typename... types_t>
         struct strong_typelist {
-
             template <template <typename...> typename new_typelist_t>
             [[nodiscard]] static constexpr auto as();
 
@@ -120,9 +124,8 @@ namespace internal {
 
             [[nodiscard]] static constexpr bool empty();
         };
-
     }
 }
 }
 
-#include <staticgui/utils/typelist.inl>
+#include <staticgui/glue/meta.inl>

@@ -35,8 +35,6 @@
 #include <stdexcept>
 #include <string>
 
-namespace std {
-
 /// A node in the tree, combining links to other nodes as well as the actual data.
 template <class T>
 class tree_node_ { // size: 5*4=20 bytes (on 32 bit arch), can be reduced by 8.
@@ -3433,6 +3431,11 @@ typename tree<T, tree_node_allocator>::leaf_iterator& tree<T, tree_node_allocato
     }
     return (*this);
 }
+
+namespace std {
+
+template <typename T, class tree_node_allocator = std::allocator<tree_node_<T>>>
+using tree = ::tree<T, tree_node_allocator>;
 
 }
 #endif

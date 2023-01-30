@@ -9,16 +9,26 @@
 
 #pragma once
 
-// #include <staticgui/staticgui.hpp>
+#include <vector>
 
 namespace staticgui {
-namespace internal {
-    namespace impl {
+namespace glue {
+    namespace id {
 
-        struct layout_manager {
-            // inline static layout immediate_layout;
+        using integer = unsigned long long;
+
+        struct generator {
+            static integer create();
+
+            static integer next();
+
+            static void destroy(const integer id);
+
+        private:
+            inline static integer _count = 0;
+            inline static std::vector<integer> _deleted;
         };
+
     }
 }
-
 }

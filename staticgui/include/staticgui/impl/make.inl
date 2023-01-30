@@ -19,14 +19,15 @@ widget_t& make(widget_args_t&&... widget_args)
     std::cout << "making " << typeid(widget_t).name() << std::endl;
     using namespace internal::impl;
 
-    internal::ecs::entity _entity(internal::impl::widgets_container);
-    runtime_widget_component& _runtime_widget = _entity.create_component<runtime_widget_component>();
+    internal::ecs::entity _entity(widgets_container);
+    widget_impl& _runtime_widget = _entity.create_component<widget_impl>();
     _runtime_widget.typeindex = std::make_unique<std::type_index>(typeid(widget_t));
     _runtime_widget.untyped = std::make_any<widget_t>(std::forward<widget_args_t>(widget_args)...);
+    // _runtime_widget.owner = std::move(_entity);
 
     widget_t& _widget = std::any_cast<widget_t&>(_runtime_widget.untyped);
     _runtime_widget.data = _widget.internal_data;
-    widgets_ptrs_staging_container[_widget.internal_data.this_id] = std::make_shared<runtime_widget_component>(std::move(_runtime_widget));
+    widgets_refs_staging_container.emplace(_widget.internal_data.this_id, _runtime_widget);
 
     return _widget;
 }
