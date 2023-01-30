@@ -7,18 +7,24 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <tree.hh>
-
-#include <staticgui/utils/draw.hpp>
+#include <staticgui/glue/containers.hpp>
 
 namespace staticgui {
-namespace internal {
-    namespace draw {
+namespace glue {
+    namespace containers {
 
-        void emplace_to_render_tree()
+        registry::registry() { }
+
+        registry::registry(registry&& other)
         {
+            *this = std::move(other);
         }
 
+        registry& registry::operator=(registry&& other)
+        {
+            _registry = std::move(other._registry);
+            return *this;
+        }
     }
 }
 }

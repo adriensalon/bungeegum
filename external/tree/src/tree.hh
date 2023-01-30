@@ -3438,6 +3438,16 @@ template <typename T, class tree_node_allocator = std::allocator<tree_node_<T>>>
 using tree = ::tree<T, tree_node_allocator>;
 
 }
+
+namespace kbtree {
+
+template <typename T, class tree_node_allocator = std::allocator<tree_node_<T>>>
+using tree = ::tree<T, tree_node_allocator>;
+
+template <typename T>
+using tree_node_ = ::tree_node_<T>;
+
+}
 #endif
 
 // Local variables:

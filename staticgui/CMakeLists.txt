@@ -10,10 +10,12 @@
 project(staticgui)
 
 set(staticgui_source
-	"source/utils/app.cpp"
-	"source/utils/draw.cpp"
-	"source/utils/ecs.cpp"
-	"source/utils/id.cpp"
+		"source/utils/ecs.cpp"
+		"source/utils/id.cpp"
+
+	"source/glue/app.cpp"
+	"source/glue/containers.cpp"
+	"source/glue/id.cpp"
 
 	"source/impl/context.cpp"
 	"source/impl/event.cpp"
