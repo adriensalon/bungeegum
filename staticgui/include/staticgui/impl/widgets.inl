@@ -15,16 +15,16 @@
 #include <typeindex>
 #include <unordered_map>
 
+#include <staticgui/glue/id.hpp>
 #include <staticgui/utils/ecs.hpp>
-#include <staticgui/utils/id.hpp>
 
 namespace staticgui {
 namespace internal {
     namespace impl {
 
         struct widget_data {
-            id::integer this_id = id::generator::create();
-            std::vector<id::integer> children_ids;
+            glue::id::integer this_id = glue::id::generator::create();
+            std::vector<glue::id::integer> children_ids;
             std::function<void(layout&)> paint_callback = nullptr;
         };
 
@@ -36,7 +36,7 @@ namespace internal {
         };
 
         inline static ecs::registry widgets_container;
-        inline static std::unordered_map<id::integer, std::reference_wrapper<widget_impl>> widgets_refs_staging_container;
+        inline static std::unordered_map<glue::id::integer, std::reference_wrapper<widget_impl>> widgets_refs_staging_container;
         inline static std::tree<widget_impl*> widgets_ptrs_container;
     }
 }

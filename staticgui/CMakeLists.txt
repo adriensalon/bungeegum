@@ -11,7 +11,6 @@ project(staticgui)
 
 set(staticgui_source
 		"source/utils/ecs.cpp"
-		"source/utils/id.cpp"
 
 	"source/glue/app.cpp"
 	"source/glue/containers.cpp"

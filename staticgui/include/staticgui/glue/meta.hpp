@@ -124,6 +124,7 @@ namespace glue {
 
             [[nodiscard]] static constexpr bool empty();
         };
+
     }
 }
 }

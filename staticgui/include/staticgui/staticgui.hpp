@@ -117,43 +117,10 @@ namespace traits {
         using type = first_value_t;
     };
 
-    // /// @brief
-    // /// @tparam value_t
-    // template <typename value_t>
-    // constexpr bool has_add();
-
-    // /// @brief
-    // /// @tparam value_t
-    // template <typename value_t>
-    // constexpr bool has_float_multiply();
-
-    template <typename value_t>
-    constexpr bool has_add_v = (internal::traits::has_outside_add<value_t> || internal::traits::has_inside_add<value_t>);
-
-    template <typename value_t>
-    constexpr bool has_float_multiply_v = (internal::traits::has_outside_float_left_multiply<value_t> || internal::traits::has_outside_float_right_multiply<value_t> || internal::traits::has_inside_float_multiply<value_t>);
-
     /// @brief
     /// @tparam value_t
     template <typename value_t>
-    constexpr bool is_lerpable = (has_float_multiply_v<value_t> && has_add_v<value_t>);
-
-    /// @brief
-    /// @tparam value_t
-    template <typename value_t>
-    using lerpable_value_t = typename std::enable_if_t<is_lerpable<value_t>, value_t>;
-
-    /// @brief
-    /// @tparam function_t
-    /// @tparam ...args_t
-    template <typename function_t, typename... values_t>
-    // constexpr bool is_convertible_to_callback = std::conjunction_v<std::negation<std::is_same<std::decay_t<function_t>, std::function<void(values_t...)>>>, std::is_invocable_r<void, function_t, values_t...>>;
-    constexpr bool is_convertible_to_callback = std::is_constructible_v<std::function<void(values_t...)>, values_t...>;
-
-    // /// @brief
-    // /// @tparam value_t
-    template <typename function_t, typename... values_t>
-    using callback_function_t = typename std::enable_if_t<is_convertible_to_callback<function_t, values_t...>>;
+    using lerpable_value_t = typename std::enable_if_t<glue::traits::is_lerpable_v<value_t>, value_t>;
 }
 
 /// @brief
@@ -474,6 +441,5 @@ void print_build_tree();
 #include <staticgui/impl/lerp.inl>
 #include <staticgui/impl/make.inl>
 #include <staticgui/impl/tools.inl>
-#include <staticgui/impl/traits.inl>
 #include <staticgui/impl/value.inl>
 #include <staticgui/impl/widgets.inl>

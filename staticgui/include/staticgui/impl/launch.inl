@@ -43,8 +43,8 @@ void launch(widget_t& widget)
     build(&_launcher, widget); // besoin de la struct degueu pour ca ?
     widgets_ptrs_container.insert(widgets_ptrs_container.begin(), {});
 
-    std::function<void(std::tree<widget_impl*>::iterator, const internal::id::integer)> _emplace =
-        [&](std::tree<widget_impl*>::iterator parent_it, const internal::id::integer parent_id) {
+    std::function<void(std::tree<widget_impl*>::iterator, const glue::id::integer)> _emplace =
+        [&](std::tree<widget_impl*>::iterator parent_it, const glue::id::integer parent_id) {
             widget_impl& _runtime_parent_widget = widgets_refs_staging_container.at(parent_id);
             parent_it = widgets_ptrs_container.append_child(parent_it, &_runtime_parent_widget); // move pcq on erase juste apres
             widgets_refs_staging_container.erase(parent_id);
