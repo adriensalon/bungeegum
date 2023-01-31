@@ -12,8 +12,7 @@
 #include <any>
 #include <typeindex>
 
-#include <staticgui/staticgui.hpp>
-#include <staticgui/utils/ecs.hpp>
+#include <staticgui/glue/registry.hpp>
 
 namespace staticgui {
 namespace internal {
@@ -21,11 +20,11 @@ namespace internal {
 
         struct event_impl {
             std::vector<std::type_index> typeinfos;
-            std::vector<tools::any_function> callbacks;
+            std::vector<glue::any_function> callbacks;
             // ecs::entity owner;
         };
 
-        inline static ecs::registry events_container;
+        inline static glue::registry events_container;
 
         event_impl& create_event_impl();
         void destroy_event_impl(event_impl& event);

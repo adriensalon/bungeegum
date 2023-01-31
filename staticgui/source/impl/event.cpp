@@ -8,7 +8,6 @@
 //                          |___/     v0.0
 
 #include <staticgui/staticgui.hpp>
-#include <staticgui/utils/ecs.hpp>
 
 namespace staticgui {
 namespace internal {
@@ -16,8 +15,8 @@ namespace internal {
 
         event_impl& create_event_impl()
         {
-            ecs::entity _entity(events_container);
-            return _entity.create_component<event_impl>();
+            glue::id_integer _entity = events_container.create_entity();
+            return events_container.create_component<event_impl>(_entity);
         }
 
     }

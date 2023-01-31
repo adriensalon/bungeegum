@@ -7,24 +7,29 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <staticgui/glue/containers.hpp>
+#include <staticgui/glue/registry.hpp>
 
 namespace staticgui {
 namespace glue {
-    namespace containers {
 
-        registry::registry() { }
+    registry::registry()
+    {
+    }
 
-        registry::registry(registry&& other)
-        {
-            *this = std::move(other);
-        }
+    registry::registry(registry&& other)
+    {
+        *this = std::move(other);
+    }
 
-        registry& registry::operator=(registry&& other)
-        {
-            _registry = std::move(other._registry);
-            return *this;
-        }
+    registry& registry::operator=(registry&& other)
+    {
+        _registry = std::move(other._registry);
+        return *this;
+    }
+
+    id_integer registry::create_entity()
+    {
+        return _registry.create();
     }
 }
 }

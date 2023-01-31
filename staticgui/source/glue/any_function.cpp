@@ -7,10 +7,10 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <staticgui/staticgui.hpp>
+#include <staticgui/glue/any_function.hpp>
 
 namespace staticgui {
-namespace tools {
+namespace glue {
 
     any_function::any_function() noexcept
     {

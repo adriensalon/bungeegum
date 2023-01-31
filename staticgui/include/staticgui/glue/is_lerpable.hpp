@@ -13,7 +13,7 @@
 
 namespace staticgui {
 namespace glue {
-    namespace traits {
+    namespace detail {
 
         // add
         template <typename value_t, typename = std::void_t<>>
@@ -52,11 +52,10 @@ namespace glue {
 
         template <typename value_t>
         constexpr bool has_float_multiply_v = (has_outside_float_left_multiply_v<value_t> || has_outside_float_right_multiply_v<value_t> || has_inside_float_multiply_v<value_t>);
-
-        // lerpable
-        template <typename value_t>
-        constexpr bool is_lerpable_v = (has_float_multiply_v<value_t> && has_add_v<value_t>);
-
     }
+
+    // lerpable
+    template <typename value_t>
+    constexpr bool is_lerpable_v = (detail::has_float_multiply_v<value_t> && detail::has_add_v<value_t>);
 }
 }

@@ -14,7 +14,7 @@
 
 namespace staticgui {
 namespace glue {
-    namespace app {
+    namespace platform {
 
         void start_window(
             const std::string& initial_title,

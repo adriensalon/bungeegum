@@ -20,9 +20,16 @@
 #include <variant>
 #include <vector>
 
-#include <staticgui/glue/containers.hpp>
-#include <staticgui/glue/meta.hpp>
-#include <staticgui/glue/traits.hpp>
+#include <staticgui/glue/any_function.hpp>
+#include <staticgui/glue/constexpr_for.hpp>
+#include <staticgui/glue/graphics.hpp>
+#include <staticgui/glue/group.hpp>
+#include <staticgui/glue/id_integer.hpp>
+#include <staticgui/glue/is_lerpable.hpp>
+#include <staticgui/glue/platform.hpp>
+#include <staticgui/glue/registry.hpp>
+#include <staticgui/glue/tree.hpp>
+#include <staticgui/glue/typelist.hpp>
 
 namespace internal {
 namespace impl {
@@ -47,66 +54,6 @@ namespace impl {
 namespace staticgui {
 
 /// @brief
-namespace tools {
-
-    typedef void (*void_function_t)(void);
-
-    /// @brief
-    struct any_function {
-    public:
-        any_function() noexcept;
-
-        any_function(nullptr_t) noexcept;
-
-        any_function(const any_function& other);
-
-        any_function& operator=(const any_function& other);
-
-        any_function(any_function&& other) noexcept;
-
-        any_function& operator=(any_function&& other) noexcept;
-
-        template <typename return_t, typename... args_t>
-        any_function& operator=(const std::function<return_t(args_t...)>& function);
-
-        template <typename return_t, typename... args_t>
-        std::function<return_t(args_t...)>& get();
-
-        template <typename return_t, typename... args_t>
-        return_t operator()(args_t&&... args);
-
-    private: // go private impl
-        std::any _untyped;
-        std::shared_ptr<std::type_index> _typeindex;
-    };
-
-    /// @brief
-    /// @tparam function_t
-    /// @tparam start_t
-    /// @tparam end_t
-    /// @tparam increment_t
-    /// @param function
-    template <unsigned int start_t, unsigned int end_t, unsigned int increment_t, typename function_t>
-    constexpr void constexpr_for(function_t&& function);
-
-    /// @brief
-    /// @tparam ...values_t
-    /// @tparam function_t
-    /// @param function
-    /// @param ...values
-    template <typename... values_t, typename function_t>
-    constexpr void constexpr_foreach(function_t&& function, values_t&... values);
-
-    // /// @brief
-    // /// @tparam ...values_t
-    // /// @tparam function_t
-    // /// @param function
-    // /// @param ...values
-    // template <typename... values_t, typename function_t>
-    // constexpr void constexpr_foreach(function_t&& function, const values_t&... values);
-}
-
-/// @brief
 namespace traits {
 
     // template <typename... values_t>
@@ -120,7 +67,7 @@ namespace traits {
     /// @brief
     /// @tparam value_t
     template <typename value_t>
-    using lerpable_value_t = typename std::enable_if_t<glue::traits::is_lerpable_v<value_t>, value_t>;
+    using lerpable_value_t = typename std::enable_if_t<glue::is_lerpable_v<value_t>, value_t>;
 }
 
 /// @brief
@@ -131,15 +78,12 @@ traits::lerpable_value_t<value_t> lerp(const value_t& min, const value_t& max, c
 
 /// @brief
 struct color {
-
     color operator+(const color& other);
-
     color operator*(const float multiplier);
 };
 
 template <typename value_t>
 struct curve {
-
     curve(const traits::lerpable_value_t<value_t>& min, const value_t& max);
 
     std::vector<std::pair<float, value_t>>& get_points();
@@ -156,17 +100,11 @@ private:
 /// @tparam ...values_t
 template <typename... values_t>
 struct event {
-
     event();
-
     event(const std::function<void(values_t...)>& trigger_callback);
-
     event(const event& other);
-
     event& operator=(const event& other);
-
     event(event&& other);
-
     event& operator=(event&& other);
 
     /// @brief
@@ -199,24 +137,17 @@ private:
     internal::impl::event_impl& _impl;
 };
 
-template <typename... values_t>
-event(std::function<void(values_t...)>) -> event<values_t...>;
+// template <typename... values_t>
+// event(const std::function<void(values_t...)>&) -> event<values_t...>;
 
 /// @brief
 /// @tparam value_t
 template <typename value_t>
 struct animation {
-
-    /// @brief
-    /// @param ...curves
     animation(const curve<value_t>& bezier_curve);
-
     animation(const animation& other);
-
     animation& operator=(const animation& other);
-
     animation(animation&& other);
-
     animation& operator=(animation&& other);
 
     /// @brief
@@ -244,13 +175,7 @@ private:
 /// @tparam value_t
 template <typename value_t>
 struct value {
-
-    /// @brief
-    /// @param animated_value
     value(const animation<traits::lerpable_value_t<value_t>>& animated_value);
-
-    /// @brief
-    /// @param static_value
     value(const traits::lerpable_value_t<value_t>& static_value);
 
     /// @brief
@@ -360,6 +285,10 @@ struct context {
     friend context& get_context();
 };
 
+/// @brief
+/// @return
+context& get_context();
+
 struct layout {
     //     // cursor etc
 
@@ -396,10 +325,6 @@ template <typename widget_t, typename... widget_args_t>
 [[nodiscard]] widget_t& make(widget_args_t&&... widget_args);
 
 /// @brief
-/// @return
-context& get_context();
-
-/// @brief
 /// @tparam widget_t
 /// @tparam child_widget_t
 /// @param widget
@@ -415,10 +340,7 @@ void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_n
 /// @param  widget
 /// @param  paint_callback
 template <typename widget_t, typename... children_widgets_t>
-void build_advanced(widget_t* widget, children_widgets_t&... children_widgets, std::function<void(layout&)> context_callback, const bool is_above_root_widgets = false);
-
-// template <typename widget_t, typename... children_widgets_t>
-// void build_advanced(widget_t& widget, children_widgets_t&... children_widgets, const event<layout&> context_callback);
+void build_advanced(widget_t* widget, std::function<void(layout&)> context_callback, children_widgets_t&... children_widgets);
 
 // #if defined(STATICGUI_DEBUG)
 
@@ -427,8 +349,6 @@ void print_build_tree();
 
 // #endif
 }
-
-// #include "staticgui.inl"
 
 #include <staticgui/impl/animation.inl>
 #include <staticgui/impl/attach.inl>
@@ -440,6 +360,5 @@ void print_build_tree();
 #include <staticgui/impl/layout.inl>
 #include <staticgui/impl/lerp.inl>
 #include <staticgui/impl/make.inl>
-#include <staticgui/impl/tools.inl>
 #include <staticgui/impl/value.inl>
 #include <staticgui/impl/widgets.inl>

@@ -19,8 +19,8 @@ widget_t& make(widget_args_t&&... widget_args)
     std::cout << "making " << typeid(widget_t).name() << std::endl;
     using namespace internal::impl;
 
-    internal::ecs::entity _entity(widgets_container);
-    widget_impl& _runtime_widget = _entity.create_component<widget_impl>();
+    glue::id_integer _entity = widgets_container.create_entity();
+    widget_impl& _runtime_widget = widgets_container.create_component<widget_impl>(_entity);
     _runtime_widget.typeindex = std::make_unique<std::type_index>(typeid(widget_t));
     _runtime_widget.untyped = std::make_any<widget_t>(std::forward<widget_args_t>(widget_args)...);
     // _runtime_widget.owner = std::move(_entity);

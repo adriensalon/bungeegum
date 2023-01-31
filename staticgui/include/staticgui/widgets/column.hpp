@@ -30,11 +30,11 @@ namespace widgets {
         template <typename... children_widgets_t>
         column_widget(children_widgets_t&... children)
         {
-            tools::constexpr_foreach([&](auto& _child) {
-                build(this, center(_child));
-            },
-                children...);
-            // build(this, children)...;
+            build_advanced(
+                this, [&](layout& lay) {
+
+                },
+                center(children)...);
         }
     };
 }
@@ -44,7 +44,8 @@ namespace widgets {
 /// @tparam ...children_widgets_t
 /// @param ...children_widgets
 /// @endcond
-template <typename... children_widgets_t>
-widgets::column_widget& column(children_widgets_t&... children_widgets) { return make<widgets::column_widget>(children_widgets...); }
+// template <typename... children_widgets_t>
+// widgets::column_widget& column(children_widgets_t&... children_widgets) { return make<widgets::column_widget>(children_widgets...); }
 
+#define column staticgui::make<staticgui::widgets::column_widget>
 }

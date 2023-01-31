@@ -9,26 +9,18 @@
 
 #pragma once
 
-#include <vector>
+#include <staticgui/glue/typelist.hpp>
 
 namespace staticgui {
 namespace glue {
-    namespace id {
 
-        using integer = unsigned long long;
+    template <unsigned int start_t, unsigned int end_t, unsigned int increment_t, typename function_t>
+    constexpr void constexpr_for(function_t&& function);
 
-        struct generator {
-            static integer create();
+    template <typename... values_t, typename function_t>
+    constexpr void constexpr_foreach(function_t&& function, values_t&... values);
 
-            static integer next();
-
-            static void destroy(const integer id);
-
-        private:
-            inline static integer _count = 0;
-            inline static std::vector<integer> _deleted;
-        };
-
-    }
 }
 }
+
+#include <staticgui/glue/constexpr_for.inl>

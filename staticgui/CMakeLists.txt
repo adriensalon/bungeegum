@@ -10,16 +10,17 @@
 project(staticgui)
 
 set(staticgui_source
-		"source/utils/ecs.cpp"
+		# "source/utils/ecs.cpp"
 
-	"source/glue/app.cpp"
-	"source/glue/containers.cpp"
-	"source/glue/id.cpp"
+	"source/glue/any_function.cpp"
+	"source/glue/graphics.cpp"
+	"source/glue/id_integer.cpp"
+	"source/glue/platform.cpp"
+	"source/glue/registry.cpp"
 
 	"source/impl/context.cpp"
 	"source/impl/event.cpp"
 	"source/impl/layout.cpp"	
-	"source/impl/tools.cpp"	
 )
 
 add_library(staticgui "${staticgui_source}")
