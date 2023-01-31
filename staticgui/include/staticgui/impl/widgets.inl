@@ -15,8 +15,8 @@
 #include <typeindex>
 #include <unordered_map>
 
-#include <staticgui/glue/id_integer.hpp>
-#include <staticgui/glue/registry.hpp>
+// #include <staticgui/glue/id_integer.hpp>
+// #include <staticgui/glue/registry.hpp>
 
 namespace staticgui {
 namespace internal {
@@ -38,6 +38,7 @@ namespace internal {
         inline static glue::registry widgets_container;
         inline static std::unordered_map<glue::id_integer, std::reference_wrapper<widget_impl>> widgets_refs_staging_container;
         inline static std::tree<widget_impl*> widgets_ptrs_container;
+        // inline static glue::tree<std::reference_wrapper<widget_impl>> widgets_refs_container;
     }
 }
 }
@@ -61,11 +62,3 @@ namespace internal {
     template <typename widget_t, typename... children_widgets_t>          \
     friend void staticgui::build_advanced(widget_t*,                      \
         std::function<void(staticgui::layout&)>, children_widgets_t&...);
-
-#include <staticgui/widgets/center.hpp>
-#include <staticgui/widgets/column.hpp>
-#include <staticgui/widgets/container.hpp>
-#include <staticgui/widgets/future_builder.hpp>
-#include <staticgui/widgets/gesture_detector.hpp>
-#include <staticgui/widgets/image.hpp>
-#include <staticgui/widgets/list_view.hpp>

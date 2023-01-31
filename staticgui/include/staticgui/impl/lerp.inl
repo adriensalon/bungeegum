@@ -8,5 +8,3 @@
 //                          |___/     v0.0
 
 #pragma once
-
-#include <staticgui/staticgui.hpp>

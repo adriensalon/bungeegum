@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <staticgui/staticgui.hpp>
-
 namespace staticgui {
 
 template <typename widget_t, typename... widget_args_t>

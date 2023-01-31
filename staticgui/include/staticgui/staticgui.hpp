@@ -31,10 +31,12 @@
 #include <staticgui/glue/tree.hpp>
 #include <staticgui/glue/typelist.hpp>
 
+#include <staticgui/components/event_component.hpp>
+
 namespace internal {
 namespace impl {
     // struct any_function_impl;
-    struct event_impl;
+    struct event_component;
     struct curve_impl;
     struct animation_impl;
     struct value_impl;
@@ -134,7 +136,7 @@ struct event {
     void trigger(const std::future<std::tuple<values_t...>>& future_value);
 
 private:
-    internal::impl::event_impl& _impl;
+    detail::event_component& _impl;
 };
 
 // template <typename... values_t>
@@ -362,3 +364,11 @@ void print_build_tree();
 #include <staticgui/impl/make.inl>
 #include <staticgui/impl/value.inl>
 #include <staticgui/impl/widgets.inl>
+
+#include <staticgui/widgets/center.hpp>
+#include <staticgui/widgets/column.hpp>
+#include <staticgui/widgets/container.hpp>
+#include <staticgui/widgets/future_builder.hpp>
+#include <staticgui/widgets/gesture_detector.hpp>
+#include <staticgui/widgets/image.hpp>
+#include <staticgui/widgets/list_view.hpp>

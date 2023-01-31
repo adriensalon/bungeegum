@@ -9,8 +9,6 @@
 
 #pragma once
 
-// #include <staticgui/staticgui.hpp>
-
 namespace staticgui {
 namespace internal {
     namespace impl {

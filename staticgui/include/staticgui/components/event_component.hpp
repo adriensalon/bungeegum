@@ -9,18 +9,20 @@
 
 #pragma once
 
+#include <functional>
+#include <typeindex>
+#include <vector>
+
+#include <staticgui/glue/id_integer.hpp>
+
 namespace staticgui {
 namespace detail {
 
-    inline static glue::registry global_events;
-}
+    struct event_component {
+        std::vector<glue::any_function> callbacks;
+        std::vector<std::type_index> typeinfos;
+        glue::id_integer entity;
+    };
 
-template <typename... values_t>
-event<values_t...>::event(const std::function<void(values_t...)>& trigger_callback)
-    : _impl(
-        detail::global_events.create_component<detail::event_component>(
-            detail::global_events.create_entity()))
-{
 }
-
 }
