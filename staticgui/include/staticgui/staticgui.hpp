@@ -31,6 +31,7 @@
 #include <staticgui/glue/tree.hpp>
 #include <staticgui/glue/typelist.hpp>
 
+#include <staticgui/containers/animations_registry.hpp>
 #include <staticgui/containers/events_registry.hpp>
 #include <staticgui/containers/widgets_registry.hpp>
 
@@ -59,6 +60,7 @@ namespace staticgui {
 
 namespace detail {
 
+    inline static animations_registry global_animations;
     inline static events_registry global_events;
     inline static widgets_registry global_widgets;
 
@@ -166,12 +168,12 @@ struct animation {
     /// @return
     animation& on_value_changed(const event<value_t>& value_changed_event);
 
-    /// @brief
-    /// @tparam other_value_t
-    /// @param previous
-    /// @return
-    template <typename other_value_t>
-    animation& start_after(const animation<other_value_t>& previous);
+    // /// @brief
+    // /// @tparam other_value_t
+    // /// @param previous
+    // /// @return
+    // template <typename other_value_t>
+    // animation& start_after(const animation<other_value_t>& previous);
 
     /// @brief
     void start();
@@ -179,7 +181,7 @@ struct animation {
     void stop();
 
 private:
-    internal::impl::animation_impl& _impl;
+    detail::animation_impl<value_t>& _impl;
 };
 
 /// @brief
@@ -194,7 +196,8 @@ struct value {
     void assign(value_t& target_value) const; // sets or registers animation callback ^^
 
 private:
-    internal::impl::value_impl& _impl;
+    bool _is_animated;
+    mutable std::variant<value_t, animation<value_t>> _value;
 };
 
 /// @brief

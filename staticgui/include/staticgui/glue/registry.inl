@@ -46,7 +46,6 @@ namespace glue {
         _view.each([&](components_t&... _components) {
             iterate_function(_components...);
         });
-        entt::entity
     }
 
     template <typename... components_t>

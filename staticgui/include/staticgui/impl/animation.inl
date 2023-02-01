@@ -10,20 +10,35 @@
 #pragma once
 
 namespace staticgui {
-namespace internal {
-    namespace impl {
-
-        struct animation_impl {
-        };
-
-        static animation_impl _NO;
-    }
-}
 
 template <typename value_t>
 animation<value_t>::animation(const curve<value_t>& bezier_curve)
-    : _impl(internal::impl::_NO)
+    : _impl(detail::global_animations.make_animation_and_data<value_t>())
 {
+}
+
+template <typename value_t>
+animation<value_t>::animation(const animation<value_t>& other)
+    : _impl(detail::global_animations.make_animation_and_data<value_t>())
+{
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::operator=(const animation<value_t>& other)
+{
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>::animation(animation<value_t>&& other)
+    : _impl(detail::global_animations.make_animation_and_data<value_t>())
+{
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::operator=(animation<value_t>&& other)
+{
+    return *this;
 }
 
 template <typename value_t>
@@ -31,12 +46,6 @@ animation<value_t>& animation<value_t>::on_value_changed(const event<value_t>& v
 {
     std::cout << "YES 2 \n";
     return *this;
-}
-
-template <typename value_t>
-template <typename other_value_t>
-animation<value_t>& animation<value_t>::start_after(const animation<other_value_t>& previous)
-{
 }
 
 template <typename value_t>

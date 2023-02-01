@@ -35,6 +35,11 @@ void launch(widget_t& widget)
         std::cout << "> \n";
     });
 
+    detail::global_animations.iterate_datas([&](detail::animation_data& _animation_data) {
+        std::cout << "- animation <";
+        std::cout << _animation_data.kind->name() << "> \n";
+    });
+
     // while (true) {
     //     print_tree<widget_impl*>(widgets_ptrs_container);
     //     std::this_thread::sleep_for(std::chrono::milliseconds(3000));

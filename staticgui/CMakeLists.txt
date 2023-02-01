@@ -18,6 +18,7 @@ set(staticgui_source
 	"source/glue/platform.cpp"
 	"source/glue/registry.cpp"
 
+	"source/containers/animations_registry.cpp"
 	"source/containers/events_registry.cpp"
 	"source/containers/widgets_registry.cpp"
 
