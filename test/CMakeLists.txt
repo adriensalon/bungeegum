@@ -14,6 +14,7 @@ set(staticgui_test_source
 
 	"source/glue/test_constexpr.cpp"
 	"source/glue/test_registry.cpp"
+	"source/test_staticgui.cpp"
 )
 
 add_executable(staticgui_test "${staticgui_test_source}")
