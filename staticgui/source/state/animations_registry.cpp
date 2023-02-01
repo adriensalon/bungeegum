@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <staticgui/containers/animations_registry.hpp>
+#include <staticgui/state/animations_registry.hpp>
 
 namespace staticgui {
 namespace detail {

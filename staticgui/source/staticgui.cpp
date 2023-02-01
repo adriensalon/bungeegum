@@ -5,54 +5,20 @@
 //  \__ \ || (_| | |_| | (_| (_| | |_| | |
 //  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
 //                           __/ |
-//                          |___/
+//                          |___/     v0.0
 
 #include <staticgui/staticgui.hpp>
 
 namespace staticgui {
 
-namespace internal {
-    namespace impl {
+// layout::layout() { }
 
-        // application& get_application()
-        // {
-        //     // static std::optional<application> _application = std::nullopt;
-        //     static application _application;
-        //     return _application;
-        // }
+context::context() { }
 
-    }
-}
-
-// application& application::title(const std::string& window_title)
-// {
-//     return *this;
-// }
-
-// application& application::size(const unsigned int window_width, const unsigned int window_height)
-// {
-//     return *this;
-// }
-
-// application& application::on_resized(std::function<void()> on_window_resized_callback)
-// {
-//     return *this;
-// }
-
-// application& application::debug_stream(const std::ostream& stream)
-// {
-//     return *this;
-// }
-
-#if defined(STATICGUI_DEBUG)
-
-void print_build_tree()
+context& get_context()
 {
-    // internal::id::print_tree<internal::detail::widget_impl>();
-    // internal::detail::runtime_context _rc;
-    // _it->second.update_callback(_rc);
+    static context _context;
+    return _context;
 }
-
-#endif
 
 }

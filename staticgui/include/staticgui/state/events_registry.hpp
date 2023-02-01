@@ -68,4 +68,4 @@ namespace detail {
 }
 }
 
-#include <staticgui/containers/events_registry.inl>
+#include <staticgui/state/events_registry.inl>

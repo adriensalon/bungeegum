@@ -9,42 +9,17 @@
 
 #pragma once
 
-#include <any>
-#include <array>
-#include <functional>
-#include <future>
 #include <iostream>
-#include <string>
-#include <type_traits>
-#include <typeindex>
-#include <variant>
-#include <vector>
 
-#include <staticgui/glue/constexpr_for.hpp>
-#include <staticgui/glue/graphics.hpp>
-#include <staticgui/glue/is_lerpable.hpp>
-#include <staticgui/glue/platform.hpp>
-#include <staticgui/glue/registry.hpp>
-#include <staticgui/glue/typelist.hpp>
-
-#include <staticgui/containers/animations_registry.hpp>
-#include <staticgui/containers/events_registry.hpp>
-#include <staticgui/containers/widgets_registry.hpp>
-
-namespace internal {
-namespace impl {
-    // struct any_function_impl;
-    struct event_component;
-    struct curve_impl;
-    struct animation_impl;
-    struct value_impl;
-    struct context_impl;
-    struct context_manager;
-    struct layout_impl;
-    struct layout_manager;
-
-}
-}
+#include <staticgui/state/animatable_value.hpp>
+#include <staticgui/state/animations_registry.hpp>
+#include <staticgui/state/color_value.hpp>
+#include <staticgui/state/context_state.hpp>
+#include <staticgui/state/curve_value.hpp>
+#include <staticgui/state/events_registry.hpp>
+#include <staticgui/state/layout_state.hpp>
+#include <staticgui/state/lerpable_value.hpp>
+#include <staticgui/state/widgets_registry.hpp>
 
 /// @brief
 /// @details
@@ -76,7 +51,7 @@ namespace traits {
     /// @brief
     /// @tparam value_t
     template <typename value_t>
-    using lerpable_value_t = typename std::enable_if_t<glue::is_lerpable_v<value_t>, value_t>;
+    using lerpable_value_t = typename std::enable_if_t<detail::is_lerpable_v<value_t>, value_t>;
 }
 
 /// @brief
@@ -102,7 +77,7 @@ struct curve {
     value_t get_value(const float t);
 
 private:
-    internal::impl::curve_impl& _impl;
+    // internal::impl::curve_impl& _impl;
 };
 
 /// @brief
@@ -127,20 +102,20 @@ struct event {
     /// @param ...values
     void trigger(const values_t&... values) const;
 
-    /// @brief
-    /// @param future_value
-    template <typename = typename std::enable_if_t<sizeof...(values_t) == 0>>
-    void trigger(const std::future<void>& future_value);
+    // /// @brief
+    // /// @param future_value
+    // template <typename = typename std::enable_if_t<sizeof...(values_t) == 0>>
+    // void trigger(const std::future<void>& future_value);
 
-    /// @brief
-    /// @param future_value
-    template <typename = typename std::enable_if_t<sizeof...(values_t) == 1>>
-    void trigger(const std::future<typename traits::first_value_impl<values_t...>::type>& future_value);
+    // /// @brief
+    // /// @param future_value
+    // template <typename = typename std::enable_if_t<sizeof...(values_t) == 1>>
+    // void trigger(const std::future<typename traits::first_value_impl<values_t...>::type>& future_value);
 
-    /// @brief
-    /// @param future_value
-    template <typename = typename std::enable_if_t<sizeof...(values_t) >= 2>>
-    void trigger(const std::future<std::tuple<values_t...>>& future_value);
+    // /// @brief
+    // /// @param future_value
+    // template <typename = typename std::enable_if_t<sizeof...(values_t) >= 2>>
+    // void trigger(const std::future<std::tuple<values_t...>>& future_value);
 
 private:
     detail::event_impl<values_t...>& _impl;
@@ -308,8 +283,8 @@ struct layout {
     layout& build_here(widget_t& widget);
 
 private:
-    layout();
-    friend struct internal::impl::layout_manager;
+    // layout();
+    // friend struct internal::impl::layout_manager;
 };
 
 /// @brief
@@ -361,18 +336,7 @@ void print_build_tree();
 
 }
 
-#include <staticgui/impl/animation.inl>
-#include <staticgui/impl/attach.inl>
-#include <staticgui/impl/build.inl>
-#include <staticgui/impl/context.inl>
-#include <staticgui/impl/curve.inl>
-#include <staticgui/impl/event.inl>
-#include <staticgui/impl/launch.inl>
-#include <staticgui/impl/layout.inl>
-#include <staticgui/impl/lerp.inl>
-#include <staticgui/impl/make.inl>
-#include <staticgui/impl/value.inl>
-// #include <staticgui/impl/widgets.inl>
+#include <staticgui/staticgui.inl>
 
 #include <staticgui/widgets/center.hpp>
 #include <staticgui/widgets/column.hpp>

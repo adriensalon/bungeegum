@@ -9,36 +9,36 @@
 
 #pragma once
 
-#include <staticgui/containers/widgets_registry.hpp>
+#include <staticgui/state/events_registry.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    widgets_registry::widgets_registry()
+    events_registry::events_registry()
     {
     }
 
-    widgets_registry::widgets_registry(widgets_registry&& other)
+    events_registry::events_registry(events_registry&& other)
     {
         *this = std::move(other);
     }
 
-    widgets_registry& widgets_registry::operator=(widgets_registry&& other)
+    events_registry& events_registry::operator=(events_registry&& other)
     {
         _registry = std::move(other._registry);
         _roots = std::move(other._roots);
         return *this;
     }
 
-    unsigned int widgets_registry::get_depth(widget_data& data)
+    unsigned int events_registry::get_depth(event_data& data)
     {
         unsigned int _depth = -1;
-        widget_data* _ancestor_widget_data_ptr = nullptr;
-        std::function<void(widget_data&)> _iterate = [&](widget_data& _widget_data) {
+        event_data* _ancestor_widget_data_ptr = nullptr;
+        std::function<void(event_data&)> _iterate = [&](event_data& _event_data) {
             _depth++;
-            _ancestor_widget_data_ptr = &(_widget_data);
-            if (_widget_data.parent.has_value()) {
-                _iterate(_widget_data.parent.value().get());
+            _ancestor_widget_data_ptr = &(_event_data);
+            if (_event_data.parent.has_value()) {
+                _iterate(_event_data.parent.value().get());
             }
         };
         _iterate(data);
@@ -48,11 +48,11 @@ namespace detail {
         return _depth + 11;
     }
 
-    void widgets_registry::iterate_datas(const std::function<void(widget_data&)>& iterate_callback)
+    void events_registry::iterate_datas(const std::function<void(event_data&)>& iterate_callback)
     {
-        std::function<void(widget_data&)> _iterate = [&](widget_data& _widget_data) {
-            iterate_callback(_widget_data);
-            for (auto& _child : _widget_data.children)
+        std::function<void(event_data&)> _iterate = [&](event_data& _event_data) {
+            iterate_callback(_event_data);
+            for (auto& _child : _event_data.children)
                 _iterate(_child);
         };
         for (auto& _root : _roots)

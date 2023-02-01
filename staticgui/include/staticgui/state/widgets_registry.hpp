@@ -12,9 +12,10 @@
 #include <optional>
 #include <typeindex>
 
-#include <staticgui/containers/layout_state.hpp>
 #include <staticgui/glue/constexpr_for.hpp>
 #include <staticgui/glue/registry.hpp>
+#include <staticgui/state/layout_state.hpp>
+
 
 namespace staticgui {
 namespace detail {
@@ -72,4 +73,4 @@ namespace detail {
 }
 }
 
-#include <staticgui/containers/widgets_registry.inl>
+#include <staticgui/state/widgets_registry.inl>

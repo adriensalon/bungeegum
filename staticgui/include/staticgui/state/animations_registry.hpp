@@ -14,7 +14,7 @@
 #include <typeindex>
 #include <vector>
 
-#include <staticgui/containers/events_registry.hpp>
+#include <staticgui/state/events_registry.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -62,4 +62,4 @@ namespace detail {
 }
 }
 
-#include <staticgui/containers/animations_registry.inl>
+#include <staticgui/state/animations_registry.inl>
