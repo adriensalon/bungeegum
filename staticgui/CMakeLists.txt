@@ -10,7 +10,6 @@
 project(staticgui)
 
 set(staticgui_source
-		# "source/utils/ecs.cpp"
 
 	"source/glue/graphics.cpp"
 	"source/glue/platform.cpp"

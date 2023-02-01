@@ -23,10 +23,6 @@
 
 /// @brief
 /// @details
-// #define STATICGUI_WIDGET(widget_t)
-
-/// @brief
-/// @details
 namespace staticgui {
 
 namespace detail {
@@ -37,28 +33,19 @@ namespace detail {
 
 }
 
-/// @brief
-namespace traits {
+// namespace traits {
 
-    // template <typename... values_t>
-    // struct first_value;
-
-    template <typename first_value_t, typename... other_values_t>
-    struct first_value_impl {
-        using type = first_value_t;
-    };
-
-    /// @brief
-    /// @tparam value_t
-    template <typename value_t>
-    using lerpable_value_t = typename std::enable_if_t<detail::is_lerpable_v<value_t>, value_t>;
-}
+//     template <typename first_value_t, typename... other_values_t>
+//     struct first_value_impl {
+//         using type = first_value_t;
+//     };
+// }
 
 /// @brief
 /// @details
 /// @tparam value_t
 template <typename value_t>
-traits::lerpable_value_t<value_t> lerp(const value_t& min, const value_t& max, const float t) { return value_t {}; }
+detail::enable_if_lerpable_t<value_t> lerp(const value_t& min, const value_t& max, const float t) { return value_t {}; }
 
 /// @brief
 struct color {
@@ -68,7 +55,7 @@ struct color {
 
 template <typename value_t>
 struct curve {
-    curve(const traits::lerpable_value_t<value_t>& min, const value_t& max);
+    curve(const detail::enable_if_lerpable_t<value_t>& min, const value_t& max);
 
     std::vector<std::pair<float, value_t>>& get_points();
 
@@ -159,8 +146,8 @@ private:
 /// @tparam value_t
 template <typename value_t>
 struct value {
-    value(const animation<traits::lerpable_value_t<value_t>>& animated_value);
-    value(const traits::lerpable_value_t<value_t>& static_value);
+    value(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value);
+    value(const detail::enable_if_lerpable_t<value_t>& static_value);
 
     /// @brief
     /// @param target_value
@@ -315,10 +302,7 @@ template <typename widget_t, typename... widget_args_t>
 /// @param widget
 /// @param child_widget
 template <typename widget_t, typename child_widget_t>
-void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_navigation = false);
-
-// template <typename widget_t, typename child_widget_t>
-// void build(widget_t& widget, child_widget_t& child_widget);
+void build(widget_t* widget, child_widget_t& child_widget);
 
 /// @brief
 /// @tparam parent_widget_t
@@ -326,13 +310,6 @@ void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_n
 /// @param  paint_callback
 template <typename widget_t, typename... children_widgets_t>
 void build_advanced(widget_t* widget, std::function<void(layout&)> context_callback, children_widgets_t&... children_widgets);
-
-// #if defined(STATICGUI_DEBUG)
-
-/// @brief
-void print_build_tree();
-
-// #endif
 
 }
 

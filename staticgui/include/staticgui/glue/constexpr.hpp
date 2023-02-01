@@ -23,4 +23,4 @@ namespace glue {
 }
 }
 
-#include <staticgui/glue/constexpr_for.inl>
+#include <staticgui/glue/constexpr.inl>

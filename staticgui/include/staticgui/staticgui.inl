@@ -71,7 +71,7 @@ widget_t& make(widget_args_t&&... widget_args)
 }
 
 template <typename widget_t, typename child_widget_t>
-void build(widget_t* widget, child_widget_t& child_widget, const bool is_above_root_widgets)
+void build(widget_t* widget, child_widget_t& child_widget)
 {
     detail::global_widgets.build(widget, nullptr, child_widget);
 }
@@ -137,14 +137,14 @@ context& context::destroy(widget_t& widget, const bool destroy_children)
 }
 
 template <typename value_t>
-value<value_t>::value(const animation<traits::lerpable_value_t<value_t>>& animated_value)
+value<value_t>::value(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value)
 {
     _is_animated = true;
     _value = animated_value;
 }
 
 template <typename value_t>
-value<value_t>::value(const traits::lerpable_value_t<value_t>& static_value)
+value<value_t>::value(const detail::enable_if_lerpable_t<value_t>& static_value)
 {
     _is_animated = false;
     _value = static_value;
@@ -176,7 +176,7 @@ namespace internal {
 }
 
 template <typename value_t>
-curve<value_t>::curve(const traits::lerpable_value_t<value_t>& min, const value_t& max)
+curve<value_t>::curve(const detail::enable_if_lerpable_t<value_t>& min, const value_t& max)
 // : _impl(internal::impl::_NO2)
 {
 }

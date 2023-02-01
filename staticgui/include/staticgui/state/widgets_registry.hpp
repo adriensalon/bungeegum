@@ -12,10 +12,9 @@
 #include <optional>
 #include <typeindex>
 
-#include <staticgui/glue/constexpr_for.hpp>
+#include <staticgui/glue/constexpr.hpp>
 #include <staticgui/glue/registry.hpp>
 #include <staticgui/state/layout_state.hpp>
-
 
 namespace staticgui {
 namespace detail {
