@@ -29,6 +29,13 @@ namespace detail {
         return *this;
     }
 
+    void animations_registry::tick_all(const float delta_milliseconds)
+    {
+        iterate_datas([&](animation_data& _animation_data) {
+            _animation_data.tick(delta_milliseconds);
+        });
+    }
+
     void animations_registry::iterate_datas(const std::function<void(animation_data&)>& iterate_callback)
     {
         _registry.iterate_components<animation_data>([&](animation_data& _animation_data) {

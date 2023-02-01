@@ -25,10 +25,11 @@ namespace detail {
     template <typename value_t>
     struct animation_impl {
         event_impl<value_t> event;
+        // curve_impl<value_t> curve;
     };
 
     struct animation_data {
-        std::function<void()> tick = nullptr;
+        std::function<void(const float)> tick = nullptr;
         std::unique_ptr<std::type_index> kind;
     };
 
@@ -39,7 +40,7 @@ namespace detail {
         animations_registry(animations_registry&& other);
         animations_registry& operator=(animations_registry&& other);
 
-        void tick_all();
+        void tick_all(const float delta_milliseconds);
 
         template <typename value_t>
         animation_impl<value_t>& make_animation_and_data();
