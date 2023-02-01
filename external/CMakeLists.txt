@@ -10,6 +10,6 @@
 add_subdirectory("imgui")
 add_subdirectory("diligent")
 add_subdirectory("sdl")
-add_subdirectory("tree")
 add_subdirectory("bezier")
 add_subdirectory("entt")
+add_subdirectory("googletest")

@@ -32,7 +32,6 @@ target_link_libraries(staticgui Diligent-ShaderTools)
 target_link_libraries(staticgui Diligent-Imgui)
 target_link_libraries(staticgui imgui)
 target_link_libraries(staticgui SDL2-static)
-target_link_libraries(staticgui tree)
 target_link_libraries(staticgui EnTT)
 
 set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)
