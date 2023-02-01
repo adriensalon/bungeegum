@@ -9,26 +9,26 @@
 
 #pragma once
 
-#include <any>
-#include <memory>
+#include <functional>
 #include <typeindex>
+#include <vector>
 
 #include <staticgui/glue/id_integer.hpp>
+#include <staticgui/glue/registry.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    struct widget_data {
-        glue::id_integer this_id = glue::id_generator::create();
-        std::vector<glue::id_integer> children_ids;
-        std::function<void(layout&)> paint_callback = nullptr;
+    struct event_component {
+        std::vector<glue::any_function> callbacks;
+        std::vector<std::type_index> typeinfos;
+        glue::id_integer entity;
     };
 
-    struct widget_component {
-        std::unique_ptr<std::type_index> typeindex = nullptr;
-        std::any untyped = nullptr;
-        widget_data data;
-        glue::id_integer entity;
+    struct events_registry {
+
+    private:
+        glue::registry _registry;
     };
 
 }

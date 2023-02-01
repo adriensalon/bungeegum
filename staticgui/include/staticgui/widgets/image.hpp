@@ -17,7 +17,7 @@ namespace widgets {
     /// @brief A widget that displays an image.
     struct image_widget {
         constexpr static char* internal_name = "image";
-        STATICGUI_WIDGET(image_widget)
+        // STATICGUI_WIDGET(image_widget)
 
         image_widget()
         {

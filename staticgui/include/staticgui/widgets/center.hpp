@@ -53,7 +53,7 @@ namespace widgets {
         float _width_factor = 1.f;
         float _height_factor = 1.f;
 
-        STATICGUI_WIDGET(center_widget)
+        // STATICGUI_WIDGET(center_widget)
     };
 
 }

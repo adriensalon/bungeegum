@@ -31,15 +31,24 @@ namespace glue {
         id_integer create_entity();
 
         template <typename component_t>
+        id_integer get_entity(component_t& component)
+        {
+            return entt::to_entity(_registry, component);
+        }
+
+        template <typename component_t>
         [[nodiscard]] bool has_component(const id_integer entity) const;
 
         template <typename component_t, typename... args_t>
-        component_t& create_component(const id_integer entity, args_t&&... args);
+        decltype(auto) create_component(const id_integer entity, args_t&&... args);
 
         // // destroy component
 
-        // template <typename component_t>
-        // [[nodiscard]] component_t& get_component(const id_integer& entity);
+        template <typename component_t>
+        component_t& get_component(const id_integer entity);
+
+        template <typename component_t>
+        const component_t& get_component(const id_integer entity) const;
 
         // template <typename component_t>
         // [[nodiscard]] const component_t& get_component(const id_integer& entity) const;

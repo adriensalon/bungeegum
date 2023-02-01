@@ -19,8 +19,22 @@ namespace glue {
     // {
     // }
 
+    template <typename component_t>
+    component_t& registry::get_component(const id_integer entity)
+    {
+        // return _registry.view<component_t, float>().get<component_t>(entity);
+        return _registry.get<component_t>(entity);
+        // return vv;
+    }
+
+    template <typename component_t>
+    const component_t& registry::get_component(const id_integer entity) const
+    {
+        return _registry.view<component_t>().get<component_t>(entity);
+    }
+
     template <typename component_t, typename... args_t>
-    component_t& registry::create_component(const id_integer entity, args_t&&... args)
+    decltype(auto) registry::create_component(const id_integer entity, args_t&&... args)
     {
         return _registry.emplace<component_t>(entity, std::forward<args_t>(args)...);
     }
@@ -32,6 +46,7 @@ namespace glue {
         _view.each([&](components_t&... _components) {
             iterate_function(_components...);
         });
+        entt::entity
     }
 
     template <typename... components_t>

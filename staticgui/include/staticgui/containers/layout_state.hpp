@@ -9,20 +9,12 @@
 
 #pragma once
 
-#include <functional>
-#include <typeindex>
-#include <vector>
-
-#include <staticgui/glue/id_integer.hpp>
-
 namespace staticgui {
 namespace detail {
 
-    struct event_component {
-        std::vector<glue::any_function> callbacks;
-        std::vector<std::type_index> typeinfos;
-        glue::id_integer entity;
+    struct layout_state {
     };
+}
+}
 
-}
-}
+// #include <staticgui/containers/widgets_registry.inl>

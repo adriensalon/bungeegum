@@ -11,10 +11,12 @@
 
 #include <vector>
 
+#include <entt/entt.hpp>
+
 namespace staticgui {
 namespace glue {
 
-    using id_integer = unsigned long long;
+    using id_integer = ENTT_ID_TYPE;
 
     struct id_generator {
         static id_integer create();

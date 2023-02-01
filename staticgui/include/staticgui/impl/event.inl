@@ -17,9 +17,9 @@ namespace detail {
 
 template <typename... values_t>
 event<values_t...>::event(const std::function<void(values_t...)>& trigger_callback)
-    : _impl(
-        detail::global_events.create_component<detail::event_component>(
-            detail::global_events.create_entity()))
+// : _impl(
+//     detail::global_events.create_component<detail::event_component>(
+//         detail::global_events.create_entity()))
 {
 }
 

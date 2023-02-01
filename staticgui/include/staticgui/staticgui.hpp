@@ -31,7 +31,7 @@
 #include <staticgui/glue/tree.hpp>
 #include <staticgui/glue/typelist.hpp>
 
-#include <staticgui/components/event_component.hpp>
+#include <staticgui/containers/widgets_registry.hpp>
 
 namespace internal {
 namespace impl {
@@ -44,16 +44,23 @@ namespace impl {
     struct context_manager;
     struct layout_impl;
     struct layout_manager;
+
 }
 }
 
 /// @brief
 /// @details
-#define STATICGUI_WIDGET(widget_t)
+// #define STATICGUI_WIDGET(widget_t)
 
 /// @brief
 /// @details
 namespace staticgui {
+
+namespace detail {
+
+    inline static widgets_registry global_widgets;
+
+}
 
 /// @brief
 namespace traits {
@@ -136,7 +143,7 @@ struct event {
     void trigger(const std::future<std::tuple<values_t...>>& future_value);
 
 private:
-    detail::event_component& _impl;
+    // detail::event_component& _impl;
 };
 
 // template <typename... values_t>
@@ -350,6 +357,7 @@ void build_advanced(widget_t* widget, std::function<void(layout&)> context_callb
 void print_build_tree();
 
 // #endif
+
 }
 
 #include <staticgui/impl/animation.inl>

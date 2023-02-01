@@ -25,7 +25,7 @@ namespace widgets {
     /// consider using 'align' or 'center' to position the child.
     struct column_widget {
         constexpr static char* internal_name = "column";
-        STATICGUI_WIDGET(column_widget)
+        // STATICGUI_WIDGET(column_widget)
 
         template <typename... children_widgets_t>
         column_widget(children_widgets_t&... children)
@@ -36,6 +36,9 @@ namespace widgets {
                 },
                 center(children)...);
         }
+
+    private:
+        int g;
     };
 }
 
@@ -44,8 +47,8 @@ namespace widgets {
 /// @tparam ...children_widgets_t
 /// @param ...children_widgets
 /// @endcond
-// template <typename... children_widgets_t>
-// widgets::column_widget& column(children_widgets_t&... children_widgets) { return make<widgets::column_widget>(children_widgets...); }
+template <typename... children_widgets_t>
+widgets::column_widget& column(children_widgets_t&... children_widgets) { return make<widgets::column_widget>(children_widgets...); }
 
-#define column staticgui::make<staticgui::widgets::column_widget>
+// #define column staticgui::make<staticgui::widgets::column_widget>
 }

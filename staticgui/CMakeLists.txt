@@ -18,6 +18,8 @@ set(staticgui_source
 	"source/glue/platform.cpp"
 	"source/glue/registry.cpp"
 
+	"source/containers/widgets_registry.cpp"
+
 	"source/impl/context.cpp"
 	"source/impl/event.cpp"
 	"source/impl/layout.cpp"	

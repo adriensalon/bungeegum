@@ -29,7 +29,9 @@ namespace widgets {
             return *this;
         }
 
-        STATICGUI_WIDGET(gesture_detector)
+        // STATICGUI_WIDGET(gesture_detector)
+    private:
+        int k;
     };
 
 }
