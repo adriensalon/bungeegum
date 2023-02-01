@@ -37,8 +37,8 @@ namespace detail {
         _widget_data.paint_callback = paint_callback;
         glue::constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {
             widget_data& _child_widget_data = get_data(_child_widget);
-            _child_widget_data.parent = &_widget_data;
-            _widget_data.children.emplace_back(&_child_widget_data);
+            _child_widget_data.parent = _widget_data;
+            _widget_data.children.emplace_back(_child_widget_data);
         },
             children...);
     }

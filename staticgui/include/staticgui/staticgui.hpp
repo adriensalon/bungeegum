@@ -31,6 +31,7 @@
 #include <staticgui/glue/tree.hpp>
 #include <staticgui/glue/typelist.hpp>
 
+#include <staticgui/containers/events_registry.hpp>
 #include <staticgui/containers/widgets_registry.hpp>
 
 namespace internal {
@@ -58,6 +59,7 @@ namespace staticgui {
 
 namespace detail {
 
+    inline static events_registry global_events;
     inline static widgets_registry global_widgets;
 
 }

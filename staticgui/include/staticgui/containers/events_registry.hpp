@@ -10,19 +10,27 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <typeindex>
 #include <vector>
 
-#include <staticgui/glue/id_integer.hpp>
 #include <staticgui/glue/registry.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    struct event_component {
-        std::vector<glue::any_function> callbacks;
-        std::vector<std::type_index> typeinfos;
-        glue::id_integer entity;
+    struct event_disabled {
+    };
+
+    template <typename values_t>
+    struct event_impl {
+    };
+
+    struct event_data {
+        std::function<void()> tick = nullptr;
+        std::vector<std::type_index> kind;
+        std::optional<std::reference_wrapper<event_data>> parent = std::nullopt;
+        std::vector<std::reference_wrapper<event_data>> children = {};
     };
 
     struct events_registry {
@@ -33,3 +41,5 @@ namespace detail {
 
 }
 }
+
+#include <staticgui/containers/events_registry.inl>

@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <memory>
 #include <optional>
 #include <typeindex>
 
@@ -25,9 +24,9 @@ namespace detail {
     struct widget_data {
         bool is_built = false;
         std::unique_ptr<std::type_index> kind = nullptr;
-        widget_data* parent = nullptr;
-        std::vector<widget_data*> children = {};
         std::function<void(layout_state&)> paint_callback = nullptr;
+        std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
+        std::vector<std::reference_wrapper<widget_data>> children = {};
     };
 
     struct widgets_registry {
@@ -45,6 +44,8 @@ namespace detail {
 
         template <typename... children_widgets_t>
         void build_root(children_widgets_t&... children);
+
+        void paint_all();
 
         template <typename widget_t>
         widget_data& get_data(widget_t& widget);
