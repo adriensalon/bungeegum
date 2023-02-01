@@ -28,6 +28,13 @@ void launch(widget_t& widget)
         std::cout << std::endl;
     });
 
+    detail::global_events.iterate_datas([&](detail::event_data& _event_data) {
+        std::cout << "- event <";
+        for (auto& _k : _event_data.kinds)
+            std::cout << _k.name() << ", ";
+        std::cout << "> \n";
+    });
+
     // while (true) {
     //     print_tree<widget_impl*>(widgets_ptrs_container);
     //     std::this_thread::sleep_for(std::chrono::milliseconds(3000));

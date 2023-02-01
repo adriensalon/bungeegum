@@ -145,7 +145,7 @@ struct event {
     void trigger(const std::future<std::tuple<values_t...>>& future_value);
 
 private:
-    // detail::event_component& _impl;
+    detail::event_impl<values_t...>& _impl;
 };
 
 // template <typename... values_t>

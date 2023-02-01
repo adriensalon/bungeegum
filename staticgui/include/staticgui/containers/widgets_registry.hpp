@@ -53,13 +53,10 @@ namespace detail {
         template <typename widget_t>
         widget_t& get_widget(widget_data& data);
 
-        template <typename widget_t, typename parent_widget_t>
+        template <typename widget_t, typename parent_widget_t> // invert
         std::optional<parent_widget_t&> get_parent_widget(widget_t& widget);
 
         unsigned int get_depth(widget_data& data);
-
-        template <typename widget_t>
-        unsigned int get_depth(widget_t& data);
 
         void iterate_datas(const std::function<void(widget_data&)>& iterate_callback);
 
