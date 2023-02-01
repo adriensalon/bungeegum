@@ -12,9 +12,7 @@ project(staticgui)
 set(staticgui_source
 		# "source/utils/ecs.cpp"
 
-	"source/glue/any_function.cpp"
 	"source/glue/graphics.cpp"
-	"source/glue/id_integer.cpp"
 	"source/glue/platform.cpp"
 	"source/glue/registry.cpp"
 

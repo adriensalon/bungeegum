@@ -13,6 +13,7 @@
 #include <typeindex>
 
 #include <staticgui/containers/layout_state.hpp>
+#include <staticgui/glue/constexpr_for.hpp>
 #include <staticgui/glue/registry.hpp>
 
 namespace staticgui {

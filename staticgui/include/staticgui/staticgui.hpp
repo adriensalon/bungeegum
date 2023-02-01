@@ -20,15 +20,11 @@
 #include <variant>
 #include <vector>
 
-#include <staticgui/glue/any_function.hpp>
 #include <staticgui/glue/constexpr_for.hpp>
 #include <staticgui/glue/graphics.hpp>
-#include <staticgui/glue/group.hpp>
-#include <staticgui/glue/id_integer.hpp>
 #include <staticgui/glue/is_lerpable.hpp>
 #include <staticgui/glue/platform.hpp>
 #include <staticgui/glue/registry.hpp>
-#include <staticgui/glue/tree.hpp>
 #include <staticgui/glue/typelist.hpp>
 
 #include <staticgui/containers/animations_registry.hpp>
@@ -376,7 +372,7 @@ void print_build_tree();
 #include <staticgui/impl/lerp.inl>
 #include <staticgui/impl/make.inl>
 #include <staticgui/impl/value.inl>
-#include <staticgui/impl/widgets.inl>
+// #include <staticgui/impl/widgets.inl>
 
 #include <staticgui/widgets/center.hpp>
 #include <staticgui/widgets/column.hpp>

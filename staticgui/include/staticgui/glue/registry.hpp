@@ -11,11 +11,12 @@
 
 #include <entt/entt.hpp>
 
-#include <staticgui/glue/id_integer.hpp>
 #include <staticgui/glue/typelist.hpp>
 
 namespace staticgui {
 namespace glue {
+
+    using id_integer = ENTT_ID_TYPE;
 
     struct registry {
         registry();
