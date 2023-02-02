@@ -11,16 +11,8 @@
 
 #include <iostream>
 
-#include <staticgui/state/animatable.hpp>
-#include <staticgui/state/animation.hpp>
-#include <staticgui/state/color.hpp>
-#include <staticgui/state/context.hpp>
-#include <staticgui/state/curve.hpp>
-#include <staticgui/state/event.hpp>
 #include <staticgui/state/host.hpp>
-#include <staticgui/state/layout.hpp>
 #include <staticgui/state/lerpable.hpp>
-#include <staticgui/state/widget.hpp>
 
 using int2 = staticgui::glue::simd_array<int, 2>;
 using int3 = staticgui::glue::simd_array<int, 3>;
@@ -275,7 +267,6 @@ private:
 /// @brief
 /// @tparam widget_t
 /// @param widget
-/// @return
 template <typename widget_t>
 void launch(widget_t& widget);
 
@@ -284,7 +275,7 @@ void launch(widget_t& widget);
 /// @param widget
 /// @return
 template <typename widget_t>
-void attach(widget_t& widget);
+std::function<void()> attach(widget_t& widget);
 
 /// @brief
 /// @tparam widget_t

@@ -69,16 +69,10 @@ void animation<value_t>::stop()
 }
 
 template <typename widget_t, typename... widget_args_t>
-widget_t& make(widget_args_t&&... widget_args)
-{
-    return detail::state.context.widgets.make<widget_t>(std::forward<widget_args_t>(widget_args)...);
-}
+widget_t& make(widget_args_t&&... widget_args) { return detail::state.context.widgets.make<widget_t>(std::forward<widget_args_t>(widget_args)...); }
 
 template <typename widget_t, typename child_widget_t>
-void declare(widget_t* widget, child_widget_t& child_widget)
-{
-    detail::state.context.widgets.declare(widget, nullptr, child_widget);
-}
+void declare(widget_t* widget, child_widget_t& child_widget) { detail::state.context.widgets.declare(widget, nullptr, child_widget); }
 
 template <typename widget_t, typename... children_widgets_t>
 void build_advanced(widget_t* widget, std::function<void(layout&)> layout_callback, children_widgets_t&... children)
@@ -125,9 +119,7 @@ void launch(widget_t& widget)
 }
 
 template <typename widget_t>
-void attach(widget_t& widget)
-{
-}
+std::function<void()> attach(widget_t& widget) { return detail::host.attach(widget); }
 
 template <typename widget_t>
 context& context::destroy(widget_t& widget, const bool destroy_children)
