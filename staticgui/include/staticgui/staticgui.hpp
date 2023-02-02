@@ -22,6 +22,22 @@
 #include <staticgui/state/platform_state.hpp>
 #include <staticgui/state/widgets_registry.hpp>
 
+using int2 = staticgui::glue::simd_array<int, 2>;
+using int3 = staticgui::glue::simd_array<int, 3>;
+using int4 = staticgui::glue::simd_array<int, 4>;
+using int3x3 = staticgui::glue::simd_ordered_array<int, 9, staticgui::glue::simd_order::row_major>;
+using int4x4 = staticgui::glue::simd_ordered_array<int, 16, staticgui::glue::simd_order::row_major>;
+using float2 = staticgui::glue::simd_array<float, 2>;
+using float3 = staticgui::glue::simd_array<float, 3>;
+using float4 = staticgui::glue::simd_array<float, 4>;
+using float3x3 = staticgui::glue::simd_ordered_array<float, 9, staticgui::glue::simd_order::row_major>;
+using float4x4 = staticgui::glue::simd_ordered_array<float, 16, staticgui::glue::simd_order::row_major>;
+using double2 = staticgui::glue::simd_array<double, 2>;
+using double3 = staticgui::glue::simd_array<double, 3>;
+using double4 = staticgui::glue::simd_array<double, 4>;
+using double3x3 = staticgui::glue::simd_ordered_array<double, 9, staticgui::glue::simd_order::row_major>;
+using double4x4 = staticgui::glue::simd_ordered_array<double, 16, staticgui::glue::simd_order::row_major>;
+
 /// @brief
 /// @details
 namespace staticgui {
