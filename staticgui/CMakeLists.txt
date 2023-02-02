@@ -23,22 +23,22 @@ set(staticgui_source
 )
 
 add_library(staticgui "${staticgui_source}")
+target_include_directories(staticgui PUBLIC "include")
+set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)
+
+target_link_libraries(staticgui imgui)
+target_link_libraries(staticgui SDL2-static)
+target_link_libraries(staticgui EnTT)
+target_link_libraries(staticgui Diligent-GraphicsEngine)
+target_link_libraries(staticgui Diligent-GraphicsTools)
+target_link_libraries(staticgui Diligent-ShaderTools)
+target_link_libraries(staticgui Diligent-Imgui)
 
 target_include_directories(staticgui PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
-target_include_directories(staticgui PUBLIC "include")
-
+target_include_directories(staticgui PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
 
 target_link_libraries(staticgui Diligent-GraphicsEngineD3D11-static)
 # target_link_libraries(librender Diligent-GraphicsEngineD3D12-static)
 # target_link_libraries(librender Diligent-GraphicsEngineOpenGL-static)
 # target_link_libraries(librender Diligent-GraphicsEngineVulkan-static)
 
-target_link_libraries(staticgui Diligent-GraphicsEngine)
-target_link_libraries(staticgui Diligent-GraphicsTools)
-target_link_libraries(staticgui Diligent-ShaderTools)
-target_link_libraries(staticgui Diligent-Imgui)
-target_link_libraries(staticgui imgui)
-target_link_libraries(staticgui SDL2-static)
-target_link_libraries(staticgui EnTT)
-
-set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)

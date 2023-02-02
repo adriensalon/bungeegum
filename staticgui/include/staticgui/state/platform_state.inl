@@ -22,7 +22,7 @@ namespace detail {
 
         });
         _window->on_update([this]() {
-
+            _renderer->debug_fn();
         });
 
         _renderer = std::make_unique<glue::renderer>(*(_window.get()));

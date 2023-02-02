@@ -12,9 +12,9 @@
 #include <staticgui/glue/toolchain.hpp>
 #include <staticgui/glue/window.hpp>
 
-#define RENDERER_BACKEND_DIRECTX (staticgui::glue::is_platform_win32 || staticgui::glue::is_platform_uwp)
-#define RENDERER_BACKEND_VULKAN (staticgui::glue::is_platform_linux || staticgui::glue::is_platform_android)
-#define RENDERER_BACKEND_OPENGL (staticgui::glue::is_platform_emscripten || staticgui::glue::is_platform_macos || staticgui::glue::is_platform_ios)
+#define RENDERER_BACKEND_DIRECTX (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
+#define RENDERER_BACKEND_VULKAN (TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
+#define RENDERER_BACKEND_OPENGL (TOOLCHAIN_PLATFORM_EMSCRIPTEN || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_IOS)
 
 namespace staticgui {
 namespace glue {
@@ -39,9 +39,12 @@ namespace glue {
 
         void* get_native_context() const;
 
+        void debug_fn();
+
     private:
-        std::any _device_context_impl = nullptr;
+        std::any _render_device_impl = nullptr;
         std::any _swap_chain_impl = nullptr;
+        std::any _device_context_impl = nullptr;
         std::any _imgui_renderer_impl = nullptr;
     };
 
