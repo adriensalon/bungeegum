@@ -19,9 +19,9 @@ namespace detail {
     struct context_state {
 
         template <typename widget_t>
-        void make_at_root(widget_t& widget);
+        void build_root(widget_t& widget);
 
-        void tick(const float delta_milliseconds);
+        bool tick_all(const float delta_milliseconds);
 
     private:
         animations_registry _animations;

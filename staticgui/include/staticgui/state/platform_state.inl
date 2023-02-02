@@ -17,25 +17,27 @@ namespace detail {
     template <typename widget_t>
     void platform_state::launch(widget_t& widget)
     {
-        _context.make_at_root(widget);
+        _context.build_root(widget);
         _window = std::make_unique<glue::window>();
-        _renderer = std::make_unique<glue::renderer>(*(_window.get()));
         _window->on_input([this](const std::any& _event) {
             _renderer->process_input(_event);
         });
         _window->on_update([this]() {
-            _renderer->new_frame();
+            if (_context.tick_all(0.2f)) {
+                _renderer->new_frame();
 
-            ///
-            ///
-            ///
-            ImGui::ShowDemoWindow();
-            ///
-            ///
-            ///
+                ///
+                ///
+                ///
+                ImGui::ShowDemoWindow();
+                ///
+                ///
+                ///
 
-            _renderer->present();
+                _renderer->present();
+            }
         });
+        _renderer = std::make_unique<glue::renderer>(*(_window.get()));
         _renderer->set_clear_color({ .82f, .22f, .22f });
         _window->run_loop();
     }

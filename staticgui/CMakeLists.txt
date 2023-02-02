@@ -16,6 +16,7 @@ set(staticgui_source
 	"source/glue/window.cpp"
 
 	"source/state/animations_registry.cpp"
+	"source/state/context_state.cpp"
 	"source/state/events_registry.cpp"
 	"source/state/widgets_registry.cpp"
 

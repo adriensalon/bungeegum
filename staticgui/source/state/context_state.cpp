@@ -9,13 +9,15 @@
 
 #pragma once
 
+#include <staticgui/state/context_state.hpp>
+
 namespace staticgui {
 namespace detail {
 
-    template <typename widget_t>
-    void context_state::build_root(widget_t& widget)
+    bool context_state::tick_all(const float delta_milliseconds)
     {
+        // parse tree et return true si besoin de refresh
+        return true;
     }
-
 }
 }

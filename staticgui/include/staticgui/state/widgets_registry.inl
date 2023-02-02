@@ -44,7 +44,7 @@ namespace detail {
     }
 
     template <typename... children_widgets_t>
-    void widgets_registry::build_root(children_widgets_t&... children)
+    void widgets_registry::build_roots(children_widgets_t&... children)
     {
         _roots.clear();
         glue::constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {

@@ -22,9 +22,7 @@ namespace staticgui {
 namespace glue {
 
     constexpr bool is_renderer_backend_directx = RENDERER_BACKEND_DIRECTX;
-
     constexpr bool is_renderer_backend_vulkan = RENDERER_BACKEND_VULKAN;
-
     constexpr bool is_renderer_backend_opengl = RENDERER_BACKEND_OPENGL;
 
     struct renderer {
@@ -36,8 +34,6 @@ namespace glue {
         renderer& operator=(renderer&& other);
 
         void set_clear_color(const std::array<float, 4>& color);
-
-        void debug_fn();
 
         void new_frame();
 

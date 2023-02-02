@@ -28,6 +28,8 @@ namespace glue {
         window(window&& other);
         window& operator=(window&& other);
 
+        SDL_Window* get_sdl_window() const;
+
         void set_title(const std::string& title);
 
         void set_size(const float width, const float height);

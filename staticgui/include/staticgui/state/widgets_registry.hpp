@@ -44,7 +44,7 @@ namespace detail {
         void build(widget_t* widget, std::function<void(layout_state&)> paint_callback, children_widgets_t&... children);
 
         template <typename... children_widgets_t>
-        void build_root(children_widgets_t&... children);
+        void build_roots(children_widgets_t&... children);
 
         void paint_all();
 

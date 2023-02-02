@@ -84,6 +84,7 @@ namespace glue {
 
         const auto& SCDesc = m_pSwapChain->GetDesc();
         m_pImGui = (new Diligent::ImGuiImplWin32((HWND)(existing_window.get_native_window()), m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
+        // bool _success = ImGui_ImplSDL2_InitForMetal(existing_window.get_sdl_window());
     }
 
     renderer::~renderer()
@@ -106,8 +107,69 @@ namespace glue {
         m_pImmediateContext->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         m_pImmediateContext->ClearRenderTarget(_rtv_ptr, _clear_color.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         m_pImmediateContext->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        const auto& SCDesc = m_pSwapChain->GetDesc();
-        m_pImGui->NewFrame(SCDesc.Width, SCDesc.Height, SCDesc.PreTransform);
+        const auto& _swap_chain_desc = m_pSwapChain->GetDesc();
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+
+        // ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
+        // IM_ASSERT(bd != NULL && "Did you call ImGui_ImplSDL2_Init()?");
+        // ImGuiIO& io = ImGui::GetIO();
+
+        // // Setup display size (every frame to accommodate for window resizing)
+        // int w, h;
+        // int display_w, display_h;
+        // SDL_GetWindowSize(bd->Window, &w, &h);
+        // if (SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_MINIMIZED)
+        //     w = h = 0;
+        // if (bd->Renderer != NULL)
+        //     SDL_GetRendererOutputSize(bd->Renderer, &display_w, &display_h);
+        // else
+        //     SDL_GL_GetDrawableSize(bd->Window, &display_w, &display_h);
+        // io.DisplaySize = ImVec2((float)w, (float)h);
+        // if (w > 0 && h > 0)
+        //     io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
+
+        // // Setup time step (we don't use SDL_GetTicks() because it is using millisecond resolution)
+        // static Uint64 frequency = SDL_GetPerformanceFrequency();
+        // Uint64 current_time = SDL_GetPerformanceCounter();
+        // io.DeltaTime = bd->Time > 0 ? (float)((double)(current_time - bd->Time) / frequency) : (float)(1.0f / 60.0f);
+        // bd->Time = current_time;
+
+        // if (bd->PendingMouseLeaveFrame && bd->PendingMouseLeaveFrame >= ImGui::GetFrameCount() && bd->MouseButtonsDown == 0) {
+        //     bd->MouseWindowID = 0;
+        //     bd->PendingMouseLeaveFrame = 0;
+        //     io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+        // }
+
+        // ImGui_ImplSDL2_UpdateMouseData();
+        // ImGui_ImplSDL2_UpdateMouseCursor();
+
+        // // Update game controllers (if enabled and available)
+        // ImGui_ImplSDL2_UpdateGamepads();
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+
+        m_pImGui->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
     }
 
     void renderer::present()

@@ -86,7 +86,7 @@ void build_advanced(widget_t* widget, std::function<void(layout&)> paint_callbac
 template <typename widget_t>
 void launch(widget_t& widget)
 {
-    detail::global_widgets.build_root(widget);
+    detail::global_widgets.build_roots(widget);
 
     std::cout << "application" << std::endl;
     detail::global_widgets.iterate_datas([&](detail::widget_data& _widget_data) {

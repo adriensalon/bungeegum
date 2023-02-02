@@ -76,6 +76,11 @@ namespace glue {
         return *this;
     }
 
+    SDL_Window* window::get_sdl_window() const
+    {
+        return detail::get_window(_window_impl);
+    }
+
     void window::set_title(const std::string& title)
     {
         if constexpr (glue::is_platform_emscripten) {
@@ -121,6 +126,7 @@ namespace glue {
         } else {
             bool _running = true;
             while (_running) {
+
                 SDL_Event _event;
                 while (SDL_PollEvent(&_event)) {
                     std::any _untyped = _event;
