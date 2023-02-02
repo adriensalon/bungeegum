@@ -15,7 +15,7 @@ namespace detail {
     template <typename widget_t>
     void host_state::launch(widget_t& widget)
     {
-        _context.build_root(widget);
+        context.build_root(widget);
         _window = std::make_unique<glue::window>();
         _renderer = std::make_unique<glue::renderer>(*(_window.get()));
         _window->on_input([this](const std::any& _event) {
@@ -23,9 +23,9 @@ namespace detail {
         });
         _window->on_update([this]() {
             // measure elapsed time with window
-            if (_context.tick(0.2f)) {
+            if (this->context.tick(0.2f)) {
                 _renderer->new_frame();
-                _context.draw();
+                this->context.draw();
                 _renderer->present();
             }
         });
@@ -36,11 +36,11 @@ namespace detail {
     template <typename widget_t>
     std::function<void()> host_state::attach(widget_t& widget)
     {
-        _context.build_root(widget);
+        context.build_root(widget);
         return [this]() {
             // measure elapsed time with window
-            _context.tick(0.2f);
-            _context.draw();
+            context.tick(0.2f);
+            context.draw();
         }
     }
 

@@ -33,10 +33,9 @@ namespace detail {
         template <typename widget_t>
         void must_draw(widget_t& widget, const bool must_draw_children = true);
 
-    private:
-        animation_registry _animations;
-        event_registry _events;
-        widget_registry _widgets;
+        widget_registry widgets;
+        animation_registry animations;
+        event_registry events;
     };
 
 }

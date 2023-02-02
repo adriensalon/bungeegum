@@ -26,8 +26,9 @@ namespace detail {
         template <typename widget_t>
         [[nodiscard]] std::function<void()> attach(widget_t& widget);
 
+        context_state context;
+
     private:
-        context_state _context;
         std::unique_ptr<glue::window> _window = nullptr;
         std::unique_ptr<glue::renderer> _renderer = nullptr;
     };

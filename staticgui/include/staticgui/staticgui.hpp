@@ -42,16 +42,6 @@ using double4x4 = staticgui::glue::simd_ordered_array<double, 16, staticgui::glu
 /// @details
 namespace staticgui {
 
-namespace detail {
-
-    inline static animation_registry global_animations;
-    inline static event_registry global_events;
-    inline static widget_registry global_widgets;
-
-    inline static host_state state;
-
-}
-
 /// @brief
 /// @details
 /// @tparam value_t

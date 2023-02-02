@@ -11,21 +11,25 @@
 
 namespace staticgui {
 
+namespace detail {
+    inline static host_state state;
+}
+
 template <typename... values_t>
 event<values_t...>::event(const std::function<void(values_t...)>& trigger_callback)
-    : _impl(detail::global_events.make_event_and_data<values_t...>())
+    : _impl(detail::state.context.events.make_event_and_data<values_t...>())
 {
 }
 
 template <typename value_t>
 animation<value_t>::animation(const curve<value_t>& bezier_curve)
-    : _impl(detail::global_animations.make_animation_and_data<value_t>())
+    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
 {
 }
 
 template <typename value_t>
 animation<value_t>::animation(const animation<value_t>& other)
-    : _impl(detail::global_animations.make_animation_and_data<value_t>())
+    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
 {
 }
 
@@ -37,7 +41,7 @@ animation<value_t>& animation<value_t>::operator=(const animation<value_t>& othe
 
 template <typename value_t>
 animation<value_t>::animation(animation<value_t>&& other)
-    : _impl(detail::global_animations.make_animation_and_data<value_t>())
+    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
 {
 }
 
@@ -67,30 +71,30 @@ void animation<value_t>::stop()
 template <typename widget_t, typename... widget_args_t>
 widget_t& make(widget_args_t&&... widget_args)
 {
-    return detail::global_widgets.make<widget_t>(std::forward<widget_args_t>(widget_args)...);
+    return detail::state.context.widgets.make<widget_t>(std::forward<widget_args_t>(widget_args)...);
 }
 
 template <typename widget_t, typename child_widget_t>
 void declare(widget_t* widget, child_widget_t& child_widget)
 {
-    detail::global_widgets.declare(widget, nullptr, child_widget);
+    detail::state.context.widgets.declare(widget, nullptr, child_widget);
 }
 
 template <typename widget_t, typename... children_widgets_t>
 void build_advanced(widget_t* widget, std::function<void(layout&)> layout_callback, children_widgets_t&... children)
 {
-    detail::global_widgets.declare(
+    detail::state.context.widgets.declare(
         widget, [](const detail::constraint_data&, detail::geometry_data&) {}, children...);
 }
 
 template <typename widget_t>
 void launch(widget_t& widget)
 {
-    detail::global_widgets.declare_root(widget);
+    detail::state.context.widgets.declare_root(widget);
 
     std::cout << "application" << std::endl;
-    detail::global_widgets.iterate_datas([&](detail::widget_data& _widget_data) {
-        unsigned int _depth = detail::global_widgets.get_depth(_widget_data);
+    detail::state.context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
+        unsigned int _depth = detail::state.context.widgets.get_depth(_widget_data);
         for (unsigned int _k = 0; _k < _depth; _k++)
             std::cout << "   ";
         std::cout << "|__ ";
@@ -100,14 +104,14 @@ void launch(widget_t& widget)
         std::cout << std::endl;
     });
 
-    detail::global_events.iterate_datas([&](detail::event_data& _event_data) {
+    detail::state.context.events.iterate_datas([&](detail::event_data& _event_data) {
         std::cout << "- event <";
         for (auto& _k : _event_data.kinds)
             std::cout << _k.name() << ", ";
         std::cout << "> \n";
     });
 
-    detail::global_animations.iterate_datas([&](detail::animation_data& _animation_data) {
+    detail::state.context.animations.iterate_datas([&](detail::animation_data& _animation_data) {
         std::cout << "- animation <";
         std::cout << _animation_data.kind->name() << "> \n";
     });
