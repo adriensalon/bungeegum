@@ -9,27 +9,30 @@
 
 #pragma once
 
-#include <staticgui/state/animations_registry.hpp>
-#include <staticgui/state/events_registry.hpp>
-#include <staticgui/state/widgets_registry.hpp>
+#include <staticgui/glue/renderer.hpp>
+#include <staticgui/glue/window.hpp>
+#include <staticgui/state/context_state.hpp>
+#include <staticgui/state/layout_state.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    struct context_state {
+    struct platform_state {
 
         template <typename widget_t>
-        void make_at_root(widget_t& widget);
+        void launch(widget_t& widget);
 
-        void tick(const float delta_milliseconds);
+        template <typename widget_t>
+        void attach(widget_t& widget);
 
     private:
-        animations_registry _animations;
-        events_registry _events;
-        widgets_registry _widgets;
+        context_state _context;
+        layout_state _layout;
+        // window
+        // renderer
     };
 
 }
 }
 
-#include <staticgui/state/context_state.inl>
+#include <staticgui/state/platform_state.inl>

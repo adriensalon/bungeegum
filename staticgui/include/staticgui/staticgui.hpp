@@ -19,6 +19,7 @@
 #include <staticgui/state/events_registry.hpp>
 #include <staticgui/state/layout_state.hpp>
 #include <staticgui/state/lerpable_value.hpp>
+#include <staticgui/state/platform_state.hpp>
 #include <staticgui/state/widgets_registry.hpp>
 
 /// @brief
@@ -31,15 +32,9 @@ namespace detail {
     inline static events_registry global_events;
     inline static widgets_registry global_widgets;
 
+    inline static platform_state state;
+
 }
-
-// namespace traits {
-
-//     template <typename first_value_t, typename... other_values_t>
-//     struct first_value_impl {
-//         using type = first_value_t;
-//     };
-// }
 
 /// @brief
 /// @details
@@ -265,9 +260,6 @@ struct layout {
     //     // cursor etc
 
     //     // im gui api here
-
-    template <typename widget_t>
-    layout& build_here(widget_t& widget);
 
 private:
     // layout();

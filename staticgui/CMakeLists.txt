@@ -11,9 +11,9 @@ project(staticgui)
 
 set(staticgui_source
 
-	"source/glue/graphics.cpp"
-	"source/glue/platform.cpp"
 	"source/glue/registry.cpp"
+	"source/glue/renderer.cpp"
+	"source/glue/window.cpp"
 
 	"source/state/animations_registry.cpp"
 	"source/state/events_registry.cpp"

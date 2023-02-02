@@ -17,7 +17,7 @@ namespace detail {
     {
         glue::id_integer _entity = _registry.create_entity();
         animation_data& _animation_data = _registry.create_component<animation_data>(_entity);
-        _animation_data.tick = [&]() {
+        _animation_data.tick = [&](const float delta_milliseconds) {
             // todo
         };
         _animation_data.kind = std::make_unique<std::type_index>(typeid(value_t));

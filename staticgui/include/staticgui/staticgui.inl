@@ -116,6 +116,8 @@ void launch(widget_t& widget)
     //     print_tree<widget_impl*>(widgets_ptrs_container);
     //     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     // }
+
+    detail::state.launch(widget);
 }
 
 template <typename widget_t>

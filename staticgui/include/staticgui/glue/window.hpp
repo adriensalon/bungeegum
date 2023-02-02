@@ -14,19 +14,18 @@
 
 namespace staticgui {
 namespace glue {
-    namespace platform {
 
-        void start_window(
-            const std::string& initial_title,
-            const unsigned int initial_width,
-            const unsigned int initial_height,
-            std::function<void()> start_callback,
-            std::function<void()> update_callback,
-            std::function<void()> end_callback);
+    void launch_window(
+        const std::string& initial_title,
+        const unsigned int initial_width,
+        const unsigned int initial_height,
+        std::function<void()> start_callback,
+        std::function<void()> update_callback,
+        std::function<void()> end_callback);
 
-        void enable_fullscreen();
+    void enable_fullscreen();
 
-        void disable_fullscreen();
-    }
+    void disable_fullscreen();
+
 }
 }
