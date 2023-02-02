@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <staticgui/glue/simd.hpp>
+
 namespace staticgui {
 namespace detail {
 
@@ -16,5 +18,3 @@ namespace detail {
     };
 }
 }
-
-// #include <staticgui/containers/widgets_registry.inl>

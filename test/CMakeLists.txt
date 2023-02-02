@@ -14,6 +14,7 @@ set(staticgui_test_source
 
 	"source/glue/test_constexpr.cpp"
 	"source/glue/test_registry.cpp"
+	"source/glue/test_simd.cpp"
 	"source/glue/test_toolchain.cpp"
 	"source/glue/test_typelist.cpp"
 	"source/test_staticgui.cpp"

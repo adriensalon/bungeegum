@@ -13,6 +13,7 @@ set(staticgui_source
 
 	"source/glue/registry.cpp"
 	"source/glue/renderer.cpp"
+	"source/glue/simd.cpp"
 	"source/glue/window.cpp"
 
 	"source/state/animations_registry.cpp"
@@ -30,6 +31,7 @@ set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)
 target_link_libraries(staticgui imgui)
 target_link_libraries(staticgui SDL2-static)
 target_link_libraries(staticgui EnTT)
+target_link_libraries(staticgui vectorclass)
 target_link_libraries(staticgui Diligent-GraphicsEngine)
 target_link_libraries(staticgui Diligent-GraphicsTools)
 target_link_libraries(staticgui Diligent-ShaderTools)
