@@ -17,9 +17,9 @@ namespace detail {
     {
     }
 
-    void context_state::tick(const float delta_milliseconds)
-    {
-    }
+    // void context_state::tick(const float delta_milliseconds)
+    // {
+    // }
 
 }
 }

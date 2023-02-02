@@ -32,6 +32,11 @@ namespace glue {
             return (std::any_cast<SDL_Window*>(untyped));
         }
 
+        SDL_Window* get_window(const std::any& untyped)
+        {
+            return (std::any_cast<SDL_Window*>(untyped));
+        }
+
         SDL_Event& get_event(std::any& untyped)
         {
             return (std::any_cast<SDL_Event&>(untyped));
@@ -150,7 +155,7 @@ namespace glue {
     {
     }
 
-    void* window::get_native_window()
+    void* window::get_native_window() const
     {
         if constexpr (glue::is_platform_win32 || glue::is_platform_uwp) {
             SDL_SysWMinfo _wmi;

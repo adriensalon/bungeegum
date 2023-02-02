@@ -45,7 +45,7 @@ namespace glue {
 #if !defined(__EMSCRIPTEN__)
         window(SDL_Window* sdl_window);
         window(void* native_window);
-        void* get_native_window();
+        void* get_native_window() const;
 #endif
 
     private:

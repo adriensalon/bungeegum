@@ -24,7 +24,14 @@ set(staticgui_source
 
 add_library(staticgui "${staticgui_source}")
 
+target_include_directories(staticgui PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
 target_include_directories(staticgui PUBLIC "include")
+
+
+target_link_libraries(staticgui Diligent-GraphicsEngineD3D11-static)
+# target_link_libraries(librender Diligent-GraphicsEngineD3D12-static)
+# target_link_libraries(librender Diligent-GraphicsEngineOpenGL-static)
+# target_link_libraries(librender Diligent-GraphicsEngineVulkan-static)
 
 target_link_libraries(staticgui Diligent-GraphicsEngine)
 target_link_libraries(staticgui Diligent-GraphicsTools)
