@@ -18,9 +18,13 @@ namespace detail {
         _context.make_at_root(widget);
 
         _window = std::make_unique<glue::window>();
-        _window->run([this]() {
+        _window->on_event([this](const std::any& _event) {
 
         });
+        _window->on_update([this]() {
+
+        });
+        _window->run_loop();
 
         // glue::launch_window(
         //     "staticgui v0.0",

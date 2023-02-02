@@ -31,6 +31,11 @@ namespace glue {
         {
             return (std::any_cast<SDL_Window*>(untyped));
         }
+
+        SDL_Event& get_event(std::any& untyped)
+        {
+            return (std::any_cast<SDL_Event&>(untyped));
+        }
 #endif
     }
 
@@ -61,6 +66,8 @@ namespace glue {
 #else
     window::window(SDL_Window* sdl_window)
     {
+        detail::is_sdl_main_ready = true;
+        _impl = sdl_window;
     }
 
     window::window(void* native_window)
@@ -122,23 +129,35 @@ namespace glue {
     }
 #endif
 
-    void window::run(const std::function<void()>& run_callback)
+    void window::on_event(const std::function<void(const std::any&)>& event_callback)
     {
+        _event_callback = event_callback;
+    }
 
+    void window::on_update(const std::function<void()>& update_callback)
+    {
+        _update_callback = update_callback;
+    }
+
+    void window::run_loop()
+    {
         if constexpr (glue::is_platform_emscripten) {
         } else {
-            while (true) {
-                run_callback();
+            bool _running = true;
+            while (_running) {
+                SDL_Event _event;
+                while (SDL_PollEvent(&_event)) {
+                    std::any _untyped = _event;
+                    if (_event.type == SDL_QUIT)
+                        _running = false;
+                    else if (_event.type == SDL_WINDOWEVENT && _event.window.event == SDL_WINDOWEVENT_CLOSE && _event.window.windowID == SDL_GetWindowID(detail::get_window(_impl)))
+                        _running = false;
+                    else
+                        _event_callback(_untyped);
+                }
+                _update_callback();
             }
         }
-    }
-
-    void poll()
-    {
-    }
-
-    void swap()
-    {
     }
 
     void window::show_cursor(const bool enabled)

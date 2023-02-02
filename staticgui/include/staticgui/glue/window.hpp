@@ -11,8 +11,10 @@
 
 #include <any>
 #include <functional>
+#include <optional>
 #include <string>
 
+typedef union SDL_Event SDL_Event;
 struct SDL_Window;
 
 namespace staticgui {
@@ -40,15 +42,17 @@ namespace glue {
         void* get_native_window();
 #endif
 
-        void run(const std::function<void()>& run_callback);
+        void on_event(const std::function<void(const std::any&)>& event_callback);
 
-        void poll();
+        void on_update(const std::function<void()>& update_callback);
 
-        void swap();
+        void run_loop();
 
         static void show_cursor(const bool show);
 
     private:
+        std::function<void(const std::any&)> _event_callback = nullptr;
+        std::function<void()> _update_callback = nullptr;
         std::any _impl = nullptr;
     };
 
