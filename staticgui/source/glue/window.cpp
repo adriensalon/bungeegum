@@ -50,7 +50,7 @@ namespace glue {
             }
             SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(
                 SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-            _impl = SDL_CreateWindow("staticgui v0.0", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, _window_flags);
+            _window_impl = SDL_CreateWindow("staticgui v0.0", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, _window_flags);
         }
     }
 
@@ -58,22 +58,9 @@ namespace glue {
     {
         if constexpr (glue::is_platform_emscripten) {
         } else {
-            SDL_DestroyWindow(detail::get_window(_impl));
+            SDL_DestroyWindow(detail::get_window(_window_impl));
         }
     }
-
-#if defined(__EMSCRIPTEN__)
-#else
-    window::window(SDL_Window* sdl_window)
-    {
-        detail::is_sdl_main_ready = true;
-        _impl = sdl_window;
-    }
-
-    window::window(void* native_window)
-    {
-    }
-#endif
 
     window::window(window&& other)
     {
@@ -88,7 +75,7 @@ namespace glue {
     {
         if constexpr (glue::is_platform_emscripten) {
         } else {
-            SDL_SetWindowTitle(detail::get_window(_impl), title.c_str());
+            SDL_SetWindowTitle(detail::get_window(_window_impl), title.c_str());
         }
     }
 
@@ -98,7 +85,7 @@ namespace glue {
         } else {
             int _width = static_cast<int>(std::floorf(width));
             int _height = static_cast<int>(std::floorf(height));
-            SDL_SetWindowSize(detail::get_window(_impl), _width, _height);
+            SDL_SetWindowSize(detail::get_window(_window_impl), _width, _height);
         }
     }
 
@@ -107,27 +94,11 @@ namespace glue {
         if constexpr (glue::is_platform_emscripten) {
         } else {
             if (enabled)
-                SDL_SetWindowFullscreen(detail::get_window(_impl), SDL_WINDOW_FULLSCREEN);
+                SDL_SetWindowFullscreen(detail::get_window(_window_impl), SDL_WINDOW_FULLSCREEN);
             else
-                SDL_SetWindowFullscreen(detail::get_window(_impl), NULL);
+                SDL_SetWindowFullscreen(detail::get_window(_window_impl), NULL);
         }
     }
-
-#if !defined(__EMSCRIPTEN__)
-    void* window::get_native_window()
-    {
-        if constexpr (glue::is_platform_win32 || glue::is_platform_uwp) {
-            SDL_SysWMinfo _wmi;
-            SDL_VERSION(&_wmi.version);
-            SDL_GetWindowWMInfo(detail::get_window(_impl), &_wmi); //, == SDL_TRUE)
-            return _wmi.info.win.window;
-        } else if constexpr (glue::is_platform_linux) {
-
-        } else if constexpr (glue::is_platform_macos) {
-        }
-        return nullptr;
-    }
-#endif
 
     void window::on_event(const std::function<void(const std::any&)>& event_callback)
     {
@@ -150,7 +121,7 @@ namespace glue {
                     std::any _untyped = _event;
                     if (_event.type == SDL_QUIT)
                         _running = false;
-                    else if (_event.type == SDL_WINDOWEVENT && _event.window.event == SDL_WINDOWEVENT_CLOSE && _event.window.windowID == SDL_GetWindowID(detail::get_window(_impl)))
+                    else if (_event.type == SDL_WINDOWEVENT && _event.window.event == SDL_WINDOWEVENT_CLOSE && _event.window.windowID == SDL_GetWindowID(detail::get_window(_window_impl)))
                         _running = false;
                     else
                         _event_callback(_untyped);
@@ -167,5 +138,31 @@ namespace glue {
             SDL_ShowCursor(enabled);
         }
     }
+
+#if !defined(__EMSCRIPTEN__)
+    window::window(SDL_Window* sdl_window)
+    {
+        detail::is_sdl_main_ready = true;
+        _window_impl = sdl_window;
+    }
+
+    window::window(void* native_window)
+    {
+    }
+
+    void* window::get_native_window()
+    {
+        if constexpr (glue::is_platform_win32 || glue::is_platform_uwp) {
+            SDL_SysWMinfo _wmi;
+            SDL_VERSION(&_wmi.version);
+            SDL_GetWindowWMInfo(detail::get_window(_window_impl), &_wmi); //, == SDL_TRUE)
+            return _wmi.info.win.window;
+        } else if constexpr (glue::is_platform_linux) {
+
+        } else if constexpr (glue::is_platform_macos) {
+        }
+        return nullptr;
+    }
+#endif
 }
 }

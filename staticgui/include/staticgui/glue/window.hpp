@@ -11,11 +11,11 @@
 
 #include <any>
 #include <functional>
-#include <optional>
 #include <string>
 
-typedef union SDL_Event SDL_Event;
+#if !defined(__EMSCRIPTEN__)
 struct SDL_Window;
+#endif
 
 namespace staticgui {
 namespace glue {
@@ -23,10 +23,6 @@ namespace glue {
     struct window {
         window();
         ~window();
-#if !defined(__EMSCRIPTEN__)
-        window(SDL_Window* sdl_window);
-        window(void* native_window);
-#endif
         window(const window& other) = delete;
         window& operator=(const window& other) = delete;
         window(window&& other);
@@ -38,10 +34,6 @@ namespace glue {
 
         void set_fullscreen(const bool enabled);
 
-#if !defined(__EMSCRIPTEN__)
-        void* get_native_window();
-#endif
-
         void on_event(const std::function<void(const std::any&)>& event_callback);
 
         void on_update(const std::function<void()>& update_callback);
@@ -50,10 +42,16 @@ namespace glue {
 
         static void show_cursor(const bool show);
 
+#if !defined(__EMSCRIPTEN__)
+        window(SDL_Window* sdl_window);
+        window(void* native_window);
+        void* get_native_window();
+#endif
+
     private:
         std::function<void(const std::any&)> _event_callback = nullptr;
         std::function<void()> _update_callback = nullptr;
-        std::any _impl = nullptr;
+        std::any _window_impl = nullptr;
     };
 
 }

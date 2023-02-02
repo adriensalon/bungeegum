@@ -31,7 +31,7 @@ namespace detail {
         context_state _context;
         layout_state _layout;
         std::unique_ptr<glue::window> _window = nullptr;
-        // std::unique_ptr<glue::renderer> _renderer = nullptr;
+        std::unique_ptr<glue::renderer> _renderer = nullptr;
     };
 
 }
