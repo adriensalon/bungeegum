@@ -17,18 +17,23 @@ namespace detail {
     {
         _context.make_at_root(widget);
 
-        glue::launch_window(
-            "staticgui v0.0",
-            1600, 900,
-            [this]() {
+        _window = std::make_unique<glue::window>();
+        _window->run([this]() {
 
-            },
-            [this]() {
+        });
 
-            },
-            [this]() {
+        // glue::launch_window(
+        //     "staticgui v0.0",
+        //     1600, 900,
+        //     [this]() {
 
-            });
+        //     },
+        //     [this]() {
+
+        //     },
+        //     [this]() {
+
+        //     });
     }
 
     template <typename widget_t>

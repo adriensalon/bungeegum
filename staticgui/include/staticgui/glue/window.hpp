@@ -9,23 +9,48 @@
 
 #pragma once
 
+#include <any>
 #include <functional>
 #include <string>
+
+struct SDL_Window;
 
 namespace staticgui {
 namespace glue {
 
-    void launch_window(
-        const std::string& initial_title,
-        const unsigned int initial_width,
-        const unsigned int initial_height,
-        std::function<void()> start_callback,
-        std::function<void()> update_callback,
-        std::function<void()> end_callback);
+    struct window {
+        window();
+        ~window();
+#if !defined(__EMSCRIPTEN__)
+        window(SDL_Window* sdl_window);
+        window(void* native_window);
+#endif
+        window(const window& other) = delete;
+        window& operator=(const window& other) = delete;
+        window(window&& other);
+        window& operator=(window&& other);
 
-    void enable_fullscreen();
+        void set_title(const std::string& title);
 
-    void disable_fullscreen();
+        void set_size(const float width, const float height);
+
+        void set_fullscreen(const bool enabled);
+
+#if !defined(__EMSCRIPTEN__)
+        void* get_native_window();
+#endif
+
+        void run(const std::function<void()>& run_callback);
+
+        void poll();
+
+        void swap();
+
+        static void show_cursor(const bool show);
+
+    private:
+        std::any _impl = nullptr;
+    };
 
 }
 }

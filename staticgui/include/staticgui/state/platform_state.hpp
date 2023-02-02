@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <staticgui/glue/renderer.hpp>
 #include <staticgui/glue/window.hpp>
 #include <staticgui/state/context_state.hpp>
@@ -28,8 +30,8 @@ namespace detail {
     private:
         context_state _context;
         layout_state _layout;
-        // window
-        // renderer
+        std::unique_ptr<glue::window> _window = nullptr;
+        // std::unique_ptr<glue::renderer> _renderer = nullptr;
     };
 
 }
