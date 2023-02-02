@@ -68,6 +68,9 @@ namespace glue {
     template <typename scalar_t, unsigned int count_t>
     simd_array<scalar_t, count_t> operator+(const simd_array<scalar_t, count_t>& first, const simd_array<scalar_t, count_t>& second);
 
+    template <typename scalar_t, unsigned int count_t>
+    simd_array<scalar_t, count_t>& operator+=(const simd_array<scalar_t, count_t>& first, const simd_array<scalar_t, count_t>& second);
+
     template <typename scalar_t, unsigned int count_t, simd_order order_t>
     simd_ordered_array<scalar_t, count_t, order_t> operator+(const simd_ordered_array<scalar_t, count_t, order_t>& first, const simd_ordered_array<scalar_t, count_t, order_t>& second);
 }

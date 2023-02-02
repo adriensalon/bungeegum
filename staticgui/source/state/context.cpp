@@ -9,15 +9,23 @@
 
 #pragma once
 
-#include <staticgui/state/context_state.hpp>
+#include <imgui.h>
+
+#include <staticgui/state/context.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    bool context_state::tick_all(const float delta_milliseconds)
+    bool context_state::tick(const float delta_milliseconds)
     {
         // parse tree et return true si besoin de refresh
         return true;
+    }
+
+    void context_state::draw()
+    {
+        ImGui::ShowDemoWindow();
+        // iterate widgets and draw OU draw direct (encapsulation) ??
     }
 }
 }

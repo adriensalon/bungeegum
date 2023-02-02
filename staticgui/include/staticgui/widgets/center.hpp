@@ -28,7 +28,7 @@ namespace widgets {
         template <typename child_widget_t>
         center_widget(child_widget_t& child)
         {
-            build(this, child);
+            declare(this, child);
         }
 
         /// @brief

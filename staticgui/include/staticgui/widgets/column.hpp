@@ -24,8 +24,6 @@ namespace widgets {
     /// using a 'list_view'. For a horizontal variant see 'row'. If you only have one child, then
     /// consider using 'align' or 'center' to position the child.
     struct column_widget {
-        constexpr static char* internal_name = "column";
-        // STATICGUI_WIDGET(column_widget)
 
         template <typename... children_widgets_t>
         column_widget(children_widgets_t&... children)
@@ -36,6 +34,10 @@ namespace widgets {
                 },
                 center(children)...);
         }
+
+        inline void resolve(const resolve_constraint& cst, resolve_advice& adv) { }
+
+        inline void draw(draw_command& cmd) { }
 
     private:
         int g;

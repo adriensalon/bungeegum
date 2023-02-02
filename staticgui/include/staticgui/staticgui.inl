@@ -71,22 +71,22 @@ widget_t& make(widget_args_t&&... widget_args)
 }
 
 template <typename widget_t, typename child_widget_t>
-void build(widget_t* widget, child_widget_t& child_widget)
+void declare(widget_t* widget, child_widget_t& child_widget)
 {
-    detail::global_widgets.build(widget, nullptr, child_widget);
+    detail::global_widgets.declare(widget, nullptr, child_widget);
 }
 
 template <typename widget_t, typename... children_widgets_t>
-void build_advanced(widget_t* widget, std::function<void(layout&)> paint_callback, children_widgets_t&... children)
+void build_advanced(widget_t* widget, std::function<void(layout&)> layout_callback, children_widgets_t&... children)
 {
-    detail::global_widgets.build(
-        widget, [](detail::layout_state&) {}, children...);
+    detail::global_widgets.declare(
+        widget, [](const detail::constraint_data&, detail::geometry_data&) {}, children...);
 }
 
 template <typename widget_t>
 void launch(widget_t& widget)
 {
-    detail::global_widgets.build_roots(widget);
+    detail::global_widgets.declare_root(widget);
 
     std::cout << "application" << std::endl;
     detail::global_widgets.iterate_datas([&](detail::widget_data& _widget_data) {
@@ -95,7 +95,7 @@ void launch(widget_t& widget)
             std::cout << "   ";
         std::cout << "|__ ";
         std::cout << _widget_data.kind->name();
-        if (_widget_data.paint_callback)
+        if (_widget_data.layout_callback)
             std::cout << " [painter]";
         std::cout << std::endl;
     });

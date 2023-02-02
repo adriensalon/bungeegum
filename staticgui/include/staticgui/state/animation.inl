@@ -13,7 +13,7 @@ namespace staticgui {
 namespace detail {
 
     template <typename value_t>
-    animation_impl<value_t>& animations_registry::make_animation_and_data()
+    animation_impl<value_t>& animation_registry::make_animation_and_data()
     {
         glue::id_integer _entity = _registry.create_entity();
         animation_data& _animation_data = _registry.create_component<animation_data>(_entity);
@@ -25,14 +25,14 @@ namespace detail {
     }
 
     template <typename value_t>
-    animation_data& animations_registry::get_data(animation_impl<value_t>& animation)
+    animation_data& animation_registry::get_data(animation_impl<value_t>& animation)
     {
         glue::id_integer _entity = _registry.get_entity(animation);
         return _registry.get_component<animation_data>(_entity);
     }
 
     template <typename value_t>
-    animation_impl<value_t>& animations_registry::get_animation(animation_data& data)
+    animation_impl<value_t>& animation_registry::get_animation(animation_data& data)
     {
         glue::id_integer _entity = _registry.get_entity(data);
         return _registry.get_component<animation_impl<value_t>>(_entity);

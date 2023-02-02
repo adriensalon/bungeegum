@@ -9,12 +9,22 @@
 
 #pragma once
 
+#include <staticgui/glue/registry.hpp>
 #include <staticgui/glue/simd.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    struct layout_state {
+    // rectangle command etc
+    // text command etc
+    // image command etc
+
+    struct command_data {
+
+        // append rectangle etx
+
+        void draw();
     };
+
 }
 }

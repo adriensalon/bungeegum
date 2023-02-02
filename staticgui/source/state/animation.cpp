@@ -9,34 +9,34 @@
 
 #pragma once
 
-#include <staticgui/state/animations_registry.hpp>
+#include <staticgui/state/animation.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    animations_registry::animations_registry()
+    animation_registry::animation_registry()
     {
     }
 
-    animations_registry::animations_registry(animations_registry&& other)
+    animation_registry::animation_registry(animation_registry&& other)
     {
         *this = std::move(other);
     }
 
-    animations_registry& animations_registry::operator=(animations_registry&& other)
+    animation_registry& animation_registry::operator=(animation_registry&& other)
     {
         _registry = std::move(other._registry);
         return *this;
     }
 
-    void animations_registry::tick_all(const float delta_milliseconds)
+    void animation_registry::tick(const float delta_milliseconds)
     {
         iterate_datas([&](animation_data& _animation_data) {
             _animation_data.tick(delta_milliseconds);
         });
     }
 
-    void animations_registry::iterate_datas(const std::function<void(animation_data&)>& iterate_callback)
+    void animation_registry::iterate_datas(const std::function<void(animation_data&)>& iterate_callback)
     {
         _registry.iterate_components<animation_data>([&](animation_data& _animation_data) {
             iterate_callback(_animation_data);

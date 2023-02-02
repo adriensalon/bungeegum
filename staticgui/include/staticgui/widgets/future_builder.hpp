@@ -35,7 +35,7 @@ namespace widgets {
                 // else
                 // 	context.replace(wait, complete_callback(std::forward<value_t>(future.get())));
             });
-            build(this, wait);
+            declare(this, wait);
         }
 
         // do something in the desctructor ?

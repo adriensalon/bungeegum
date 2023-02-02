@@ -14,7 +14,7 @@
 
 #include <staticgui/glue/constexpr.hpp>
 #include <staticgui/glue/registry.hpp>
-#include <staticgui/state/layout_state.hpp>
+#include <staticgui/state/layout.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -25,28 +25,36 @@ namespace detail {
     struct widget_data {
         bool is_built = false;
         std::unique_ptr<std::type_index> kind = nullptr;
-        std::function<void(layout_state&)> paint_callback = nullptr;
+        std::function<void(const constraint_data&, geometry_data&)> layout_callback = nullptr;
         std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<widget_data>> children = {};
     };
 
-    struct widgets_registry {
-        widgets_registry();
-        widgets_registry(const widgets_registry& other) = delete;
-        widgets_registry& operator=(const widgets_registry& other) = delete;
-        widgets_registry(widgets_registry&& other);
-        widgets_registry& operator=(widgets_registry&& other);
+    struct widget_registry {
+        widget_registry();
+        widget_registry(const widget_registry& other) = delete;
+        widget_registry& operator=(const widget_registry& other) = delete;
+        widget_registry(widget_registry&& other);
+        widget_registry& operator=(widget_registry&& other);
 
         template <typename widget_t, typename... widget_args_t>
         widget_t& make(widget_args_t&&... widget_args);
 
         template <typename widget_t, typename... children_widgets_t>
-        void build(widget_t* widget, std::function<void(layout_state&)> paint_callback, children_widgets_t&... children);
+        void declare(widget_t* widget, std::function<void(const constraint_data&, geometry_data&)> layout_callback, children_widgets_t&... children);
 
         template <typename... children_widgets_t>
-        void build_roots(children_widgets_t&... children);
+        void declare_root(children_widgets_t&... children);
 
-        void paint_all();
+        void iterate_datas(const std::function<void(widget_data&)>& iterate_callback);
+
+        template <typename widget_t>
+        void iterate_widgets(const std::function<void(widget_t&)>& iterate_callback);
+
+        ///
+        ///
+        ///
+        /// PAS SUR
 
         template <typename widget_t>
         widget_data& get_data(widget_t& widget);
@@ -59,11 +67,6 @@ namespace detail {
 
         unsigned int get_depth(widget_data& data);
 
-        void iterate_datas(const std::function<void(widget_data&)>& iterate_callback);
-
-        template <typename widget_t>
-        void iterate_widgets(const std::function<void(widget_t&)>& iterate_callback);
-
     private:
         glue::registry _registry;
         std::vector<std::reference_wrapper<widget_data>> _roots;
@@ -72,4 +75,4 @@ namespace detail {
 }
 }
 
-#include <staticgui/state/widgets_registry.inl>
+#include <staticgui/state/widget.inl>

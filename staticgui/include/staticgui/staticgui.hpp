@@ -12,15 +12,15 @@
 #include <iostream>
 
 #include <staticgui/state/animatable_value.hpp>
-#include <staticgui/state/animations_registry.hpp>
-#include <staticgui/state/color_value.hpp>
-#include <staticgui/state/context_state.hpp>
-#include <staticgui/state/curve_value.hpp>
-#include <staticgui/state/events_registry.hpp>
-#include <staticgui/state/layout_state.hpp>
-#include <staticgui/state/lerpable_value.hpp>
+#include <staticgui/state/animation.hpp>
+#include <staticgui/state/color.hpp>
+#include <staticgui/state/context.hpp>
+#include <staticgui/state/curve.hpp>
+#include <staticgui/state/event.hpp>
+#include <staticgui/state/layout.hpp>
+#include <staticgui/state/lerpable.hpp>
 #include <staticgui/state/platform_state.hpp>
-#include <staticgui/state/widgets_registry.hpp>
+#include <staticgui/state/widget.hpp>
 
 using int2 = staticgui::glue::simd_array<int, 2>;
 using int3 = staticgui::glue::simd_array<int, 3>;
@@ -44,9 +44,9 @@ namespace staticgui {
 
 namespace detail {
 
-    inline static animations_registry global_animations;
-    inline static events_registry global_events;
-    inline static widgets_registry global_widgets;
+    inline static animation_registry global_animations;
+    inline static event_registry global_events;
+    inline static widget_registry global_widgets;
 
     inline static platform_state state;
 
@@ -310,14 +310,34 @@ template <typename widget_t, typename... widget_args_t>
 /// @param widget
 /// @param child_widget
 template <typename widget_t, typename child_widget_t>
-void build(widget_t* widget, child_widget_t& child_widget);
+void declare(widget_t* widget, child_widget_t& child_widget);
 
 /// @brief
 /// @tparam parent_widget_t
 /// @param  widget
-/// @param  paint_callback
+/// @param  layout_callback
 template <typename widget_t, typename... children_widgets_t>
 void build_advanced(widget_t* widget, std::function<void(layout&)> context_callback, children_widgets_t&... children_widgets);
+
+struct resolve_constraint {
+    // getters
+};
+
+struct resolve_advice {
+
+    // setters
+};
+
+template <typename widget_t>
+void on_resolve(widget_t* widget, const std::function<void(const resolve_constraint&, resolve_advice&)>& resolve_callback);
+
+struct draw_command {
+
+    // emplace rect etc
+};
+
+template <typename widget_t>
+void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback);
 
 }
 

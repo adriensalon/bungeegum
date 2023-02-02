@@ -35,14 +35,14 @@ namespace detail {
         std::vector<std::reference_wrapper<event_data>> children = {};
     };
 
-    struct events_registry {
-        events_registry();
-        events_registry(const events_registry& other) = delete;
-        events_registry& operator=(const events_registry& other) = delete;
-        events_registry(events_registry&& other);
-        events_registry& operator=(events_registry&& other);
+    struct event_registry {
+        event_registry();
+        event_registry(const event_registry& other) = delete;
+        event_registry& operator=(const event_registry& other) = delete;
+        event_registry(event_registry&& other);
+        event_registry& operator=(event_registry&& other);
 
-        void tick_all();
+        void tick();
 
         template <typename... values_t>
         event_impl<values_t...>& make_event_and_data();
@@ -68,4 +68,4 @@ namespace detail {
 }
 }
 
-#include <staticgui/state/events_registry.inl>
+#include <staticgui/state/event.inl>

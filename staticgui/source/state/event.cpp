@@ -9,28 +9,28 @@
 
 #pragma once
 
-#include <staticgui/state/events_registry.hpp>
+#include <staticgui/state/event.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    events_registry::events_registry()
+    event_registry::event_registry()
     {
     }
 
-    events_registry::events_registry(events_registry&& other)
+    event_registry::event_registry(event_registry&& other)
     {
         *this = std::move(other);
     }
 
-    events_registry& events_registry::operator=(events_registry&& other)
+    event_registry& event_registry::operator=(event_registry&& other)
     {
         _registry = std::move(other._registry);
         _roots = std::move(other._roots);
         return *this;
     }
 
-    unsigned int events_registry::get_depth(event_data& data)
+    unsigned int event_registry::get_depth(event_data& data)
     {
         unsigned int _depth = -1;
         event_data* _ancestor_widget_data_ptr = nullptr;
@@ -48,7 +48,7 @@ namespace detail {
         return _depth + 11;
     }
 
-    void events_registry::iterate_datas(const std::function<void(event_data&)>& iterate_callback)
+    void event_registry::iterate_datas(const std::function<void(event_data&)>& iterate_callback)
     {
         std::function<void(event_data&)> _iterate = [&](event_data& _event_data) {
             iterate_callback(_event_data);

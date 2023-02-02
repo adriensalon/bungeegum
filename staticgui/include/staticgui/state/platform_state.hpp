@@ -13,8 +13,7 @@
 
 #include <staticgui/glue/renderer.hpp>
 #include <staticgui/glue/window.hpp>
-#include <staticgui/state/context_state.hpp>
-#include <staticgui/state/layout_state.hpp>
+#include <staticgui/state/context.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -29,7 +28,6 @@ namespace detail {
 
     private:
         context_state _context;
-        layout_state _layout;
         std::unique_ptr<glue::window> _window = nullptr;
         std::unique_ptr<glue::renderer> _renderer = nullptr;
     };

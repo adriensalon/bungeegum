@@ -14,7 +14,7 @@
 #include <typeindex>
 #include <vector>
 
-#include <staticgui/state/events_registry.hpp>
+#include <staticgui/state/event.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -33,14 +33,14 @@ namespace detail {
         std::unique_ptr<std::type_index> kind;
     };
 
-    struct animations_registry {
-        animations_registry();
-        animations_registry(const animations_registry& other) = delete;
-        animations_registry& operator=(const animations_registry& other) = delete;
-        animations_registry(animations_registry&& other);
-        animations_registry& operator=(animations_registry&& other);
+    struct animation_registry {
+        animation_registry();
+        animation_registry(const animation_registry& other) = delete;
+        animation_registry& operator=(const animation_registry& other) = delete;
+        animation_registry(animation_registry&& other);
+        animation_registry& operator=(animation_registry&& other);
 
-        void tick_all(const float delta_milliseconds);
+        void tick(const float delta_milliseconds);
 
         template <typename value_t>
         animation_impl<value_t>& make_animation_and_data();
@@ -63,4 +63,4 @@ namespace detail {
 }
 }
 
-#include <staticgui/state/animations_registry.inl>
+#include <staticgui/state/animation.inl>

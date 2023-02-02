@@ -9,28 +9,28 @@
 
 #pragma once
 
-#include <staticgui/state/widgets_registry.hpp>
+#include <staticgui/state/widget.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    widgets_registry::widgets_registry()
+    widget_registry::widget_registry()
     {
     }
 
-    widgets_registry::widgets_registry(widgets_registry&& other)
+    widget_registry::widget_registry(widget_registry&& other)
     {
         *this = std::move(other);
     }
 
-    widgets_registry& widgets_registry::operator=(widgets_registry&& other)
+    widget_registry& widget_registry::operator=(widget_registry&& other)
     {
         _registry = std::move(other._registry);
         _roots = std::move(other._roots);
         return *this;
     }
 
-    unsigned int widgets_registry::get_depth(widget_data& data)
+    unsigned int widget_registry::get_depth(widget_data& data)
     {
         unsigned int _depth = -1;
         widget_data* _ancestor_widget_data_ptr = nullptr;
@@ -48,7 +48,7 @@ namespace detail {
         return _depth + 11;
     }
 
-    void widgets_registry::iterate_datas(const std::function<void(widget_data&)>& iterate_callback)
+    void widget_registry::iterate_datas(const std::function<void(widget_data&)>& iterate_callback)
     {
         std::function<void(widget_data&)> _iterate = [&](widget_data& _widget_data) {
             iterate_callback(_widget_data);

@@ -16,10 +16,10 @@ set(staticgui_source
 	"source/glue/simd.cpp"
 	"source/glue/window.cpp"
 
-	"source/state/animations_registry.cpp"
-	"source/state/context_state.cpp"
-	"source/state/events_registry.cpp"
-	"source/state/widgets_registry.cpp"
+	"source/state/animation.cpp"
+	"source/state/context.cpp"
+	"source/state/event.cpp"
+	"source/state/widget.cpp"
 
 	"source/staticgui.cpp"
 )

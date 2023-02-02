@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <imgui.h>
-
 namespace staticgui {
 namespace detail {
 
@@ -23,17 +21,9 @@ namespace detail {
             _renderer->process_input(_event);
         });
         _window->on_update([this]() {
-            if (_context.tick_all(0.2f)) {
+            if (_context.tick(0.2f)) {
                 _renderer->new_frame();
-
-                ///
-                ///
-                ///
-                ImGui::ShowDemoWindow();
-                ///
-                ///
-                ///
-
+                _context.draw();
                 _renderer->present();
             }
         });
