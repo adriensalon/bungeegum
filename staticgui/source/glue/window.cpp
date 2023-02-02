@@ -105,7 +105,7 @@ namespace glue {
         }
     }
 
-    void window::on_event(const std::function<void(const std::any&)>& event_callback)
+    void window::on_input(const std::function<void(const std::any&)>& event_callback)
     {
         _event_callback = event_callback;
     }

@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <staticgui/glue/toolchain.hpp>
 #include <staticgui/glue/window.hpp>
 
@@ -33,17 +35,18 @@ namespace glue {
         renderer(renderer&& other);
         renderer& operator=(renderer&& other);
 
-        void* get_native_device() const;
-
-        void* get_native_swap_chain() const;
-
-        void* get_native_context() const;
+        void set_clear_color(const std::array<float, 4>& color);
 
         void debug_fn();
 
-        void process_event(const std::any& event);
+        void new_frame();
+
+        void present();
+
+        void process_input(const std::any& input);
 
     private:
+        std::array<float, 4> _clear_color = { 0.f, 0.f, 0.f, 1.f };
         std::any _render_device_impl = nullptr;
         std::any _swap_chain_impl = nullptr;
         std::any _device_context_impl = nullptr;

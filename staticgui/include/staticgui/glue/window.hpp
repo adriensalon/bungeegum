@@ -34,7 +34,7 @@ namespace glue {
 
         void set_fullscreen(const bool enabled);
 
-        void on_event(const std::function<void(const std::any&)>& event_callback);
+        void on_input(const std::function<void(const std::any&)>& event_callback);
 
         void on_update(const std::function<void()>& update_callback);
 

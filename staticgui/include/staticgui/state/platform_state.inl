@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <imgui.h>
+
 namespace staticgui {
 namespace detail {
 
@@ -16,31 +18,26 @@ namespace detail {
     void platform_state::launch(widget_t& widget)
     {
         _context.make_at_root(widget);
-
         _window = std::make_unique<glue::window>();
-        _window->on_event([this](const std::any& _event) {
-            _renderer->process_event(_event);
+        _renderer = std::make_unique<glue::renderer>(*(_window.get()));
+        _window->on_input([this](const std::any& _event) {
+            _renderer->process_input(_event);
         });
         _window->on_update([this]() {
-            _renderer->debug_fn();
+            _renderer->new_frame();
+
+            ///
+            ///
+            ///
+            ImGui::ShowDemoWindow();
+            ///
+            ///
+            ///
+
+            _renderer->present();
         });
-
-        _renderer = std::make_unique<glue::renderer>(*(_window.get()));
-
+        _renderer->set_clear_color({ .82f, .22f, .22f });
         _window->run_loop();
-
-        // glue::launch_window(
-        //     "staticgui v0.0",
-        //     1600, 900,
-        //     [this]() {
-
-        //     },
-        //     [this]() {
-
-        //     },
-        //     [this]() {
-
-        //     });
     }
 
     template <typename widget_t>

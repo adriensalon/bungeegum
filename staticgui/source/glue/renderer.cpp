@@ -86,37 +86,6 @@ namespace glue {
         m_pImGui = (new Diligent::ImGuiImplWin32((HWND)(existing_window.get_native_window()), m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
     }
 
-    void renderer::debug_fn()
-    {
-        // auto* pCtx = pContext; //reinterpret_cast<Diligent::IDeviceContext*>(context);
-        auto* pRTV = m_pSwapChain->GetCurrentBackBufferRTV();
-        auto* pDSV = m_pSwapChain->GetDepthBufferDSV();
-        m_pImmediateContext->SetRenderTargets(1, &pRTV, pDSV, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-
-        // Clear the back buffer
-        static float a = 0.150f;
-        a += 0.01f;
-        const float ClearColor[] = { std::fmin(1.f, a), 0.350f, 0.850f, 1.0f };
-        // Let the engine perform required state transitions
-        m_pImmediateContext->ClearRenderTarget(pRTV, ClearColor, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        m_pImmediateContext->ClearDepthStencil(pDSV, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-
-        const auto& SCDesc = m_pSwapChain->GetDesc();
-        m_pImGui->NewFrame(SCDesc.Width, SCDesc.Height, SCDesc.PreTransform);
-
-        bool aa = true;
-
-        ImGui::ShowDemoWindow(&aa);
-
-        ImGui::Begin("my_window");
-
-        ImGui::End();
-
-        m_pImGui->Render(m_pImmediateContext);
-
-        m_pSwapChain->Present();
-    }
-
     renderer::~renderer()
     {
     }
@@ -125,29 +94,31 @@ namespace glue {
     {
     }
 
-    void renderer::process_event(const std::any& event)
+    void renderer::set_clear_color(const std::array<float, 4>& color)
     {
-        ImGui_ImplSDL2_ProcessEvent(&(std::any_cast<SDL_Event>(event)));
+        _clear_color = color;
     }
 
-    renderer& renderer::operator=(renderer&& other)
+    void renderer::new_frame()
     {
-        return *this;
+        auto* _rtv_ptr = m_pSwapChain->GetCurrentBackBufferRTV();
+        auto* _dsv_ptr = m_pSwapChain->GetDepthBufferDSV();
+        m_pImmediateContext->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        m_pImmediateContext->ClearRenderTarget(_rtv_ptr, _clear_color.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        m_pImmediateContext->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        const auto& SCDesc = m_pSwapChain->GetDesc();
+        m_pImGui->NewFrame(SCDesc.Width, SCDesc.Height, SCDesc.PreTransform);
     }
 
-    void* renderer::get_native_device() const
+    void renderer::present()
     {
-        return nullptr;
+        m_pImGui->Render(m_pImmediateContext);
+        m_pSwapChain->Present();
     }
 
-    void* renderer::get_native_swap_chain() const
+    void renderer::process_input(const std::any& input)
     {
-        return nullptr;
-    }
-
-    void* renderer::get_native_context() const
-    {
-        return nullptr;
+        ImGui_ImplSDL2_ProcessEvent(&(std::any_cast<SDL_Event>(input)));
     }
 
 }
