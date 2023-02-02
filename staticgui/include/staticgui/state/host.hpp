@@ -18,13 +18,13 @@
 namespace staticgui {
 namespace detail {
 
-    struct platform_state {
+    struct host_state {
 
         template <typename widget_t>
         void launch(widget_t& widget);
 
         template <typename widget_t>
-        void attach(widget_t& widget);
+        [[nodiscard]] std::function<void()> attach(widget_t& widget);
 
     private:
         context_state _context;
@@ -35,4 +35,4 @@ namespace detail {
 }
 }
 
-#include <staticgui/state/platform_state.inl>
+#include <staticgui/state/host.inl>

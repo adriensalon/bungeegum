@@ -11,15 +11,15 @@
 
 #include <iostream>
 
-#include <staticgui/state/animatable_value.hpp>
+#include <staticgui/state/animatable.hpp>
 #include <staticgui/state/animation.hpp>
 #include <staticgui/state/color.hpp>
 #include <staticgui/state/context.hpp>
 #include <staticgui/state/curve.hpp>
 #include <staticgui/state/event.hpp>
+#include <staticgui/state/host.hpp>
 #include <staticgui/state/layout.hpp>
 #include <staticgui/state/lerpable.hpp>
-#include <staticgui/state/platform_state.hpp>
 #include <staticgui/state/widget.hpp>
 
 using int2 = staticgui::glue::simd_array<int, 2>;
@@ -48,7 +48,7 @@ namespace detail {
     inline static event_registry global_events;
     inline static widget_registry global_widgets;
 
-    inline static platform_state state;
+    inline static host_state state;
 
 }
 
