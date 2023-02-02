@@ -37,7 +37,11 @@
 // #endif
 #include <Common/interface/RefCntAutoPtr.hpp>
 
-#include "imgui.h"
+#include <SDL.h>
+
+#include <imgui.h>
+#include <imgui_impl_sdl.h>
+
 #include <ImGui/interface/ImGuiDiligentRenderer.hpp>
 #include <ImGui/interface/ImGuiImplDiligent.hpp>
 
@@ -89,6 +93,14 @@ namespace glue {
         auto* pDSV = m_pSwapChain->GetDepthBufferDSV();
         m_pImmediateContext->SetRenderTargets(1, &pRTV, pDSV, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
 
+        // Clear the back buffer
+        static float a = 0.150f;
+        a += 0.01f;
+        const float ClearColor[] = { std::fmin(1.f, a), 0.350f, 0.850f, 1.0f };
+        // Let the engine perform required state transitions
+        m_pImmediateContext->ClearRenderTarget(pRTV, ClearColor, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        m_pImmediateContext->ClearDepthStencil(pDSV, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+
         const auto& SCDesc = m_pSwapChain->GetDesc();
         m_pImGui->NewFrame(SCDesc.Width, SCDesc.Height, SCDesc.PreTransform);
 
@@ -111,6 +123,11 @@ namespace glue {
 
     renderer::renderer(renderer&& other)
     {
+    }
+
+    void renderer::process_event(const std::any& event)
+    {
+        ImGui_ImplSDL2_ProcessEvent(&(std::any_cast<SDL_Event>(event)));
     }
 
     renderer& renderer::operator=(renderer&& other)

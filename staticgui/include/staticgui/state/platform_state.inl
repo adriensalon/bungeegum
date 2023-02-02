@@ -19,7 +19,7 @@ namespace detail {
 
         _window = std::make_unique<glue::window>();
         _window->on_event([this](const std::any& _event) {
-
+            _renderer->process_event(_event);
         });
         _window->on_update([this]() {
             _renderer->debug_fn();

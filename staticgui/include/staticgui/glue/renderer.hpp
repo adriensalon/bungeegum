@@ -41,6 +41,8 @@ namespace glue {
 
         void debug_fn();
 
+        void process_event(const std::any& event);
+
     private:
         std::any _render_device_impl = nullptr;
         std::any _swap_chain_impl = nullptr;
