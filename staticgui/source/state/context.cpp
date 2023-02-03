@@ -10,6 +10,7 @@
 #pragma once
 
 #include <imgui.h>
+#include <iostream>
 
 #include <staticgui/state/context.hpp>
 
@@ -21,14 +22,32 @@ namespace detail {
         animations.tick(delta_milliseconds);
         events.tick();
 
-        // parse tree et return true si besoin de refresh
+        // on window resize on resolve
+
+        // resolve si besoin
+        widgets.iterate_must_resolve([&](widget_data& _data, const bool _must_resolve_children) {
+
+        });
+        widgets.clear_resolve();
         return true;
     }
 
     void context_state::draw()
     {
         ImGui::ShowDemoWindow();
-        // iterate widgets and draw OU draw direct (encapsulation) ??
+        //
+        //
+        //
+        //
+        widgets.iterate_must_draw([](widget_data& _data, const bool _must_draw_children) {
+            _data.command.value().clear();
+            _data.drawer(_data.command.value());
+        });
+        widgets.iterate_datas([](widget_data& _data) {
+            if (_data.command.has_value())
+                _data.command.value().draw();
+        });
+        widgets.clear_draw();
     }
 }
 }

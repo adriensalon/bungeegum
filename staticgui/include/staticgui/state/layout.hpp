@@ -9,11 +9,14 @@
 
 #pragma once
 
+#include <functional>
+
 #include <staticgui/glue/simd.hpp>
 
 namespace staticgui {
 namespace detail {
 
+    // implements https://api.flutter.dev/flutter/rendering/RenderObject/parentData.html
     struct constraint_data {
         bool is_tight;
         bool has_infinite_width;
@@ -22,10 +25,10 @@ namespace detail {
         glue::simd_array<float, 2> max_size;
     };
 
-    struct geometry_data {
+    struct advice_data {
         glue::simd_array<float, 2> size;
     };
 
-    // implements https://api.flutter.dev/flutter/rendering/RenderObject/parentData.html
+    using resolve_function = std::function<void(const constraint_data&, advice_data&)>;
 }
 }

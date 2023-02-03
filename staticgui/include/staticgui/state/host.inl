@@ -15,7 +15,7 @@ namespace detail {
     template <typename widget_t>
     void host_state::launch(widget_t& widget)
     {
-        context.build_root(widget);
+        context.widgets.declare_root(widget);
         _window = std::make_unique<glue::window>();
         _renderer = std::make_unique<glue::renderer>(*(_window.get()));
         _window->on_input([this](const std::any& _event) {
@@ -37,7 +37,7 @@ namespace detail {
     template <typename widget_t>
     std::function<void()> host_state::attach(widget_t& widget)
     {
-        context.build_root(widget);
+        context.widgets.declare_root(widget);
         return [this]() {
             std::chrono::milliseconds _delta_time = _stopwatch.lap();
             float _delta_milliseconds = static_cast<float>(_delta_time.count());

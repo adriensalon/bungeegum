@@ -15,6 +15,7 @@
 #include <staticgui/glue/constexpr.hpp>
 #include <staticgui/glue/registry.hpp>
 #include <staticgui/state/layout.hpp>
+#include <staticgui/state/rendering.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -25,7 +26,9 @@ namespace detail {
     struct widget_data {
         bool is_built = false;
         std::unique_ptr<std::type_index> kind = nullptr;
-        std::function<void(const constraint_data&, geometry_data&)> layout_callback = nullptr;
+        resolve_function resolver = nullptr;
+        draw_function drawer = nullptr;
+        std::optional<command_data> command = std::nullopt;
         std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<widget_data>> children = {};
     };
@@ -43,18 +46,26 @@ namespace detail {
         template <typename widget_t, typename... children_widgets_t>
         void declare(widget_t* widget, children_widgets_t&... children);
 
+        template <typename widget_t>
+        void on_resolve(widget_t* widget, const resolve_function& resolver);
+
+        template <typename widget_t>
+        void on_draw(widget_t* widget, const draw_function& drawer);
+
         template <typename... children_widgets_t>
         void declare_root(children_widgets_t&... children);
 
-        void iterate_datas(const std::function<void(widget_data&)>& iterate_callback);
+        template <typename widget_t>
+        void must_resolve(widget_t& widget, const bool must_resolve_children = true);
 
         template <typename widget_t>
-        void iterate_widgets(const std::function<void(widget_t&)>& iterate_callback);
+        void must_draw(widget_t& widget, const bool must_draw_children = true);
 
-        ///
-        ///
-        ///
-        /// PAS SUR
+        void clear_resolve();
+
+        void clear_draw();
+
+        bool is_parent(const widget_data& parent, const widget_data& child);
 
         template <typename widget_t>
         widget_data& get_data(widget_t& widget);
@@ -62,14 +73,22 @@ namespace detail {
         template <typename widget_t>
         widget_t& get_widget(widget_data& data);
 
-        template <typename widget_t, typename parent_widget_t> // invert
-        std::optional<parent_widget_t&> get_parent_widget(widget_t& widget);
+        void iterate_must_resolve(const std::function<void(widget_data&, const bool)>& iterate_callback);
+
+        void iterate_must_draw(const std::function<void(widget_data&, const bool)>& iterate_callback);
+
+        void iterate_datas(const std::function<void(widget_data&)>& iterate_callback);
+
+        template <typename widget_t>
+        void iterate_widgets(const std::function<void(widget_t&)>& iterate_callback);
 
         unsigned int get_depth(widget_data& data);
 
     private:
         glue::registry _registry;
         std::vector<std::reference_wrapper<widget_data>> _roots;
+        std::vector<std::pair<std::reference_wrapper<widget_data>, bool>> _must_resolve_heads;
+        std::vector<std::pair<std::reference_wrapper<widget_data>, bool>> _must_draw_heads;
     };
 
 }

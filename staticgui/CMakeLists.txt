@@ -19,6 +19,8 @@ set(staticgui_source
 	"source/state/animation.cpp"
 	"source/state/context.cpp"
 	"source/state/event.cpp"
+	"source/state/layout.cpp"
+	"source/state/rendering.cpp"
 	"source/state/widget.cpp"
 
 	"source/staticgui.cpp"

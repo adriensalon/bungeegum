@@ -13,7 +13,7 @@ namespace staticgui {
 namespace detail {
 
     template <typename value_t>
-    animation_impl<value_t>& animation_registry::make_animation_and_data()
+    animation_impl<value_t>& animation_registry::make()
     {
         glue::entity _entity = _registry.create_entity();
         animation_data& _animation_data = _registry.create_component<animation_data>(_entity);

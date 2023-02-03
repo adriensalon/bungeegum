@@ -14,29 +14,31 @@
 namespace staticgui {
 namespace widgets {
 
-    /// @brief A widget that centers its child within itself.
-    /// @details This widget will be as big as possible if its dimensions are constrained and
-    /// 'width_factor' and 'height_factor are not specified. If a dimension is unconstrained and the
-    /// corresponding size factor is not specified then the widget will match its child's size in that
-    /// dimension. If a size factor is specified then the corresponding dimension of this widget will
-    /// be the product of the child's dimension and the size factor. For example if 'width_factor' is
-    /// 2.0 then the width of this widget will always be twice its child's width.
-    /// @tparam child_widget_t
-    template <typename child_widget_t>
-    struct container : base_widget {
+    struct container_widget {
 
-        container(child_widget_t&& child)
+        template <typename child_widget_t>
+        container_widget(child_widget_t& child_widget)
         {
-            build_advanced(this, [this](build_advanced_context& context) {
-                std::cout << "container\n";
-                context.append(child);
-            });
+            declare(this, child_widget);
+        }
+
+        inline void resolve(const resolve_constraint& cst, resolve_advice& adv) { }
+
+        void draw(draw_command& command)
+        {
+            draw_line_command _line;
+            command.add_line(_line);
+            command.add_line(_line);
+            command.add_line(_line);
+            std::cout << "DRAWING CONTAINER \n";
         }
 
     private:
-        float _width_factor = 1.f;
-        float _height_factor = 1.f;
+        float4 _color = { 0.f, 0.f, 0.f, 1.f };
     };
-
 }
+
+template <typename child_widget_t>
+widgets::container_widget& container(child_widget_t& child_widget) { return make<widgets::container_widget>(child_widget); }
+
 }

@@ -13,6 +13,17 @@ namespace staticgui {
 
 namespace detail {
     inline static host_state state;
+
+    template <typename widget_t, typename = std::void_t<>>
+    constexpr bool has_resolve = false;
+    template <typename widget_t>
+    constexpr bool has_resolve<widget_t, std::void_t<decltype(std::declval<widget_t>().resolve(std::declval<const resolve_constraint&>(), std::declval<resolve_advice&>()))>> = true;
+
+    template <typename widget_t, typename = std::void_t<>>
+    constexpr bool has_draw = false;
+    template <typename widget_t>
+    constexpr bool has_draw<widget_t, std::void_t<decltype(std::declval<widget_t>().draw(std::declval<draw_command&>()))>> = true;
+
 }
 
 template <typename... values_t>
@@ -23,13 +34,13 @@ event<values_t...>::event(const std::function<void(values_t...)>& trigger_callba
 
 template <typename value_t>
 animation<value_t>::animation(const curve<value_t>& bezier_curve)
-    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
+    : _impl(detail::state.context.animations.make<value_t>())
 {
 }
 
 template <typename value_t>
 animation<value_t>::animation(const animation<value_t>& other)
-    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
+    : _impl(detail::state.context.animations.make<value_t>())
 {
 }
 
@@ -41,7 +52,7 @@ animation<value_t>& animation<value_t>::operator=(const animation<value_t>& othe
 
 template <typename value_t>
 animation<value_t>::animation(animation<value_t>&& other)
-    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
+    : _impl(detail::state.context.animations.make<value_t>())
 {
 }
 
@@ -72,14 +83,34 @@ template <typename widget_t, typename... widget_args_t>
 widget_t& make(widget_args_t&&... widget_args) { return detail::state.context.widgets.make<widget_t>(std::forward<widget_args_t>(widget_args)...); }
 
 template <typename widget_t, typename... children_widgets_t>
-void declare(widget_t* widget, children_widgets_t&... children_widgets) { detail::state.context.widgets.declare(widget, children_widgets...); }
+void declare(widget_t* widget, children_widgets_t&... children_widgets)
+{
+    detail::state.context.widgets.declare(widget, children_widgets...);
+    if constexpr (detail::has_resolve<widget_t>)
+        detail::state.context.widgets.on_resolve(widget, [&](const detail::constraint_data& constraints, detail::advice_data& advice) {
+            // TODO
+        });
+    if constexpr (detail::has_draw<widget_t>)
+        detail::state.context.widgets.on_draw(widget, [&](detail::command_data& command) {
+            // TODO
+        });
+}
 
-// template <typename widget_t, typename... children_widgets_t>
-// void build_advanced(widget_t* widget, std::function<void(layout&)> layout_callback, children_widgets_t&... children)
-// {
-//     detail::state.context.widgets.declare(
-//         widget, [](const detail::constraint_data&, detail::geometry_data&) {}, children...);
-// }
+template <typename widget_t>
+void on_resolve(widget_t* widget, const std::function<void(const resolve_constraint&, resolve_advice&)>& resolve_callback)
+{
+    detail::state.context.widgets.on_resolve(widget, [&](const detail::constraint_data& constraints, detail::advice_data& advice) {
+        // TODO
+    });
+}
+
+template <typename widget_t>
+void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback)
+{
+    detail::state.context.widgets.on_draw(widget, [&](detail::command_data& command) {
+        // TODO
+    });
+}
 
 template <typename widget_t>
 void launch(widget_t& widget)
@@ -93,7 +124,7 @@ void launch(widget_t& widget)
             std::cout << "   ";
         std::cout << "|__ ";
         std::cout << _widget_data.kind->name();
-        if (_widget_data.layout_callback)
+        if (_widget_data.drawer)
             std::cout << " [painter]";
         std::cout << std::endl;
     });

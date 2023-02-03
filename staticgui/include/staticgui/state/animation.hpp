@@ -43,7 +43,7 @@ namespace detail {
         void tick(const float delta_milliseconds);
 
         template <typename value_t>
-        animation_impl<value_t>& make_animation_and_data();
+        animation_impl<value_t>& make();
 
         template <typename value_t>
         animation_data& get_data(animation_impl<value_t>& widget);

@@ -34,6 +34,30 @@ namespace glue {
         simd_array(const std::vector<scalar_t>& vector);
         simd_array(std::initializer_list<scalar_t> initializer_list);
 
+        template <typename = typename std::enable_if_t<count_t >= 1>>
+        scalar_t& x() { return _array[0]; }
+
+        template <typename = typename std::enable_if_t<count_t >= 1>>
+        scalar_t x() const { return _array[0]; }
+
+        template <typename = typename std::enable_if_t<count_t >= 2>>
+        scalar_t& y() { return _array[1]; }
+
+        template <typename = typename std::enable_if_t<count_t >= 2>>
+        scalar_t y() const { return _array[1]; }
+
+        template <typename = typename std::enable_if_t<count_t >= 3>>
+        scalar_t& z() { return _array[2]; }
+
+        template <typename = typename std::enable_if_t<count_t >= 3>>
+        scalar_t z() const { return _array[2]; }
+
+        template <typename = typename std::enable_if_t<count_t >= 4>>
+        scalar_t& w() { return _array[3]; }
+
+        template <typename = typename std::enable_if_t<count_t >= 4>>
+        scalar_t w() const { return _array[3]; }
+
         scalar_t& at(const unsigned int index);
 
         const scalar_t& at(const unsigned int index) const;

@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <iostream>
+
 namespace staticgui {
 namespace detail {
 
@@ -33,13 +35,32 @@ namespace detail {
     {
         widget_data& _widget_data = get_data(*widget);
         _widget_data.is_built = true;
-        // _widget_data.layout_callback = layout_callback;
         glue::constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {
             widget_data& _child_widget_data = get_data(_child_widget);
             _child_widget_data.parent = _widget_data;
             _widget_data.children.emplace_back(_child_widget_data);
         },
             children...);
+    }
+
+    template <typename widget_t>
+    void widget_registry::on_resolve(widget_t* widget, const resolve_function& resolver)
+    {
+        widget_data& _widget_data = get_data(*widget);
+        _widget_data.is_built = true;
+        _widget_data.resolver = resolver;
+        must_resolve<widget_t>(*widget);
+    }
+
+    template <typename widget_t>
+    void widget_registry::on_draw(widget_t* widget, const draw_function& drawer)
+    {
+        widget_data& _widget_data = get_data(*widget);
+        _widget_data.is_built = true;
+        _widget_data.drawer = drawer;
+        _widget_data.command = command_data();
+        must_draw<widget_t>(*widget);
+        std::cout << "ASSIGN ON DRAW" << std::endl;
     }
 
     template <typename... children_widgets_t>
@@ -51,6 +72,39 @@ namespace detail {
             _roots.emplace_back(_child_widget_data);
         },
             children...);
+    }
+
+    template <typename widget_t>
+    void widget_registry::must_resolve(widget_t& widget, const bool must_resolve_children)
+    {
+        // resolve pareil
+        _must_resolve_heads.emplace_back(std::pair<std::reference_wrapper<widget_data>, bool> { get_data(widget), must_resolve_children });
+    }
+
+    template <typename widget_t>
+    void widget_registry::must_draw(widget_t& widget, const bool must_draw_children)
+    {
+        // std::cout << "MUST DRAW" << std::endl;
+        widget_data& _data = get_data(widget);
+
+        // if (must_draw_children) {
+        //     unsigned int _index = 0;
+        //     std::vector<unsigned int> _remove_indices;
+        //     for (const std::pair<std::reference_wrapper<widget_data>, bool>& _head : _must_draw_heads) {
+        //         if (is_parent(_data, _head.first.get()))
+        //             _remove_indices.emplace_back(_index);
+        //         _index++;
+        //     }
+        //     for (std::vector<unsigned int>::reverse_iterator _it = _remove_indices.rbegin(); _it != _remove_indices.rend(); _it++) {
+        //         _must_draw_heads.erase(_must_draw_heads.begin() + *_it);
+        //     }
+        // }
+        // for (std::pair<std::reference_wrapper<widget_data>, bool>& _head : _must_draw_heads) {
+        //     if (_head.second && !is_parent(_head.first.get(), _data))
+        //         _must_draw_heads.emplace_back(std::pair<std::reference_wrapper<widget_data>, bool> { _data, must_draw_children });
+        // }
+
+        _must_draw_heads.emplace_back(std::pair<std::reference_wrapper<widget_data>, bool> { _data, must_draw_children });
     }
 
     template <typename widget_t>
@@ -67,23 +121,23 @@ namespace detail {
         return _registry.get_component<widget_t>(_entity);
     }
 
-    template <typename widget_t, typename parent_widget_t>
-    std::optional<parent_widget_t&> get_parent_widget(widget_t& widget)
-    {
-        widget_data& _widget_data = get_data(widget);
-        return _widget_data.parent ? *(_widget_data.parent) : std::nullopt;
-    }
-
-    template <typename widget_t>
-    unsigned int get_depth(widget_t& data)
-    {
-        return 0;
-    }
-
     template <typename widget_t>
     void widget_registry::iterate_widgets(const std::function<void(widget_t&)>& iterate_callback)
     {
     }
+
+    // template <typename parent_widget_t, typename widget_t>
+    // std::optional<parent_widget_t&> _get_parent_widget(widget_t& widget)
+    // {
+    //     widget_data& _widget_data = get_data(widget);
+    //     return _widget_data.parent ? *(_widget_data.parent) : std::nullopt;
+    // }
+
+    // template <typename widget_t>
+    // unsigned int get_depth(widget_t& data)
+    // {
+    //     return 0;
+    // }
 
 }
 }

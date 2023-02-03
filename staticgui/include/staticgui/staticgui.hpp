@@ -310,9 +310,43 @@ template <typename widget_t>
 void on_resolve(widget_t* widget, const std::function<void(const resolve_constraint&, resolve_advice&)>& resolve_callback);
 
 /// @brief
+struct draw_rounding_command {
+
+    draw_rounding_command& strength(const float z);
+
+    draw_rounding_command& top_left(const bool enable);
+
+    draw_rounding_command& top_right(const bool enable);
+
+    draw_rounding_command& bottom_left(const bool enable);
+
+    draw_rounding_command& bottom_right(const bool enable);
+
+private:
+    detail::rounding_data _rounding;
+};
+
+struct draw_line_command {
+    glue::simd_array<float, 2> first_point;
+    glue::simd_array<float, 2> second_point;
+    glue::simd_array<float, 4> color;
+    float thickness = 1.f;
+};
+
+struct draw_rectangle_command {
+    glue::simd_array<float, 2> min_point;
+    glue::simd_array<float, 2> max_point;
+    glue::simd_array<float, 4> color;
+    draw_rounding_command rounding;
+    float thickness = 1.f;
+};
+
+/// @brief
 struct draw_command {
 
-    // emplace rect etc
+    draw_command& add_line(const draw_line_command& line_command);
+
+    draw_command& add_rectangle(const draw_rectangle_command& line_command);
 };
 
 /// @brief

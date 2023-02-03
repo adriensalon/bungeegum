@@ -20,18 +20,9 @@ namespace detail {
 
     struct context_state {
 
-        template <typename widget_t>
-        void build_root(widget_t& widget);
-
         bool tick(const float delta_milliseconds);
 
         void draw();
-
-        template <typename widget_t>
-        void must_resolve(widget_t& widget, const bool must_resolve_children = true);
-
-        template <typename widget_t>
-        void must_draw(widget_t& widget, const bool must_draw_children = true);
 
         widget_registry widgets;
         animation_registry animations;
@@ -40,5 +31,3 @@ namespace detail {
 
 }
 }
-
-#include <staticgui/state/context.inl>

@@ -53,12 +53,12 @@ namespace detail {
         template <typename... values_t>
         event_impl<values_t...>& get_event(event_data& data);
 
-        unsigned int get_depth(event_data& data);
-
         void iterate_datas(const std::function<void(event_data&)>& iterate_callback);
 
         template <typename... values_t>
         void iterate_events(const std::function<void(event_impl<values_t...>&)>& iterate_callback);
+
+        unsigned int get_depth(event_data& data);
 
     private:
         glue::registry _registry;
