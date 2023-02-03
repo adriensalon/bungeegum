@@ -51,7 +51,7 @@ namespace detail {
             if (_data.command.has_value())
                 _data.command.value().draw();
         });
-        // widgets.clear_draw();
+        widgets.clear_draw();
     }
 }
 }

@@ -33,7 +33,6 @@ namespace detail {
         _y = vec4.y();
         _z = vec4.z();
         _w = vec4.w();
-        std::cout << "x = " << vec4.data()[0] << std::endl;
         return ImVec4(_x, _y, _z, _w);
     }
 

@@ -84,27 +84,27 @@ namespace detail {
     template <typename widget_t>
     void widget_registry::must_draw(widget_t& widget, const bool must_draw_children)
     {
-        // std::cout << "MUST DRAW" << std::endl;
         widget_data& _data = get_data(widget);
-
-        // if (must_draw_children) {
-        //     unsigned int _index = 0;
-        //     std::vector<unsigned int> _remove_indices;
-        //     for (const std::pair<std::reference_wrapper<widget_data>, bool>& _head : _must_draw_heads) {
-        //         if (is_parent(_data, _head.first.get()))
-        //             _remove_indices.emplace_back(_index);
-        //         _index++;
-        //     }
-        //     for (std::vector<unsigned int>::reverse_iterator _it = _remove_indices.rbegin(); _it != _remove_indices.rend(); _it++) {
-        //         _must_draw_heads.erase(_must_draw_heads.begin() + *_it);
-        //     }
-        // }
-        // for (std::pair<std::reference_wrapper<widget_data>, bool>& _head : _must_draw_heads) {
-        //     if (_head.second && !is_parent(_head.first.get(), _data))
-        //         _must_draw_heads.emplace_back(std::pair<std::reference_wrapper<widget_data>, bool> { _data, must_draw_children });
-        // }
-
-        _must_draw_heads.emplace_back(std::pair<std::reference_wrapper<widget_data>, bool> { _data, must_draw_children });
+        if (_must_draw_heads.empty())
+            _must_draw_heads.emplace_back(std::pair<std::reference_wrapper<widget_data>, bool> { _data, must_draw_children });
+        else {
+            if (must_draw_children) {
+                unsigned int _index = 0;
+                std::vector<unsigned int> _remove_indices;
+                for (const std::pair<std::reference_wrapper<widget_data>, bool>& _head : _must_draw_heads) {
+                    if (is_parent(_data, _head.first.get()))
+                        _remove_indices.emplace_back(_index);
+                    _index++;
+                }
+                for (std::vector<unsigned int>::reverse_iterator _it = _remove_indices.rbegin(); _it != _remove_indices.rend(); _it++) {
+                    _must_draw_heads.erase(_must_draw_heads.begin() + *_it);
+                }
+            }
+            for (std::pair<std::reference_wrapper<widget_data>, bool>& _head : _must_draw_heads) {
+                if (_head.second && !is_parent(_head.first.get(), _data))
+                    _must_draw_heads.emplace_back(std::pair<std::reference_wrapper<widget_data>, bool> { _data, must_draw_children });
+            }
+        }
     }
 
     template <typename widget_t>
