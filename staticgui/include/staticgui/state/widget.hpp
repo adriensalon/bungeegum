@@ -77,6 +77,8 @@ namespace detail {
 
         void iterate_must_draw(const std::function<void(widget_data&, const bool)>& iterate_callback);
 
+        bool is_must_draw_empty() const;
+
         void iterate_datas(const std::function<void(widget_data&)>& iterate_callback);
 
         template <typename widget_t>

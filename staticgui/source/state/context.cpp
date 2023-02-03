@@ -23,13 +23,17 @@ namespace detail {
         events.tick();
 
         // on window resize on resolve
+        bool _has_window_been_resized = false;
 
         // resolve si besoin
+        // bool _must_draw = (!widgets.is_must_resolve_empty() && !widgets.is_must_draw_empty());
+        bool _must_draw = (!widgets.is_must_draw_empty());
         widgets.iterate_must_resolve([&](widget_data& _data, const bool _must_resolve_children) {
 
         });
         widgets.clear_resolve();
-        return true;
+
+        return _must_draw;
     }
 
     void context_state::draw()
@@ -47,7 +51,7 @@ namespace detail {
             if (_data.command.has_value())
                 _data.command.value().draw();
         });
-        widgets.clear_draw();
+        // widgets.clear_draw();
     }
 }
 }

@@ -65,9 +65,13 @@ namespace detail {
 
     void widget_registry::iterate_must_draw(const std::function<void(widget_data&, const bool)>& iterate_callback)
     {
-        // std::cout << "ITERATE MUST DRAW" << std::endl;
         for (std::pair<std::reference_wrapper<staticgui::detail::widget_data>, bool>& _must_draw : _must_draw_heads)
             iterate_callback(_must_draw.first.get(), _must_draw.second);
+    }
+
+    bool widget_registry::is_must_draw_empty() const
+    {
+        return _must_draw_heads.empty();
     }
 
     void widget_registry::iterate_datas(const std::function<void(widget_data&)>& iterate_callback)

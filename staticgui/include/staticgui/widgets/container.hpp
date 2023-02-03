@@ -26,10 +26,12 @@ namespace widgets {
 
         void draw(draw_command& command)
         {
-            draw_line_command _line;
-            command.add_line(_line);
-            command.add_line(_line);
-            command.add_line(_line);
+            draw_rectangle_command _rect;
+            _rect.min_point({ 20.f, 20.f })
+                .max_point({ 200.f, 200.f })
+                .thickness(50.f)
+                .color({ 0.33f, 0.33f, 0.89f, 1.f });
+            command.add_rectangle(_rect);
             std::cout << "DRAWING CONTAINER \n";
         }
 

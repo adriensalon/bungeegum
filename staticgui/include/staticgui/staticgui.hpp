@@ -311,7 +311,6 @@ void on_resolve(widget_t* widget, const std::function<void(const resolve_constra
 
 /// @brief
 struct draw_rounding_command {
-
     draw_rounding_command& strength(const float z);
 
     draw_rounding_command& top_left(const bool enable);
@@ -324,21 +323,37 @@ struct draw_rounding_command {
 
 private:
     detail::rounding_data _rounding;
+    friend struct draw_rectangle_command;
 };
 
 struct draw_line_command {
-    glue::simd_array<float, 2> first_point;
-    glue::simd_array<float, 2> second_point;
-    glue::simd_array<float, 4> color;
-    float thickness = 1.f;
+    draw_line_command& first_point(const float2& first);
+
+    draw_line_command& second_point(const float2& second);
+
+    draw_line_command& color(const float4& col); // go color !!
+
+    draw_line_command& thickness(const float t = 10.f);
+
+private:
+    detail::line_command_data _line_command_data;
+    friend struct draw_command;
 };
 
 struct draw_rectangle_command {
-    glue::simd_array<float, 2> min_point;
-    glue::simd_array<float, 2> max_point;
-    glue::simd_array<float, 4> color;
-    draw_rounding_command rounding;
-    float thickness = 1.f;
+    draw_rectangle_command& min_point(const float2& first);
+
+    draw_rectangle_command& max_point(const float2& second);
+
+    draw_rectangle_command& color(const float4& col); // go color !!
+
+    draw_rectangle_command& rounding(const draw_rounding_command& rounding_command);
+
+    draw_rectangle_command& thickness(const float t = 10.f);
+
+private:
+    detail::rectangle_command_data _rectangle_command_data;
+    friend struct draw_command;
 };
 
 /// @brief

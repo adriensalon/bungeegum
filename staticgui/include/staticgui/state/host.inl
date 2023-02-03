@@ -25,7 +25,7 @@ namespace detail {
             std::chrono::milliseconds _delta_time = _stopwatch.lap();
             float _delta_milliseconds = static_cast<float>(_delta_time.count());
             if (this->context.tick(_delta_milliseconds)) {
-                _renderer->new_frame();
+                _renderer->new_frame(); // create fullscreen window dedans
                 this->context.draw();
                 _renderer->present();
             }
