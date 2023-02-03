@@ -10,11 +10,10 @@ Windows/MacOS/iOS/Linux/Android platform, but only tested on Windows so far
 
 ### __Features__
 #### _Flutter-like formalism_
-___
+
 #### _No policy is the best policy_
-___
+
 #### _Build only when needed_
-___
 
 ### __Quickstart__
 Launch / Attach
@@ -61,10 +60,8 @@ my_widget::my_widget(children_widgets_t&... children_widgets) {
 ### __Advanced usage__
 
 #### _Layout_
-___
 
 #### _Rendering_
-___
 
 
 ### __External dependencies__

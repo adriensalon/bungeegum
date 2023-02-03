@@ -18,6 +18,9 @@ namespace detail {
 
     bool context_state::tick(const float delta_milliseconds)
     {
+        animations.tick(delta_milliseconds);
+        events.tick();
+
         // parse tree et return true si besoin de refresh
         return true;
     }

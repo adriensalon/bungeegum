@@ -15,12 +15,12 @@ namespace staticgui {
 namespace glue {
 
     // template <typename component_t, typename... args_t>
-    // component_t& registry::bool has_component(const id_integer entity) const
+    // component_t& registry::bool has_component(const entity entity) const
     // {
     // }
 
     template <typename component_t>
-    component_t& registry::get_component(const id_integer entity)
+    component_t& registry::get_component(const entity entity)
     {
         // return _registry.view<component_t, float>().get<component_t>(entity);
         return _registry.get<component_t>(entity);
@@ -28,13 +28,13 @@ namespace glue {
     }
 
     template <typename component_t>
-    const component_t& registry::get_component(const id_integer entity) const
+    const component_t& registry::get_component(const entity entity) const
     {
         return _registry.view<component_t>().get<component_t>(entity);
     }
 
     template <typename component_t, typename... args_t>
-    decltype(auto) registry::create_component(const id_integer entity, args_t&&... args)
+    decltype(auto) registry::create_component(const entity entity, args_t&&... args)
     {
         return _registry.emplace<component_t>(entity, std::forward<args_t>(args)...);
     }
@@ -49,11 +49,11 @@ namespace glue {
     }
 
     template <typename... components_t>
-    void registry::iterate_entities_components(const std::function<void(id_integer, components_t&...)>& iterate_function)
+    void registry::iterate_entities_components(const std::function<void(entity, components_t&...)>& iterate_function)
     {
         // static_assert(std::is_invocable_v<function_t, const components_t&...>);
         auto& _view = _registry.view<components_t...>();
-        _view.each([&](id_integer _entity, components_t&... _components) {
+        _view.each([&](entity _entity, components_t&... _components) {
             iterate_function(_entity, _components...);
         });
     }

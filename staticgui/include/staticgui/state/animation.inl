@@ -15,7 +15,7 @@ namespace detail {
     template <typename value_t>
     animation_impl<value_t>& animation_registry::make_animation_and_data()
     {
-        glue::id_integer _entity = _registry.create_entity();
+        glue::entity _entity = _registry.create_entity();
         animation_data& _animation_data = _registry.create_component<animation_data>(_entity);
         _animation_data.tick = [&](const float delta_milliseconds) {
             // todo
@@ -27,14 +27,14 @@ namespace detail {
     template <typename value_t>
     animation_data& animation_registry::get_data(animation_impl<value_t>& animation)
     {
-        glue::id_integer _entity = _registry.get_entity(animation);
+        glue::entity _entity = _registry.get_entity(animation);
         return _registry.get_component<animation_data>(_entity);
     }
 
     template <typename value_t>
     animation_impl<value_t>& animation_registry::get_animation(animation_data& data)
     {
-        glue::id_integer _entity = _registry.get_entity(data);
+        glue::entity _entity = _registry.get_entity(data);
         return _registry.get_component<animation_impl<value_t>>(_entity);
     }
 

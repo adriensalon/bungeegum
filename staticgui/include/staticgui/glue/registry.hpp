@@ -16,7 +16,7 @@
 namespace staticgui {
 namespace glue {
 
-    using id_integer = ENTT_ID_TYPE;
+    using entity = ENTT_ID_TYPE;
 
     struct registry {
         registry();
@@ -25,40 +25,40 @@ namespace glue {
         registry(registry&& other);
         registry& operator=(registry&& other);
 
-        // create id_integer
+        // create entity
 
-        // destroy(const id_integer& entity);
+        // destroy(const entity& entity);
 
-        id_integer create_entity();
+        entity create_entity();
 
         template <typename component_t>
-        id_integer get_entity(component_t& component)
+        entity get_entity(component_t& component)
         {
             return entt::to_entity(_registry, component);
         }
 
         template <typename component_t>
-        [[nodiscard]] bool has_component(const id_integer entity) const;
+        [[nodiscard]] bool has_component(const entity entity) const;
 
         template <typename component_t, typename... args_t>
-        decltype(auto) create_component(const id_integer entity, args_t&&... args);
+        decltype(auto) create_component(const entity entity, args_t&&... args);
 
         // // destroy component
 
         template <typename component_t>
-        component_t& get_component(const id_integer entity);
+        component_t& get_component(const entity entity);
 
         template <typename component_t>
-        const component_t& get_component(const id_integer entity) const;
+        const component_t& get_component(const entity entity) const;
 
         // template <typename component_t>
-        // [[nodiscard]] const component_t& get_component(const id_integer& entity) const;
+        // [[nodiscard]] const component_t& get_component(const entity& entity) const;
 
         // template <typename component_t>
-        // [[nodiscard]] component_t& get_or_create_component(const id_integer& entity);
+        // [[nodiscard]] component_t& get_or_create_component(const entity& entity);
 
         // template <typename component_t>
-        // [[nodiscard]] const component_t& get_or_create_component(const id_integer& entity) const;
+        // [[nodiscard]] const component_t& get_or_create_component(const entity& entity) const;
 
         // iterate entities only
 
@@ -66,10 +66,10 @@ namespace glue {
         void iterate_components(const std::function<void(components_t&...)>& iterate_function);
 
         template <typename... components_t> // exclude filter
-        void iterate_entities_components(const std::function<void(id_integer, components_t&...)>& iterate_function);
+        void iterate_entities_components(const std::function<void(entity, components_t&...)>& iterate_function);
 
     private:
-        entt::basic_registry<id_integer> _registry;
+        entt::basic_registry<entity> _registry;
     };
 
 }

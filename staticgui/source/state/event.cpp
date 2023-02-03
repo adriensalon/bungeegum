@@ -30,6 +30,10 @@ namespace detail {
         return *this;
     }
 
+    void event_registry::tick()
+    {
+    }
+
     unsigned int event_registry::get_depth(event_data& data)
     {
         unsigned int _depth = -1;

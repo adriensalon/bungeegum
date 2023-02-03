@@ -27,7 +27,7 @@ namespace glue {
         return *this;
     }
 
-    id_integer registry::create_entity()
+    entity registry::create_entity()
     {
         return _registry.create();
     }

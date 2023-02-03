@@ -15,7 +15,7 @@ namespace detail {
     template <typename widget_t, typename... widget_args_t>
     widget_t& widget_registry::make(widget_args_t&&... widget_args)
     {
-        glue::id_integer _entity = _registry.create_entity();
+        glue::entity _entity = _registry.create_entity();
         widget_data& _widget_data = _registry.create_component<widget_data>(_entity);
         _widget_data.kind = std::make_unique<std::type_index>(typeid(widget_t));
         widget_t& _widget = _registry.create_component<widget_t>(_entity, std::forward<widget_args_t>(widget_args)...);
@@ -56,14 +56,14 @@ namespace detail {
     template <typename widget_t>
     widget_data& widget_registry::get_data(widget_t& widget)
     {
-        glue::id_integer _entity = _registry.get_entity(widget);
+        glue::entity _entity = _registry.get_entity(widget);
         return _registry.get_component<widget_data>(_entity);
     }
 
     template <typename widget_t>
     widget_t& widget_registry::get_widget(widget_data& data)
     {
-        glue::id_integer _entity = _registry.get_entity(data);
+        glue::entity _entity = _registry.get_entity(data);
         return _registry.get_component<widget_t>(_entity);
     }
 
