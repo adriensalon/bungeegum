@@ -92,7 +92,8 @@ void declare(widget_t* widget, children_widgets_t&... children_widgets)
         });
     if constexpr (detail::has_draw<widget_t>)
         detail::state.context.widgets.on_draw(widget, [&](detail::command_data& command) {
-            // TODO
+            draw_command _hl_command(command);
+            widget->draw(_hl_command);
         });
 }
 
@@ -108,7 +109,8 @@ template <typename widget_t>
 void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback)
 {
     detail::state.context.widgets.on_draw(widget, [&](detail::command_data& command) {
-        // TODO
+        draw_command _hl_command(command);
+        draw_callback(_hl_command);
     });
 }
 

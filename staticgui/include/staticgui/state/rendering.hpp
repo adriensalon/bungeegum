@@ -55,7 +55,7 @@ namespace detail {
         void clear();
 
     private:
-        std::any _command_impl;
+        // std::any _command_impl = nullptr;
         std::vector<line_command_data> _lines;
         std::vector<rectangle_command_data> _rectangles;
     };

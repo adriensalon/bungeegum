@@ -11,6 +11,41 @@
 
 namespace staticgui {
 
+draw_command::draw_command(detail::command_data& data)
+    : _command_data(data)
+{
+}
+
+draw_command::draw_command(const draw_command& other)
+    : _command_data(other._command_data)
+{
+}
+
+draw_command& draw_command::operator=(const draw_command& other)
+{
+    return *this;
+}
+
+draw_command::draw_command(draw_command&& other)
+    : _command_data(other._command_data)
+{
+}
+
+draw_command& draw_command::operator=(draw_command&& other)
+{
+    return *this;
+}
+
+draw_command& draw_command::add_line(const draw_line_command& line_command)
+{
+    return *this;
+}
+
+draw_command& draw_command::add_rectangle(const draw_rectangle_command& rectangle_command)
+{
+    return *this;
+}
+
 // layout::layout() { }
 
 context::context() { }

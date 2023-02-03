@@ -343,10 +343,18 @@ struct draw_rectangle_command {
 
 /// @brief
 struct draw_command {
+    draw_command(detail::command_data& data);
+    draw_command(const draw_command& other);
+    draw_command& operator=(const draw_command& other);
+    draw_command(draw_command&& other);
+    draw_command& operator=(draw_command&& other);
 
     draw_command& add_line(const draw_line_command& line_command);
 
-    draw_command& add_rectangle(const draw_rectangle_command& line_command);
+    draw_command& add_rectangle(const draw_rectangle_command& rectangle_command);
+
+private:
+    detail::command_data& _command_data;
 };
 
 /// @brief
