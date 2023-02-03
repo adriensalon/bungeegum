@@ -11,6 +11,8 @@
 
 #include <imgui.h>
 
+#include <iostream>
+
 #include <staticgui/state/rendering.hpp>
 
 namespace staticgui {
@@ -31,6 +33,7 @@ namespace detail {
         _y = vec4.y();
         _z = vec4.z();
         _w = vec4.w();
+        std::cout << "x = " << vec4.data()[0] << std::endl;
         return ImVec4(_x, _y, _z, _w);
     }
 
@@ -72,9 +75,9 @@ namespace detail {
             ImVec2 _max_point = get_vec2(_rectangle.max_point);
             ImU32 _color = get_color(_rectangle.color);
             ImDrawFlags _flags = get_rounding(_rectangle.rounding);
-            _draw_list->AddRectFilled(ImVec2(20.f, 20.f), ImVec2(200.f, 200.f), ImGui::GetColorU32(ImVec4(0.33f, 0.22f, 0.66f, 1.f)));
-            // _draw_list.AddRectFilled(_min_point, _max_point, _color, _rectangle.rounding.strength, 0);
-            // _draw_list.AddRect(_min_point, _max_point, _color, _rectangle.rounding.strength, _flags, _rectangle.thickness);
+            // _draw_list->AddRectFilled(ImVec2(20.f, 20.f), ImVec2(200.f, 200.f), ImGui::GetColorU32(ImVec4(0.33f, 0.22f, 0.66f, 1.f)));
+            // _draw_list->AddRectFilled(_min_point, _max_point, ImGui::GetColorU32(ImVec4(0.33f, 0.22f, 0.66f, 1.f)));
+            _draw_list->AddRect(_min_point, _max_point, _color, _rectangle.rounding.strength, _flags, _rectangle.thickness);
         }
 
         // ImGui::End();

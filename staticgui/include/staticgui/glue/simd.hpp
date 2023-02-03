@@ -32,7 +32,7 @@ namespace glue {
         simd_array();
         simd_array(const std::array<scalar_t, count_t>& array);
         simd_array(const std::vector<scalar_t>& vector);
-        simd_array(std::initializer_list<scalar_t> initializer_list);
+        // simd_array(std::initializer_list<scalar_t> initializer_list);
 
         template <typename = typename std::enable_if_t<count_t >= 1>>
         scalar_t& x() { return _array[0]; }
@@ -75,8 +75,8 @@ namespace glue {
         const scalar_t* operator&() const;
 
     private:
-        // alignas(128) std::array<scalar_t, count_t> _array;
-        alignas(128) scalar_t _array[count_t];
+        alignas(128) std::array<scalar_t, count_t> _array;
+        // alignas(128) scalar_t _array[count_t];
     };
 
     template <typename scalar_t, unsigned int count_t, simd_order order_t>

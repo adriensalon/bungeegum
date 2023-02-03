@@ -33,11 +33,13 @@ namespace glue {
         static_assert((count_t == 2) || (count_t == 3) || (count_t == 4), "Invalid scalar_t value. Possible values are 2, 3, 4. Any other value defeats the purpose of SIMD cpu instructions.");
     }
 
-    template <typename scalar_t, unsigned int count_t>
-    simd_array<scalar_t, count_t>::simd_array(std::initializer_list<scalar_t> initializer_list) // : _array(initializer_list)
-    {
-        static_assert((count_t == 2) || (count_t == 3) || (count_t == 4), "Invalid scalar_t value. Possible values are 2, 3, 4. Any other value defeats the purpose of SIMD cpu instructions.");
-    }
+    // template <typename scalar_t, unsigned int count_t>
+    // simd_array<scalar_t, count_t>::simd_array(std::initializer_list<scalar_t> initializer_list)
+    // // : _array { initializer_list }
+    // {
+    //     static_assert((count_t == 2) || (count_t == 3) || (count_t == 4), "Invalid scalar_t value. Possible values are 2, 3, 4. Any other value defeats the purpose of SIMD cpu instructions.");
+    //     _array = std::array<scalar_t, count_t>({ { initializer_list } });
+    // }
 
     template <typename scalar_t, unsigned int count_t>
     scalar_t& simd_array<scalar_t, count_t>::at(const unsigned int index);
@@ -62,7 +64,7 @@ namespace glue {
     const scalar_t* simd_array<scalar_t, count_t>::data() const
     {
         // return this->_array.data();
-        return static_cast<const scalar_t*>(this->_array);
+        return static_cast<const scalar_t*>(this->_array.data());
     }
 
     template <typename scalar_t, unsigned int count_t>
