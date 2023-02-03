@@ -290,15 +290,8 @@ template <typename widget_t, typename... widget_args_t>
 /// @tparam child_widget_t
 /// @param widget
 /// @param child_widget
-template <typename widget_t, typename child_widget_t>
-void declare(widget_t* widget, child_widget_t& child_widget);
-
-/// @brief
-/// @tparam parent_widget_t
-/// @param  widget
-/// @param  layout_callback
-template <typename widget_t, typename... children_widgets_t>
-void build_advanced(widget_t* widget, std::function<void(layout&)> context_callback, children_widgets_t&... children_widgets);
+template <typename widget_t, typename... children_widget_t>
+void declare(widget_t* widget, children_widget_t&... children_widgets);
 
 struct resolve_constraint {
     // getters
@@ -309,14 +302,23 @@ struct resolve_advice {
     // setters
 };
 
+/// @brief
+/// @tparam widget_t
+/// @param widget
+/// @param resolve_callback
 template <typename widget_t>
 void on_resolve(widget_t* widget, const std::function<void(const resolve_constraint&, resolve_advice&)>& resolve_callback);
 
+/// @brief
 struct draw_command {
 
     // emplace rect etc
 };
 
+/// @brief
+/// @tparam widget_t
+/// @param widget
+/// @param draw_callback
 template <typename widget_t>
 void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback);
 

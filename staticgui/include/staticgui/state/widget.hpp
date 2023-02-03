@@ -41,7 +41,7 @@ namespace detail {
         widget_t& make(widget_args_t&&... widget_args);
 
         template <typename widget_t, typename... children_widgets_t>
-        void declare(widget_t* widget, std::function<void(const constraint_data&, geometry_data&)> layout_callback, children_widgets_t&... children);
+        void declare(widget_t* widget, children_widgets_t&... children);
 
         template <typename... children_widgets_t>
         void declare_root(children_widgets_t&... children);

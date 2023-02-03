@@ -19,9 +19,7 @@ namespace widgets {
 
         gesture_detector()
         {
-            build_advanced(this, [&](layout& ctx) {
-
-            });
+            declare(this);
         }
 
         gesture_detector& on_tap(std::function<void()> tap_callback)

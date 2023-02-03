@@ -28,11 +28,7 @@ namespace widgets {
         template <typename... children_widgets_t>
         column_widget(children_widgets_t&... children)
         {
-            build_advanced(
-                this, [&](layout& lay) {
-
-                },
-                center(children)...);
+            declare(this, center(children)...);
         }
 
         inline void resolve(const resolve_constraint& cst, resolve_advice& adv) { }

@@ -22,9 +22,7 @@ namespace widgets {
         image_widget()
         {
             std::cout << "image ctor\n";
-            build_advanced(this, [&](const layout& ctx) {
-
-            });
+            declare(this);
         }
 
         ~image_widget()

@@ -29,12 +29,11 @@ namespace detail {
     template <typename widget_t, typename... children_widgets_t>
     void widget_registry::declare(
         widget_t* widget,
-        std::function<void(const constraint_data&, geometry_data&)> layout_callback,
         children_widgets_t&... children)
     {
         widget_data& _widget_data = get_data(*widget);
         _widget_data.is_built = true;
-        _widget_data.layout_callback = layout_callback;
+        // _widget_data.layout_callback = layout_callback;
         glue::constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {
             widget_data& _child_widget_data = get_data(_child_widget);
             _child_widget_data.parent = _widget_data;
