@@ -11,6 +11,7 @@ project(staticgui)
 
 set(staticgui_source
 
+	"source/glue/backtrace.cpp"
 	"source/glue/registry.cpp"
 	"source/glue/renderer.cpp"
 	"source/glue/simd.cpp"
@@ -30,6 +31,7 @@ add_library(staticgui "${staticgui_source}")
 target_include_directories(staticgui PUBLIC "include")
 set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)
 
+target_link_libraries(staticgui backward)
 target_link_libraries(staticgui imgui)
 target_link_libraries(staticgui SDL2-static)
 target_link_libraries(staticgui EnTT)
