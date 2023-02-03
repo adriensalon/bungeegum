@@ -12,6 +12,7 @@
 #include <memory>
 
 #include <staticgui/glue/renderer.hpp>
+#include <staticgui/glue/stopwatch.hpp>
 #include <staticgui/glue/window.hpp>
 #include <staticgui/state/context.hpp>
 
@@ -29,6 +30,7 @@ namespace detail {
         context_state context;
 
     private:
+        glue::stopwatch<std::chrono::milliseconds> _stopwatch;
         std::unique_ptr<glue::window> _window = nullptr;
         std::unique_ptr<glue::renderer> _renderer = nullptr;
     };

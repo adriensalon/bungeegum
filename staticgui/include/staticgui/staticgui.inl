@@ -71,8 +71,8 @@ void animation<value_t>::stop()
 template <typename widget_t, typename... widget_args_t>
 widget_t& make(widget_args_t&&... widget_args) { return detail::state.context.widgets.make<widget_t>(std::forward<widget_args_t>(widget_args)...); }
 
-template <typename widget_t, typename... children_widget_t>
-void declare(widget_t* widget, children_widget_t&... children_widgets) { detail::state.context.widgets.declare(widget, children_widgets...); }
+template <typename widget_t, typename... children_widgets_t>
+void declare(widget_t* widget, children_widgets_t&... children_widgets) { detail::state.context.widgets.declare(widget, children_widgets...); }
 
 // template <typename widget_t, typename... children_widgets_t>
 // void build_advanced(widget_t* widget, std::function<void(layout&)> layout_callback, children_widgets_t&... children)

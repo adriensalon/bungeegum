@@ -22,8 +22,9 @@ namespace detail {
             _renderer->process_input(_event);
         });
         _window->on_update([this]() {
-            // measure elapsed time with window
-            if (this->context.tick(0.2f)) {
+            std::chrono::milliseconds _delta_time = _stopwatch.lap();
+            float _delta_milliseconds = static_cast<float>(_delta_time.count());
+            if (this->context.tick(_delta_milliseconds)) {
                 _renderer->new_frame();
                 this->context.draw();
                 _renderer->present();
@@ -38,8 +39,9 @@ namespace detail {
     {
         context.build_root(widget);
         return [this]() {
-            // measure elapsed time with window
-            context.tick(0.2f);
+            std::chrono::milliseconds _delta_time = _stopwatch.lap();
+            float _delta_milliseconds = static_cast<float>(_delta_time.count());
+            context.tick(_delta_milliseconds);
             context.draw();
         }
     }

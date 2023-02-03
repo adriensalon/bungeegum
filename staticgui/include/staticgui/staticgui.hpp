@@ -290,8 +290,8 @@ template <typename widget_t, typename... widget_args_t>
 /// @tparam child_widget_t
 /// @param widget
 /// @param child_widget
-template <typename widget_t, typename... children_widget_t>
-void declare(widget_t* widget, children_widget_t&... children_widgets);
+template <typename widget_t, typename... children_widgets_t>
+void declare(widget_t* widget, children_widgets_t&... children_widgets);
 
 struct resolve_constraint {
     // getters
