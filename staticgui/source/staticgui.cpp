@@ -11,6 +11,39 @@
 
 namespace staticgui {
 
+draw_rounding_command& draw_rounding_command::strength(const float z)
+{
+    _rounding.strength = z;
+    return *this;
+}
+
+draw_rounding_command& draw_rounding_command::top_left(const bool enable)
+{
+    _rounding.top_left = enable;
+    return *this;
+}
+
+draw_rounding_command& draw_rounding_command::top_right(const bool enable)
+{
+
+    _rounding.top_right = enable;
+    return *this;
+}
+
+draw_rounding_command& draw_rounding_command::bottom_left(const bool enable)
+{
+
+    _rounding.bottom_left = enable;
+    return *this;
+}
+
+draw_rounding_command& draw_rounding_command::bottom_right(const bool enable)
+{
+
+    _rounding.bottom_right = enable;
+    return *this;
+}
+
 draw_rectangle_command& draw_rectangle_command::min_point(const float2& first)
 {
     _rectangle_command_data.min_point = first;
