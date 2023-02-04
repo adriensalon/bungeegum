@@ -44,19 +44,20 @@
 
 #include <ImGui/interface/ImGuiDiligentRenderer.hpp>
 #include <ImGui/interface/ImGuiImplDiligent.hpp>
-
-#include "windows.h"
 #include <ImGui/interface/ImGuiImplSDL.hpp>
-#include <ImGui/interface/ImGuiImplWin32.hpp>
-
 
 namespace staticgui {
 namespace glue {
 
-    static Diligent::IRenderDevice* m_pDevice;
-    static Diligent::IDeviceContext* m_pImmediateContext;
-    static Diligent::ISwapChain* m_pSwapChain;
-    static Diligent::ImGuiImplDiligent* m_pImGui;
+    static Diligent::IRenderDevice* _render_device_impl;
+    static Diligent::IDeviceContext* _device_context_impl;
+    static Diligent::ISwapChain* _swap_chain_impl;
+    static Diligent::ImGuiImplDiligent* _imgui_renderer_impl;
+
+    Diligent::IRenderDevice* get_render_device(std::any& untyped)
+    {
+        return std::any_cast<Diligent::IRenderDevice*>(untyped);
+    }
 
     namespace detail {
         // conversions comme window
@@ -68,11 +69,10 @@ namespace glue {
         if constexpr (is_renderer_backend_directx) {
             Diligent::IEngineFactoryD3D11* pFactoryD3D11 = Diligent::GetEngineFactoryD3D11();
             Diligent::EngineD3D11CreateInfo _engine_create_info;
-            // _engine_create_info.
             _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
-            pFactoryD3D11->CreateDeviceAndContextsD3D11(_engine_create_info, &m_pDevice, &m_pImmediateContext);
+            pFactoryD3D11->CreateDeviceAndContextsD3D11(_engine_create_info, &_render_device_impl, &_device_context_impl);
             Diligent::Win32NativeWindow Window { existing_window.get_native_window() };
-            pFactoryD3D11->CreateSwapChainD3D11(m_pDevice, m_pImmediateContext, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, Window, &m_pSwapChain);
+            pFactoryD3D11->CreateSwapChainD3D11(_render_device_impl, _device_context_impl, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, Window, &_swap_chain_impl);
 
         } else if constexpr (is_renderer_backend_vulkan) {
 
@@ -81,11 +81,11 @@ namespace glue {
             Diligent::EngineGLCreateInfo _engine_create_info;
             _engine_create_info.Window = { existing_window.get_native_window() };
             // kidnap std::cout ? => go dans libconsole
-            _factory_ptr->CreateDeviceAndSwapChainGL(_engine_create_info, &m_pDevice, &m_pImmediateContext, _swap_chain_descriptor, &m_pSwapChain);
+            _factory_ptr->CreateDeviceAndSwapChainGL(_engine_create_info, &_render_device_impl, &_device_context_impl, _swap_chain_descriptor, &_swap_chain_impl);
         }
 
-        const auto& SCDesc = m_pSwapChain->GetDesc();
-        m_pImGui = (new Diligent::ImGuiImplSDL(existing_window.get_sdl_window(), m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
+        const auto& SCDesc = _swap_chain_impl->GetDesc();
+        _imgui_renderer_impl = (new Diligent::ImGuiImplSDL(existing_window.get_sdl_window(), _render_device_impl, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
         // bool _success = ImGui_ImplSDL2_InitForMetal(existing_window.get_sdl_window());
     }
 
@@ -104,93 +104,23 @@ namespace glue {
 
     void renderer::new_frame()
     {
-        auto* _rtv_ptr = m_pSwapChain->GetCurrentBackBufferRTV();
-        auto* _dsv_ptr = m_pSwapChain->GetDepthBufferDSV();
-        m_pImmediateContext->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        m_pImmediateContext->ClearRenderTarget(_rtv_ptr, _clear_color.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        m_pImmediateContext->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        const auto& _swap_chain_desc = m_pSwapChain->GetDesc();
-
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-
-        // ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
-        // IM_ASSERT(bd != NULL && "Did you call ImGui_ImplSDL2_Init()?");
-        ImGuiIO& io = ImGui::GetIO();
-
-        // // Setup display size (every frame to accommodate for window resizing)
-        // int w, h;
-        // int display_w, display_h;
-        // SDL_GetWindowSize(bd->Window, &w, &h);
-        // if (SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_MINIMIZED)
-        //     w = h = 0;
-        // if (bd->Renderer != NULL)
-        //     SDL_GetRendererOutputSize(bd->Renderer, &display_w, &display_h);
-        // else
-        //     SDL_GL_GetDrawableSize(bd->Window, &display_w, &display_h);
-        // io.DisplaySize = ImVec2((float)w, (float)h);
-        // if (w > 0 && h > 0)
-        //     io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
-
-        // Setup time step (we don't use SDL_GetTicks() because it is using millisecond resolution)
-        // static Uint64 frequency = SDL_GetPerformanceFrequency();
-        // static Uint64 last_time = 0;
-        // Uint64 current_time = SDL_GetPerformanceCounter();
-        // io.DeltaTime = last_time > 0 ? (float)((double)(current_time - last_time) / frequency) : (float)(1.0f / 60.0f);
-        // last_time = current_time;
-
-        // if (bd->PendingMouseLeaveFrame && bd->PendingMouseLeaveFrame >= ImGui::GetFrameCount() && bd->MouseButtonsDown == 0) {
-        //     bd->MouseWindowID = 0;
-        //     bd->PendingMouseLeaveFrame = 0;
-        //     io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
-        // }
-
-        // ImGui_ImplSDL2_UpdateMouseData();
-        // ImGui_ImplSDL2_UpdateMouseCursor();
-
-        // // Update game controllers (if enabled and available)
-        // ImGui_ImplSDL2_UpdateGamepads();
-
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        // static Uint64 frequency = SDL_GetPerformanceFrequency();
-        // static Uint64 last_time = 0;
-        // Uint64 current_time = SDL_GetPerformanceCounter();
-        // io.DeltaTime = last_time > 0 ? (float)((double)(current_time - last_time) / frequency) : (float)(1.0f / 60.0f);
-        // last_time = current_time;
-
-        m_pImGui->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
-
-        // std::cout << "delta time = " << io.DeltaTime << std::endl;
+        auto* _rtv_ptr = _swap_chain_impl->GetCurrentBackBufferRTV();
+        auto* _dsv_ptr = _swap_chain_impl->GetDepthBufferDSV();
+        _device_context_impl->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        _device_context_impl->ClearRenderTarget(_rtv_ptr, _clear_color.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        _device_context_impl->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        const auto& _swap_chain_desc = _swap_chain_impl->GetDesc();
+        _imgui_renderer_impl->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
     }
 
     void renderer::present()
     {
-        m_pImGui->Render(m_pImmediateContext);
-        m_pSwapChain->Present();
+        _imgui_renderer_impl->Render(_device_context_impl);
+        _swap_chain_impl->Present();
     }
 
     void renderer::process_input(const std::any& input)
     {
-        std::cout << "PROCESS INPUT \n";
         ImGui_ImplSDL2_ProcessEvent(&(std::any_cast<SDL_Event>(input)));
     }
 

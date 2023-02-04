@@ -45,7 +45,8 @@ namespace detail {
         //
         //
         widgets.iterate_must_draw([](widget_data& _data, const bool _must_draw_children) {
-            _data.command.value().clear();
+            if (!has_userspace_thrown())
+                _data.command.value().clear();
             protect_userspace([&]() {
                 _data.drawer(_data.command.value());
             });
