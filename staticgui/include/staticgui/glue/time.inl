@@ -13,26 +13,7 @@ namespace staticgui {
 namespace glue {
 
     template <typename unit_t>
-    stopwatch<unit_t>::stopwatch()
-    {
-        _last = std::chrono::system_clock::now();
-    }
-
-    template <typename unit_t>
-    stopwatch<unit_t>::stopwatch(stopwatch&& other)
-    {
-        *this = std::move(other);
-    }
-
-    template <typename unit_t>
-    stopwatch<unit_t>& stopwatch<unit_t>::operator=(stopwatch&& other)
-    {
-        _last = std::move(other._last);
-        return *this;
-    }
-
-    template <typename unit_t>
-    unit_t stopwatch<unit_t>::lap()
+    unit_t stopwatch::lap()
     {
         auto _now = std::chrono::system_clock::now();
         auto _duration = std::chrono::duration_cast<unit_t>(_now - _last);

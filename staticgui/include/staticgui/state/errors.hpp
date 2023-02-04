@@ -25,11 +25,11 @@ namespace detail {
 
     // invoke autour du user code
     // catch from nullptr, from user, from bad usage -> ui display + TRACED pour user et bad usage
-    void try_catch_user_space(const bool rethrow, const std::function<void()>& try_callback, const std::function<void()>& catch_callback = nullptr);
+    void try_catch_user_space_strategy(const std::function<void()>& try_callback, const std::function<void()>& catch_callback);
+    void try_catch_user_space_island(const std::function<void()>& try_callback);
     // -> 2 functions
     // - 1.
 
-    bool has_user_space_caught();
     void display_user_space_gui();
 
     // invoke sur tout le programme

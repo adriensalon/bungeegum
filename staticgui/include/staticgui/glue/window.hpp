@@ -13,6 +13,8 @@
 #include <functional>
 #include <string>
 
+#include <staticgui/glue/backtrace.hpp>
+
 #if !defined(__EMSCRIPTEN__)
 struct SDL_Window;
 #endif

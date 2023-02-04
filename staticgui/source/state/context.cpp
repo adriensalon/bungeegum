@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include <staticgui/state/context.hpp>
+#include <staticgui/state/errors.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -38,6 +39,7 @@ namespace detail {
 
     void context_state::draw()
     {
+
         ImGui::ShowDemoWindow();
         //
         //
@@ -45,7 +47,9 @@ namespace detail {
         //
         widgets.iterate_must_draw([](widget_data& _data, const bool _must_draw_children) {
             _data.command.value().clear();
-            _data.drawer(_data.command.value());
+            try_catch_user_space_island([&]() {
+                _data.drawer(_data.command.value());
+            });
         });
         widgets.iterate_datas([](widget_data& _data) {
             if (_data.command.has_value())

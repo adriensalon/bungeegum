@@ -30,12 +30,14 @@ namespace widgets {
             _rounding.strength(12.f);
             draw_rectangle_command _rect;
             _rect.min_point(std::array<float, 2> { 20.f, 20.f })
-                .max_point(std::array<float, 2> { 200.f, 200.f })
-                .thickness(50.f)
+                .max_point(std::array<float, 2> { 600.f, 200.f })
+                .thickness(10.f)
                 .color(std::array<float, 4> { 0.33f, 0.33f, 0.89f, 1.f })
                 .rounding(_rounding);
             command.add_rectangle(_rect);
             std::cout << "DRAWING CONTAINER \n";
+            // throw glue::backtraced_exception("myexcept", 10);
+            detail::throw_bad_implementation("helloww");
         }
 
     private:

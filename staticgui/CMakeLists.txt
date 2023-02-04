@@ -12,13 +12,16 @@ project(staticgui)
 set(staticgui_source
 
 	"source/glue/backtrace.cpp"
+	"source/glue/console.cpp"
 	"source/glue/registry.cpp"
 	"source/glue/renderer.cpp"
 	"source/glue/simd.cpp"
+	"source/glue/time.cpp"
 	"source/glue/window.cpp"
 
 	"source/state/animation.cpp"
 	"source/state/context.cpp"
+	"source/state/errors.cpp"
 	"source/state/event.cpp"
 	"source/state/layout.cpp"
 	"source/state/rendering.cpp"
