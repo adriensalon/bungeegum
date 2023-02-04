@@ -9,11 +9,14 @@
 
 #pragma once
 
+#include <optional>
+
 #include <imgui.h>
 
 #include <staticgui/glue/backtrace.hpp>
 #include <staticgui/glue/console.hpp>
 #include <staticgui/state/errors.hpp>
+#include <staticgui/state/widget.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -58,15 +61,21 @@ namespace detail {
             });
     }
 
+    // struct userspace_thrown_exception_data {
+    //     std::string what;
+    //     std::vector<glue::backtraced_result> tracing;
+    // };
+
+    static std::optional<glue::backtraced_exception> userspace_thrown_exception = std::nullopt;
     static bool has_userspace_thrown_memory = false;
 
-    struct userspace_exception : public glue::backtraced_exception {
+    struct user_bad_implementation_exception : public glue::backtraced_exception {
         using glue::backtraced_exception::backtraced_exception;
     };
 
-    void throw_userspace(const std::string& what)
+    void throw_user_bad_implementation(const std::string& what)
     {
-        throw userspace_exception(what, 10);
+        throw user_bad_implementation_exception(what, 10);
     }
 
     void protect_userspace(const std::function<void()>& try_callback)
@@ -76,8 +85,19 @@ namespace detail {
                 try_callback();
             } catch (library_bad_implementation_exception&) {
                 throw;
+            } catch (library_bad_usage_exception& _exception) {
+                userspace_thrown_exception = std::move(_exception);
+                has_userspace_thrown_memory = true;
+            } catch (user_bad_implementation_exception& _exception) {
+                userspace_thrown_exception = std::move(_exception);
+                has_userspace_thrown_memory = true;
+            } catch (std::exception& _exception) {
+                has_userspace_thrown_memory = true;
+                (void)_exception;
+                // TODO
             } catch (...) { // detail here
                 has_userspace_thrown_memory = true;
+                // TODO
             }
         }
     }
@@ -87,9 +107,24 @@ namespace detail {
         return has_userspace_thrown_memory;
     }
 
-    void display_userspace_gui()
+    std::optional<glue::backtraced_exception>& get_userspace_thrown_exception()
     {
-        ImGui::ShowDemoWindow();
+        return userspace_thrown_exception;
     }
+
+    // void display_userspace_gui()
+    // {
+    //     ImGui::StyleColorsLight();
+    //     if (ImGui::Begin("Exception caught")) {
+    //         ImGui::Text(userspace_thrown_exception.value().what());
+    //         for (auto& _trace : userspace_thrown_exception.value().tracing) {
+
+    //             ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
+    //             // ImGui
+    //         }
+    //         ImGui::End();
+    //     }
+    //     ImGui::ShowDemoWindow();
+    // }
 }
 }

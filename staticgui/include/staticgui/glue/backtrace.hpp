@@ -34,6 +34,7 @@ namespace glue {
 
     struct backtraced_exception : std::exception {
         backtraced_exception(const std::string& what, const unsigned int tracing_size);
+        backtraced_exception(const std::exception& existing);
         backtraced_exception(const backtraced_exception& other) = delete;
         backtraced_exception& operator=(const backtraced_exception& other) = delete;
         backtraced_exception(backtraced_exception&& other);

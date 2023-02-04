@@ -39,6 +39,11 @@ namespace glue {
         detail::emplace_traces(tracing, tracing_size);
     }
 
+    backtraced_exception::backtraced_exception(const std::exception& existing)
+    {
+        _what = std::string(existing.what());
+    }
+
     backtraced_exception::backtraced_exception(backtraced_exception&& other)
     {
         *this = std::move(other);

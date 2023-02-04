@@ -21,7 +21,6 @@ namespace detail {
     struct context_state {
 
         bool tick(const float delta_milliseconds);
-
         void draw();
 
         widget_registry widgets;

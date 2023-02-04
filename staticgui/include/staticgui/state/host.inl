@@ -37,11 +37,10 @@ namespace detail {
                 } else {
                     _renderer->new_frame();
                     this->context.draw();
-                    display_userspace_gui();
                     _renderer->present();
                 }
             });
-            _renderer->set_clear_color({ .62f, .22f, .22f });
+            _renderer->set_clear_color({ 1.f, 1.f, 1.f });
             _window->run_loop();
         });
     }
@@ -56,13 +55,9 @@ namespace detail {
             protect_library([&]() {
                 std::chrono::milliseconds _delta_time = _stopwatch.lap();
                 float _delta_milliseconds = static_cast<float>(_delta_time.count());
-                if (!has_userspace_thrown()) {
+                if (!has_userspace_thrown())
                     context.tick(_delta_milliseconds);
-                    context.draw();
-                } else {
-                    context.draw();
-                    display_userspace_gui();
-                }
+                context.draw();
             });
         }
     }

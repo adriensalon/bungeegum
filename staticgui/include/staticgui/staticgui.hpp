@@ -34,6 +34,8 @@ using double4x4 = staticgui::glue::simd_ordered_array<double, 16, staticgui::glu
 /// @details
 namespace staticgui {
 
+void throw_error(const std::string& what);
+
 /// @brief
 /// @details
 /// @tparam value_t

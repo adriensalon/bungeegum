@@ -74,9 +74,8 @@ namespace glue {
             Diligent::EngineD3D11CreateInfo _engine_create_info;
             _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
             pFactoryD3D11->CreateDeviceAndContextsD3D11(_engine_create_info, &_render_device_impl, &_device_context_impl);
-            Window = std::make_unique<Diligent::Win32NativeWindow>(existing_window.get_native_window());
-
-            pFactoryD3D11->CreateSwapChainD3D11(_render_device_impl, _device_context_impl, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, *(Window.get()), &_swap_chain_impl);
+            Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native_window());
+            pFactoryD3D11->CreateSwapChainD3D11(_render_device_impl, _device_context_impl, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, _win32_native_window, &_swap_chain_impl);
         } else if constexpr (is_renderer_backend_vulkan) {
         } else if constexpr (is_renderer_backend_opengl) {
             Diligent::IEngineFactoryOpenGL* _factory_ptr = Diligent::GetEngineFactoryOpenGL();
@@ -88,7 +87,6 @@ namespace glue {
 
         const auto& SCDesc = _swap_chain_impl->GetDesc();
         _imgui_renderer_impl = (new Diligent::ImGuiImplSDL(existing_window.get_sdl_window(), _render_device_impl, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
-        // bool _success = ImGui_ImplSDL2_InitForMetal(existing_window.get_sdl_window());
     }
 
     renderer::~renderer()
@@ -123,17 +121,16 @@ namespace glue {
 
     void renderer::process_input(const std::any& input)
     {
+        // window resize devrait etre manage par un diligent SDLNativeWindow
         const SDL_Event* _event = &(std::any_cast<SDL_Event>(input));
         if (_event->type == SDL_WINDOWEVENT) {
             if (_event->window.event == SDL_WINDOWEVENT_RESIZED) {
                 int _w, _h;
-                std::cout << "RESIZED \n";
                 SDL_GetWindowSize(_sdl_window, &_w, &_h);
                 _swap_chain_impl->Resize(_w, _h);
             }
         }
         _imgui_renderer_impl->ProcessEvent(&(std::any_cast<SDL_Event>(input)));
-        // ImGui_ImplSDL2_ProcessEvent(&(std::any_cast<SDL_Event>(input)));
     }
 
 }

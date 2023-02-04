@@ -12,6 +12,7 @@
 #include <imgui.h>
 #include <iostream>
 
+#include <staticgui/glue/backtrace.hpp>
 #include <staticgui/state/context.hpp>
 #include <staticgui/state/errors.hpp>
 
@@ -57,6 +58,21 @@ namespace detail {
         });
         if (!has_userspace_thrown())
             widgets.clear_draw();
+
+        // draw exception if any
+        if (has_userspace_thrown()) {
+            glue::backtraced_exception& _exception = get_userspace_thrown_exception().value();
+            ImGui::StyleColorsLight();
+            if (ImGui::Begin("Exception caught")) {
+                ImGui::Text(_exception.what());
+                for (auto& _trace : _exception.tracing) {
+
+                    ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
+                    // ImGui
+                }
+                ImGui::End();
+            }
+        }
     }
 }
 }

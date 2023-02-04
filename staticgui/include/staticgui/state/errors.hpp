@@ -12,10 +12,6 @@
 #include <functional>
 #include <string>
 
-// lib -> catch bad implementation
-
-// user -> catch bad usage, user, nullptr, std::exception, int, const char* et record un callback
-
 namespace staticgui {
 namespace detail {
 
@@ -23,9 +19,9 @@ namespace detail {
     void throw_library_bad_implementation(const std::string& what);
     void protect_library(const std::function<void()>& try_callback);
 
-    void throw_userspace(const std::string& what);
+    void throw_user_bad_implementation(const std::string& what);
     void protect_userspace(const std::function<void()>& try_callback);
     bool has_userspace_thrown();
-    void display_userspace_gui();
+    std::optional<glue::backtraced_exception>& get_userspace_thrown_exception();
 }
 }

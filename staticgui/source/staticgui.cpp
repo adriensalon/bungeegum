@@ -11,6 +11,11 @@
 
 namespace staticgui {
 
+void throw_error(const std::string& what)
+{
+    detail::throw_user_bad_implementation(what);
+}
+
 draw_rounding_command& draw_rounding_command::strength(const float z)
 {
     _rounding.strength = z;
