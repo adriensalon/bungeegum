@@ -46,7 +46,9 @@
 #include <ImGui/interface/ImGuiImplDiligent.hpp>
 
 #include "windows.h"
+#include <ImGui/interface/ImGuiImplSDL.hpp>
 #include <ImGui/interface/ImGuiImplWin32.hpp>
+
 
 namespace staticgui {
 namespace glue {
@@ -83,7 +85,7 @@ namespace glue {
         }
 
         const auto& SCDesc = m_pSwapChain->GetDesc();
-        m_pImGui = (new Diligent::ImGuiImplWin32((HWND)(existing_window.get_native_window()), m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
+        m_pImGui = (new Diligent::ImGuiImplSDL(existing_window.get_sdl_window(), m_pDevice, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat));
         // bool _success = ImGui_ImplSDL2_InitForMetal(existing_window.get_sdl_window());
     }
 
@@ -169,14 +171,15 @@ namespace glue {
         //
         //
         //
+        // static Uint64 frequency = SDL_GetPerformanceFrequency();
+        // static Uint64 last_time = 0;
+        // Uint64 current_time = SDL_GetPerformanceCounter();
+        // io.DeltaTime = last_time > 0 ? (float)((double)(current_time - last_time) / frequency) : (float)(1.0f / 60.0f);
+        // last_time = current_time;
 
         m_pImGui->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
 
-        static Uint64 frequency = SDL_GetPerformanceFrequency();
-        static Uint64 last_time = 0;
-        Uint64 current_time = SDL_GetPerformanceCounter();
-        io.DeltaTime = last_time > 0 ? (float)((double)(current_time - last_time) / frequency) : (float)(1.0f / 60.0f);
-        last_time = current_time;
+        // std::cout << "delta time = " << io.DeltaTime << std::endl;
     }
 
     void renderer::present()
@@ -187,6 +190,7 @@ namespace glue {
 
     void renderer::process_input(const std::any& input)
     {
+        std::cout << "PROCESS INPUT \n";
         ImGui_ImplSDL2_ProcessEvent(&(std::any_cast<SDL_Event>(input)));
     }
 

@@ -36,6 +36,7 @@ namespace detail {
                     }
                 } else {
                     _renderer->new_frame();
+                    this->context.draw();
                     display_userspace_gui();
                     _renderer->present();
                 }
@@ -48,12 +49,21 @@ namespace detail {
     template <typename widget_t>
     std::function<void()> host_state::attach(widget_t& widget)
     {
-        context.widgets.declare_root(widget);
+        protect_library([&]() {
+            context.widgets.declare_root(widget);
+        });
         return [this]() {
-            std::chrono::milliseconds _delta_time = _stopwatch.lap();
-            float _delta_milliseconds = static_cast<float>(_delta_time.count());
-            context.tick(_delta_milliseconds);
-            context.draw();
+            protect_library([&]() {
+                std::chrono::milliseconds _delta_time = _stopwatch.lap();
+                float _delta_milliseconds = static_cast<float>(_delta_time.count());
+                if (!has_userspace_thrown()) {
+                    context.tick(_delta_milliseconds);
+                    context.draw();
+                } else {
+                    context.draw();
+                    display_userspace_gui();
+                }
+            });
         }
     }
 

@@ -46,6 +46,8 @@ elseif(PLATFORM_EMSCRIPTEN)
     list(APPEND SOURCE src/ImGuiImplEmscripten.cpp)
     list(APPEND INTERFACE interface/ImGuiImplEmscripten.hpp)
 endif()
+list(APPEND SOURCE src/ImGuiImplSDL.cpp)
+list(APPEND INTERFACE interface/ImGuiImplSDL.hpp)
 
 add_library(Diligent-Imgui STATIC
     ${SOURCE}
@@ -120,6 +122,9 @@ if(PLATFORM_WIN32 AND MINGW_BUILD)
     # when compiler is not MSVC
     target_link_libraries(Diligent-Imgui PRIVATE xinput.lib)
 endif()
+
+
+target_link_libraries(Diligent-Imgui PRIVATE SDL2-static)
 
 source_group("src" FILES ${SOURCE})
 source_group("include" FILES ${INCLUDE})
