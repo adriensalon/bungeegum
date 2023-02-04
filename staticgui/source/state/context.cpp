@@ -39,15 +39,14 @@ namespace detail {
 
     void context_state::draw()
     {
-
-        ImGui::ShowDemoWindow();
+        // throw_library_bad_usage("whatt");
         //
         //
         //
         //
         widgets.iterate_must_draw([](widget_data& _data, const bool _must_draw_children) {
             _data.command.value().clear();
-            try_catch_user_space_island([&]() {
+            protect_userspace([&]() {
                 _data.drawer(_data.command.value());
             });
         });
@@ -55,7 +54,8 @@ namespace detail {
             if (_data.command.has_value())
                 _data.command.value().draw();
         });
-        widgets.clear_draw();
+        if (!has_userspace_thrown())
+            widgets.clear_draw();
     }
 }
 }

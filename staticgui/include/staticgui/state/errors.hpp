@@ -19,21 +19,13 @@
 namespace staticgui {
 namespace detail {
 
+    void throw_library_bad_usage(const std::string& what);
+    void throw_library_bad_implementation(const std::string& what);
+    void protect_library(const std::function<void()>& try_callback);
+
     void throw_userspace(const std::string& what);
-    void throw_bad_usage(const std::string& what);
-    void throw_bad_implementation(const std::string& what);
-
-    // invoke autour du user code
-    // catch from nullptr, from user, from bad usage -> ui display + TRACED pour user et bad usage
-    void try_catch_user_space_strategy(const std::function<void()>& try_callback, const std::function<void()>& catch_callback);
-    void try_catch_user_space_island(const std::function<void()>& try_callback);
-    // -> 2 functions
-    // - 1.
-
-    void display_user_space_gui();
-
-    // invoke sur tout le programme
-    // catch from nullptr, from bad implementation  -> console message TRACED pour bad implementation
-    void try_catch_library_space(const std::function<void()>& try_callback);
+    void protect_userspace(const std::function<void()>& try_callback);
+    bool has_userspace_thrown();
+    void display_userspace_gui();
 }
 }

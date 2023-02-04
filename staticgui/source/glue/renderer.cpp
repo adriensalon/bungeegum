@@ -123,7 +123,7 @@ namespace glue {
 
         // ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
         // IM_ASSERT(bd != NULL && "Did you call ImGui_ImplSDL2_Init()?");
-        // ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io = ImGui::GetIO();
 
         // // Setup display size (every frame to accommodate for window resizing)
         // int w, h;
@@ -139,11 +139,12 @@ namespace glue {
         // if (w > 0 && h > 0)
         //     io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
 
-        // // Setup time step (we don't use SDL_GetTicks() because it is using millisecond resolution)
+        // Setup time step (we don't use SDL_GetTicks() because it is using millisecond resolution)
         // static Uint64 frequency = SDL_GetPerformanceFrequency();
+        // static Uint64 last_time = 0;
         // Uint64 current_time = SDL_GetPerformanceCounter();
-        // io.DeltaTime = bd->Time > 0 ? (float)((double)(current_time - bd->Time) / frequency) : (float)(1.0f / 60.0f);
-        // bd->Time = current_time;
+        // io.DeltaTime = last_time > 0 ? (float)((double)(current_time - last_time) / frequency) : (float)(1.0f / 60.0f);
+        // last_time = current_time;
 
         // if (bd->PendingMouseLeaveFrame && bd->PendingMouseLeaveFrame >= ImGui::GetFrameCount() && bd->MouseButtonsDown == 0) {
         //     bd->MouseWindowID = 0;
@@ -170,6 +171,12 @@ namespace glue {
         //
 
         m_pImGui->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
+
+        static Uint64 frequency = SDL_GetPerformanceFrequency();
+        static Uint64 last_time = 0;
+        Uint64 current_time = SDL_GetPerformanceCounter();
+        io.DeltaTime = last_time > 0 ? (float)((double)(current_time - last_time) / frequency) : (float)(1.0f / 60.0f);
+        last_time = current_time;
     }
 
     void renderer::present()

@@ -36,8 +36,8 @@ namespace widgets {
                 .rounding(_rounding);
             command.add_rectangle(_rect);
             std::cout << "DRAWING CONTAINER \n";
-            // throw glue::backtraced_exception("myexcept", 10);
-            detail::throw_bad_implementation("helloww");
+            // detail::throw_library_bad_implementation("helloww");
+            detail::throw_library_bad_usage("helloww");
         }
 
     private:
