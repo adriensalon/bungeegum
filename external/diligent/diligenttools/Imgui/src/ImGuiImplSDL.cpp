@@ -59,15 +59,42 @@ void ImGuiImplSDL::NewFrame(Uint32 RenderSurfaceWidth, Uint32 RenderSurfaceHeigh
     ImGui_ImplSDL2_NewFrame();
     ImGuiImplDiligent::NewFrame(RenderSurfaceWidth, RenderSurfaceHeight, SurfacePreTransform);
 
-#ifdef DILIGENT_DEBUG
+    // m_pSwapChain->GetDesc().Width;
+    // RTColorDesc.Height = m_pSwapChain->GetDesc().Height;
+
+    // #ifdef DILIGENT_DEBUG
+    //     {
+    //         ImGuiIO& io = ImGui::GetIO();
+    //         VERIFY(io.DisplaySize.x == 0 || io.DisplaySize.x == static_cast<float>(RenderSurfaceWidth),
+    //                "Render surface width (", RenderSurfaceWidth, ") does not match io.DisplaySize.x (", io.DisplaySize.x, ")");
+    //         VERIFY(io.DisplaySize.y == 0 || io.DisplaySize.y == static_cast<float>(RenderSurfaceHeight),
+    //                "Render surface height (", RenderSurfaceHeight, ") does not match io.DisplaySize.y (", io.DisplaySize.y, ")");
+    //     }
+    // #endif
+}
+
+
+bool ImGuiImplSDL::ProcessEvent(const SDL_Event* event)
+{
+    if (ImGui::GetCurrentContext() == NULL)
+        return 0;
+
+    ImGui_ImplSDL2_ProcessEvent(event);
+
+    ImGuiIO& io = ImGui::GetIO();
+    switch (event->type)
     {
-        ImGuiIO& io = ImGui::GetIO();
-        VERIFY(io.DisplaySize.x == 0 || io.DisplaySize.x == static_cast<float>(RenderSurfaceWidth),
-               "Render surface width (", RenderSurfaceWidth, ") does not match io.DisplaySize.x (", io.DisplaySize.x, ")");
-        VERIFY(io.DisplaySize.y == 0 || io.DisplaySize.y == static_cast<float>(RenderSurfaceHeight),
-               "Render surface height (", RenderSurfaceHeight, ") does not match io.DisplaySize.y (", io.DisplaySize.y, ")");
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEWHEEL:
+            return io.WantCaptureMouse;
+
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+        case SDL_TEXTINPUT:
+            return io.WantCaptureKeyboard;
     }
-#endif
+    return false;
 }
 
 } // namespace Diligent

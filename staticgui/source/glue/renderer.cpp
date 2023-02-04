@@ -49,10 +49,12 @@
 namespace staticgui {
 namespace glue {
 
+    static std::unique_ptr<Diligent::Win32NativeWindow> Window;
     static Diligent::IRenderDevice* _render_device_impl;
     static Diligent::IDeviceContext* _device_context_impl;
     static Diligent::ISwapChain* _swap_chain_impl;
-    static Diligent::ImGuiImplDiligent* _imgui_renderer_impl;
+    static Diligent::ImGuiImplSDL* _imgui_renderer_impl;
+    static SDL_Window* _sdl_window;
 
     Diligent::IRenderDevice* get_render_device(std::any& untyped)
     {
@@ -65,17 +67,17 @@ namespace glue {
 
     renderer::renderer(const window& existing_window)
     {
+        _sdl_window = existing_window.get_sdl_window();
         Diligent::SwapChainDesc _swap_chain_descriptor;
         if constexpr (is_renderer_backend_directx) {
             Diligent::IEngineFactoryD3D11* pFactoryD3D11 = Diligent::GetEngineFactoryD3D11();
             Diligent::EngineD3D11CreateInfo _engine_create_info;
             _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
             pFactoryD3D11->CreateDeviceAndContextsD3D11(_engine_create_info, &_render_device_impl, &_device_context_impl);
-            Diligent::Win32NativeWindow Window { existing_window.get_native_window() };
-            pFactoryD3D11->CreateSwapChainD3D11(_render_device_impl, _device_context_impl, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, Window, &_swap_chain_impl);
+            Window = std::make_unique<Diligent::Win32NativeWindow>(existing_window.get_native_window());
 
+            pFactoryD3D11->CreateSwapChainD3D11(_render_device_impl, _device_context_impl, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, *(Window.get()), &_swap_chain_impl);
         } else if constexpr (is_renderer_backend_vulkan) {
-
         } else if constexpr (is_renderer_backend_opengl) {
             Diligent::IEngineFactoryOpenGL* _factory_ptr = Diligent::GetEngineFactoryOpenGL();
             Diligent::EngineGLCreateInfo _engine_create_info;
@@ -121,7 +123,17 @@ namespace glue {
 
     void renderer::process_input(const std::any& input)
     {
-        ImGui_ImplSDL2_ProcessEvent(&(std::any_cast<SDL_Event>(input)));
+        const SDL_Event* _event = &(std::any_cast<SDL_Event>(input));
+        if (_event->type == SDL_WINDOWEVENT) {
+            if (_event->window.event == SDL_WINDOWEVENT_RESIZED) {
+                int _w, _h;
+                std::cout << "RESIZED \n";
+                SDL_GetWindowSize(_sdl_window, &_w, &_h);
+                _swap_chain_impl->Resize(_w, _h);
+            }
+        }
+        _imgui_renderer_impl->ProcessEvent(&(std::any_cast<SDL_Event>(input)));
+        // ImGui_ImplSDL2_ProcessEvent(&(std::any_cast<SDL_Event>(input)));
     }
 
 }

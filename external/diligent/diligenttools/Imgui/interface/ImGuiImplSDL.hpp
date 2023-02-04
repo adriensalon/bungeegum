@@ -1,9 +1,10 @@
 #pragma once
 
+struct SDL_Window;
+typedef union SDL_Event SDL_Event;
+
 #include <memory>
 #include "ImGuiImplDiligent.hpp"
-
-struct SDL_Window;
 
 namespace Diligent
 {
@@ -27,6 +28,8 @@ public:
     // clang-format on
 
     virtual void NewFrame(Uint32 RenderSurfaceWidth, Uint32 RenderSurfaceHeight, SURFACE_TRANSFORM SurfacePreTransform) override final;
+
+    bool ProcessEvent(const SDL_Event* event);
 };
 
 } // namespace Diligent
