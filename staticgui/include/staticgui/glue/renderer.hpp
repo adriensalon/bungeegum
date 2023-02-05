@@ -42,11 +42,9 @@ namespace glue {
         void process_input(const std::any& input);
 
     private:
+        struct diligent_renderer;
+        std::unique_ptr<diligent_renderer> _renderer_impl = nullptr;
         std::array<float, 4> _clear_color = { 0.f, 0.f, 0.f, 1.f };
-        // std::any _render_device_impl = nullptr;
-        // std::any _swap_chain_impl = nullptr;
-        // std::any _device_context_impl = nullptr;
-        // std::any _imgui_renderer_impl = nullptr;
     };
 
 }
