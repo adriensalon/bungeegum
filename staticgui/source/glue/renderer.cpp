@@ -72,7 +72,7 @@ namespace glue {
         if constexpr (is_renderer_backend_directx) {
             Diligent::IEngineFactoryD3D11* pFactoryD3D11 = Diligent::GetEngineFactoryD3D11();
             Diligent::EngineD3D11CreateInfo _engine_create_info;
-            _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
+            // _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
             pFactoryD3D11->CreateDeviceAndContextsD3D11(_engine_create_info, &_render_device_impl, &_device_context_impl);
             Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native_window());
             pFactoryD3D11->CreateSwapChainD3D11(_render_device_impl, _device_context_impl, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, _win32_native_window, &_swap_chain_impl);

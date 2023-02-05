@@ -65,11 +65,28 @@ namespace detail {
             ImGui::StyleColorsLight();
             if (ImGui::Begin("Exception caught")) {
                 ImGui::Text(_exception.what());
+                ImGui::Spacing();
+                ImGui::Separator();
+                ImGui::Spacing();
                 for (auto& _trace : _exception.tracing) {
-
                     ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
-                    // ImGui
                 }
+                auto _black = ImVec4(0.f, 0.f, 0.f, 1.f);
+                ImGui::Spacing();
+                ImGui::Separator();
+                ImGui::Spacing();
+                widgets.iterate_datas([&](detail::widget_data& _widget_data) {
+                    unsigned int _depth = widgets.get_depth(_widget_data);
+                    for (unsigned int _k = 0; _k < _depth; _k++) {
+                        ImGui::TextColored(_black, "      ");
+                        ImGui::SameLine();
+                    }
+                    ImGui::TextColored(_black, _widget_data.kind->name());
+                    if (_widget_data.drawer) {
+                        ImGui::SameLine();
+                        ImGui::TextColored(_black, " [painter]");
+                    }
+                });
                 ImGui::End();
             }
         }

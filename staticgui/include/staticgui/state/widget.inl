@@ -60,7 +60,6 @@ namespace detail {
         _widget_data.drawer = drawer;
         _widget_data.command = command_data();
         must_draw<widget_t>(*widget);
-        std::cout << "ASSIGN ON DRAW" << std::endl;
     }
 
     template <typename... children_widgets_t>

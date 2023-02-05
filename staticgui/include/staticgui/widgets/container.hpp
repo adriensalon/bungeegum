@@ -35,7 +35,7 @@ namespace widgets {
                 .color(std::array<float, 4> { 0.33f, 0.33f, 0.89f, 1.f })
                 .rounding(_rounding);
             command.add_rectangle(_rect);
-            std::cout << "DRAWING CONTAINER \n";
+            // std::cout << "DRAWING CONTAINER \n";
             // detail::throw_library_bad_implementation("helloww");
             // detail::throw_library_bad_usage("helloww");
             throw_error("my user error");

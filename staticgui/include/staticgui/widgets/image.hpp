@@ -21,13 +21,13 @@ namespace widgets {
 
         image_widget()
         {
-            std::cout << "image ctor\n";
+            // std::cout << "image ctor\n";
             declare(this);
         }
 
         ~image_widget()
         {
-            std::cout << "image dtor\n";
+            // std::cout << "image dtor\n";
         }
 
         float x = 0.f;

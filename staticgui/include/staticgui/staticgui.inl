@@ -65,7 +65,7 @@ animation<value_t>& animation<value_t>::operator=(animation<value_t>&& other)
 template <typename value_t>
 animation<value_t>& animation<value_t>::on_value_changed(const event<value_t>& value_changed_event)
 {
-    std::cout << "YES 2 \n";
+    // std::cout << "YES 2 \n";
     return *this;
 }
 
@@ -119,29 +119,29 @@ void launch(widget_t& widget)
 {
     detail::state.context.widgets.declare_root(widget);
 
-    std::cout << "application" << std::endl;
-    detail::state.context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
-        unsigned int _depth = detail::state.context.widgets.get_depth(_widget_data);
-        for (unsigned int _k = 0; _k < _depth; _k++)
-            std::cout << "   ";
-        std::cout << "|__ ";
-        std::cout << _widget_data.kind->name();
-        if (_widget_data.drawer)
-            std::cout << " [painter]";
-        std::cout << std::endl;
-    });
+    // std::cout << "application" << std::endl;
+    // detail::state.context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
+    //     unsigned int _depth = detail::state.context.widgets.get_depth(_widget_data);
+    //     for (unsigned int _k = 0; _k < _depth; _k++)
+    //         std::cout << "   ";
+    //     std::cout << "|__ ";
+    //     std::cout << _widget_data.kind->name();
+    //     if (_widget_data.drawer)
+    //         std::cout << " [painter]";
+    //     std::cout << std::endl;
+    // });
 
-    detail::state.context.events.iterate_datas([&](detail::event_data& _event_data) {
-        std::cout << "- event <";
-        for (auto& _k : _event_data.kinds)
-            std::cout << _k.name() << ", ";
-        std::cout << "> \n";
-    });
+    // detail::state.context.events.iterate_datas([&](detail::event_data& _event_data) {
+    //     std::cout << "- event <";
+    //     for (auto& _k : _event_data.kinds)
+    //         std::cout << _k.name() << ", ";
+    //     std::cout << "> \n";
+    // });
 
-    detail::state.context.animations.iterate_datas([&](detail::animation_data& _animation_data) {
-        std::cout << "- animation <";
-        std::cout << _animation_data.kind->name() << "> \n";
-    });
+    // detail::state.context.animations.iterate_datas([&](detail::animation_data& _animation_data) {
+    //     std::cout << "- animation <";
+    //     std::cout << _animation_data.kind->name() << "> \n";
+    // });
 
     // while (true) {
     //     print_tree<widget_impl*>(widgets_ptrs_container);
