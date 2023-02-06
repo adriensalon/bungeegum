@@ -76,6 +76,13 @@ event<values_t...>::~event()
 }
 
 template <typename... values_t>
+event<values_t...>& event<values_t...>::merge(const event<values_t...>& other)
+{
+    detail::state.context.events.merge_events_and_datas<values_t...>(_impl, other._impl);
+    return *this;
+}
+
+template <typename... values_t>
 event<values_t...>& event<values_t...>::attach()
 {
     detail::state.context.events.attach_to_wrapper(_impl);
@@ -112,13 +119,13 @@ const event<values_t...>& event<values_t...>::trigger(values_t&&... values) cons
 }
 
 template <typename... values_t>
-void event<values_t...>::trigger(std::future<typename detail::value_or_tuple<values_t...>::type>&& future_value)
+void event<values_t...>::trigger(std::future<detail::future_values<values_t...>>&& future_value)
 {
     detail::state.context.events.trigger_future_value(_impl, std::move(future_value));
 }
 
 template <typename... values_t>
-void event<values_t...>::trigger(const std::shared_future<typename detail::value_or_tuple<values_t...>::type>& shared_future_value)
+void event<values_t...>::trigger(const std::shared_future<detail::future_values<values_t...>>& shared_future_value)
 {
     detail::state.context.events.trigger_shared_future_value(_impl, shared_future_value);
 }

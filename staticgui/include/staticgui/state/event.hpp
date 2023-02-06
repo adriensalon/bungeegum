@@ -17,18 +17,14 @@
 #include <vector>
 
 #include <staticgui/glue/registry.hpp>
-#include <staticgui/state/traits.hpp>
-// #include <staticgui/state/widget.hpp>
+#include <staticgui/state/sfinae.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    struct event_disabled {
-    };
-
     template <typename... values_t>
     struct event_impl {
-        using future_type = typename value_or_tuple<values_t...>::type;
+        using future_type = detail::future_values<values_t...>;
 
         event_impl();
         event_impl(const event_impl& other) = delete;
@@ -47,8 +43,6 @@ namespace detail {
     struct event_data {
         std::function<void()> tick = nullptr;
         std::vector<std::type_index> kinds;
-        std::optional<std::reference_wrapper<event_data>> parent = std::nullopt;
-        std::vector<std::reference_wrapper<event_data>> children = {};
     };
 
     struct event_registry {
@@ -62,6 +56,9 @@ namespace detail {
 
         template <typename... values_t>
         event_impl<values_t...>& make_event_and_data();
+
+        template <typename... values_t>
+        void merge_events_and_datas(event_impl<values_t...>& merger, event_impl<values_t...>& merged);
 
         template <typename... values_t>
         void destroy_event_and_data(const event_impl<values_t...>& event);
@@ -81,10 +78,10 @@ namespace detail {
         void trigger_values(event_impl<values_t...>& event, values_t&&... values);
 
         template <typename... values_t>
-        void trigger_future_value(event_impl<values_t...>& event, std::future<typename value_or_tuple<values_t...>::type>&& future_value);
+        void trigger_future_value(event_impl<values_t...>& event, std::future<future_values<values_t...>>&& future_value);
 
         template <typename... values_t>
-        void trigger_shared_future_value(event_impl<values_t...>& event, const std::shared_future<typename value_or_tuple<values_t...>::type>& shared_future_value);
+        void trigger_shared_future_value(event_impl<values_t...>& event, const std::shared_future<future_values<values_t...>>& shared_future_value);
 
         template <typename... values_t>
         void attach_to_wrapper(event_impl<values_t...>& event);

@@ -43,12 +43,12 @@ namespace detail {
         _event_data.tick = [&]() {
             for (auto _future_it = _event.futures.begin(); _future_it != _event.futures.end();) {
                 if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    if constexpr (typename value_or_tuple<values_t...>::is_void()) {
+                    if constexpr (glue::future_typelist<values_t...>::is_void()) {
                         for (auto& _callback : _event.callbacks)
                             _callback();
                     } else {
-                        typename value_or_tuple<values_t...>::type _vals = _future_it->get();
-                        if constexpr (typename value_or_tuple<values_t...>::is_tuple()) {
+                        glue::future_typelist_t<values_t...> _vals = _future_it->get();
+                        if constexpr (glue::future_typelist<values_t...>::is_tuple()) {
                             for (auto& _callback : _event.callbacks)
                                 _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
                         } else {
@@ -63,12 +63,12 @@ namespace detail {
             for (auto _shared_future_it = _event.shared_futures.begin(); _shared_future_it != _event.shared_futures.end();) {
                 if (_shared_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
 
-                    if constexpr (typename value_or_tuple<values_t...>::is_void()) {
+                    if constexpr (glue::future_typelist<values_t...>::is_void()) {
                         for (auto& _callback : _event.callbacks)
                             _callback();
                     } else {
-                        typename value_or_tuple<values_t...>::type _vals = _shared_future_it->get();
-                        if constexpr (typename value_or_tuple<values_t...>::is_tuple()) {
+                        glue::future_typelist_t<values_t...> _vals = _shared_future_it->get();
+                        if constexpr (glue::future_typelist<values_t...>::is_tuple()) {
                             for (auto& _callback : _event.callbacks)
                                 _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
                         } else {
@@ -83,6 +83,23 @@ namespace detail {
         };
         (_event_data.kinds.emplace_back(typeid(values_t)), ...);
         return _event;
+    }
+
+    template <typename... values_t>
+    void event_registry::merge_events_and_datas(event_impl<values_t...>& merger, event_impl<values_t...>& merged)
+    {
+        // attach_to_wrapper(merger);
+        // attach_to_wrapper(merged);
+        merger.callbacks.insert(merger.callbacks.end(),
+            std::make_move_iterator(merged.callbacks.begin()),
+            std::make_move_iterator(merged.callbacks.end()));
+        merger.futures.insert(merger.futures.end(),
+            std::make_move_iterator(merged.futures.begin()),
+            std::make_move_iterator(merged.futures.end()));
+        merger.shared_futures.insert(merger.shared_futures.end(),
+            std::make_move_iterator(merged.shared_futures.begin()),
+            std::make_move_iterator(merged.shared_futures.end()));
+        // destroy_event_and_data(merged);
     }
 
     template <typename... values_t>
@@ -107,13 +124,13 @@ namespace detail {
     }
 
     template <typename... values_t>
-    void event_registry::trigger_future_value(event_impl<values_t...>& event, std::future<typename value_or_tuple<values_t...>::type>&& future_value)
+    void event_registry::trigger_future_value(event_impl<values_t...>& event, std::future<future_values<values_t...>>&& future_value)
     {
         event.futures.push_back(std::move(future_value));
     }
 
     template <typename... values_t>
-    void event_registry::trigger_shared_future_value(event_impl<values_t...>& event, const std::shared_future<typename value_or_tuple<values_t...>::type>& shared_future_value)
+    void event_registry::trigger_shared_future_value(event_impl<values_t...>& event, const std::shared_future<future_values<values_t...>>& shared_future_value)
     {
         event.shared_futures.push_back(shared_future_value);
     }

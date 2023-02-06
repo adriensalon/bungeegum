@@ -118,6 +118,32 @@ namespace glue {
         [[nodiscard]] static constexpr bool empty();
     };
 
+    template <typename... types_t>
+    struct future_typelist {
+        constexpr static bool is_void() { return false; }
+        constexpr static bool is_value() { return false; }
+        constexpr static bool is_tuple() { return true; }
+        using type = std::tuple<types_t...>;
+    };
+
+    template <typename type_t>
+    struct future_typelist<type_t> {
+        constexpr static bool is_void() { return false; }
+        constexpr static bool is_value() { return true; }
+        constexpr static bool is_tuple() { return false; }
+        using type = type_t;
+    };
+
+    template <>
+    struct future_typelist<> {
+        constexpr static bool is_void() { return true; }
+        constexpr static bool is_value() { return false; }
+        constexpr static bool is_tuple() { return false; }
+        using type = void;
+    };
+
+    template <typename... types_t>
+    using future_typelist_t = typename future_typelist<types_t...>::type;
 }
 }
 

@@ -16,8 +16,7 @@
 #include <staticgui/glue/window.hpp>
 #include <staticgui/state/context.hpp>
 #include <staticgui/state/curve.hpp>
-#include <staticgui/state/traits.hpp>
-
+#include <staticgui/state/sfinae.hpp>
 
 namespace staticgui {
 namespace detail {

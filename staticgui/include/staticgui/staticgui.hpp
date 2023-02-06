@@ -66,8 +66,10 @@ private:
     struct animation;
 };
 
-/// @brief Event objects
-/// @details
+/// @brief Event objects store same type callbacks and can be passed around the user code to be
+/// triggered all at once when desired. Events can be fired on std::future completion, taking its
+/// return value as input parameters for callbacks
+/// @details Lifetime
 /// @tparam ...values_t
 template <typename... values_t>
 struct event {
@@ -82,6 +84,10 @@ struct event {
     event(event&& other);
     event& operator=(event&& other);
     ~event();
+
+    /// @brief
+    /// @details
+    event& merge(const event& other);
 
     /// @brief Transfers ownership of the underlying callback dispatcher back to this event object
     /// @details This allows you to
@@ -102,7 +108,7 @@ struct event {
     /// be destroyed when the application terminates
     event& detach();
 
-    /// @brief Emplaces a new callback that will be called
+    /// @brief Emplaces a new callback to be fired after
     /// @param trigger_callback
     event& on_trigger(const on_trigger_callback& trigger_callback);
 
@@ -112,11 +118,11 @@ struct event {
 
     /// @brief
     /// @param future_value
-    void trigger(std::future<typename detail::value_or_tuple<values_t...>::type>&& future_value);
+    void trigger(std::future<detail::future_values<values_t...>>&& future_value);
 
     /// @brief
     /// @param future_value
-    void trigger(const std::shared_future<typename detail::value_or_tuple<values_t...>::type>& shared_future_value);
+    void trigger(const std::shared_future<detail::future_values<values_t...>>& shared_future_value);
 
     /// @brief
     std::vector<on_trigger_callback>& trigger_callbacks();
