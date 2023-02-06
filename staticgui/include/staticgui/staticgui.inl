@@ -26,22 +26,7 @@ namespace detail {
     constexpr bool has_draw = false;
     template <typename widget_t>
     constexpr bool has_draw<widget_t, std::void_t<decltype(std::declval<widget_t>().draw(std::declval<draw_command&>()))>> = true;
-
 }
-
-// EVENT
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 #pragma region event
 template <typename... values_t>
@@ -127,6 +112,10 @@ const event<values_t...>& event<values_t...>::trigger(values_t&&... values) cons
 }
 
 // FUTURE TRIGGER
+template <typename... values_t>
+void event<values_t...>::trigger(const std::future<typename detail::value_or_tuple<values_t...>::type>& future_value)
+{
+}
 
 template <typename... values_t>
 std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callbacks()
@@ -141,21 +130,7 @@ const std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callb
 }
 #pragma endregion
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
+#pragma region animation
 template <typename value_t>
 animation<value_t>::animation(const curve& bezier_curve)
     : _impl(detail::state.context.animations.make<value_t>())
@@ -209,9 +184,57 @@ template <typename value_t>
 void animation<value_t>::stop()
 {
 }
+#pragma endregion
 
+#pragma region value
+template <typename value_t>
+value<value_t>::value(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value)
+{
+    _is_animated = true;
+    _value = animated_value;
+}
+
+template <typename value_t>
+value<value_t>::value(const detail::enable_if_lerpable_t<value_t>& static_value)
+{
+    _is_animated = false;
+    _value = static_value;
+}
+
+template <typename value_t>
+void value<value_t>::assign(value_t& target_value) const
+{
+    if (_is_animated) {
+        animation<value_t>& _animation = std::get<animation<value_t>>(_value);
+        _animation.on_value_changed(event<value_t>([&](const value_t& _value_changed) {
+            target_value = _value_changed;
+        }));
+    } else
+        target_value = std::get<value_t>(_value);
+}
+#pragma endregion
+
+#pragma region context
+template <typename widget_t>
+context& context::destroy(widget_t& widget, const bool destroy_children)
+{
+    using namespace internal::impl;
+    // destroy component
+    // widgets_container.destroy()
+
+    // destroy in tree
+    // widgets_ptrs_container.
+
+    return *this;
+}
+#pragma endregion
+
+#pragma region main
 template <typename widget_t, typename... widget_args_t>
-widget_t& make(widget_args_t&&... widget_args) { return detail::state.context.widgets.make<widget_t>(std::forward<widget_args_t>(widget_args)...); }
+widget_t& make(widget_args_t&&... widget_args)
+{
+    return detail::state.context.widgets.make<widget_t>(std::forward<widget_args_t>(widget_args)...);
+}
 
 template <typename widget_t, typename... children_widgets_t>
 void declare(widget_t* widget, children_widgets_t&... children_widgets)
@@ -249,45 +272,6 @@ template <typename widget_t>
 void launch(widget_t& widget) { detail::state.launch(widget); }
 
 template <typename widget_t>
-std::function<void()> attach(widget_t& widget) { return detail::state.attach(widget); }
-
-template <typename widget_t>
-context& context::destroy(widget_t& widget, const bool destroy_children)
-{
-    using namespace internal::impl;
-    // destroy component
-    // widgets_container.destroy()
-
-    // destroy in tree
-    // widgets_ptrs_container.
-
-    return *this;
-}
-
-template <typename value_t>
-value<value_t>::value(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value)
-{
-    _is_animated = true;
-    _value = animated_value;
-}
-
-template <typename value_t>
-value<value_t>::value(const detail::enable_if_lerpable_t<value_t>& static_value)
-{
-    _is_animated = false;
-    _value = static_value;
-}
-
-template <typename value_t>
-void value<value_t>::assign(value_t& target_value) const
-{
-    if (_is_animated) {
-        animation<value_t>& _animation = std::get<animation<value_t>>(_value);
-        _animation.on_value_changed(event<value_t>([&](const value_t& _value_changed) {
-            target_value = _value_changed;
-        }));
-    } else
-        target_value = std::get<value_t>(_value);
-}
-
+std::function<void()> launch_embedded(widget_t& widget) { return detail::state.attach(widget); }
+#pragma endregion
 }

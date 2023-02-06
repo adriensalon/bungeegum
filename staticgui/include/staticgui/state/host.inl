@@ -46,7 +46,7 @@ namespace detail {
     }
 
     template <typename widget_t>
-    std::function<void()> host_state::attach(widget_t& widget)
+    std::function<void()> host_state::launch_embedded(widget_t& widget)
     {
         protect_library([&]() {
             context.widgets.declare_root(widget);

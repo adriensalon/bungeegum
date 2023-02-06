@@ -9,9 +9,9 @@
 
 #pragma once
 
+#include <future>
 #include <iostream>
 
-#include <staticgui/state/curve.hpp>
 #include <staticgui/state/host.hpp>
 #include <staticgui/state/lerpable.hpp>
 
@@ -110,20 +110,9 @@ struct event {
     /// @param ...values
     const event& trigger(values_t&&... values) const;
 
-    // /// @brief
-    // /// @param future_value
-    // template <typename = typename std::enable_if_t<sizeof...(values_t) == 0>>
-    // void trigger(const std::future<void>& future_value);
-
-    // /// @brief
-    // /// @param future_value
-    // template <typename = typename std::enable_if_t<sizeof...(values_t) == 1>>
-    // void trigger(const std::future<typename traits::first_value_impl<values_t...>::type>& future_value);
-
-    // /// @brief
-    // /// @param future_value
-    // template <typename = typename std::enable_if_t<sizeof...(values_t) >= 2>>
-    // void trigger(const std::future<std::tuple<values_t...>>& future_value);
+    /// @brief
+    /// @param future_value
+    void trigger(const std::future<typename detail::value_or_tuple<values_t...>::type>& future_value);
 
     /// @brief
     std::vector<on_trigger_callback>& trigger_callbacks();
@@ -312,7 +301,7 @@ void launch(widget_t& widget);
 /// @param widget
 /// @return
 template <typename widget_t>
-std::function<void()> attach(widget_t& widget);
+std::function<void()> launch_embedded(widget_t& widget);
 
 /// @brief
 /// @tparam widget_t

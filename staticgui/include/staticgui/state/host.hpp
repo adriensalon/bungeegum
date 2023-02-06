@@ -15,6 +15,9 @@
 #include <staticgui/glue/time.hpp>
 #include <staticgui/glue/window.hpp>
 #include <staticgui/state/context.hpp>
+#include <staticgui/state/curve.hpp>
+#include <staticgui/state/traits.hpp>
+
 
 namespace staticgui {
 namespace detail {
@@ -25,7 +28,7 @@ namespace detail {
         void launch(widget_t& widget);
 
         template <typename widget_t>
-        [[nodiscard]] std::function<void()> attach(widget_t& widget);
+        [[nodiscard]] std::function<void()> launch_embedded(widget_t& widget);
 
         context_state context;
 
