@@ -14,7 +14,9 @@
 #include <typeindex>
 #include <vector>
 
+#include <staticgui/state/curve.hpp>
 #include <staticgui/state/event.hpp>
+
 
 namespace staticgui {
 namespace detail {
@@ -25,7 +27,7 @@ namespace detail {
     template <typename value_t>
     struct animation_impl {
         event_impl<value_t> event;
-        // curve_impl<value_t> curve;
+        curve_data curve;
     };
 
     struct animation_data {

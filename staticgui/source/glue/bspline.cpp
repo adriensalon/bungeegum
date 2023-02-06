@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <cmath>
+
 #include <tinysplinecxx.h>
 
 #include <staticgui/glue/bspline.hpp>
@@ -23,12 +25,12 @@ namespace glue {
         }
     }
 
-    bspline::bspline(const std::vector<float>& strided_controls)
+    bspline::bspline(const std::vector<float>& strided_controls, const bool drop_invalid)
     {
         _bspline_impl = tinyspline::BSpline::interpolateCubicNatural(strided_controls, 2);
     }
 
-    bspline::bspline(const std::vector<simd_array<float, 2>>& controls)
+    bspline::bspline(const std::vector<simd_array<float, 2>>& controls, const bool drop_invalid)
     {
         // TODO
         // size_t _size = controls.size();
@@ -44,7 +46,12 @@ namespace glue {
         // _bspline_impl = tinyspline::BSpline::interpolateCubicNatural(_data, 2);
     }
 
-    bspline::bspline(const float departure, const float arrival, const std::vector<simd_array<float, 2>>& controls)
+    bspline::bspline(const float departure, const float arrival, const std::vector<float>& strided_controls, const bool drop_invalid)
+    {
+        // TODO
+    }
+
+    bspline::bspline(const float departure, const float arrival, const std::vector<simd_array<float, 2>>& controls, const bool drop_invalid)
     {
         // VERIFY HEIN
         size_t _size = controls.size() + 2U;
@@ -82,9 +89,11 @@ namespace glue {
         return *this;
     }
 
-    float bspline::get_eval(const float t)
+    simd_array<float, 2> bspline::get_eval(const float t)
     {
-        return impl::get_bspline_impl(_bspline_impl).eval(t).result()[1];
+        float _clamped = std::fmin(1.f, std::fmax(0.f, t));
+        auto& _vector = impl::get_bspline_impl(_bspline_impl).eval(_clamped).result();
+        return std::array<float, 2> { _vector[0], _vector[1] };
     }
 
     std::vector<float> bspline::get_strided_samples(const unsigned int size)

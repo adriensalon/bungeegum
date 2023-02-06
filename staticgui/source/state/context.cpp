@@ -41,13 +41,13 @@ namespace detail {
             };
 
             auto controls3 = std::vector<glue::simd_array<float, 2>> {
-                std::array<float, 2> { 0.25f, 0.15f },
-                std::array<float, 2> { 0.75f, 0.85f }
+                std::array<float, 2> { 0.25f, 0.2f },
+                std::array<float, 2> { 0.75f, 0.8f }
             };
 
-            auto _spl = glue::bspline(0.f, 1.f, controls3); //controls2);
+            // auto _spl = glue::bspline(controls);
+            auto _spl = glue::bspline(0.f, 1.f, controls3);
             std::vector<float> kkk = _spl.get_strided_samples(100);
-            std::cout << "eval t = 0.6, y = " << _spl.get_eval(0.6f) << std::endl;
 
             if (ImPlot::BeginPlot("##StatsGraphTitle", ImGui::GetContentRegionAvail())) {
                 //     if (state.train_flow_index() > 0) {
@@ -55,7 +55,12 @@ namespace detail {
                 //         for (int k = 0; k < state.train_flow_index(); k++)
                 //             x[k] = k + 1;
                 //         auto xptr = x.data();
-                // ImPlot::PlotScatter("pp", controls.data(), &(controls[1]), 5, 0, 0, 2 * sizeof(float));
+                static float _t = 0.f;
+                _t += 0.001f;
+
+                auto _tp = _spl.get_eval(_t);
+
+                ImPlot::PlotScatter("pp", _tp.data(), _tp.data() + 1, 1, 0, 0, 2 * sizeof(float));
                 ImPlot::PlotLine("gan loss", kkk.data(), &(kkk[1]), 100, 0, 0, 2 * sizeof(float));
                 //         ImPlot::PlotLine("L1 loss", xptr, state.train_stats().get_l1_loss_data(), state.train_flow_index());
                 //         ImPlot::PlotLine("real loss", xptr, state.train_stats().get_real_loss_data(), state.train_flow_index());

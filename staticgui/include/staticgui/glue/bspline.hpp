@@ -18,15 +18,16 @@ namespace staticgui {
 namespace glue {
 
     struct bspline {
-        bspline(const std::vector<float>& strided_controls);
-        bspline(const std::vector<simd_array<float, 2>>& controls);
-        bspline(const float departure, const float arrival, const std::vector<simd_array<float, 2>>& controls);
+        bspline(const std::vector<float>& strided_controls, const bool drop_invalid = true);
+        bspline(const std::vector<simd_array<float, 2>>& controls, const bool drop_invalid = true);
+        bspline(const float departure, const float arrival, const std::vector<float>& strided_controls = {}, const bool drop_invalid = true);
+        bspline(const float departure, const float arrival, const std::vector<simd_array<float, 2>>& controls = {}, const bool drop_invalid = true);
         bspline(const bspline& other);
         bspline& operator=(const bspline& other);
         bspline(bspline&& other);
         bspline& operator=(bspline&& other);
 
-        float get_eval(const float t);
+        simd_array<float, 2> get_eval(const float t);
         std::vector<float> get_strided_samples(const unsigned int size);
 
     private:

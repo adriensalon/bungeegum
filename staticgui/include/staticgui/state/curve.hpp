@@ -9,33 +9,18 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 
+#include <staticgui/glue/bspline.hpp>
 #include <staticgui/glue/simd.hpp>
 
 namespace staticgui {
 namespace detail {
 
     struct curve_data {
-
-        float& departure();
-        const float& departure() const;
-        float& arrival();
-        const float& arrival() const;
-        std::vector<glue::simd_array<float, 2>>& control_points();
-        const std::vector<glue::simd_array<float, 2>>& control_points() const;
-
-        float evaluate(const float t) const;
-        unsigned int size() const;
-
-    private:
-        bool _is_dirty = false;
-        float _first_control_point_y = 0.f;
-        float _last_control_point_y = 0.f;
-        std::vector<glue::simd_array<float, 2>> _control_points;
+        std::unique_ptr<glue::bspline> spline = nullptr;
     };
 
 }
 }
-
-#include <staticgui/state/curve.inl>

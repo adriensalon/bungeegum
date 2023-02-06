@@ -57,7 +57,7 @@ namespace glue {
     scalar_t* simd_array<scalar_t, count_t>::data()
     {
         // return this->_array.data();
-        return static_cast<scalar_t*>(this->_array);
+        return static_cast<scalar_t*>(this->_array.data());
     }
 
     template <typename scalar_t, unsigned int count_t>

@@ -33,7 +33,7 @@ event<values_t...>::event(const std::function<void(values_t...)>& trigger_callba
 }
 
 template <typename value_t>
-animation<value_t>::animation(const curve<value_t>& bezier_curve)
+animation<value_t>::animation(const curve& bezier_curve)
     : _impl(detail::state.context.animations.make<value_t>())
 {
 }
@@ -157,40 +157,6 @@ void value<value_t>::assign(value_t& target_value) const
         }));
     } else
         target_value = std::get<value_t>(_value);
-}
-
-namespace internal {
-    namespace impl {
-
-        struct runtime_curve_component {
-        };
-
-        struct curve_impl {
-        };
-
-        static curve_impl _NO2;
-    }
-}
-
-template <typename value_t, typename curve_resolver>
-curve<value_t, curve_resolver>::curve(const detail::enable_if_lerpable_t<value_t>& min, const value_t& max)
-// : _impl(internal::impl::_NO2)
-{
-}
-
-template <typename value_t, typename curve_resolver>
-std::vector<std::pair<float, value_t>>& curve<value_t, curve_resolver>::get_points()
-{
-}
-
-template <typename value_t, typename curve_resolver>
-const std::vector<std::pair<float, value_t>>& curve<value_t, curve_resolver>::get_points() const
-{
-}
-
-template <typename value_t, typename curve_resolver>
-value_t curve<value_t, curve_resolver>::get_value(const float t)
-{
 }
 
 }

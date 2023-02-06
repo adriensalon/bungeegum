@@ -11,6 +11,7 @@
 
 #include <iostream>
 
+#include <staticgui/state/curve.hpp>
 #include <staticgui/state/host.hpp>
 #include <staticgui/state/lerpable.hpp>
 
@@ -48,40 +49,19 @@ struct color {
     color operator*(const float multiplier);
 };
 
-template <unsigned int order_t>
-struct bezier_curve_resolver {
-    constexpr static unsigned int controls_count = order_t + 1;
-
-    std::array<float2, controls_count>& get_controls();
-
-    // float evaluate(const float)
+enum struct curve_preset {
+    linear,
+    bounce_in,
 };
 
-template <unsigned int order_t>
-struct bspline_curve_resolver {
-};
-
-template <unsigned int order_t>
-struct nurbs_curve_resolver {
-};
-
-template <typename value_t, typename curve_resolver = bezier_curve_resolver<3>>
 struct curve {
-
-    // using resolver_control_points = curve_resolver::controls_count;
-
-    curve(const detail::enable_if_lerpable_t<value_t>& min, const value_t& max);
-
-    void test(std::array<value_t, curve_resolver::controls_count>& arr) { }
-
-    std::vector<std::pair<float, value_t>>& get_points();
-
-    const std::vector<std::pair<float, value_t>>& get_points() const;
-
-    value_t get_value(const float t);
+    curve(const curve_preset preset);
+    curve(const float departure, const float arrival, const std::vector<float2>& controls = {});
 
 private:
-    // internal::detail::curve_data& _data;
+    detail::curve_data _data;
+    template <typename value_t>
+    struct animation;
 };
 
 /// @brief
@@ -123,6 +103,8 @@ struct event {
 
 private:
     detail::event_impl<values_t...>& _impl;
+    template <typename value_t>
+    struct animation;
 };
 
 // template <typename... values_t>
@@ -132,7 +114,7 @@ private:
 /// @tparam value_t
 template <typename value_t>
 struct animation {
-    animation(const curve<value_t>& bezier_curve);
+    animation(const curve& bezier_curve);
     animation(const animation& other);
     animation& operator=(const animation& other);
     animation(animation&& other);
