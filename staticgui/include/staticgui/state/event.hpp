@@ -96,7 +96,6 @@ namespace detail {
 
     private:
         glue::registry _registry;
-        std::vector<std::reference_wrapper<event_data>> _roots;
     };
 
 }

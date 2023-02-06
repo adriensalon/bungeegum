@@ -21,14 +21,15 @@ namespace detail {
         event_impl<values_t...>& _event = _registry.create_component<event_impl<values_t...>>(_entity);
         event_data& _event_data = _registry.create_component<event_data>(_entity);
         _event_data.tick = [&]() {
-            for (auto& _future : _event.futures) {
-                if (_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+            // std::cout << "tick... !! \n";
+            for (auto _future_it = _event.futures.begin(); _future_it != _event.futures.end();) {
+                if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                     std::cout << "READY !! \n";
                     if constexpr (typename value_or_tuple<values_t...>::is_void()) {
                         for (auto& _callback : _event.callbacks)
                             _callback();
                     } else {
-                        typename value_or_tuple<values_t...>::type _vals = _future.get();
+                        typename value_or_tuple<values_t...>::type _vals = _future_it->get();
                         if constexpr (typename value_or_tuple<values_t...>::is_tuple()) {
                             for (auto& _callback : _event.callbacks)
                                 _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
@@ -37,7 +38,9 @@ namespace detail {
                                 _callback(std::forward<values_t>(_vals)...);
                         }
                     }
-                }
+                    _future_it = _event.futures.erase(_future_it);
+                } else
+                    _future_it++;
             }
             for (auto& _shared_future : _event.shared_futures) {
                 if (_shared_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
@@ -46,7 +49,6 @@ namespace detail {
             }
         };
         (_event_data.kinds.emplace_back(typeid(values_t)), ...);
-        _roots.emplace_back(_event_data);
         return _event;
     }
 
