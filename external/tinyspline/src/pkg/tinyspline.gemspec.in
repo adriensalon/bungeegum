@@ -1,0 +1,15 @@
+puts(`@CMAKE_COMMAND@ --build . --target @TINYSPLINE_RUBY_CMAKE_TARGET@ --config Release`)
+
+Gem::Specification.new do |spec|
+  spec.name        = '@TINYSPLINE_PACKAGE_NAME@@RUBY_VERSION_MAJOR@@RUBY_VERSION_MINOR@'
+  spec.version     = '@TINYSPLINE_VERSION@'
+  spec.authors     = ["@TINYSPLINE_AUTHOR@"]
+  spec.email       = '@TINYSPLINE_MAIL@'
+  spec.summary     = "@TINYSPLINE_SUMMARY@"
+  spec.description = "@TINYSPLINE_DESCRIPTION@"
+  spec.files       = @TINYSPLINE_GEM_FILES@
+  spec.homepage    = '@TINYSPLINE_URL@'
+  spec.license     = '@TINYSPLINE_LICENSE@'
+  spec.platform    = '@TINYSPLINE_RUBY_PLATFORM@'
+  spec.required_ruby_version = '~> @TINYSPLINE_RUBY_REQ_VERSION@'
+end

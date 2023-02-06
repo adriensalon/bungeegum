@@ -12,6 +12,7 @@ project(staticgui)
 set(staticgui_source
 
 	"source/glue/backtrace.cpp"
+	"source/glue/bspline.cpp"
 	"source/glue/console.cpp"
 	"source/glue/registry.cpp"
 	"source/glue/renderer.cpp"
@@ -36,6 +37,8 @@ set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(staticgui backward)
 target_link_libraries(staticgui imgui)
+target_link_libraries(staticgui implot)
+target_link_libraries(staticgui tinysplinecxx)
 target_link_libraries(staticgui SDL2-static)
 target_link_libraries(staticgui EnTT)
 target_link_libraries(staticgui vectorclass)

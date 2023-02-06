@@ -10,14 +10,93 @@
 #pragma once
 
 #include <imgui.h>
+#include <imgui_internal.h>
+#include <implot.h>
 #include <iostream>
 
 #include <staticgui/glue/backtrace.hpp>
+#include <staticgui/glue/bspline.hpp>
 #include <staticgui/state/context.hpp>
 #include <staticgui/state/errors.hpp>
 
 namespace staticgui {
 namespace detail {
+
+    void draw_bezier()
+    {
+        // ImPlot::ShowDemoWindow();
+        if (ImGui::Begin("Bezier")) {
+
+            std::vector<float> controls = { 100.f, -100.f,
+                -100.f, 200.f,
+                100.f, 400.f,
+                400.f, 300.f,
+                700.f, 500.f };
+            std::vector<glue::simd_array<float, 2>> controls2 = std::vector<glue::simd_array<float, 2>> {
+                std::array<float, 2> { 100.f, -100.f },
+                std::array<float, 2> { -100.f, 200.f },
+                std::array<float, 2> { 100.f, 400.f },
+                std::array<float, 2> { 400.f, 300.f },
+                std::array<float, 2> { 700.f, 500.f }
+            };
+
+            auto controls3 = std::vector<glue::simd_array<float, 2>> {
+                std::array<float, 2> { 0.25f, 0.15f },
+                std::array<float, 2> { 0.75f, 0.85f }
+            };
+
+            auto _spl = glue::bspline(0.f, 1.f, controls3); //controls2);
+            std::vector<float> kkk = _spl.get_strided_samples(100);
+            std::cout << "eval t = 0.6, y = " << _spl.get_eval(0.6f) << std::endl;
+
+            if (ImPlot::BeginPlot("##StatsGraphTitle", ImGui::GetContentRegionAvail())) {
+                //     if (state.train_flow_index() > 0) {
+                //         std::vector<float> x(state.train_flow_index());
+                //         for (int k = 0; k < state.train_flow_index(); k++)
+                //             x[k] = k + 1;
+                //         auto xptr = x.data();
+                // ImPlot::PlotScatter("pp", controls.data(), &(controls[1]), 5, 0, 0, 2 * sizeof(float));
+                ImPlot::PlotLine("gan loss", kkk.data(), &(kkk[1]), 100, 0, 0, 2 * sizeof(float));
+                //         ImPlot::PlotLine("L1 loss", xptr, state.train_stats().get_l1_loss_data(), state.train_flow_index());
+                //         ImPlot::PlotLine("real loss", xptr, state.train_stats().get_real_loss_data(), state.train_flow_index());
+                //         ImPlot::PlotLine("fake loss", xptr, state.train_stats().get_fake_loss_data(), state.train_flow_index());
+
+                ImPlot::EndPlot();
+            }
+            ImGui::End();
+        }
+    }
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
 
     bool context_state::tick(const float delta_milliseconds)
     {
@@ -89,6 +168,7 @@ namespace detail {
                 });
                 ImGui::End();
             }
+            draw_bezier();
         }
     }
 }

@@ -1,0 +1,620 @@
+name: Continuous Integration
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        shared: [On, Off]
+        float: [On, Off]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install System Tools
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt update -y
+        sudo apt install -y valgrind
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DTINYSPLINE_FLOAT_PRECISION=${{ matrix.float }}
+
+    - name: Configure Installation
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            cmake -DCMAKE_INSTALL_PREFIX=~/tinyspline -DTINYSPLINE_INSTALL_LIBRARY_DIR=lib .
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+            cmake -DCMAKE_INSTALL_PREFIX=C:/tinyspline -DTINYSPLINE_INSTALL_LIBRARY_DIR=lib .
+        else
+            cmake -DCMAKE_INSTALL_PREFIX=~/tinyspline .
+        fi
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: ctest -C $BUILD_TYPE
+
+    - name: Check Memory Consistency
+      if: runner.os == 'Linux'
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cmake --build . --target memcheck --config $BUILD_TYPE
+
+    - name: Install
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cmake --build . --target install --config $BUILD_TYPE
+
+    - name: Test CMake Installation
+      shell: bash
+      run: |
+        mkdir $GITHUB_WORKSPACE/test/pkg/build
+        cd $GITHUB_WORKSPACE/test/pkg/build
+        if [ "$RUNNER_OS" == "Windows" ]; then
+            cmake -DCMAKE_PREFIX_PATH=C:/tinyspline ..
+        else
+            cmake -DCMAKE_PREFIX_PATH=~/tinyspline ..
+        fi
+        cmake --build . --config $BUILD_TYPE
+        ctest -C $BUILD_TYPE
+
+    - name: Test Pkg-config Installation
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/test/pkg
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            PKG_CONFIG_PATH=~/tinyspline/lib/pkgconfig make test
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+            PKG_CONFIG_PATH=~/tinyspline/lib64/pkgconfig make test
+        fi
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/tools/ci
+        ./build.sh
+
+    - name: Deploy
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker
+        path: ${{runner.workspace}}/${{github.event.repository.name}}/tools/ci/build
+        if-no-files-found: error
+
+  lua:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+        luaVersion: ["5.1", "5.2", "5.3", "5.4"]
+
+    steps:
+    - uses: actions/checkout@master
+    - uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: ${{ matrix.luaVersion }}
+    - uses: leafo/gh-actions-luarocks@v4
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTINYSPLINE_ENABLE_LUA=True -DLUA_INCLUDE_DIR="$GITHUB_WORKSPACE/.lua/include" -DLUA_LIBRARIES="$GITHUB_WORKSPACE/.lua/lib/liblua.a"
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: luarocks make --pack-binary-rock
+
+    - name: OTool
+      if: runner.os == 'macOS'
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: otool -L lib/*tinysplinelua*
+
+    - name: Deploy
+      uses: actions/upload-artifact@v3
+      with:
+        name: lua-${{ matrix.luaVersion }}-${{ matrix.os }}_amd64
+        path: ${{runner.workspace}}/build/*.rock
+        if-no-files-found: error
+
+  macos:
+    needs: build
+    runs-on: [macos-latest]
+    strategy:
+      matrix:
+        arch: ["x86_64", "arm64", "x86_64;arm64"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v3
+      if: matrix.arch == 'arm64'
+      with:
+        distribution: temurin
+        java-version: 11
+        architecture: aarch64
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" -DTINYSPLINE_ENABLE_CSHARP=True -DTINYSPLINE_ENABLE_GO=True
+        if [ "${{ matrix.arch }}" == "x86_64" ]; then
+           export JAVA_HOME=$JAVA_HOME_8_X64
+        fi
+        if [ "${{ matrix.arch }}" == "x86_64" ] || [ "${{ matrix.arch }}" == "arm64" ]; then
+           cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTINYSPLINE_ENABLE_JAVA=True -DJava_JAVAC_EXECUTABLE="$JAVA_HOME_8_X64/bin/javac" -DJava_JAR_EXECUTABLE="$JAVA_HOME_8_X64/bin/jar"
+        fi
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: |
+        cmake --build . --target tinysplinecsharp --config $BUILD_TYPE
+        dotnet pack *.csproj
+        cmake --build . --target tinysplinego
+        if [ -f "pom.xml" ]; then
+           JAVA_HOME=$JAVA_HOME_8_X64 mvn package
+        fi
+
+    - name: OTool
+      if: matrix.arch == 'x86_64' || matrix.arch == 'arm64'
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: otool -L lib/*tinysplinejava*
+
+    - name: Deploy
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos_${{ matrix.arch }}
+        path: |
+          ${{runner.workspace}}/build/*.nupkg
+          ${{runner.workspace}}/build/tinyspline-go.zip
+          ${{runner.workspace}}/build/target/*.jar
+        if-no-files-found: error
+
+  python:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+        python: ["2.7", "3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install System Tools
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+            choco install swig
+        fi
+        python -m pip install -U pip setuptools
+        python -m pip install wheel
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        INCLUDE_DIR=$(python -c "from sysconfig import get_paths; print(get_paths()['include'])")
+        if [ "$RUNNER_OS" == "Windows" ]; then
+            LIBRARY=$INCLUDE_DIR/../libs/python$(echo ${{ matrix.python }} | cut  -d'.' -f1-2 | tr -d '.').lib
+            cmake $GITHUB_WORKSPACE -A x64 -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        else
+            LIBRARY=($INCLUDE_DIR/../../lib/*.dylib)
+        fi
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTINYSPLINE_ENABLE_PYTHON=True -DPYTHON_INCLUDE_DIR="$INCLUDE_DIR" -DPYTHON_LIBRARY="$LIBRARY"
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: python setup.py bdist_wheel
+
+    - name: OTool
+      if: runner.os == 'macOS'
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: otool -L lib/*tinysplinepython*
+
+    - name: Deploy
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-${{ matrix.python }}-${{ matrix.os }}_amd64
+        path: ${{runner.workspace}}/build/dist/*.whl
+        if-no-files-found: error
+
+  ruby:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0', '3.1', '3.2']
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        RUBY_EXECUTABLE=$(ruby -e "puts(RbConfig.ruby)")
+        INCLUDE_DIR=$(ruby -e "puts(RbConfig::CONFIG['rubyhdrdir'])")
+        CONFIG_DIR=$(ruby -e "puts(RbConfig::CONFIG['rubyarchhdrdir'])")
+        LIBRARY=$(ruby -e "puts(RbConfig::CONFIG['libdir'])")
+        LIBRARY=$LIBRARY/$(ruby -e "puts(RbConfig::CONFIG['LIBRUBY'])")
+        CXXFLAGS="-Wno-reserved-user-defined-literal -fms-extensions" cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTINYSPLINE_ENABLE_RUBY=True -DRuby_EXECUTABLE="$RUBY_EXECUTABLE" -DRuby_INCLUDE_DIR="$INCLUDE_DIR" -DRuby_CONFIG_INCLUDE_DIR="$CONFIG_DIR" -DRuby_LIBRARY="$LIBRARY"
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: gem build *.gemspec
+
+    - name: OTool
+      if: runner.os == 'macOS'
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: otool -L lib/*tinysplineruby*
+
+    - name: Deploy
+      uses: actions/upload-artifact@v3
+      with:
+        name: ruby-${{ matrix.ruby }}-${{ matrix.os }}_amd64
+        path: |
+          ${{runner.workspace}}/build/*.gem
+          ${{runner.workspace}}/build/*.gemspec
+        if-no-files-found: error
+
+  uwp:
+    needs: build
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [ARM, ARM64]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install System Tools
+      shell: bash
+      run: |
+        choco install swig
+        choco install nuget.commandline
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -A ${{ matrix.arch }} -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION="10.0" -DTINYSPLINE_ENABLE_CSHARP=True
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: |
+        cmake --build . --config $BUILD_TYPE
+        dotnet pack *.csproj
+
+    - name: Deploy
+      uses: actions/upload-artifact@v3
+      with:
+        name: uwp_${{ matrix.arch }}
+        path: ${{runner.workspace}}/build/*.nupkg
+        if-no-files-found: error
+
+  package:
+    needs: [docker, lua, macos, python, ruby, uwp]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download Packages
+      uses: actions/download-artifact@v3
+      with:
+        path: tools/ci/actions
+
+    - name: Prepare Downloaded Packages
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/tools/ci
+        mkdir build
+        mv actions/docker/* build
+        mkdir -p build/macosx64
+        find actions -name '*win_amd64.whl' -exec mv {} build/windows64 \;
+        find actions -name '*darwin*.gem' -exec mv {} build/macosx64 \; -printf "%h\n" | xargs -I[] find [] -name '*.gemspec' -exec mv {} build/macosx64 \;
+        find actions/macos_x86_64 -name '*go.zip' -exec mv {} build/macosx64 \;
+        find actions/macos_x86_64 -name '*.jar' -exec mv {} build/macosx64 \;
+        find actions/macos_x86_64 -name '*.nupkg' -exec mv {} build/macosx64 \;
+        find actions -name '*macosx-x86_64.rock' -exec mv {} build/macosx64 \;
+        find actions -name '*macosx*_x86_64.whl' -exec mv {} build/macosx64 \;
+        find actions -name '*macosx*_universal2.whl' -exec mv {} build/macosx64 \;
+        tree .
+
+    - name: Create Releases
+      shell: bash
+      run: |
+        sudo apt-get install luarocks
+        cd $GITHUB_WORKSPACE/tools/ci
+        ./package.sh
+
+    - name: Deploy
+      uses: actions/upload-artifact@v3
+      with:
+        name: tinyspline
+        path: ${{runner.workspace}}/${{github.event.repository.name}}/tools/ci/tinyspline/
+        if-no-files-found: error
+
+  test-csharp:
+    needs: [package]
+    runs-on: ${{ matrix.os }}
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Download Packages
+      uses: actions/download-artifact@v3
+      with:
+        path: packages
+
+    - name: Install Package
+      shell: bash
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build
+        find $GITHUB_WORKSPACE/packages/tinyspline -name '*.nupkg' -exec cp {} $GITHUB_WORKSPACE/build \;
+
+    - name: Run Tests
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/test/csharp
+        dotnet test
+
+  test-go:
+    needs: [package]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        go: ["1.13", "1.14", "1.15", "1.16", "1.17", "1.18", "1.19"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go }}
+
+    - name: Download Packages
+      uses: actions/download-artifact@v3
+      with:
+        path: packages
+
+    - name: Install Package
+      shell: bash
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build/lib
+        cd $GITHUB_WORKSPACE/build/lib
+        unzip -d . $GITHUB_WORKSPACE/packages/tinyspline/tinyspline-go.zip
+
+    - name: Run Tests
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/test/go
+        go test
+
+  test-java:
+    needs: [package]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: ["11", "17"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v3
+      with:
+        distribution: "adopt"
+        java-version: ${{ matrix.java }}
+
+    - name: Download Packages
+      uses: actions/download-artifact@v3
+      with:
+        path: packages
+
+    - name: Install Package
+      shell: bash
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build/lib
+        cd $GITHUB_WORKSPACE/build/lib
+        unzip -d . $GITHUB_WORKSPACE/packages/tinyspline/tinyspline-java.zip
+        find . -name "*[0-9].jar" -exec mv {} tinyspline.jar \;
+
+    - name: Run Tests
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/test/java
+        mvn test
+        mvn test
+        find  ~/.tinyspline/ -type f -exec bash -c 'cat "$1" "$1" > "$1"' find-sh {} \;
+        mvn test
+
+  test-lua:
+    needs: [package]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        luaVersion: ["5.1", "5.2", "5.3", "5.4", "luajit"]
+        exclude:
+          - os: macos-latest
+            luaVersion: 5.1
+          - os: macos-latest
+            luaVersion: luajit
+
+    steps:
+    - uses: actions/checkout@master
+    - uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: ${{ matrix.luaVersion }}
+    - uses: leafo/gh-actions-luarocks@v4
+
+    - name: Download Packages
+      uses: actions/download-artifact@v3
+      with:
+        path: packages
+
+    - name: Install Package
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/packages/tinyspline
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            find . -name "*linux-x86_64.rock" -exec luarocks install {} \;
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+            find . -name "*windows-x86_64.rock" -exec luarocks install {} \;
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+            find . -name "*macosx-x86_64.rock" -exec luarocks install {} \;
+        fi
+
+    - name: Run Tests
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/test/lua
+        lua tests.lua
+
+  test-python:
+    needs: [package]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["2.7", "3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Download Packages
+      uses: actions/download-artifact@v3
+      with:
+        path: packages
+
+    - name: Install Package
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/packages/tinyspline
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            find . -name "*$(python -c "import platform; print(''.join(platform.python_version_tuple()[0:2]))")*linux*.whl" -exec python -m pip install {} \;
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+            find . -name "*$(python -c "import platform; print(''.join(platform.python_version_tuple()[0:2]))")*win*.whl" -exec python -m pip install {} \;
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+            export SYSTEM_VERSION_COMPAT=0
+            find . -name "*$(python -c "import platform; print(''.join(platform.python_version_tuple()[0:2]))")*macosx*.whl" -exec python -m pip install {} \;
+        fi
+
+    - name: Run Tests
+      shell: bash
+      run: python $GITHUB_WORKSPACE/test/python/tests.py
+
+  test-ruby:
+    needs: [package]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0', '3.1', '3.2']
+        exclude:
+          - os: windows-latest
+            ruby: 2.3
+          - os: windows-latest
+            ruby: 2.4
+          - os: windows-latest
+            ruby: 2.5
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+
+    - name: Download Packages
+      uses: actions/download-artifact@v3
+      with:
+        path: packages
+
+    - name: Install Package
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/packages/tinyspline
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            find . -name "*linux*.gem" -exec gem install {} \;
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+            find . -name "*mingw*.gem" -exec gem install {} \;
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+            find . -name "*darwin*.gem" -exec gem install {} \;
+        fi
+
+    - name: Run Tests
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE/test/ruby
+        ruby tests.rb

@@ -1,0 +1,9 @@
+bin
+build
+.idea
+cmake-build-debug
+*~
+*.swp
+*.swo
+compile_commands.json
+.cache

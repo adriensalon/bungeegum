@@ -1,0 +1,242 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0308
+header_name {.h}
+code_name {.cxx}
+Function {make_window()} {open
+} {
+  Fl_Window {} {open selected
+    xywh {2324 294 900 600} type Double visible
+  } {
+    Fl_Tabs {} {open
+      xywh {10 10 880 585}
+    } {
+      Fl_Group {} {
+        label Eval open
+        xywh {25 35 865 560}
+      } {
+        Fl_Box eval {
+          xywh {25 50 525 525}
+          code0 {\#include "eval.h"}
+          class Eval
+        }
+        Fl_Group {} {open
+          xywh {580 50 300 525}
+        } {
+          Fl_Value_Slider evalKnot {
+            label Knot
+            callback {eval->knot(((Fl_Slider *)o)->value());
+eval->redraw();}
+            xywh {580 50 300 25} type Horizontal
+            code0 {evalKnot->value(eval->knot());}
+          }
+          Fl_Light_Button evalAutoplay {
+            label Autoplay
+            callback {if (((Fl_Button *)o)->value())
+	Fl::add_timeout(0.01, evalAutoplay_cb);
+else
+	Fl::remove_timeout(evalAutoplay_cb)}
+            xywh {580 105 300 25}
+          }
+          Fl_Light_Button evalShowNet {
+            label {Show De Boor control net}
+            callback {eval->drawNet(((Fl_Button *)o)->value());
+eval->redraw();}
+            xywh {580 150 300 25}
+            code0 {evalShowNet->value(eval->drawNet());}
+          }
+          Fl_Value_Slider evalDegree {
+            label Degree
+            callback {eval->degree(((Fl_Slider *)o)->value());
+eval->redraw();}
+            xywh {580 200 300 25} type Horizontal
+            code0 {evalDegree->step(1);}
+            code1 {evalDegree->minimum(0);}
+            code2 {evalDegree->maximum(6);}
+            code3 {evalDegree->value(eval->degree());}
+          }
+          Fl_Text_Display evalInfo {
+            label Info
+            xywh {580 275 300 300} box THIN_DOWN_FRAME
+            code0 {evalInfo->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);}
+          }
+        }
+      }
+      Fl_Group {} {
+        label Sample open
+        xywh {25 35 865 560} hide
+      } {
+        Fl_Box sample {
+          xywh {25 50 525 525}
+          code0 {\#include "sample.h"}
+          class Sample
+        }
+        Fl_Group {} {open
+          xywh {579 50 301 525}
+        } {
+          Fl_Value_Slider sampleNum {
+            label Samples
+            callback {sample->num(((Fl_Slider *)o)->value());
+sample->redraw();}
+            xywh {580 50 300 25} type Horizontal
+            code0 {sampleNum->step(1);}
+            code1 {sampleNum->minimum(0);}
+            code2 {sampleNum->maximum(100);}
+            code3 {sampleNum->value(sample->num());}
+          }
+          Fl_Group {} {
+            label {Knot vector:} open
+            xywh {670 92 209 45} align 4
+          } {
+            Fl_Round_Button sampleClamped {
+              label Clamped
+              callback {sample->knotVector(tinyspline::BSpline::Type::Clamped);
+eval->redraw();}
+              xywh {684 105 82 20} type Radio down_box ROUND_DOWN_BOX
+              code0 {sampleClamped->value(sample->knotVector() == tinyspline::BSpline::Type::Clamped);}
+            }
+            Fl_Round_Button sampleOpened {
+              label Opened
+              callback {sample->knotVector(tinyspline::BSpline::Type::Opened);
+eval->redraw();}
+              xywh {787 105 77 20} type Radio down_box ROUND_DOWN_BOX
+              code0 {sampleOpened->value(sample->knotVector() == tinyspline::BSpline::Type::Opened);}
+            }
+          }
+          Fl_Light_Button sampleShowPoints {
+            label {Show sampled points}
+            callback {sample->drawPoints(((Fl_Button *)o)->value());
+sample->redraw();}
+            xywh {580 143 300 25}
+            code0 {sampleShowPoints->value(sample->drawPoints());}
+          }
+          Fl_Light_Button sampleShowControlPoints {
+            label {Show control points}
+            callback {sample->drawControlPoints(((Fl_Button *)o)->value());
+sample->redraw();}
+            xywh {580 188 300 25}
+            code0 {sampleShowControlPoints->value(sample->drawControlPoints());}
+          }
+          Fl_Text_Display sampleInfo {
+            label Info
+            xywh {580 275 300 300} box THIN_DOWN_FRAME
+            code0 {sampleInfo->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);}
+          }
+        }
+      }
+      Fl_Group {} {
+        label Interpolation open
+        xywh {25 35 865 560} hide
+      } {
+        Fl_Box interpolation {
+          xywh {25 50 525 525}
+          code0 {\#include "interpolation.h"}
+          class Interpolation
+        }
+        Fl_Group {} {open
+          xywh {579 50 301 525}
+        } {
+          Fl_Light_Button interpolationCubicNatural {
+            label {Cubic Natural}
+            callback {interpolation->drawCubicNatural(((Fl_Button *)o)->value());
+interpolation->redraw();}
+            xywh {580 50 300 25}
+            code0 {interpolationCubicNatural->value(interpolation->drawCubicNatural());}
+          }
+          Fl_Light_Button interpolationCatmullRom {
+            label {Catmull-Rom}
+            callback {interpolation->drawCatmullRom(((Fl_Button *)o)->value());
+interpolation->redraw();}
+            xywh {580 95 300 25}
+            code0 {interpolationCatmullRom->value(interpolation->drawCatmullRom());}
+          }
+          Fl_Value_Slider interpolationAlpha {
+            label alpha
+            callback {interpolation->alpha(((Fl_Slider *)o)->value());
+interpolation->redraw();}
+            xywh {670 130 210 25} type Horizontal align 4 value 0.5
+            code0 {interpolationAlpha->value(interpolation->alpha());}
+          }
+          Fl_Button interpolationReset {
+            label Reset
+            callback {interpolation->reset();
+interpolationAlpha->value(interpolation->alpha());
+interpolation->redraw();}
+            xywh {735 221 145 25}
+          }
+          Fl_Text_Display interpolationInfo {
+            label Info
+            xywh {580 275 300 300} box THIN_DOWN_FRAME
+            code0 {interpolationInfo->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);}
+          }
+        }
+      }
+      Fl_Group {} {
+        label Frames
+        xywh {25 35 865 560} hide
+      } {
+        Fl_Box frames {
+          xywh {25 50 525 525}
+          code0 {\#include "frames.h"}
+          class Frames
+        }
+        Fl_Group {} {open
+          xywh {580 50 300 525}
+        } {
+          Fl_Value_Slider framesKnot {
+            label Knot
+            callback {frames->knot(((Fl_Slider *)o)->value());
+frames->redraw();}
+            xywh {580 50 300 25} type Horizontal
+            code0 {framesKnot->value(frames->knot());}
+          }
+          Fl_Light_Button framesAutoplay {
+            label Autoplay
+            callback {if (((Fl_Button *)o)->value())
+	Fl::add_timeout(0.01, framesAutoplay_cb);
+else
+	Fl::remove_timeout(framesAutoplay_cb)}
+            xywh {580 105 300 25}
+          }
+          Fl_Text_Display framesInfo {
+            label Info
+            xywh {580 275 300 300} box THIN_DOWN_FRAME
+            code0 {framesInfo->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);}
+          }
+        }
+      }
+    }
+  }
+  code {Fl_Text_Buffer *evalBuff = new Fl_Text_Buffer();
+evalInfo->buffer(evalBuff);
+evalBuff->append("Spline evaluation is one of the most essential functions as it forms the basis for many other functions.");
+evalBuff->append("\\n\\nThe result of an evaluation is a so-called 'De Boor control net'. It stores the evaluated point as well as all points that were part of the calucation process.");
+evalBuff->append("\\n\\nUse the knot slider to evaluate the spline on the left at a certain knot. The degree of the spline can be changed with the degree slider.");} {}
+  code {Fl_Text_Buffer *sampleBuff = new Fl_Text_Buffer();
+sampleInfo->buffer(sampleBuff);
+sampleBuff->append("Splines can be approximated as polyline (a chain of lines) by evaluating consecutive points. The more points are evaluated, the more precise the approximation becomes.");
+sampleBuff->append("\\n\\nThe multiple evaluation of a spline, so as to approximate it as polyline, is also known as sampling. In this context, resolution means the number of points to be evaluated.");
+sampleBuff->append("\\n\\nUse the samples slider to sample the spline on the left with the specified resolution. Whether the spline should touch its first and last control points can be set with the knot vector toggle.");} {}
+}
+
+Function {evalAutoplay_cb(void *)} {open
+} {
+  code {double val = evalKnot->value();
+val += 0.001;
+if (val > evalKnot->maximum())
+	val = evalKnot->minimum();
+evalKnot->value(val);
+evalKnot->do_callback();
+if (evalAutoplay->value())
+	Fl::repeat_timeout(0.01, evalAutoplay_cb);} {}
+}
+
+Function {framesAutoplay_cb(void *)} {} {
+  code {double val = framesKnot->value();
+val += 0.001;
+if (val > framesKnot->maximum())
+	val = framesKnot->minimum();
+framesKnot->value(val);
+framesKnot->do_callback();
+if (framesAutoplay->value())
+	Fl::repeat_timeout(0.01, framesAutoplay_cb);} {}
+}

@@ -60,6 +60,9 @@ namespace detail {
 
         unsigned int get_depth(event_data& data);
 
+        template <typename... values_t>
+        void trigger(event_impl<values_t...>& event, values_t&&... values);
+
     private:
         glue::registry _registry;
         std::vector<std::reference_wrapper<event_data>> _roots;

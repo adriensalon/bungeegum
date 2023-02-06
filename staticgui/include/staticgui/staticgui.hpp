@@ -48,9 +48,31 @@ struct color {
     color operator*(const float multiplier);
 };
 
-template <typename value_t>
+template <unsigned int order_t>
+struct bezier_curve_resolver {
+    constexpr static unsigned int controls_count = order_t + 1;
+
+    std::array<float2, controls_count>& get_controls();
+
+    // float evaluate(const float)
+};
+
+template <unsigned int order_t>
+struct bspline_curve_resolver {
+};
+
+template <unsigned int order_t>
+struct nurbs_curve_resolver {
+};
+
+template <typename value_t, typename curve_resolver = bezier_curve_resolver<3>>
 struct curve {
+
+    // using resolver_control_points = curve_resolver::controls_count;
+
     curve(const detail::enable_if_lerpable_t<value_t>& min, const value_t& max);
+
+    void test(std::array<value_t, curve_resolver::controls_count>& arr) { }
 
     std::vector<std::pair<float, value_t>>& get_points();
 
@@ -59,7 +81,7 @@ struct curve {
     value_t get_value(const float t);
 
 private:
-    // internal::impl::curve_impl& _impl;
+    // internal::detail::curve_data& _data;
 };
 
 /// @brief
@@ -82,7 +104,7 @@ struct event {
 
     /// @brief
     /// @param ...values
-    void trigger(const values_t&... values) const;
+    event& trigger(const values_t&... values) const;
 
     // /// @brief
     // /// @param future_value
@@ -121,12 +143,8 @@ struct animation {
     /// @return
     animation& on_value_changed(const event<value_t>& value_changed_event);
 
-    // /// @brief
-    // /// @tparam other_value_t
-    // /// @param previous
-    // /// @return
-    // template <typename other_value_t>
-    // animation& start_after(const animation<other_value_t>& previous);
+    // pareil pour les events ! :)
+    animation& detach(); // disables destructor, animation will be claimed at program exit
 
     /// @brief
     void start();

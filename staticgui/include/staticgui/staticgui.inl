@@ -115,44 +115,10 @@ void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_ca
 }
 
 template <typename widget_t>
-void launch(widget_t& widget)
-{
-    detail::state.context.widgets.declare_root(widget);
-
-    // std::cout << "application" << std::endl;
-    // detail::state.context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
-    //     unsigned int _depth = detail::state.context.widgets.get_depth(_widget_data);
-    //     for (unsigned int _k = 0; _k < _depth; _k++)
-    //         std::cout << "   ";
-    //     std::cout << "|__ ";
-    //     std::cout << _widget_data.kind->name();
-    //     if (_widget_data.drawer)
-    //         std::cout << " [painter]";
-    //     std::cout << std::endl;
-    // });
-
-    // detail::state.context.events.iterate_datas([&](detail::event_data& _event_data) {
-    //     std::cout << "- event <";
-    //     for (auto& _k : _event_data.kinds)
-    //         std::cout << _k.name() << ", ";
-    //     std::cout << "> \n";
-    // });
-
-    // detail::state.context.animations.iterate_datas([&](detail::animation_data& _animation_data) {
-    //     std::cout << "- animation <";
-    //     std::cout << _animation_data.kind->name() << "> \n";
-    // });
-
-    // while (true) {
-    //     print_tree<widget_impl*>(widgets_ptrs_container);
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    // }
-
-    detail::state.launch(widget);
-}
+void launch(widget_t& widget) { detail::state.launch(widget); }
 
 template <typename widget_t>
-std::function<void()> attach(widget_t& widget) { return detail::host.attach(widget); }
+std::function<void()> attach(widget_t& widget) { return detail::state.attach(widget); }
 
 template <typename widget_t>
 context& context::destroy(widget_t& widget, const bool destroy_children)
@@ -206,24 +172,24 @@ namespace internal {
     }
 }
 
-template <typename value_t>
-curve<value_t>::curve(const detail::enable_if_lerpable_t<value_t>& min, const value_t& max)
+template <typename value_t, typename curve_resolver>
+curve<value_t, curve_resolver>::curve(const detail::enable_if_lerpable_t<value_t>& min, const value_t& max)
 // : _impl(internal::impl::_NO2)
 {
 }
 
-template <typename value_t>
-std::vector<std::pair<float, value_t>>& curve<value_t>::get_points()
+template <typename value_t, typename curve_resolver>
+std::vector<std::pair<float, value_t>>& curve<value_t, curve_resolver>::get_points()
 {
 }
 
-template <typename value_t>
-const std::vector<std::pair<float, value_t>>& curve<value_t>::get_points() const
+template <typename value_t, typename curve_resolver>
+const std::vector<std::pair<float, value_t>>& curve<value_t, curve_resolver>::get_points() const
 {
 }
 
-template <typename value_t>
-value_t curve<value_t>::get_value(const float t)
+template <typename value_t, typename curve_resolver>
+value_t curve<value_t, curve_resolver>::get_value(const float t)
 {
 }
 

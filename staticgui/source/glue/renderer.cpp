@@ -41,6 +41,7 @@
 
 #include <imgui.h>
 #include <imgui_impl_sdl.h>
+#include <implot.h>
 
 #include <ImGui/interface/ImGuiDiligentRenderer.hpp>
 #include <ImGui/interface/ImGuiImplDiligent.hpp>
@@ -80,6 +81,7 @@ namespace glue {
 
         const auto& SCDesc = _renderer_impl->swap_chain->GetDesc();
         _renderer_impl->imgui_renderer = std::make_unique<Diligent::ImGuiImplSDL>(existing_window.get_sdl_window(), _renderer_impl->render_device, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat);
+        ImPlot::CreateContext();
     }
 
     renderer::~renderer()
