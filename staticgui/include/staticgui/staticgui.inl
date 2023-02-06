@@ -107,14 +107,20 @@ event<values_t...>& event<values_t...>::on_trigger(const on_trigger_callback& tr
 template <typename... values_t>
 const event<values_t...>& event<values_t...>::trigger(values_t&&... values) const
 {
-    detail::state.context.events.trigger(_impl, std::forward<values_t>(values)...);
+    detail::state.context.events.trigger_values(_impl, std::forward<values_t>(values)...);
     return *this;
 }
 
-// FUTURE TRIGGER
 template <typename... values_t>
-void event<values_t...>::trigger(const std::future<typename detail::value_or_tuple<values_t...>::type>& future_value)
+void event<values_t...>::trigger(std::future<typename detail::value_or_tuple<values_t...>::type>&& future_value)
 {
+    detail::state.context.events.trigger_future_value(_impl, std::move(future_value));
+}
+
+template <typename... values_t>
+void event<values_t...>::trigger(const std::shared_future<typename detail::value_or_tuple<values_t...>::type>& shared_future_value)
+{
+    detail::state.context.events.trigger_shared_future_value(_impl, shared_future_value);
 }
 
 template <typename... values_t>

@@ -112,7 +112,11 @@ struct event {
 
     /// @brief
     /// @param future_value
-    void trigger(const std::future<typename detail::value_or_tuple<values_t...>::type>& future_value);
+    void trigger(std::future<typename detail::value_or_tuple<values_t...>::type>&& future_value);
+
+    /// @brief
+    /// @param future_value
+    void trigger(const std::shared_future<typename detail::value_or_tuple<values_t...>::type>& shared_future_value);
 
     /// @brief
     std::vector<on_trigger_callback>& trigger_callbacks();

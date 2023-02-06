@@ -10,11 +10,13 @@
 #pragma once
 
 #include <functional>
+#include <future>
 #include <optional>
 #include <typeindex>
 #include <vector>
 
 #include <staticgui/glue/registry.hpp>
+#include <staticgui/state/traits.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -24,9 +26,28 @@ namespace detail {
 
     template <typename... values_t>
     struct event_impl {
+        using future_type = typename value_or_tuple<values_t...>::type;
+
+        event_impl() { }
+        event_impl(const event_impl& other) = delete;
+        event_impl& operator=(const event_impl& other) = delete;
+        event_impl(event_impl&& other)
+        {
+            *this = std::move(other);
+        }
+        event_impl& operator=(event_impl&& other)
+        {
+            is_attached = other.is_attached;
+            callbacks = std::move(other.callbacks);
+            futures = std::move(other.futures);
+            shared_futures = std::move(other.shared_futures);
+            return *this;
+        }
+
         bool is_attached = true;
         std::vector<std::function<void(values_t...)>> callbacks;
-        // std::vector<std::future<std::tuple<values_t...>>> futures;
+        std::vector<std::future<future_type>> futures;
+        std::vector<std::shared_future<future_type>> shared_futures;
     };
 
     struct event_data {
@@ -65,7 +86,13 @@ namespace detail {
         unsigned int get_depth(event_data& data);
 
         template <typename... values_t>
-        void trigger(event_impl<values_t...>& event, values_t&&... values);
+        void trigger_values(event_impl<values_t...>& event, values_t&&... values);
+
+        template <typename... values_t>
+        void trigger_future_value(event_impl<values_t...>& event, std::future<typename value_or_tuple<values_t...>::type>&& future_value);
+
+        template <typename... values_t>
+        void trigger_shared_future_value(event_impl<values_t...>& event, const std::shared_future<typename value_or_tuple<values_t...>::type>& shared_future_value);
 
     private:
         glue::registry _registry;

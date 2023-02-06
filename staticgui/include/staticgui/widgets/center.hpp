@@ -34,18 +34,18 @@ namespace widgets {
         /// @brief
         /// @param factor
         /// @return
-        center_widget& width_factor(const value<float>& factor)
+        center_widget& width_factor(const float& factor)
         {
-            factor.assign(_width_factor);
+            // factor.assign(_width_factor);
             return *this;
         }
 
         /// @brief
         /// @param factor
         /// @return
-        center_widget& height_factor(const value<float>& factor)
+        center_widget& height_factor(const float& factor)
         {
-            factor.assign(_height_factor);
+            // factor.assign(_height_factor);
             return *this;
         }
 

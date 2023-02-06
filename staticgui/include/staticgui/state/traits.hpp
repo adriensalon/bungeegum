@@ -35,16 +35,25 @@ namespace detail {
 
     template <typename... multiple_t>
     struct value_or_tuple {
+        constexpr static bool is_void() { return false; }
+        constexpr static bool is_value() { return false; }
+        constexpr static bool is_tuple() { return true; }
         using type = std::tuple<multiple_t...>;
     };
 
     template <typename only_t>
     struct value_or_tuple<only_t> {
+        constexpr static bool is_void() { return false; }
+        constexpr static bool is_value() { return true; }
+        constexpr static bool is_tuple() { return false; }
         using type = only_t;
     };
 
     template <>
     struct value_or_tuple<> {
+        constexpr static bool is_void() { return true; }
+        constexpr static bool is_value() { return false; }
+        constexpr static bool is_tuple() { return false; }
         using type = void;
     };
 
