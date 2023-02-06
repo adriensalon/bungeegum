@@ -125,6 +125,22 @@ namespace detail {
     {
     }
 
+    template <typename... values_t, typename widget_t>
+    void widget_registry::attach_event(event_impl<values_t...>& event, widget_t& widget)
+    {
+        if (!event.is_attached)
+            event.rattach_callback();
+        event.is_attached = false;
+        event.detached_id = glue::generator::create();
+        widget_data& _data = get_data(widget);
+        _data.detached_events_removers.emplace(event.detached_id, [&]() {
+            event.~event_impl<values_t...>(); // destroy event with the widget
+        });
+        event.rattach_callback = [&]() {
+            _data.detached_events_removers.erase(event.detached_id);
+        };
+    }
+
     // template <typename parent_widget_t, typename widget_t>
     // std::optional<parent_widget_t&> _get_parent_widget(widget_t& widget)
     // {

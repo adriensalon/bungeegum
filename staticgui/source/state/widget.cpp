@@ -14,6 +14,32 @@
 namespace staticgui {
 namespace detail {
 
+    widget_data::widget_data() { }
+
+    widget_data::widget_data(widget_data&& other)
+    {
+        *this = std::move(other);
+    }
+
+    widget_data& widget_data::operator=(widget_data&& other)
+    {
+        is_built = other.is_built;
+        kind = std::move(other.kind);
+        resolver = std::move(other.resolver);
+        drawer = std::move(other.drawer);
+        command = std::move(other.command);
+        parent = std::move(other.parent);
+        children = std::move(other.children);
+        detached_events_removers = std::move(other.detached_events_removers);
+        return *this;
+    }
+
+    widget_data::~widget_data()
+    {
+        for (auto& _detached_event_remover : detached_events_removers)
+            _detached_event_remover.second();
+    }
+
     widget_registry::widget_registry()
     {
     }

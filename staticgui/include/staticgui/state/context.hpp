@@ -10,11 +10,11 @@
 #pragma once
 
 #include <staticgui/state/animation.hpp>
-#include <staticgui/state/event.hpp>
 #include <staticgui/state/layout.hpp>
 #include <staticgui/state/rendering.hpp>
 #include <staticgui/state/widget.hpp>
 
+#include <staticgui/state/event.hpp>
 namespace staticgui {
 namespace detail {
 

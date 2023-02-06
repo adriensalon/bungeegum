@@ -14,6 +14,8 @@
 
 #include <staticgui/glue/constexpr.hpp>
 #include <staticgui/glue/registry.hpp>
+#include <staticgui/state/animation.hpp>
+#include <staticgui/state/event.hpp>
 #include <staticgui/state/layout.hpp>
 #include <staticgui/state/rendering.hpp>
 
@@ -24,6 +26,13 @@ namespace detail {
     };
 
     struct widget_data {
+        widget_data();
+        widget_data(const widget_data& other) = delete;
+        widget_data& operator=(const widget_data&& other) = delete;
+        widget_data(widget_data&& other);
+        widget_data& operator=(widget_data&& other);
+        ~widget_data();
+
         bool is_built = false;
         std::unique_ptr<std::type_index> kind = nullptr;
         resolve_function resolver = nullptr;
@@ -31,6 +40,7 @@ namespace detail {
         std::optional<command_data> command = std::nullopt;
         std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<widget_data>> children = {};
+        std::unordered_map<glue::entity, std::function<void()>> detached_events_removers;
     };
 
     struct widget_registry {
@@ -85,6 +95,9 @@ namespace detail {
         void iterate_widgets(const std::function<void(widget_t&)>& iterate_callback);
 
         unsigned int get_depth(widget_data& data);
+
+        template <typename... values_t, typename widget_t>
+        void attach_event(event_impl<values_t...>& event, widget_t& widget);
 
     private:
         glue::registry _registry;

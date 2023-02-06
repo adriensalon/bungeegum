@@ -18,6 +18,22 @@ namespace glue {
 
     using entity = ENTT_ID_TYPE;
 
+    struct generator {
+        inline static entity create()
+        {
+            entity _retval = _max_entity;
+            _max_entity++;
+            return _retval;
+        }
+        inline static void destroy(const entity& ent)
+        {
+        }
+
+    private:
+        inline static entity _max_entity = 0;
+        inline static std::vector<entity> _deleted_entities;
+    };
+
     struct registry {
         registry();
         registry(const registry& other) = delete;
@@ -43,7 +59,7 @@ namespace glue {
         template <typename component_t, typename... args_t>
         decltype(auto) create_component(const entity entity, args_t&&... args);
 
-        // // destroy component
+        void destroy_entity_components(const entity ent);
 
         template <typename component_t>
         component_t& get_component(const entity entity);

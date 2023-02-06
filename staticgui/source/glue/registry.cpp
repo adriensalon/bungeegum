@@ -31,5 +31,11 @@ namespace glue {
     {
         return _registry.create();
     }
+
+    void registry::destroy_entity_components(const entity ent)
+    {
+        _registry.destroy(ent);
+    }
+
 }
 }

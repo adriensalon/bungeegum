@@ -78,7 +78,7 @@ event<values_t...>::~event()
 template <typename... values_t>
 event<values_t...>& event<values_t...>::attach()
 {
-    // TODO
+    detail::state.context.events.attach_to_wrapper(_impl);
     return *this;
 }
 
@@ -86,14 +86,14 @@ template <typename... values_t>
 template <typename widget_t>
 event<values_t...>& event<values_t...>::detach(widget_t& widget)
 {
-    // TODO
+    detail::state.context.widgets.attach_event(_impl, widget);
     return *this;
 }
 
 template <typename... values_t>
 event<values_t...>& event<values_t...>::detach()
 {
-    // TODO
+    detail::state.context.events.detach_to_registry(_impl);
     return *this;
 }
 

@@ -13,10 +13,12 @@
 #include <future>
 #include <optional>
 #include <typeindex>
+#include <unordered_map>
 #include <vector>
 
 #include <staticgui/glue/registry.hpp>
 #include <staticgui/state/traits.hpp>
+// #include <staticgui/state/widget.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -28,23 +30,15 @@ namespace detail {
     struct event_impl {
         using future_type = typename value_or_tuple<values_t...>::type;
 
-        event_impl() { }
+        event_impl();
         event_impl(const event_impl& other) = delete;
         event_impl& operator=(const event_impl& other) = delete;
-        event_impl(event_impl&& other)
-        {
-            *this = std::move(other);
-        }
-        event_impl& operator=(event_impl&& other)
-        {
-            is_attached = other.is_attached;
-            callbacks = std::move(other.callbacks);
-            futures = std::move(other.futures);
-            shared_futures = std::move(other.shared_futures);
-            return *this;
-        }
+        event_impl(event_impl&& other);
+        event_impl& operator=(event_impl&& other);
 
         bool is_attached = true;
+        glue::entity detached_id = 0;
+        std::function<void()> rattach_callback = nullptr;
         std::vector<std::function<void(values_t...)>> callbacks;
         std::vector<std::future<future_type>> futures;
         std::vector<std::shared_future<future_type>> shared_futures;
@@ -73,7 +67,7 @@ namespace detail {
         void destroy_event_and_data(const event_impl<values_t...>& event);
 
         template <typename... values_t>
-        event_data& get_data(event_impl<values_t...>& widget);
+        event_data& get_data(event_impl<values_t...>& event);
 
         template <typename... values_t>
         event_impl<values_t...>& get_event(event_data& data);
@@ -82,8 +76,6 @@ namespace detail {
 
         template <typename... values_t>
         void iterate_events(const std::function<void(event_impl<values_t...>&)>& iterate_callback);
-
-        unsigned int get_depth(event_data& data);
 
         template <typename... values_t>
         void trigger_values(event_impl<values_t...>& event, values_t&&... values);
@@ -94,8 +86,19 @@ namespace detail {
         template <typename... values_t>
         void trigger_shared_future_value(event_impl<values_t...>& event, const std::shared_future<typename value_or_tuple<values_t...>::type>& shared_future_value);
 
+        template <typename... values_t>
+        void attach_to_wrapper(event_impl<values_t...>& event);
+
+        // template <typename... values_t>
+        // void mark_detached_to_widget(event_impl<values_t...>& event, const std::function<void()>& detach_callback);
+
+        template <typename... values_t>
+        void detach_to_registry(event_impl<values_t...>& event);
+
     private:
         glue::registry _registry;
+        std::unordered_map<glue::entity, std::reference_wrapper<event_data>> _detached_events;
+        std::unordered_map<glue::entity, std::reference_wrapper<event_data>> _detached_events_to_widgets;
     };
 
 }
