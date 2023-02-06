@@ -54,6 +54,8 @@ enum struct curve_preset {
     bounce_in,
 };
 
+/// @brief Curve object
+/// @details Curves are represented by bsplines and can be created directly from control points.
 struct curve {
     curve(const curve_preset preset);
     curve(const float departure, const float arrival, const std::vector<float2>& controls = {});
@@ -64,27 +66,49 @@ private:
     struct animation;
 };
 
-/// @brief
+/// @brief Event objects
+/// @details
 /// @tparam ...values_t
 template <typename... values_t>
 struct event {
+
+    /// @brief
+    using on_trigger_callback = std::function<void(const values_t&...)>;
+
     event();
-    event(const std::function<void(values_t...)>& trigger_callback);
+    event(const on_trigger_callback& trigger_callback);
     event(const event& other);
     event& operator=(const event& other);
     event(event&& other);
     event& operator=(event&& other);
+    ~event();
 
-    /// @brief
+    /// @brief Transfers ownership of the underlying callback dispatcher back to this event object
+    /// @details This allows you to
+    event& attach();
+
+    /// @brief Transfers ownership of the underlying callback dispatcher to the specified widget
+    /// @details This allows you to let this event object exit scope without destroying its
+    /// callback dispatch subroutine. While an event is detached to a widget both will be destroyed
+    /// at the same time
+    /// @tparam widget_t
+    /// @param widget
+    template <typename widget_t>
+    event& detach(widget_t& widget);
+
+    /// @brief Transfers ownership of the underlying callback dispatcher to the internal registry
+    /// @details This allows you to let this event object exit scope without destroying its
+    /// callback dispatch subroutine. While an event is detached to the internal registry it will
+    /// be destroyed when the application terminates
+    event& detach();
+
+    /// @brief Emplaces a new callback that will be called
     /// @param trigger_callback
-    /// @return
-    event& on_trigger(const std::function<void(const values_t&...)>& trigger_callback);
+    event& on_trigger(const on_trigger_callback& trigger_callback);
 
-    event& clear();
-
-    /// @brief
+    /// @brief Triggers all contained callbacks
     /// @param ...values
-    event& trigger(const values_t&... values) const;
+    const event& trigger(values_t&&... values) const;
 
     // /// @brief
     // /// @param future_value
@@ -101,14 +125,17 @@ struct event {
     // template <typename = typename std::enable_if_t<sizeof...(values_t) >= 2>>
     // void trigger(const std::future<std::tuple<values_t...>>& future_value);
 
+    /// @brief
+    std::vector<on_trigger_callback>& trigger_callbacks();
+
+    /// @brief
+    const std::vector<on_trigger_callback>& trigger_callbacks() const;
+
 private:
     detail::event_impl<values_t...>& _impl;
     template <typename value_t>
     struct animation;
 };
-
-// template <typename... values_t>
-// event(const std::function<void(values_t...)>&) -> event<values_t...>;
 
 /// @brief
 /// @tparam value_t
@@ -119,6 +146,7 @@ struct animation {
     animation& operator=(const animation& other);
     animation(animation&& other);
     animation& operator=(animation&& other);
+    ~animation();
 
     /// @brief
     /// @param value_changed_event
@@ -132,6 +160,13 @@ struct animation {
     void start();
 
     void stop();
+
+    void attach();
+
+    template <typename widget_t>
+    void attach(widget_t& widget);
+
+    void detach2();
 
 private:
     detail::animation_impl<value_t>& _impl;

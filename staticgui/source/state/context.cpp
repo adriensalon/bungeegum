@@ -48,6 +48,9 @@ namespace detail {
             // auto _spl = glue::bspline(controls);
             auto _spl = glue::bspline(0.f, 1.f, controls3);
             std::vector<float> kkk = _spl.get_strided_samples(100);
+            static float _t = 0.f;
+            _t += 0.001f;
+            ImGui::DragFloat("heyy", &_t);
 
             if (ImPlot::BeginPlot("##StatsGraphTitle", ImGui::GetContentRegionAvail())) {
                 //     if (state.train_flow_index() > 0) {
@@ -55,8 +58,6 @@ namespace detail {
                 //         for (int k = 0; k < state.train_flow_index(); k++)
                 //             x[k] = k + 1;
                 //         auto xptr = x.data();
-                static float _t = 0.f;
-                _t += 0.001f;
 
                 auto _tp = _spl.get_eval(_t);
 

@@ -24,6 +24,7 @@ namespace detail {
 
     template <typename... values_t>
     struct event_impl {
+        bool is_attached = true;
         std::vector<std::function<void(values_t...)>> callbacks;
         // std::vector<std::future<std::tuple<values_t...>>> futures;
     };
@@ -46,6 +47,9 @@ namespace detail {
 
         template <typename... values_t>
         event_impl<values_t...>& make_event_and_data();
+
+        template <typename... values_t>
+        void destroy_event_and_data(const event_impl<values_t...>& event);
 
         template <typename... values_t>
         event_data& get_data(event_impl<values_t...>& widget);

@@ -26,9 +26,16 @@ namespace detail {
     }
 
     template <typename... values_t>
+    void event_registry::destroy_event_and_data(const event_impl<values_t...>& event)
+    {
+        glue::entity _entity = _registry.get_entity(event);
+        // _registry. DESTROY
+    }
+
+    template <typename... values_t>
     void event_registry::trigger(event_impl<values_t...>& event, values_t&&... values)
     {
-        for (auto& _callback : callbacks)
+        for (auto& _callback : event.callbacks)
             _callback(std::forward<values_t>(values)...);
     }
 }

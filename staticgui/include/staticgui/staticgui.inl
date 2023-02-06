@@ -11,6 +11,9 @@
 
 namespace staticgui {
 
+template <typename... values_t>
+event(std::function<void(values_t...)>) -> event<values_t...>;
+
 namespace detail {
     inline static host_state state;
 
@@ -26,11 +29,132 @@ namespace detail {
 
 }
 
+// EVENT
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+#pragma region event
 template <typename... values_t>
-event<values_t...>::event(const std::function<void(values_t...)>& trigger_callback)
+event<values_t...>::event()
     : _impl(detail::state.context.events.make_event_and_data<values_t...>())
 {
 }
+
+template <typename... values_t>
+event<values_t...>::event(const on_trigger_callback& trigger_callback)
+    : _impl(detail::state.context.events.make_event_and_data<values_t...>())
+{
+    _impl.callbacks.push_back(trigger_callback);
+}
+
+template <typename... values_t>
+event<values_t...>::event(const event& other)
+{
+    *this = other;
+}
+
+template <typename... values_t>
+event<values_t...>& event<values_t...>::operator=(const event& other)
+{
+    _impl = other._impl;
+    return *this;
+}
+
+template <typename... values_t>
+event<values_t...>::event(event&& other)
+{
+    *this = std::move(other);
+}
+
+template <typename... values_t>
+event<values_t...>& event<values_t...>::operator=(event<values_t...>&& other)
+{
+    _impl = std::move(other._impl);
+    return *this;
+}
+
+template <typename... values_t>
+event<values_t...>::~event()
+{
+    if (_impl.is_attached)
+        detail::state.context.events.destroy_event_and_data(_impl);
+}
+
+template <typename... values_t>
+event<values_t...>& event<values_t...>::attach()
+{
+    // TODO
+    return *this;
+}
+
+template <typename... values_t>
+template <typename widget_t>
+event<values_t...>& event<values_t...>::detach(widget_t& widget)
+{
+    // TODO
+    return *this;
+}
+
+template <typename... values_t>
+event<values_t...>& event<values_t...>::detach()
+{
+    // TODO
+    return *this;
+}
+
+template <typename... values_t>
+event<values_t...>& event<values_t...>::on_trigger(const on_trigger_callback& trigger_callback)
+{
+    _impl.callbacks.push_back(trigger_callback);
+    return *this;
+}
+
+template <typename... values_t>
+const event<values_t...>& event<values_t...>::trigger(values_t&&... values) const
+{
+    detail::state.context.events.trigger(_impl, std::forward<values_t>(values)...);
+    return *this;
+}
+
+// FUTURE TRIGGER
+
+template <typename... values_t>
+std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callbacks()
+{
+    return _impl.callbacks;
+}
+
+template <typename... values_t>
+const std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callbacks() const
+{
+    return _impl.callbacks;
+}
+#pragma endregion
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 template <typename value_t>
 animation<value_t>::animation(const curve& bezier_curve)
@@ -60,6 +184,13 @@ template <typename value_t>
 animation<value_t>& animation<value_t>::operator=(animation<value_t>&& other)
 {
     return *this;
+}
+
+template <typename value_t>
+animation<value_t>::~animation()
+{
+    // if (_impl.is_attached)
+    //     detail::state.context.events.destroy_event_and_data(_impl)
 }
 
 template <typename value_t>
