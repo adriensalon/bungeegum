@@ -83,6 +83,12 @@ event<values_t...>& event<values_t...>::merge(const event<values_t...>& other)
 }
 
 template <typename... values_t>
+event<values_t...>& event<values_t...>::operator+=(const event<values_t...>& other)
+{
+    return merge(other);
+}
+
+template <typename... values_t>
 event<values_t...>& event<values_t...>::attach()
 {
     detail::state.context.events.attach_to_wrapper(_impl);
@@ -93,7 +99,7 @@ template <typename... values_t>
 template <typename widget_t>
 event<values_t...>& event<values_t...>::detach(widget_t& widget)
 {
-    detail::state.context.widgets.attach_event(_impl, widget);
+    detail::state.context.widgets.detach_to_widget(_impl, widget);
     return *this;
 }
 
@@ -119,13 +125,13 @@ const event<values_t...>& event<values_t...>::trigger(values_t&&... values) cons
 }
 
 template <typename... values_t>
-void event<values_t...>::trigger(std::future<detail::future_values<values_t...>>&& future_value)
+void event<values_t...>::trigger(std::future<future_values>&& future_value)
 {
     detail::state.context.events.trigger_future_value(_impl, std::move(future_value));
 }
 
 template <typename... values_t>
-void event<values_t...>::trigger(const std::shared_future<detail::future_values<values_t...>>& shared_future_value)
+void event<values_t...>::trigger(const std::shared_future<future_values>& shared_future_value)
 {
     detail::state.context.events.trigger_shared_future_value(_impl, shared_future_value);
 }
@@ -145,32 +151,43 @@ const std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callb
 
 #pragma region animation
 template <typename value_t>
-animation<value_t>::animation(const curve& bezier_curve)
-    : _impl(detail::state.context.animations.make<value_t>())
+animation<value_t>::animation()
+    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
 {
 }
 
 template <typename value_t>
-animation<value_t>::animation(const animation<value_t>& other)
-    : _impl(detail::state.context.animations.make<value_t>())
+template <typename duration_unit_t>
+animation<value_t>::animation(const curve& curved_shape, const unsigned int duration_count, const animation_mode mode)
+    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
 {
+    duration_unit_t kk;
+    (void)kk;
+}
+
+template <typename value_t>
+animation<value_t>::animation(const animation<value_t>& other)
+{
+    *this = other;
 }
 
 template <typename value_t>
 animation<value_t>& animation<value_t>::operator=(const animation<value_t>& other)
 {
+    _impl = other._impl;
     return *this;
 }
 
 template <typename value_t>
 animation<value_t>::animation(animation<value_t>&& other)
-    : _impl(detail::state.context.animations.make<value_t>())
 {
+    *this = std::move(other);
 }
 
 template <typename value_t>
 animation<value_t>& animation<value_t>::operator=(animation<value_t>&& other)
 {
+    _impl = std::move(other._impl);
     return *this;
 }
 
@@ -189,41 +206,43 @@ animation<value_t>& animation<value_t>::on_value_changed(const event<value_t>& v
 }
 
 template <typename value_t>
-void animation<value_t>::start()
+animation<value_t>& animation<value_t>::start()
 {
+    return *this;
 }
 
 template <typename value_t>
-void animation<value_t>::stop()
+animation<value_t>& animation<value_t>::stop()
 {
+    return *this;
 }
 #pragma endregion
 
 #pragma region value
 template <typename value_t>
-value<value_t>::value(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value)
+animatable<value_t>::animatable(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value)
 {
-    _is_animated = true;
-    _value = animated_value;
+    // _is_animated = true;
+    // _value = animated_value;
 }
 
 template <typename value_t>
-value<value_t>::value(const detail::enable_if_lerpable_t<value_t>& static_value)
+animatable<value_t>::animatable(const detail::enable_if_lerpable_t<value_t>& static_value)
 {
-    _is_animated = false;
-    _value = static_value;
+    // _is_animated = false;
+    // _value = static_value;
 }
 
 template <typename value_t>
-void value<value_t>::assign(value_t& target_value) const
+void animatable<value_t>::assign(value_t& target_value) const
 {
-    if (_is_animated) {
-        animation<value_t>& _animation = std::get<animation<value_t>>(_value);
-        _animation.on_value_changed(event<value_t>([&](const value_t& _value_changed) {
-            target_value = _value_changed;
-        }));
-    } else
-        target_value = std::get<value_t>(_value);
+    // if (_is_animated) {
+    //     animation<value_t>& _animation = std::get<animation<value_t>>(_value);
+    //     _animation.on_value_changed(event<value_t>([&](const value_t& _value_changed) {
+    //         target_value = _value_changed;
+    //     }));
+    // } else
+    //     target_value = std::get<value_t>(_value);
 }
 #pragma endregion
 

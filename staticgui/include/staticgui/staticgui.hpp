@@ -35,20 +35,13 @@ using double4x4 = staticgui::glue::simd_ordered_array<double, 16, staticgui::glu
 /// @details
 namespace staticgui {
 
+/// @brief
+/// @details
+/// @param what
 void throw_error(const std::string& what);
 
 /// @brief
 /// @details
-/// @tparam value_t
-template <typename value_t>
-detail::enable_if_lerpable_t<value_t> lerp(const value_t& min, const value_t& max, const float t) { return value_t {}; }
-
-/// @brief
-struct color {
-    color operator+(const color& other);
-    color operator*(const float multiplier);
-};
-
 enum struct curve_preset {
     linear,
     bounce_in,
@@ -77,6 +70,9 @@ struct event {
     /// @brief
     using on_trigger_callback = std::function<void(const values_t&...)>;
 
+    /// @brief
+    using future_values = glue::future_typelist_t<values_t...>;
+
     event();
     event(const on_trigger_callback& trigger_callback);
     event(const event& other);
@@ -88,6 +84,10 @@ struct event {
     /// @brief
     /// @details
     event& merge(const event& other);
+
+    /// @brief
+    /// @details
+    event& operator+=(const event& other);
 
     /// @brief Transfers ownership of the underlying callback dispatcher back to this event object
     /// @details This allows you to
@@ -114,15 +114,15 @@ struct event {
 
     /// @brief Triggers all contained callbacks
     /// @param ...values
-    const event& trigger(values_t&&... values) const;
+    const event& trigger(values_t&&... values) const; // + operator() overload
 
     /// @brief
     /// @param future_value
-    void trigger(std::future<detail::future_values<values_t...>>&& future_value);
+    void trigger(std::future<future_values>&& future_value); // + operator() overload
 
     /// @brief
     /// @param future_value
-    void trigger(const std::shared_future<detail::future_values<values_t...>>& shared_future_value);
+    void trigger(const std::shared_future<future_values>& shared_future_value); // + operator() overload
 
     /// @brief
     std::vector<on_trigger_callback>& trigger_callbacks();
@@ -137,10 +137,23 @@ private:
 };
 
 /// @brief
+/// @details
+enum struct animation_mode {
+    forward,
+    backward,
+    repeat,
+    loop,
+    random
+};
+
+/// @brief
 /// @tparam value_t
 template <typename value_t>
 struct animation {
-    animation(const curve& bezier_curve);
+
+    animation();
+    template <typename duration_unit_t = std::chrono::seconds>
+    animation(const curve& curved_shape, const unsigned int duration_count = 1, const animation_mode mode = animation_mode::forward);
     animation(const animation& other);
     animation& operator=(const animation& other);
     animation(animation&& other);
@@ -149,23 +162,42 @@ struct animation {
 
     /// @brief
     /// @param value_changed_event
-    /// @return
     animation& on_value_changed(const event<value_t>& value_changed_event);
 
-    // pareil pour les events ! :)
-    animation& detach(); // disables destructor, animation will be claimed at program exit
+    /// @brief
+    animation& start();
 
     /// @brief
-    void start();
+    animation& stop();
 
-    void stop();
+    /// @brief
+    animation& reset();
 
-    void attach();
+    /// @brief
+    animation& shape(const curve& curved_shape);
 
+    /// @brief
+    template <typename duration_unit_t = std::chrono::seconds>
+    animation& duration(const unsigned int count);
+
+    /// @brief Transfers ownership of the underlying callback dispatcher back to this animation object
+    /// @details This allows you to
+    animation& attach();
+
+    /// @brief Transfers ownership of the underlying callback dispatcher to the specified widget
+    /// @details This allows you to let this animation object exit scope without destroying its
+    /// callback dispatch subroutine. While an animation is detached to a widget both will be destroyed
+    /// at the same time
+    /// @tparam widget_t
+    /// @param widget
     template <typename widget_t>
-    void attach(widget_t& widget);
+    animation& detach(widget_t& widget);
 
-    void detach2();
+    /// @brief Transfers ownership of the underlying callback dispatcher to the internal registry
+    /// @details This allows you to let this animation object exit scope without destroying its
+    /// callback dispatch subroutine. While an animation is detached to the internal registry it will
+    /// be destroyed when the application terminates
+    animation& detach();
 
 private:
     detail::animation_impl<value_t>& _impl;
@@ -174,20 +206,27 @@ private:
 /// @brief
 /// @tparam value_t
 template <typename value_t>
-struct value {
-    value(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value);
-    value(const detail::enable_if_lerpable_t<value_t>& static_value);
+struct animatable {
+
+    animatable(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value);
+    animatable(const detail::enable_if_lerpable_t<value_t>& value);
+    animatable(const animatable& other);
+    animatable& operator=(const animatable& other);
+    animatable(animatable&& other);
+    animatable& operator=(animatable&& other);
+    ~animatable();
 
     /// @brief
     /// @param target_value
-    void assign(value_t& target_value) const; // sets or registers animation callback ^^
+    void assign(value_t& target_value) const; // sets or registers animation callback + detach ^^
 
 private:
-    bool _is_animated;
-    mutable std::variant<value_t, animation<value_t>> _value;
+    // bool _is_animated;
+    // mutable std::variant<value_t, animation<value_t>> _value;
 };
 
 /// @brief
+/// @details
 struct context {
 
     template <typename widget_t>
@@ -290,16 +329,6 @@ struct context {
 /// @return
 context& get_context();
 
-struct layout {
-    //     // cursor etc
-
-    //     // im gui api here
-
-private:
-    // layout();
-    // friend struct internal::impl::layout_manager;
-};
-
 /// @brief
 /// @tparam widget_t
 /// @param widget
@@ -329,10 +358,14 @@ template <typename widget_t, typename... widget_args_t>
 template <typename widget_t, typename... children_widgets_t>
 void declare(widget_t* widget, children_widgets_t&... children_widgets);
 
+/// @brief
+/// @details
 struct resolve_constraint {
     // getters
 };
 
+/// @brief
+/// @details
 struct resolve_advice {
 
     // setters
@@ -346,7 +379,9 @@ template <typename widget_t>
 void on_resolve(widget_t* widget, const std::function<void(const resolve_constraint&, resolve_advice&)>& resolve_callback);
 
 /// @brief
+/// @details
 struct draw_rounding_command {
+
     draw_rounding_command& strength(const float z);
 
     draw_rounding_command& top_left(const bool enable);
@@ -362,12 +397,14 @@ private:
     friend struct draw_rectangle_command;
 };
 
+/// @brief
+/// @details
 struct draw_line_command {
     draw_line_command& first_point(const float2& first);
 
     draw_line_command& second_point(const float2& second);
 
-    draw_line_command& color(const float4& col); // go color !!
+    draw_line_command& color(const float4& col);
 
     draw_line_command& thickness(const float t = 10.f);
 
@@ -376,12 +413,14 @@ private:
     friend struct draw_command;
 };
 
+/// @brief
+/// @details
 struct draw_rectangle_command {
     draw_rectangle_command& min_point(const float2& first);
 
     draw_rectangle_command& max_point(const float2& second);
 
-    draw_rectangle_command& color(const float4& col); // go color !!
+    draw_rectangle_command& color(const float4& col);
 
     draw_rectangle_command& rounding(const draw_rounding_command& rounding_command);
 
@@ -393,6 +432,7 @@ private:
 };
 
 /// @brief
+/// @details
 struct draw_command {
     draw_command(detail::command_data& data);
     draw_command(const draw_command& other);

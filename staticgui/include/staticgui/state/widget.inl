@@ -126,7 +126,7 @@ namespace detail {
     }
 
     template <typename... values_t, typename widget_t>
-    void widget_registry::attach_event(event_impl<values_t...>& event, widget_t& widget)
+    void widget_registry::detach_to_widget(event_impl<values_t...>& event, widget_t& widget)
     {
         if (!event.is_attached)
             event.rattach_callback();

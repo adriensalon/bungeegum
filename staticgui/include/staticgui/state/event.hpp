@@ -17,14 +17,14 @@
 #include <vector>
 
 #include <staticgui/glue/registry.hpp>
-#include <staticgui/state/sfinae.hpp>
+#include <staticgui/glue/typelist.hpp>
 
 namespace staticgui {
 namespace detail {
 
     template <typename... values_t>
     struct event_impl {
-        using future_type = detail::future_values<values_t...>;
+        using future_values = glue::future_typelist_t<values_t...>;
 
         event_impl();
         event_impl(const event_impl& other) = delete;
@@ -36,8 +36,8 @@ namespace detail {
         glue::entity detached_id = 0;
         std::function<void()> rattach_callback = nullptr;
         std::vector<std::function<void(values_t...)>> callbacks;
-        std::vector<std::future<future_type>> futures;
-        std::vector<std::shared_future<future_type>> shared_futures;
+        std::vector<std::future<future_values>> futures;
+        std::vector<std::shared_future<future_values>> shared_futures;
     };
 
     struct event_data {
@@ -51,6 +51,9 @@ namespace detail {
         event_registry& operator=(const event_registry& other) = delete;
         event_registry(event_registry&& other);
         event_registry& operator=(event_registry&& other);
+
+        template <typename... values_t>
+        using future_values = glue::future_typelist_t<values_t...>;
 
         void tick();
 
@@ -85,9 +88,6 @@ namespace detail {
 
         template <typename... values_t>
         void attach_to_wrapper(event_impl<values_t...>& event);
-
-        // template <typename... values_t>
-        // void mark_detached_to_widget(event_impl<values_t...>& event, const std::function<void()>& detach_callback);
 
         template <typename... values_t>
         void detach_to_registry(event_impl<values_t...>& event);
