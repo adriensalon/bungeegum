@@ -21,6 +21,7 @@
 namespace staticgui {
 namespace detail {
 
+    static bool _debug = false;
     bool context_state::tick(const float delta_milliseconds)
     {
 
@@ -38,7 +39,16 @@ namespace detail {
         });
         widgets.clear_resolve();
 
-        return _must_draw;
+        static bool _mem = false;
+        if (!_mem && ImGui::GetIO().KeysDown[ImGuiKey_Escape]) {
+            _debug = true;
+            _mem = true;
+        }
+        if (!ImGui::GetIO().KeysDown[ImGuiKey_Escape]) {
+            _debug = false;
+            _mem = false;
+        }
+        return _must_draw || _debug;
         // return true;
     }
 
@@ -60,36 +70,41 @@ namespace detail {
             widgets.clear_draw();
 
         // draw exception if any
-        if (has_userspace_thrown()) {
-            glue::backtraced_exception& _exception = get_userspace_thrown_exception().value();
+        if (has_userspace_thrown() || _debug) {
             ImGui::StyleColorsLight();
-            if (ImGui::Begin("Exception caught")) {
-                ImGui::Text(_exception.what());
-                ImGui::Spacing();
-                ImGui::Separator();
-                ImGui::Spacing();
-                for (auto& _trace : _exception.tracing) {
-                    ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
+            ImGui::SetNextWindowSize({ 1000, 600 });
+            if (ImGui::Begin("Debug")) {
+                if (has_userspace_thrown()) {
+
+                    glue::backtraced_exception& _exception = get_userspace_thrown_exception().value();
+                    ImGui::Text(_exception.what());
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                    ImGui::Spacing();
+                    for (auto& _trace : _exception.tracing) {
+                        ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
+                    }
+                    auto _black = ImVec4(0.f, 0.f, 0.f, 1.f);
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                    ImGui::Spacing();
+                    widgets.iterate_datas([&](detail::widget_data& _widget_data) {
+                        unsigned int _depth = widgets.get_depth(_widget_data);
+                        for (unsigned int _k = 0; _k < _depth; _k++) {
+                            ImGui::TextColored(_black, "      ");
+                            ImGui::SameLine();
+                        }
+                        ImGui::TextColored(_black, _widget_data.kind->name());
+                        if (_widget_data.drawer) {
+                            ImGui::SameLine();
+                            ImGui::TextColored(_black, " [painter]");
+                        }
+                    });
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                    ImGui::Spacing();
                 }
-                auto _black = ImVec4(0.f, 0.f, 0.f, 1.f);
-                ImGui::Spacing();
-                ImGui::Separator();
-                ImGui::Spacing();
-                widgets.iterate_datas([&](detail::widget_data& _widget_data) {
-                    unsigned int _depth = widgets.get_depth(_widget_data);
-                    for (unsigned int _k = 0; _k < _depth; _k++) {
-                        ImGui::TextColored(_black, "      ");
-                        ImGui::SameLine();
-                    }
-                    ImGui::TextColored(_black, _widget_data.kind->name());
-                    if (_widget_data.drawer) {
-                        ImGui::SameLine();
-                        ImGui::TextColored(_black, " [painter]");
-                    }
-                });
-                ImGui::Spacing();
-                ImGui::Separator();
-                ImGui::Spacing();
+
                 int _k = 0;
                 animations.iterate_datas([&](detail::animation_data& _animation_data) {
                     if (_animation_data.is_playing) {
