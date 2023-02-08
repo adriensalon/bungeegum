@@ -19,20 +19,10 @@ namespace widgets {
     struct container_widget {
 
         template <typename child_widget_t>
-        container_widget(child_widget_t& child_widget)
+        container_widget(child_widget_t& child_widget, const animatable<float>& testanim)
         {
             declare(this, child_widget);
-            // _animpos.start()
-            animation<float> _animpos(curve(0.f, 1.f), 10.f, 100.f, 3);
-            _animpos.on_tick([&](const float& _tick) {
-                context& _ctx = get_context();
-                // must redraw !
-                // std::cout << "tick = " << _tick_value << std::endl;
-                // std::cout << "me 1 = " << reinterpret_cast<uintptr_t>(this) << std::endl;
-                this->_tick_value = _tick;
-                _ctx.must_draw(this);
-            });
-            _animpos.start().detach();
+            testanim.assign(this, _tick_value);
         }
 
         inline void resolve(const resolve_constraint& cst, resolve_advice& adv) { }
@@ -62,6 +52,6 @@ namespace widgets {
 }
 
 template <typename child_widget_t>
-widgets::container_widget& container(child_widget_t& child_widget) { return make<widgets::container_widget>(child_widget); }
+widgets::container_widget& container(child_widget_t& child_widget, const animatable<float>& testanim) { return make<widgets::container_widget>(child_widget, testanim); }
 
 }

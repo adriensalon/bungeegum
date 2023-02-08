@@ -136,8 +136,6 @@ struct event {
 
 private:
     detail::event_impl<values_t...>& _impl;
-    template <typename value_t>
-    struct animation;
 };
 
 /// @brief
@@ -228,6 +226,8 @@ struct animation {
 
 private:
     detail::animation_impl<value_t>& _impl;
+    template <typename value_t>
+    friend struct animatable;
 };
 
 /// @brief
@@ -235,19 +235,19 @@ private:
 template <typename value_t>
 struct animatable {
 
-    using lerpable_value = glue::enable_if_lerpable_t<value_t>;
+    // using lerpable_value = glue::enable_if_lerpable_t<value_t>;
 
-    animatable(const animation<lerpable_value>& animated_value);
-    animatable(const lerpable_value& value);
+    animatable(const animation<value_t>& animated_value);
+    animatable(const value_t& value);
     animatable(const animatable& other);
     animatable& operator=(const animatable& other);
     animatable(animatable&& other);
     animatable& operator=(animatable&& other);
-    ~animatable();
 
     /// @brief
     /// @param target_value
-    void assign(lerpable_value& target_value) const; // sets or registers animation callback + detach ^^
+    template <typename widget_t>
+    void assign(widget_t* widget, value_t& target_value) const; // sets or registers animation callback + detach ^^
 
 private:
     detail::animatable_data<value_t> _data;

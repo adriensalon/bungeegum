@@ -294,30 +294,60 @@ animation<value_t>& animation<value_t>::detach()
 
 #pragma region animatable
 template <typename value_t>
-animatable<value_t>::animatable(const animation<glue::enable_if_lerpable_t<value_t>>& animated_value)
+animatable<value_t>::animatable(const animation<value_t>& animated_value)
 {
-    // _is_animated = true;
-    // _value = animated_value;
+    _data.is_animated = true;
+    _data.animation = animated_value._impl;
 }
 
 template <typename value_t>
-animatable<value_t>::animatable(const glue::enable_if_lerpable_t<value_t>& static_value)
+animatable<value_t>::animatable(const value_t& value)
 {
-    // _is_animated = false;
-    // _value = static_value;
+    _data.is_animated = false;
+    _data.value = value;
 }
 
-// template <typename value_t>
-// void animatable<value_t>::assign(value_t& target_value) const
-// {
-//     // if (_is_animated) {
-//     //     animation<value_t>& _animation = std::get<animation<value_t>>(_value);
-//     //     _animation.on_value_changed(event<value_t>([&](const value_t& _value_changed) {
-//     //         target_value = _value_changed;
-//     //     }));
-//     // } else
-//     //     target_value = std::get<value_t>(_value);
-// }
+template <typename value_t>
+animatable<value_t>::animatable(const animatable& other)
+{
+    *this = other;
+}
+
+template <typename value_t>
+animatable<value_t>& animatable<value_t>::operator=(const animatable& other)
+{
+    _data = other._data;
+    return *this;
+}
+
+template <typename value_t>
+animatable<value_t>::animatable(animatable&& other)
+{
+    *this = std::move(other);
+}
+
+template <typename value_t>
+animatable<value_t>& animatable<value_t>::operator=(animatable&& other)
+{
+    _data = std::move(other._data);
+    return *this;
+}
+
+template <typename value_t>
+template <typename widget_t>
+void animatable<value_t>::assign(widget_t* widget, value_t& target_value) const
+{
+    if (_data.is_animated) {
+        detail::animation_impl<value_t>& _animation = _data.animation.value().get();
+        _animation.event.callbacks.emplace_back(([&target_value, widget](const value_t& _value_changed) {
+            target_value = _value_changed;
+            get_context().must_draw<widget_t>(widget);
+        }));
+        detail::state.context.animations.start_animation(_animation);
+        detail::state.context.animations.detach_animation(_animation);
+    } else
+        target_value = _data.value.value();
+}
 #pragma endregion
 
 #pragma region context
