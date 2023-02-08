@@ -202,8 +202,8 @@ animation<value_t>& animation<value_t>::operator=(animation<value_t>&& other)
 template <typename value_t>
 animation<value_t>::~animation()
 {
-    // if (_impl.event.is_attached)
-    //     detail::state.context.animations.destroy_animation_and_data(_impl);
+    if (_impl.event.is_attached)
+        detail::state.context.animations.destroy_animation_and_data(_impl);
 }
 
 template <typename value_t>
@@ -344,7 +344,7 @@ void animatable<value_t>::assign(widget_t* widget, value_t& target_value) const
             get_context().must_draw<widget_t>(widget);
         }));
         detail::state.context.animations.start_animation(_animation);
-        detail::state.context.animations.detach_animation(_animation);
+        detail::state.context.widgets.detach_animation(_animation, *widget);
     } else
         target_value = _data.value.value();
 }

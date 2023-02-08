@@ -235,7 +235,7 @@ private:
 template <typename value_t>
 struct animatable {
 
-    // using lerpable_value = glue::enable_if_lerpable_t<value_t>;
+    using lerpable_value = glue::enable_if_lerpable_t<value_t>;
 
     animatable(const animation<value_t>& animated_value);
     animatable(const value_t& value);
