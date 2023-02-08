@@ -7,6 +7,8 @@
 //                           __/ |
 //                          |___/     v0.0
 
+#include <future>
+
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
@@ -120,23 +122,29 @@ namespace glue {
         _update_callback = update_callback;
     }
 
+    bool window::poll()
+    {
+        SDL_Event _event;
+        bool _polled = false;
+        while (SDL_PollEvent(&_event)) {
+            _polled = true;
+            std::any _untyped = _event;
+            if (_event.type == SDL_QUIT)
+                _is_running = false;
+            else if (_event.type == SDL_WINDOWEVENT && _event.window.event == SDL_WINDOWEVENT_CLOSE && _event.window.windowID == SDL_GetWindowID(detail::get_window(_window_impl)))
+                _is_running = false;
+            else
+                _event_callback(_untyped);
+        }
+        return _polled;
+    }
+
     void window::run_loop()
     {
         if constexpr (glue::is_platform_emscripten) {
         } else {
-            bool _running = true;
-            while (_running) {
-
-                SDL_Event _event;
-                while (SDL_PollEvent(&_event)) {
-                    std::any _untyped = _event;
-                    if (_event.type == SDL_QUIT)
-                        _running = false;
-                    else if (_event.type == SDL_WINDOWEVENT && _event.window.event == SDL_WINDOWEVENT_CLOSE && _event.window.windowID == SDL_GetWindowID(detail::get_window(_window_impl)))
-                        _running = false;
-                    else
-                        _event_callback(_untyped);
-                }
+            _is_running = true;
+            while (_is_running) {
                 _update_callback();
             }
         }
@@ -175,5 +183,6 @@ namespace glue {
         return nullptr;
     }
 #endif
+
 }
 }

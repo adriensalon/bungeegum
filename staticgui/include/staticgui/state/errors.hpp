@@ -12,6 +12,8 @@
 #include <functional>
 #include <string>
 
+#include <staticgui/glue/backtrace.hpp>
+
 namespace staticgui {
 namespace detail {
 

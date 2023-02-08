@@ -28,6 +28,8 @@ set(staticgui_source
 	"source/state/rendering.cpp"
 	"source/state/widget.cpp"
 
+	"source/overlay/overlay.cpp"
+
 	"source/staticgui.cpp"
 )
 

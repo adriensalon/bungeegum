@@ -10,10 +10,11 @@
 #pragma once
 
 #include <any>
+#include <chrono>
 #include <functional>
 #include <string>
 
-#include <staticgui/glue/backtrace.hpp>
+#include <staticgui/glue/time.hpp>
 
 #if !defined(__EMSCRIPTEN__)
 struct SDL_Window;
@@ -46,6 +47,8 @@ namespace glue {
 
         static void show_cursor(const bool show);
 
+        bool poll();
+
 #if !defined(__EMSCRIPTEN__)
         window(SDL_Window* sdl_window);
         window(void* native_window);
@@ -53,6 +56,7 @@ namespace glue {
 #endif
 
     private:
+        bool _is_running = false;
         std::function<void(const std::any&)> _event_callback = nullptr;
         std::function<void()> _update_callback = nullptr;
         std::any _window_impl = nullptr;
