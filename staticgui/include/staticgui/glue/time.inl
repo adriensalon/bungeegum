@@ -43,6 +43,18 @@ namespace glue {
     void chronometer<count_t, unit_t>::new_frame()
     {
         if constexpr (is_build_debug) {
+            // std::cout << " --- new frame \n";
+            for (auto _k = 0; _k < _tasks.size(); _k++) {
+                task& _task = _tasks[_k];
+                if (_task.count > 0) {
+                    // std::cout << "k = " << _k << " --- task duration = " << std::chrono::duration_cast<std::chrono::nanoseconds>(_task.duration).count() << std::endl;
+                    _frames[count_t - 1].indices.push_back(_k);
+                    _frames[count_t - 1].ratios.push_back(static_cast<float>(_task.duration.count()) / _frame_duration.count());
+                    // std::cout << "ratio = " << _frames[count_t - 1].ratios[_k];
+                    _task.count = 0;
+                    _task.duration = unit_t(0);
+                }
+            }
             std::iter_swap(_frames.data(), _frames.data() + count_t - 1);
             _frames[count_t - 1].indices.clear();
             _frames[count_t - 1].ratios.clear();
@@ -53,6 +65,13 @@ namespace glue {
     void chronometer<count_t, unit_t>::begin(const std::string& name)
     {
         if constexpr (is_build_debug) {
+            if (_task_names.find(name) == _task_names.end()) {
+                _task_names.emplace(name, static_cast<unsigned int>(_tasks.size()));
+                _tasks.emplace_back();
+            }
+            task& _task = _tasks[_task_names[name]];
+            // _task.watch.lap<unit_t>(); // <<<<<<<<<<<<<<<<<<<<
+            _task.count++;
         }
     }
 
@@ -60,6 +79,10 @@ namespace glue {
     void chronometer<count_t, unit_t>::end(const std::string& name)
     {
         if constexpr (is_build_debug) {
+            task& _task = _tasks[_task_names[name]];
+            auto _duration = _task.watch.lap<unit_t>();
+            _task.duration += _duration;
+            _frame_duration += _duration;
         }
     }
 

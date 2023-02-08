@@ -25,19 +25,28 @@ namespace detail {
     bool context_state::tick(const float delta_milliseconds)
     {
         frames_chronometer.new_frame();
+
+        frames_chronometer.begin("animations");
         animations.tick(delta_milliseconds);
+        frames_chronometer.end("animations");
+
+        frames_chronometer.begin("events");
         events.tick();
+        frames_chronometer.end("events");
 
         // on window resize on resolve
         bool _has_window_been_resized = false;
 
         // resolve si besoin
         // bool _must_draw = (!widgets.is_must_resolve_empty() && !widgets.is_must_draw_empty());
+
+        frames_chronometer.begin("resolve");
         bool _must_draw = (!widgets.is_must_draw_empty());
         widgets.iterate_must_resolve([&](widget_data& _data, const bool _must_resolve_children) {
 
         });
         widgets.clear_resolve();
+        frames_chronometer.end("resolve");
 
         return _must_draw;
         // return true;
@@ -46,6 +55,7 @@ namespace detail {
     void context_state::draw()
     {
 
+        frames_chronometer.begin("draw");
         widgets.iterate_must_draw([](widget_data& _data, const bool _must_draw_children) {
             if (!has_userspace_thrown())
                 _data.command.value().clear();
@@ -59,6 +69,7 @@ namespace detail {
         });
         if (!has_userspace_thrown())
             widgets.clear_draw();
+        frames_chronometer.end("draw");
 
         overlay::draw_overlay(*this);
     }

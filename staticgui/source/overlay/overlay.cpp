@@ -53,8 +53,19 @@ namespace detail {
         void draw_overlay(context_state& context)
         {
             ImGui::PushFont(overlay_font);
+
+            static bool _debug = false;
+            static bool _debugcancel = true;
+            if (ImGui::GetIO().KeysDown[ImGuiKey_Escape] && _debugcancel) {
+                _debug = !_debug;
+                _debugcancel = false;
+            }
+            if (!ImGui::GetIO().KeysDown[ImGuiKey_Escape]) {
+                _debugcancel = true;
+            }
+
             // ImGui::ShowDemoWindow();
-            if (has_userspace_thrown() || ImGui::GetIO().KeysDown[ImGuiKey_Escape]) {
+            if (has_userspace_thrown() || _debug) {
                 ImGui::StyleColorsLight();
                 ImGui::SetNextWindowSize({ 1000, 600 });
                 if (ImGui::Begin("Debug")) {
@@ -105,6 +116,8 @@ namespace detail {
                     });
                     ImGui::End();
                 }
+
+                draw_profiler(context);
             }
             ImGui::PopFont();
         }

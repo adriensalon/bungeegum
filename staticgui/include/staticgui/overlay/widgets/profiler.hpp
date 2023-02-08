@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <staticgui/glue/time.hpp>
 #include <staticgui/state/context.hpp>
 
 namespace staticgui {

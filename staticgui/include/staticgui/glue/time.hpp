@@ -59,6 +59,7 @@ namespace glue {
         };
 
         struct task {
+            stopwatch watch;
             unit_t duration;
             unsigned int count = 0;
         };
@@ -71,6 +72,7 @@ namespace glue {
         const std::array<frame, count_t>& get_frames();
 
     private:
+        unit_t _frame_duration;
         std::vector<task> _tasks;
         std::array<frame, count_t> _frames;
         std::unordered_map<std::string, unsigned int> _task_names;
