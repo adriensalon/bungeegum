@@ -19,7 +19,7 @@ namespace detail {
         animation_impl<value_t>& _animation = _registry.create_component<animation_impl<value_t>>(_entity);
         animation_data& _animation_data = _registry.create_component<animation_data>(_entity);
         _animation_data.tick = [&](const float delta_milliseconds) {
-            if (_animation.is_playing) {
+            if (_animation_data.is_playing) {
                 _animation.playing_cursor_seconds += 0.001f * delta_milliseconds;
                 if (_animation.playing_cursor_seconds > _animation.duration_seconds) {
                     std::cout << "STOPPED \n";
@@ -27,8 +27,8 @@ namespace detail {
                     stop_animation(_animation);
                 }
                 float _frac = _animation.playing_cursor_seconds / _animation.duration_seconds;
-
-                float _t = _animation.curve.spline->get_eval(_frac).y();
+                _animation_data.t_curve = _animation_data.curve.spline->get_eval(_frac);
+                float _t = _animation_data.t_curve.y();
                 value_t _lerped = lerp<value_t>(std::forward<value_t>(*(_animation.min_value)), std::forward<value_t>(*(_animation.max_value)), _t);
                 events.trigger_values<value_t>(_animation.event, std::forward<value_t>(_lerped));
             }
@@ -45,13 +45,13 @@ namespace detail {
     template <typename value_t>
     void animation_registry::start_animation(animation_impl<value_t>& animation)
     {
-        animation.is_playing = true;
+        get_data(animation).is_playing = true;
     }
 
     template <typename value_t>
     void animation_registry::stop_animation(animation_impl<value_t>& animation)
     {
-        animation.is_playing = false;
+        get_data(animation).is_playing = false;
     }
 
     template <typename value_t>
@@ -63,7 +63,7 @@ namespace detail {
     template <typename value_t>
     void animation_registry::shape_animation(animation_impl<value_t>& animation, const curve_data& curve)
     {
-        animation.curve.spline = curve.spline;
+        get_data(animation).curve.spline = curve.spline;
     }
 
     template <typename value_t>

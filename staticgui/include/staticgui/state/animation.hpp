@@ -26,8 +26,6 @@ namespace detail {
         std::unique_ptr<value_t> min_value = nullptr;
         std::unique_ptr<value_t> max_value = nullptr;
         event_impl<value_t> event;
-        curve_data curve;
-        bool is_playing = false;
         float playing_cursor_seconds = 0.f;
         float duration_seconds = 0.f;
     };
@@ -35,6 +33,9 @@ namespace detail {
     struct animation_data {
         std::function<void(const float)> tick = nullptr;
         std::unique_ptr<std::type_index> kind;
+        bool is_playing = false;
+        curve_data curve;
+        glue::simd_array<float, 2> t_curve = std::array<float, 2> { 0.f, 0.f };
     };
 
     struct animation_registry {

@@ -10,9 +10,7 @@
 #pragma once
 
 #include <imgui.h>
-#include <imgui_internal.h>
 #include <implot.h>
-#include <iostream>
 
 #include <staticgui/glue/backtrace.hpp>
 #include <staticgui/glue/bspline.hpp>
@@ -21,88 +19,6 @@
 
 namespace staticgui {
 namespace detail {
-
-    void draw_bezier()
-    {
-        // ImPlot::ShowDemoWindow();
-        if (ImGui::Begin("Bezier")) {
-
-            std::vector<float> controls = { 100.f, -100.f,
-                -100.f, 200.f,
-                100.f, 400.f,
-                400.f, 300.f,
-                700.f, 500.f };
-            std::vector<glue::simd_array<float, 2>> controls2 = std::vector<glue::simd_array<float, 2>> {
-                std::array<float, 2> { 100.f, -100.f },
-                std::array<float, 2> { -100.f, 200.f },
-                std::array<float, 2> { 100.f, 400.f },
-                std::array<float, 2> { 400.f, 300.f },
-                std::array<float, 2> { 700.f, 500.f }
-            };
-
-            auto controls3 = std::vector<glue::simd_array<float, 2>> {
-                std::array<float, 2> { 0.25f, 0.2f },
-                std::array<float, 2> { 0.75f, 0.8f }
-            };
-
-            // auto _spl = glue::bspline(controls);
-            auto _spl = glue::bspline(0.f, 1.f, controls3);
-            std::vector<float> kkk = _spl.get_strided_samples(100);
-            static float _t = 0.f;
-            _t += 0.001f;
-            ImGui::DragFloat("heyy", &_t);
-
-            if (ImPlot::BeginPlot("##StatsGraphTitle", ImGui::GetContentRegionAvail())) {
-                //     if (state.train_flow_index() > 0) {
-                //         std::vector<float> x(state.train_flow_index());
-                //         for (int k = 0; k < state.train_flow_index(); k++)
-                //             x[k] = k + 1;
-                //         auto xptr = x.data();
-
-                auto _tp = _spl.get_eval(_t);
-
-                ImPlot::PlotScatter("pp", _tp.data(), _tp.data() + 1, 1, 0, 0, 2 * sizeof(float));
-                ImPlot::PlotLine("gan loss", kkk.data(), &(kkk[1]), 100, 0, 0, 2 * sizeof(float));
-                //         ImPlot::PlotLine("L1 loss", xptr, state.train_stats().get_l1_loss_data(), state.train_flow_index());
-                //         ImPlot::PlotLine("real loss", xptr, state.train_stats().get_real_loss_data(), state.train_flow_index());
-                //         ImPlot::PlotLine("fake loss", xptr, state.train_stats().get_fake_loss_data(), state.train_flow_index());
-
-                ImPlot::EndPlot();
-            }
-            ImGui::End();
-        }
-    }
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
 
     bool context_state::tick(const float delta_milliseconds)
     {
@@ -126,11 +42,7 @@ namespace detail {
 
     void context_state::draw()
     {
-        // throw_library_bad_usage("whatt");
-        //
-        //
-        //
-        //
+
         widgets.iterate_must_draw([](widget_data& _data, const bool _must_draw_children) {
             if (!has_userspace_thrown())
                 _data.command.value().clear();
@@ -173,9 +85,25 @@ namespace detail {
                         ImGui::TextColored(_black, " [painter]");
                     }
                 });
+                ImGui::Spacing();
+                ImGui::Separator();
+                ImGui::Spacing();
+                int _k = 0;
+                animations.iterate_datas([&](detail::animation_data& _animation_data) {
+                    if (_animation_data.is_playing) {
+                        std::string _title = "##StatsGraphTitle" + std::to_string(_k);
+                        if (ImPlot::BeginPlot(_title.c_str(), { ImGui::GetContentRegionAvail().x, 150 })) {
+                            auto _samples = _animation_data.curve.spline->get_strided_samples(100);
+                            auto _point = _animation_data.t_curve;
+                            ImPlot::PlotLine("", _samples.data(), &(_samples[1]), 100, 0, 0, 2 * sizeof(float));
+                            ImPlot::PlotScatter("", _point.data(), _point.data() + 1, 1, 0, 0, 2 * sizeof(float));
+                            ImPlot::EndPlot();
+                        }
+                    }
+                    _k++;
+                });
                 ImGui::End();
             }
-            draw_bezier();
         }
     }
 }
