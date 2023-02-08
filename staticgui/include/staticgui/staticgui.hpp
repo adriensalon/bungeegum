@@ -259,6 +259,9 @@ struct context {
     /// @brief
     context& max_fps(const unsigned int fps);
 
+    template <typename widget_t>
+    context& must_draw(widget_t* widget);
+
     //
     //
     //
@@ -336,27 +339,27 @@ struct context {
 
     context& on_key_pressed(const event<void>& key_pressed_callback);
 
-    // navigation ?
+    // // navigation ?
 
-    inline void erase() { }
+    // inline void erase() { }
 
-    inline void erase_children() { }
+    // inline void erase_children() { }
 
-    template <typename widget_t>
-    void replace(const widget_t& widget) { }
+    // template <typename widget_t>
+    // void replace(const widget_t& widget) { }
 
-    template <typename child_widget_t, typename widget_t>
-    void replace(const child_widget_t& child_widget, const widget_t& widget) { }
+    // template <typename child_widget_t, typename widget_t>
+    // void replace(const child_widget_t& child_widget, const widget_t& widget) { }
 
-    template <typename widget_t>
-    void replace_children(const widget_t& widget) { }
+    // template <typename widget_t>
+    // void replace_children(const widget_t& widget) { }
 
-    inline void maintain() { }
+    // inline void maintain() { }
 
-    template <typename child_widget_t>
-    void maintain_child(const child_widget_t& child) { }
+    // template <typename child_widget_t>
+    // void maintain_child(const child_widget_t& child) { }
 
-    inline void maintain_children() { }
+    // inline void maintain_children() { }
 
     // rebuild
     // private:
@@ -492,7 +495,7 @@ private:
 /// @param widget
 /// @param draw_callback
 template <typename widget_t>
-void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback);
+void on_draw(widget_t* widget, std::function<void(draw_command&)> draw_callback);
 
 }
 

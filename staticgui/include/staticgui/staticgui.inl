@@ -202,8 +202,8 @@ animation<value_t>& animation<value_t>::operator=(animation<value_t>&& other)
 template <typename value_t>
 animation<value_t>::~animation()
 {
-    if (_impl.event.is_attached)
-        detail::state.context.animations.destroy_animation_and_data(_impl);
+    // if (_impl.event.is_attached)
+    //     detail::state.context.animations.destroy_animation_and_data(_impl);
 }
 
 template <typename value_t>
@@ -321,6 +321,14 @@ void animatable<value_t>::assign(value_t& target_value) const
 #pragma endregion
 
 #pragma region context
+
+template <typename widget_t>
+context& context::must_draw(widget_t* widget)
+{
+    detail::state.context.widgets.must_draw(*widget);
+    return *this;
+}
+
 template <typename widget_t>
 context& context::destroy(widget_t& widget, const bool destroy_children)
 {
@@ -351,7 +359,7 @@ void declare(widget_t* widget, children_widgets_t&... children_widgets)
             // TODO
         });
     if constexpr (detail::has_draw<widget_t>)
-        detail::state.context.widgets.on_draw(widget, [&](detail::command_data& command) {
+        detail::state.context.widgets.on_draw(widget, [=](detail::command_data& command) { // [=] otherwise we pass a reference to ptr
             draw_command _hl_command(command);
             widget->draw(_hl_command);
         });
@@ -366,9 +374,9 @@ void on_resolve(widget_t* widget, const std::function<void(const resolve_constra
 }
 
 template <typename widget_t>
-void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback)
+void on_draw(widget_t* widget, std::function<void(draw_command&)> draw_callback)
 {
-    detail::state.context.widgets.on_draw(widget, [&](detail::command_data& command) {
+    detail::state.context.widgets.on_draw(widget, [=](detail::command_data& command) { // [=] otherwise we pass a reference to ptr
         draw_command _hl_command(command);
         draw_callback(_hl_command);
     });

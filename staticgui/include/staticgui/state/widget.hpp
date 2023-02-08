@@ -36,7 +36,7 @@ namespace detail {
         bool is_built = false;
         std::unique_ptr<std::type_index> kind = nullptr;
         resolve_function resolver = nullptr;
-        draw_function drawer = nullptr;
+        std::function<void(command_data&)> drawer = nullptr;
         std::optional<command_data> command = std::nullopt;
         std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<widget_data>> children = {};
@@ -60,7 +60,7 @@ namespace detail {
         void on_resolve(widget_t* widget, const resolve_function& resolver);
 
         template <typename widget_t>
-        void on_draw(widget_t* widget, const draw_function& drawer);
+        void on_draw(widget_t* widget, draw_function drawer);
 
         template <typename... children_widgets_t>
         void declare_root(children_widgets_t&... children);

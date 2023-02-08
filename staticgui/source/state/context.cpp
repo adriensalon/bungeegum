@@ -11,6 +11,7 @@
 
 #include <imgui.h>
 #include <implot.h>
+#include <iostream>
 
 #include <staticgui/glue/backtrace.hpp>
 #include <staticgui/glue/bspline.hpp>
@@ -37,7 +38,8 @@ namespace detail {
         });
         widgets.clear_resolve();
 
-        return _must_draw;
+        // return _must_draw;
+        return true;
     }
 
     void context_state::draw()
