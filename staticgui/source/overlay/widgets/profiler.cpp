@@ -99,6 +99,7 @@ namespace detail {
         static std::vector<unsigned int> _indices;
         static std::vector<ScrollingBuffer> _buffers;
         static float _delta_time = 0.f;
+        static float _max = 0.f;
 
         void setup_profiler(context_state& context)
         {
@@ -107,14 +108,13 @@ namespace detail {
                 _names.push_back(_name);
                 _indices.push_back(_index);
                 _buffers.emplace_back(ScrollingBuffer());
-                std::cout << "setup !! \n";
             });
             context.frames_chronometer.on_new_frame([&]() {
                 _delta_time += ImGui::GetIO().DeltaTime;
                 for (unsigned int _k = 0; _k < _count; _k++) {
-                    std::cout << "size = " << context.frames_chronometer.get_frames().back().ratios.size() << std::endl;
                     float _ratio = context.frames_chronometer.get_frames().back().ratios[_k];
                     _buffers[_k].AddPoint(_delta_time, _ratio);
+                    _max = std::fmax(_max, 1.1f * _ratio);
                 }
             });
         }
@@ -132,15 +132,16 @@ namespace detail {
                 if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, 150))) {
                     ImPlot::SetupAxes(NULL, NULL, flags, flags);
                     ImPlot::SetupAxisLimits(ImAxis_X1, _delta_time - history, _delta_time, ImGuiCond_Always);
-                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
+
+                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, _max);
                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-                    // ImPlot::PlotShaded("Mouse X", &sdata1.Data[0].x, &sdata1.Data[0].y, sdata1.Data.size(), -INFINITY, 0, sdata1.Offset, 2 * sizeof(float));
 
-                    // ImPlot::PlotLine("Mouse Y", &sdata2.Data[0].x, &sdata2.Data[0].y, sdata2.Data.size(), 0, sdata2.Offset, 2 * sizeof(float));
-
-                    for (unsigned int _k = 0; _k < _count; _k++) {
+                    for (unsigned int _k = 0; _k < _count; _k++)
                         ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
-                    }
+
+                    // ImPlot::PlotShaded(_names[0].c_str(), &(_buffers[0].Data[0].x), &(_buffers[0].Data[0].y), _buffers[0].Data.size(), -INFINITY, 0, _buffers[0].Offset, 2 * sizeof(float));
+                    // for (unsigned int _k = 1; _k < _count; _k++)
+                    //     ImPlot::PlotShaded(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), _buffers[_k - 1].Data[0].y, 0, _buffers[_k].Offset, 2 * sizeof(float));
 
                     ImPlot::EndPlot();
                 }

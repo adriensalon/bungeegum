@@ -28,7 +28,7 @@ namespace detail {
 
         frames_chronometer.begin("animations");
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         animations.tick(delta_milliseconds);
         frames_chronometer.end("animations");
 
