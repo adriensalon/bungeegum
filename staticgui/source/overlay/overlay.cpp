@@ -8,11 +8,14 @@
 //                          |___/     v0.0
 
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <implot.h>
 #include <iostream>
 
 #include <staticgui/glue/imguarded.hpp>
 #include <staticgui/overlay/overlay.hpp>
+#include <staticgui/overlay/widgets/debug.hpp>
+#include <staticgui/overlay/widgets/hierarchy.hpp>
 #include <staticgui/overlay/widgets/inspector.hpp>
 #include <staticgui/overlay/widgets/profiler.hpp>
 #include <staticgui/state/errors.hpp>
@@ -41,22 +44,23 @@ namespace detail {
                 overlay_font = io.Fonts->AddFontFromMemoryCompressedTTF(helvetica_compressed_data, helvetica_compressed_size, 13.0f);
 
                 // font awesome for the glyphs
-                // ImFontConfig config;
-                // config.MergeMode = true;
-                // config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
-                // static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-                // icons_font = io.Fonts->AddFontFromMemoryCompressedTTF(fa4_compressed_data, fa4_compressed_size, 13.0f, &config, icon_ranges);
+                ImFontConfig config;
+                config.MergeMode = true;
+                config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
+                static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+                icons_font = io.Fonts->AddFontFromMemoryCompressedTTF(fa4_compressed_data, fa4_compressed_size, 13.0f, &config, icon_ranges);
 
                 // build
                 io.Fonts->Build();
+                io.FontDefault = overlay_font;
                 _installed = true;
             }
         }
 
         void draw_overlay(context_state& context)
         {
-            ImGui::PushFont(overlay_font);
 
+            ImGui::PushFont(overlay_font);
             static bool _debug = false;
             static bool _debugcancel = true;
             if (ImGui::GetIO().KeysDown[ImGuiKey_Escape] && _debugcancel) {
@@ -69,59 +73,37 @@ namespace detail {
 
             // ImGui::ShowDemoWindow();
             if (has_userspace_thrown() || _debug) {
-                ImGui::StyleColorsLight();
-                ImGui::SetNextWindowSize({ 1000, 600 });
-                if (ImGui::Begin("Debug")) {
-                    if (has_userspace_thrown()) {
-                        glue::backtraced_exception& _exception = get_userspace_thrown_exception().value();
-                        ImGui::Text(_exception.what());
-                        ImGui::Spacing();
-                        ImGui::Separator();
-                        ImGui::Spacing();
-                        for (auto& _trace : _exception.tracing) {
-                            ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
-                        }
-                        ImGui::Spacing();
-                        ImGui::Separator();
-                        ImGui::Spacing();
-                    }
+                // set meilleur style
 
-                    auto _black = ImVec4(0.f, 0.f, 0.f, 1.f);
-                    context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
-                        unsigned int _depth = context.widgets.get_depth(_widget_data);
-                        for (unsigned int _k = 0; _k < _depth; _k++) {
-                            ImGui::TextColored(_black, "      ");
-                            ImGui::SameLine();
-                        }
-                        ImGui::TextColored(_black, _widget_data.kind->name());
-                        if (_widget_data.drawer) {
-                            ImGui::SameLine();
-                            ImGui::TextColored(_black, " [painter]");
-                        }
-                    });
-                    ImGui::Spacing();
-                    ImGui::Separator();
-                    ImGui::Spacing();
+                static bool _setup = false;
+                if (!_setup) {
+                    ImGui::StyleColorsLight();
+                    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+                    ImGuiViewport* viewport = ImGui::GetMainViewport();
+                    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+                    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+                    ImGui::DockBuilderRemoveNode(dockspace_id); // clear any previous layout
+                    ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags);
+                    ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
 
-                    int _k = 0;
-                    context.animations.iterate_datas([&](detail::animation_data& _animation_data) {
-                        if (_animation_data.is_playing) {
-                            std::string _title = "##StatsGraphTitle" + std::to_string(_k);
-                            if (ImPlot::BeginPlot(_title.c_str(), { ImGui::GetContentRegionAvail().x, 150 })) {
-                                auto _samples = _animation_data.curve.spline->get_strided_samples(100);
-                                auto _point = _animation_data.t_curve;
-                                ImPlot::PlotLine("", _samples.data(), &(_samples[1]), 100, 0, 0, 2 * sizeof(float));
-                                ImPlot::PlotScatter("", _point.data(), _point.data() + 1, 1, 0, 0, 2 * sizeof(float));
-                                ImPlot::EndPlot();
-                            }
-                        }
-                        _k++;
-                    });
-                    ImGui::End();
+                    auto dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.315f, nullptr, &dockspace_id);
+                    auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.315f, nullptr, &dockspace_id);
+                    auto dock_id_down = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.315f, nullptr, &dockspace_id);
+                    ImGui::DockBuilderDockWindow("Hierarchy", dock_id_left);
+                    ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
+                    ImGui::DockBuilderDockWindow("Profiler", dock_id_down);
+                    ImGui::DockBuilderDockWindow("Debug", dockspace_id);
+                    ImGui::DockBuilderFinish(dockspace_id);
+                    _setup = true;
                 }
 
+                draw_debug(context);
+                draw_hierarchy(context);
                 draw_inspector(context);
                 draw_profiler(context);
+
+                ImGui::SetNextWindowFocus();
+                ImGui::ShowDemoWindow();
             }
             ImGui::PopFont();
         }
