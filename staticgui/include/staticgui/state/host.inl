@@ -22,7 +22,7 @@ namespace detail {
             this->context.widgets.declare_root(widget);
             _window = std::make_unique<glue::window>();
             _renderer = std::make_unique<glue::renderer>(*(_window.get()));
-            overlay::install_font();
+            overlay::setup_overlay(this->context);
             _renderer->rebuild_fonts();
             _window->on_input([this](const std::any& _event) {
                 _renderer->process_input(_event);

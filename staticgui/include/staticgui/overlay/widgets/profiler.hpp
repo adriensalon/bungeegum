@@ -16,6 +16,8 @@ namespace staticgui {
 namespace detail {
     namespace overlay {
 
+        void setup_profiler(context_state& context);
+
         void draw_profiler(context_state& context);
     }
 }

@@ -15,7 +15,7 @@ namespace staticgui {
 namespace detail {
     namespace overlay {
 
-        void install_font();
+        void setup_overlay(context_state& context);
 
         void draw_overlay(context_state& context);
     }

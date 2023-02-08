@@ -94,18 +94,35 @@ namespace detail {
             }
         };
 
+        static unsigned int _count = 0;
+        static std::vector<std::string> _names;
+        static std::vector<unsigned int> _indices;
+        static std::vector<ScrollingBuffer> _buffers;
+        static float _delta_time = 0.f;
+
+        void setup_profiler(context_state& context)
+        {
+            context.frames_chronometer.on_new_task([&](const std::string& _name, const unsigned int _index) {
+                _count++;
+                _names.push_back(_name);
+                _indices.push_back(_index);
+                _buffers.emplace_back(ScrollingBuffer());
+                std::cout << "setup !! \n";
+            });
+            context.frames_chronometer.on_new_frame([&]() {
+                _delta_time += ImGui::GetIO().DeltaTime;
+                for (unsigned int _k = 0; _k < _count; _k++) {
+                    std::cout << "size = " << context.frames_chronometer.get_frames().back().ratios.size() << std::endl;
+                    float _ratio = context.frames_chronometer.get_frames().back().ratios[_k];
+                    _buffers[_k].AddPoint(_delta_time, _ratio);
+                }
+            });
+        }
+
         void draw_profiler(context_state& context)
         {
-
             ImGui::SetNextWindowSize({ 800, 250 });
             if (ImGui::Begin("Profiler")) {
-
-                static ScrollingBuffer sdata1, sdata2;
-                ImVec2 mouse = ImGui::GetMousePos();
-                static float t = 0;
-                t += ImGui::GetIO().DeltaTime;
-                sdata1.AddPoint(t, mouse.x * 0.0005f);
-                sdata2.AddPoint(t, mouse.y * 0.0005f);
 
                 static float history = 10.0f;
                 ImGui::SliderFloat("History", &history, 1, 30, "%.1f s");
@@ -114,11 +131,17 @@ namespace detail {
 
                 if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, 150))) {
                     ImPlot::SetupAxes(NULL, NULL, flags, flags);
-                    ImPlot::SetupAxisLimits(ImAxis_X1, t - history, t, ImGuiCond_Always);
+                    ImPlot::SetupAxisLimits(ImAxis_X1, _delta_time - history, _delta_time, ImGuiCond_Always);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-                    ImPlot::PlotShaded("Mouse X", &sdata1.Data[0].x, &sdata1.Data[0].y, sdata1.Data.size(), -INFINITY, 0, sdata1.Offset, 2 * sizeof(float));
-                    ImPlot::PlotLine("Mouse Y", &sdata2.Data[0].x, &sdata2.Data[0].y, sdata2.Data.size(), 0, sdata2.Offset, 2 * sizeof(float));
+                    // ImPlot::PlotShaded("Mouse X", &sdata1.Data[0].x, &sdata1.Data[0].y, sdata1.Data.size(), -INFINITY, 0, sdata1.Offset, 2 * sizeof(float));
+
+                    // ImPlot::PlotLine("Mouse Y", &sdata2.Data[0].x, &sdata2.Data[0].y, sdata2.Data.size(), 0, sdata2.Offset, 2 * sizeof(float));
+
+                    for (unsigned int _k = 0; _k < _count; _k++) {
+                        ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
+                    }
+
                     ImPlot::EndPlot();
                 }
                 ImGui::End();

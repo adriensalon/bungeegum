@@ -27,8 +27,10 @@ namespace detail {
         static ImFont* overlay_font = nullptr;
         static ImFont* icons_font = nullptr;
 
-        void install_font()
+        void setup_overlay(context_state& context)
         {
+            setup_profiler(context);
+
             static bool _installed = false;
             if (!_installed) {
 

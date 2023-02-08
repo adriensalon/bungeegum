@@ -44,16 +44,24 @@ namespace glue {
     {
         if constexpr (is_build_debug) {
             // std::cout << " --- new frame \n";
+
             for (auto _k = 0; _k < _tasks.size(); _k++) {
                 task& _task = _tasks[_k];
-                if (_task.count > 0) {
-                    // std::cout << "k = " << _k << " --- task duration = " << std::chrono::duration_cast<std::chrono::nanoseconds>(_task.duration).count() << std::endl;
-                    _frames[count_t - 1].indices.push_back(_k);
-                    _frames[count_t - 1].ratios.push_back(static_cast<float>(_task.duration.count()) / _frame_duration.count());
-                    // std::cout << "ratio = " << _frames[count_t - 1].ratios[_k];
-                    _task.count = 0;
-                    _task.duration = unit_t(0);
-                }
+                // if (_task.count > 0) {
+                // std::cout << "k = " << _k << " --- task duration = " << std::chrono::duration_cast<std::chrono::nanoseconds>(_task.duration).count() << std::endl;
+                _frames[count_t - 1].indices.push_back(_k);
+                _frames[count_t - 1].ratios.push_back(static_cast<float>(_task.duration.count()));
+                // _frames[count_t - 1].ratios.push_back(static_cast<float>(_task.duration.count()) / _frame_duration.count());
+                // }
+            }
+            for (auto& _callback : _new_frame_callbacks)
+                _callback();
+            for (auto _k = 0; _k < _tasks.size(); _k++) {
+                task& _task = _tasks[_k];
+                // if (_task.count > 0) {
+                _task.count = 0;
+                _task.duration = unit_t(0);
+                // }
             }
             std::iter_swap(_frames.data(), _frames.data() + count_t - 1);
             _frames[count_t - 1].indices.clear();
@@ -68,9 +76,11 @@ namespace glue {
             if (_task_names.find(name) == _task_names.end()) {
                 _task_names.emplace(name, static_cast<unsigned int>(_tasks.size()));
                 _tasks.emplace_back();
+                for (auto& _callback : _new_task_callbacks)
+                    _callback(name, static_cast<unsigned int>(_tasks.size()) - 1);
             }
             task& _task = _tasks[_task_names[name]];
-            // _task.watch.lap<unit_t>(); // <<<<<<<<<<<<<<<<<<<<
+            _task.watch.lap<unit_t>(); // <<<<<<<<<<<<<<<<<<<<
             _task.count++;
         }
     }
@@ -104,5 +114,16 @@ namespace glue {
         return _frames;
     }
 
+    template <unsigned int count_t, typename unit_t>
+    void chronometer<count_t, unit_t>::on_new_task(const std::function<void(const std::string&, unsigned int)>& new_task_callback)
+    {
+        _new_task_callbacks.push_back(new_task_callback);
+    }
+
+    template <unsigned int count_t, typename unit_t>
+    void chronometer<count_t, unit_t>::on_new_frame(const std::function<void()>& new_frame_callback)
+    {
+        _new_frame_callbacks.push_back(new_frame_callback);
+    }
 }
 }

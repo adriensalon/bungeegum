@@ -12,6 +12,7 @@
 #include <array>
 #include <chrono>
 #include <ctime>
+#include <functional>
 #include <iostream>
 #include <unordered_map>
 #include <vector>
@@ -70,9 +71,13 @@ namespace glue {
         const task& get_task(const std::string& name);
         const std::vector<task>& get_tasks();
         const std::array<frame, count_t>& get_frames();
+        void on_new_task(const std::function<void(const std::string&, unsigned int)>& new_task_callback);
+        void on_new_frame(const std::function<void()>& new_frame_callback);
 
     private:
         unit_t _frame_duration;
+        std::vector<std::function<void(const std::string&, unsigned int)>> _new_task_callbacks;
+        std::vector<std::function<void()>> _new_frame_callbacks;
         std::vector<task> _tasks;
         std::array<frame, count_t> _frames;
         std::unordered_map<std::string, unsigned int> _task_names;
