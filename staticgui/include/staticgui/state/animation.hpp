@@ -14,9 +14,10 @@
 #include <typeindex>
 #include <vector>
 
+#include <staticgui/glue/lerp.hpp>
 #include <staticgui/state/curve.hpp>
 #include <staticgui/state/event.hpp>
-#include <staticgui/state/lerp.hpp>
+
 
 namespace staticgui {
 namespace detail {

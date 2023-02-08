@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <staticgui/state/animation.hpp>
+#include <staticgui/state/animatable.hpp>
 #include <staticgui/state/layout.hpp>
 #include <staticgui/state/rendering.hpp>
 #include <staticgui/state/widget.hpp>

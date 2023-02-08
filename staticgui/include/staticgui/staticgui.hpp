@@ -142,7 +142,7 @@ private:
 
 /// @brief
 template <typename value_t>
-value_t lerp(detail::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t);
+value_t lerp(glue::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t);
 
 /// @brief
 /// @details
@@ -159,7 +159,7 @@ enum struct animation_mode {
 template <typename value_t>
 struct animation {
 
-    using lerpable_value = detail::enable_if_lerpable_t<value_t>;
+    using lerpable_value = glue::enable_if_lerpable_t<value_t>;
 
     /// @brief
     using on_tick_callback = std::function<void(const value_t&)>;
@@ -235,8 +235,10 @@ private:
 template <typename value_t>
 struct animatable {
 
-    animatable(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value);
-    animatable(const detail::enable_if_lerpable_t<value_t>& value);
+    using lerpable_value = glue::enable_if_lerpable_t<value_t>;
+
+    animatable(const animation<lerpable_value>& animated_value);
+    animatable(const lerpable_value& value);
     animatable(const animatable& other);
     animatable& operator=(const animatable& other);
     animatable(animatable&& other);
@@ -245,11 +247,10 @@ struct animatable {
 
     /// @brief
     /// @param target_value
-    void assign(value_t& target_value) const; // sets or registers animation callback + detach ^^
+    void assign(lerpable_value& target_value) const; // sets or registers animation callback + detach ^^
 
 private:
-    // bool _is_animated;
-    // mutable std::variant<value_t, animation<value_t>> _value;
+    detail::animatable_data<value_t> _data;
 };
 
 /// @brief

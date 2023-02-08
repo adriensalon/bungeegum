@@ -12,7 +12,7 @@
 #include <type_traits>
 
 namespace staticgui {
-namespace detail {
+namespace glue {
 
     // add
     template <typename value_t, typename = std::void_t<>>
@@ -54,7 +54,7 @@ namespace detail {
 
     // lerpable
     template <typename value_t>
-    constexpr bool is_lerpable_v = (detail::has_float_multiply_v<value_t> && detail::has_add_v<value_t>);
+    constexpr bool is_lerpable_v = (has_float_multiply_v<value_t> && has_add_v<value_t>);
 
     template <typename value_t>
     using enable_if_lerpable_t = typename std::enable_if_t<is_lerpable_v<value_t>, value_t>;
@@ -64,4 +64,4 @@ namespace detail {
 }
 }
 
-#include <staticgui/state/lerp.inl>
+#include <staticgui/glue/lerp.inl>

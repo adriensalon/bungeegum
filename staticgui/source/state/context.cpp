@@ -38,8 +38,8 @@ namespace detail {
         });
         widgets.clear_resolve();
 
-        // return _must_draw;
-        return true;
+        return _must_draw;
+        // return true;
     }
 
     void context_state::draw()

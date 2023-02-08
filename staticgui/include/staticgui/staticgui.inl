@@ -150,9 +150,9 @@ const std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callb
 #pragma endregion
 
 template <typename value_t>
-value_t lerp(detail::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t)
+value_t lerp(glue::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t)
 {
-    return detail::lerp<value_t>(std::forward<value_t>(min_value), std::forward<value_t>(max_value), t);
+    return glue::lerp<value_t>(std::forward<value_t>(min_value), std::forward<value_t>(max_value), t);
 }
 
 #pragma region animation
@@ -292,32 +292,32 @@ animation<value_t>& animation<value_t>::detach()
 }
 #pragma endregion
 
-#pragma region value
+#pragma region animatable
 template <typename value_t>
-animatable<value_t>::animatable(const animation<detail::enable_if_lerpable_t<value_t>>& animated_value)
+animatable<value_t>::animatable(const animation<glue::enable_if_lerpable_t<value_t>>& animated_value)
 {
     // _is_animated = true;
     // _value = animated_value;
 }
 
 template <typename value_t>
-animatable<value_t>::animatable(const detail::enable_if_lerpable_t<value_t>& static_value)
+animatable<value_t>::animatable(const glue::enable_if_lerpable_t<value_t>& static_value)
 {
     // _is_animated = false;
     // _value = static_value;
 }
 
-template <typename value_t>
-void animatable<value_t>::assign(value_t& target_value) const
-{
-    // if (_is_animated) {
-    //     animation<value_t>& _animation = std::get<animation<value_t>>(_value);
-    //     _animation.on_value_changed(event<value_t>([&](const value_t& _value_changed) {
-    //         target_value = _value_changed;
-    //     }));
-    // } else
-    //     target_value = std::get<value_t>(_value);
-}
+// template <typename value_t>
+// void animatable<value_t>::assign(value_t& target_value) const
+// {
+//     // if (_is_animated) {
+//     //     animation<value_t>& _animation = std::get<animation<value_t>>(_value);
+//     //     _animation.on_value_changed(event<value_t>([&](const value_t& _value_changed) {
+//     //         target_value = _value_changed;
+//     //     }));
+//     // } else
+//     //     target_value = std::get<value_t>(_value);
+// }
 #pragma endregion
 
 #pragma region context
