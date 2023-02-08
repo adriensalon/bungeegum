@@ -149,20 +149,28 @@ const std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callb
 }
 #pragma endregion
 
-#pragma region animation
 template <typename value_t>
-animation<value_t>::animation()
-    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
+value_t lerp(detail::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t)
 {
+    return detail::lerp<value_t>(std::forward<value_t>(min_value), std::forward<value_t>(max_value), t);
 }
 
+#pragma region animation
 template <typename value_t>
 template <typename duration_unit_t>
-animation<value_t>::animation(const curve& curved_shape, const unsigned int duration_count, const animation_mode mode)
-    : _impl(detail::state.context.animations.make_animation_and_data<value_t>())
+animation<value_t>::animation(
+    const curve& curved_shape,
+    lerpable_value&& min_value,
+    lerpable_value&& max_value,
+    const unsigned int duration_count,
+    const animation_mode mode)
+    : _impl(detail::state.context.animations.make_animation_and_data<value_t>(detail::state.context.events))
 {
-    duration_unit_t kk;
-    (void)kk;
+    detail::state.context.animations.shape_animation(_impl, curved_shape._data);
+    detail::state.context.animations.set_animation_min(_impl, std::forward<value_t>(min_value));
+    detail::state.context.animations.set_animation_max(_impl, std::forward<value_t>(max_value));
+    detail::state.context.animations.set_animation_duration<value_t, duration_unit_t>(_impl, duration_count);
+    // mode
 }
 
 template <typename value_t>
@@ -194,26 +202,92 @@ animation<value_t>& animation<value_t>::operator=(animation<value_t>&& other)
 template <typename value_t>
 animation<value_t>::~animation()
 {
-    // if (_impl.is_attached)
-    //     detail::state.context.events.destroy_event_and_data(_impl)
+    if (_impl.event.is_attached)
+        detail::state.context.animations.destroy_animation_and_data(_impl);
 }
 
 template <typename value_t>
 animation<value_t>& animation<value_t>::on_value_changed(const event<value_t>& value_changed_event)
 {
-    // std::cout << "YES 2 \n";
+    detail::state.context.events.merge_events_and_datas(_impl.event, value_changed_event);
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::on_tick(const on_tick_callback& tick_callback)
+{
+    _impl.event.callbacks.push_back(tick_callback);
     return *this;
 }
 
 template <typename value_t>
 animation<value_t>& animation<value_t>::start()
 {
+    detail::state.context.animations.start_animation(_impl);
     return *this;
 }
 
 template <typename value_t>
 animation<value_t>& animation<value_t>::stop()
 {
+    detail::state.context.animations.stop_animation(_impl);
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::reset()
+{
+    detail::state.context.animations.reset_animation(_impl);
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::shape(const curve& curved_shape)
+{
+    detail::state.context.animations.shape_animation(_impl, curved_shape._data);
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::min(value_t&& min_value)
+{
+    detail::state.context.animations.set_animation_min(_impl, std::forward<value_t>(min_value));
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::max(value_t&& max_value)
+{
+    detail::state.context.animations.set_animation_max(_impl, std::forward<value_t>(max_value));
+    return *this;
+}
+
+template <typename value_t>
+template <typename duration_unit_t>
+animation<value_t>& animation<value_t>::duration(const unsigned int count)
+{
+    detail::state.context.animations.set_animation_duration<value_t, duration_unit_t>(_impl, count);
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::attach()
+{
+    detail::state.context.animations.attach_animation(_impl);
+    return *this;
+}
+
+template <typename value_t>
+template <typename widget_t>
+animation<value_t>& animation<value_t>::detach(widget_t& widget)
+{
+    detail::state.context.widgets.detach_animation(_impl, widget);
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::detach()
+{
+    detail::state.context.animations.detach_animation(_impl);
     return *this;
 }
 #pragma endregion

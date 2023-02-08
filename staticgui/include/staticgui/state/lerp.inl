@@ -9,18 +9,15 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-
-#include <staticgui/glue/bspline.hpp>
-#include <staticgui/glue/simd.hpp>
-
 namespace staticgui {
 namespace detail {
 
-    struct curve_data {
-        std::shared_ptr<glue::bspline> spline = nullptr;
-    };
+    template <typename value_t>
+    value_t lerp(enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t)
+    {
+        return (1.f - t) * min_value + t * max_value;
+    }
+}
+}
 
-}
-}
+#include <staticgui/state/lerp.inl>

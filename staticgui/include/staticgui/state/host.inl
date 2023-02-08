@@ -25,8 +25,9 @@ namespace detail {
                 _renderer->process_input(_event);
             });
             _window->on_update([this]() {
-                std::chrono::milliseconds _delta_time = _stopwatch.lap();
-                float _delta_milliseconds = static_cast<float>(_delta_time.count());
+                std::chrono::microseconds _max_fps_period_microseconds = std::chrono::microseconds(static_cast<unsigned int>(std::floorf(1000000.f / context.max_fps)));
+                std::chrono::microseconds _delta_time = _stopwatch.lap_at_least(_max_fps_period_microseconds);
+                float _delta_milliseconds = 0.001f * static_cast<float>(_delta_time.count());
                 bool _has_thrown = has_userspace_thrown();
                 if (!has_userspace_thrown()) {
                     if (this->context.tick(_delta_milliseconds)) {

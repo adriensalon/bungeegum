@@ -16,16 +16,20 @@
 
 #include <staticgui/state/curve.hpp>
 #include <staticgui/state/event.hpp>
+#include <staticgui/state/lerp.hpp>
 
 namespace staticgui {
 namespace detail {
 
     template <typename value_t>
     struct animation_impl {
+        std::unique_ptr<value_t> min_value = nullptr;
+        std::unique_ptr<value_t> max_value = nullptr;
         event_impl<value_t> event;
         curve_data curve;
         bool is_playing = false;
-        float playing_cursor = 0.f;
+        float playing_cursor_seconds = 0.f;
+        float duration_seconds = 0.f;
     };
 
     struct animation_data {
@@ -43,11 +47,8 @@ namespace detail {
         void tick(const float delta_milliseconds);
 
         template <typename value_t>
-        animation_impl<value_t>& make_animation_and_data();
+        animation_impl<value_t>& make_animation_and_data(event_registry& events);
 
-        //
-        //
-        //
         template <typename value_t>
         void destroy_animation_and_data(const animation_impl<value_t>& animation);
 
@@ -63,6 +64,12 @@ namespace detail {
         template <typename value_t>
         void shape_animation(animation_impl<value_t>& animation, const curve_data& curve);
 
+        template <typename value_t>
+        void set_animation_min(animation_impl<value_t>& animation, value_t&& min_value);
+
+        template <typename value_t>
+        void set_animation_max(animation_impl<value_t>& animation, value_t&& max_value);
+
         template <typename value_t, typename duration_unit_t = std::chrono::seconds>
         void set_animation_duration(animation_impl<value_t>& animation, const unsigned int count);
 
@@ -72,10 +79,6 @@ namespace detail {
         template <typename value_t>
         void detach_animation(animation_impl<value_t>& animation);
 
-        //
-        //
-        //
-        //
         template <typename value_t>
         animation_data& get_data(animation_impl<value_t>& widget);
 

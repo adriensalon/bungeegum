@@ -41,6 +41,9 @@ namespace glue {
         template <typename unit_t = std::chrono::milliseconds>
         unit_t lap();
 
+        template <typename unit_t = std::chrono::milliseconds>
+        unit_t lap_at_least(const unit_t at_least);
+
     private:
         std::chrono::system_clock::time_point _last;
     };

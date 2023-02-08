@@ -99,15 +99,9 @@ namespace detail {
         template <typename... values_t, typename widget_t>
         void detach_to_widget(event_impl<values_t...>& event, widget_t& widget);
 
-        //
-        //
-        //
         template <typename value_t, typename widget_t>
-        void detach_to_widget(animation_impl<value_t>& animation, widget_t& widget);
+        void detach_animation(animation_impl<value_t>& animation, widget_t& widget);
 
-        //
-        //
-        //
     private:
         glue::registry _registry;
         std::vector<std::reference_wrapper<widget_data>> _roots;

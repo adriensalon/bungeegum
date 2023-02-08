@@ -16,6 +16,42 @@ void throw_error(const std::string& what)
     detail::throw_user_bad_implementation(what);
 }
 
+#pragma region curve
+
+curve::curve(const curve_preset preset)
+{
+    // switch on preset
+    _data.spline = std::make_shared<glue::bspline>(0.f, 1.f, std::vector<float2> {});
+}
+curve::curve(const float departure, const float arrival, const std::vector<float2>& controls)
+{
+    _data.spline = std::make_shared<glue::bspline>(departure, arrival, controls);
+}
+
+curve::curve(const curve& other)
+{
+    *this = other;
+}
+
+curve& curve::operator=(const curve& other)
+{
+    _data = other._data;
+    return *this;
+}
+
+curve::curve(curve&& other)
+{
+    *this = std::move(other);
+}
+
+curve& curve::operator=(curve&& other)
+{
+    _data = other._data;
+    return *this;
+}
+
+#pragma endregion
+
 draw_rounding_command& draw_rounding_command::strength(const float z)
 {
     _rounding.strength = z;
@@ -124,6 +160,12 @@ context& get_context()
 {
     static context _context;
     return _context;
+}
+
+context& context::max_fps(const unsigned int fps)
+{
+    detail::state.context.max_fps = fps;
+    return *this;
 }
 
 }

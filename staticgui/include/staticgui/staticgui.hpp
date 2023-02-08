@@ -13,7 +13,6 @@
 #include <iostream>
 
 #include <staticgui/state/host.hpp>
-#include <staticgui/state/lerpable.hpp>
 
 using int2 = staticgui::glue::simd_array<int, 2>;
 using int3 = staticgui::glue::simd_array<int, 3>;
@@ -50,13 +49,18 @@ enum struct curve_preset {
 /// @brief Curve object
 /// @details Curves are represented by bsplines and can be created directly from control points.
 struct curve {
+
     curve(const curve_preset preset);
     curve(const float departure, const float arrival, const std::vector<float2>& controls = {});
+    curve(const curve& other);
+    curve& operator=(const curve& other);
+    curve(curve&& other);
+    curve& operator=(curve&& other);
 
 private:
     detail::curve_data _data;
     template <typename value_t>
-    struct animation;
+    friend struct animation;
 };
 
 /// @brief Event objects store same type callbacks and can be passed around the user code to be
@@ -137,6 +141,10 @@ private:
 };
 
 /// @brief
+template <typename value_t>
+value_t lerp(detail::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t);
+
+/// @brief
 /// @details
 enum struct animation_mode {
     forward,
@@ -151,9 +159,18 @@ enum struct animation_mode {
 template <typename value_t>
 struct animation {
 
-    animation();
+    using lerpable_value = detail::enable_if_lerpable_t<value_t>;
+
+    /// @brief
+    using on_tick_callback = std::function<void(const value_t&)>;
+
     template <typename duration_unit_t = std::chrono::seconds>
-    animation(const curve& curved_shape, const unsigned int duration_count = 1, const animation_mode mode = animation_mode::forward);
+    animation(
+        const curve& curved_shape,
+        lerpable_value&& min_value,
+        lerpable_value&& max_value,
+        const unsigned int duration_count = 1,
+        const animation_mode mode = animation_mode::forward);
     animation(const animation& other);
     animation& operator=(const animation& other);
     animation(animation&& other);
@@ -163,6 +180,10 @@ struct animation {
     /// @brief
     /// @param value_changed_event
     animation& on_value_changed(const event<value_t>& value_changed_event);
+
+    /// @brief
+    /// @param value_changed_event
+    animation& on_tick(const on_tick_callback& tick_callback);
 
     /// @brief
     animation& start();
@@ -175,6 +196,12 @@ struct animation {
 
     /// @brief
     animation& shape(const curve& curved_shape);
+
+    /// @brief
+    animation& min(value_t&& min_value);
+
+    /// @brief
+    animation& max(value_t&& min_value);
 
     /// @brief
     template <typename duration_unit_t = std::chrono::seconds>
@@ -228,6 +255,18 @@ private:
 /// @brief
 /// @details
 struct context {
+
+    /// @brief
+    context& max_fps(const unsigned int fps);
+
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
 
     template <typename widget_t>
     context& destroy(widget_t& widget, const bool destroy_children = true);

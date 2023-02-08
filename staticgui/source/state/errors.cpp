@@ -36,6 +36,7 @@ namespace detail {
 
     void throw_library_bad_implementation(const std::string& what)
     {
+        // if not protecting => console
         throw library_bad_implementation_exception(what, 10);
     }
 
@@ -52,6 +53,7 @@ namespace detail {
                         glue::console_log(_trace.primary.function, glue::console_color::green);
                 } catch (const std::exception& _exception) {
                     std::cout << "UNKNOWN 2\n";
+                    std::cout << _exception.what() << std::endl;
                     (void)_exception;
                     // bad implementation exception (non traced)
                 }

@@ -141,6 +141,12 @@ namespace detail {
         };
     }
 
+    template <typename value_t, typename widget_t>
+    void widget_registry::detach_animation(animation_impl<value_t>& animation, widget_t& widget)
+    {
+        detach_to_widget(animation.event, widget);
+    }
+
     // template <typename parent_widget_t, typename widget_t>
     // std::optional<parent_widget_t&> _get_parent_widget(widget_t& widget)
     // {

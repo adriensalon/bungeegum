@@ -26,6 +26,8 @@ namespace detail {
         widget_registry widgets;
         animation_registry animations;
         event_registry events;
+
+        unsigned int max_fps = 60;
     };
 
 }
