@@ -12,11 +12,12 @@
 #include <iostream>
 
 #include <staticgui/glue/imguarded.hpp>
-#include <staticgui/overlay/embedded/fa4.hpp>
 #include <staticgui/overlay/overlay.hpp>
+#include <staticgui/overlay/widgets/profiler.hpp>
 #include <staticgui/state/errors.hpp>
 
 #include "embedded/fa4.cpp"
+#include "embedded/fa4.hpp"
 #include "embedded/helvetica.cpp"
 
 namespace staticgui {
@@ -52,7 +53,7 @@ namespace detail {
         void draw_overlay(context_state& context)
         {
             ImGui::PushFont(overlay_font);
-            ImGui::ShowDemoWindow();
+            // ImGui::ShowDemoWindow();
             if (has_userspace_thrown() || ImGui::GetIO().KeysDown[ImGuiKey_Escape]) {
                 ImGui::StyleColorsLight();
                 ImGui::SetNextWindowSize({ 1000, 600 });
@@ -66,26 +67,27 @@ namespace detail {
                         for (auto& _trace : _exception.tracing) {
                             ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
                         }
-                        auto _black = ImVec4(0.f, 0.f, 0.f, 1.f);
-                        ImGui::Spacing();
-                        ImGui::Separator();
-                        ImGui::Spacing();
-                        context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
-                            unsigned int _depth = context.widgets.get_depth(_widget_data);
-                            for (unsigned int _k = 0; _k < _depth; _k++) {
-                                ImGui::TextColored(_black, "      ");
-                                ImGui::SameLine();
-                            }
-                            ImGui::TextColored(_black, _widget_data.kind->name());
-                            if (_widget_data.drawer) {
-                                ImGui::SameLine();
-                                ImGui::TextColored(_black, " [painter]");
-                            }
-                        });
                         ImGui::Spacing();
                         ImGui::Separator();
                         ImGui::Spacing();
                     }
+
+                    auto _black = ImVec4(0.f, 0.f, 0.f, 1.f);
+                    context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
+                        unsigned int _depth = context.widgets.get_depth(_widget_data);
+                        for (unsigned int _k = 0; _k < _depth; _k++) {
+                            ImGui::TextColored(_black, "      ");
+                            ImGui::SameLine();
+                        }
+                        ImGui::TextColored(_black, _widget_data.kind->name());
+                        if (_widget_data.drawer) {
+                            ImGui::SameLine();
+                            ImGui::TextColored(_black, " [painter]");
+                        }
+                    });
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                    ImGui::Spacing();
 
                     int _k = 0;
                     context.animations.iterate_datas([&](detail::animation_data& _animation_data) {

@@ -24,7 +24,7 @@ namespace detail {
 
     bool context_state::tick(const float delta_milliseconds)
     {
-
+        frames_chronometer.new_frame();
         animations.tick(delta_milliseconds);
         events.tick();
 

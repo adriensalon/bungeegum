@@ -9,9 +9,12 @@
 
 #pragma once
 
+#include <array>
 #include <chrono>
 #include <ctime>
 #include <iostream>
+#include <unordered_map>
+#include <vector>
 
 namespace staticgui {
 namespace glue {
@@ -46,6 +49,31 @@ namespace glue {
 
     private:
         std::chrono::system_clock::time_point _last;
+    };
+
+    template <unsigned int count_t, typename unit_t = std::chrono::milliseconds>
+    struct chronometer {
+        struct frame {
+            std::vector<unsigned int> indices;
+            std::vector<float> ratios;
+        };
+
+        struct task {
+            unit_t duration;
+            unsigned int count = 0;
+        };
+
+        void new_frame();
+        void begin(const std::string& name);
+        void end(const std::string& name);
+        const task& get_task(const std::string& name);
+        const std::vector<task>& get_tasks();
+        const std::array<frame, count_t>& get_frames();
+
+    private:
+        std::vector<task> _tasks;
+        std::array<frame, count_t> _frames;
+        std::unordered_map<std::string, unsigned int> _task_names;
     };
 
 }

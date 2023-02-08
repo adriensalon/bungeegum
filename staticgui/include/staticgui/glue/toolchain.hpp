@@ -135,36 +135,37 @@
 #define TOOLCHAIN_COMPILER_GCC 0
 #endif
 
+// build variant
+#if defined(NDEBUG)
+#define TOOLCHAIN_BUILD_DEBUG 0
+#define TOOLCHAIN_BUILD_RELEASE 1
+#else
+#define TOOLCHAIN_BUILD_DEBUG 1
+#define TOOLCHAIN_BUILD_RELEASE 0
+#endif
+
 namespace staticgui {
 namespace glue {
     constexpr bool is_arch_32 = TOOLCHAIN_ARCH_32;
-
     constexpr bool is_arch_64 = TOOLCHAIN_ARCH_64;
 
     constexpr bool is_cpu_x86 = TOOLCHAIN_CPU_X86;
-
     constexpr bool is_cpu_arm = TOOLCHAIN_CPU_ARM;
-
     constexpr bool is_cpu_webasm = TOOLCHAIN_CPU_WEBASM;
 
     constexpr bool is_platform_emscripten = TOOLCHAIN_PLATFORM_EMSCRIPTEN;
-
     constexpr bool is_platform_win32 = TOOLCHAIN_PLATFORM_WIN32;
-
     constexpr bool is_platform_uwp = TOOLCHAIN_PLATFORM_UWP;
-
     constexpr bool is_platform_macos = TOOLCHAIN_PLATFORM_MACOS;
-
     constexpr bool is_platform_ios = TOOLCHAIN_PLATFORM_IOS;
-
     constexpr bool is_platform_linux = TOOLCHAIN_PLATFORM_LINUX;
-
     constexpr bool is_platform_android = TOOLCHAIN_PLATFORM_ANDROID;
 
     constexpr bool is_compiler_msvc = TOOLCHAIN_COMPILER_MSVC;
-
     constexpr bool is_compiler_clang = TOOLCHAIN_COMPILER_CLANG;
-
     constexpr bool is_compiler_gcc = TOOLCHAIN_COMPILER_GCC;
+
+    constexpr bool is_build_debug = TOOLCHAIN_BUILD_DEBUG;
+    constexpr bool is_build_release = TOOLCHAIN_BUILD_RELEASE;
 }
 }
