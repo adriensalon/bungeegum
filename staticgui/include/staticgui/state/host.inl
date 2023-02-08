@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <staticgui/overlay/overlay.hpp>
 #include <staticgui/state/errors.hpp>
 
 namespace staticgui {
@@ -21,6 +22,8 @@ namespace detail {
             this->context.widgets.declare_root(widget);
             _window = std::make_unique<glue::window>();
             _renderer = std::make_unique<glue::renderer>(*(_window.get()));
+            overlay::install_font();
+            _renderer->rebuild_fonts();
             _window->on_input([this](const std::any& _event) {
                 _renderer->process_input(_event);
             });
@@ -52,6 +55,7 @@ namespace detail {
     std::function<void()> host_state::launch_embedded(widget_t& widget)
     {
         protect_library([&]() {
+            overlay::install_font();
             context.widgets.declare_root(widget);
         });
         return [this]() {

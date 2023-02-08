@@ -39,6 +39,8 @@ namespace glue {
 
         void present();
 
+        void rebuild_fonts();
+
         void process_input(const std::any& input);
 
     private:

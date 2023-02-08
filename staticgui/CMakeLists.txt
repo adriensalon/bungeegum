@@ -29,6 +29,8 @@ set(staticgui_source
 	"source/state/rendering.cpp"
 	"source/state/widget.cpp"
 
+	"source/overlay/embedded/fa4.cpp"
+	"source/overlay/embedded/helvetica.cpp"
 	"source/overlay/overlay.cpp"
 
 	"source/staticgui.cpp"

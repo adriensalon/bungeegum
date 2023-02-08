@@ -7,20 +7,51 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <staticgui/glue/imguarded.hpp>
-#include <staticgui/overlay/overlay.hpp>
-#include <staticgui/state/errors.hpp>
-
 #include <imgui.h>
 #include <implot.h>
 #include <iostream>
+
+#include <staticgui/glue/imguarded.hpp>
+#include <staticgui/overlay/embedded/fa4.hpp>
+#include <staticgui/overlay/overlay.hpp>
+#include <staticgui/state/errors.hpp>
+
+#include "embedded/fa4.cpp"
+#include "embedded/helvetica.cpp"
 
 namespace staticgui {
 namespace detail {
     namespace overlay {
 
+        static ImFont* overlay_font = nullptr;
+        static ImFont* icons_font = nullptr;
+
+        void install_font()
+        {
+            static bool _installed = false;
+            if (!_installed) {
+
+                // config.
+                ImGuiIO& io = ImGui::GetIO();
+                // io.Fonts->AddFontFromMemoryCompressedTTF(helvetica_compressed_data, helvetica_compressed_size, 13.0f);
+                overlay_font = io.Fonts->AddFontFromMemoryCompressedTTF(helvetica_compressed_data, helvetica_compressed_size, 13.0f);
+
+                // font awesome for the glyphs
+                // ImFontConfig config;
+                // config.MergeMode = true;
+                // config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
+                // static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+                // icons_font = io.Fonts->AddFontFromMemoryCompressedTTF(fa4_compressed_data, fa4_compressed_size, 13.0f, &config, icon_ranges);
+
+                // build
+                io.Fonts->Build();
+                _installed = true;
+            }
+        }
+
         void draw_overlay(context_state& context)
         {
+            ImGui::PushFont(overlay_font);
             ImGui::ShowDemoWindow();
             if (has_userspace_thrown() || ImGui::GetIO().KeysDown[ImGuiKey_Escape]) {
                 ImGui::StyleColorsLight();
@@ -73,6 +104,7 @@ namespace detail {
                     ImGui::End();
                 }
             }
+            ImGui::PopFont();
         }
     }
 }

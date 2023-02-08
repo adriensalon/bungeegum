@@ -92,6 +92,11 @@ namespace glue {
     {
     }
 
+    void renderer::rebuild_fonts()
+    {
+        _renderer_impl->imgui_renderer->CreateDeviceObjects();
+    }
+
     void renderer::set_clear_color(const std::array<float, 4>& color)
     {
         _clear_color = color;
