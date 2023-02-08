@@ -47,7 +47,6 @@ namespace detail {
         widgets.iterate_must_resolve([&](widget_data& _data, const bool _must_resolve_children) {
 
         });
-        widgets.clear_resolve();
         frames_chronometer.end("resolve");
 
         return _must_draw;
@@ -69,11 +68,14 @@ namespace detail {
             if (_data.command.has_value())
                 _data.command.value().draw();
         });
-        if (!has_userspace_thrown())
-            widgets.clear_draw();
         frames_chronometer.end("draw");
 
         overlay::draw_overlay(*this);
+
+        if (!has_userspace_thrown()) {
+            widgets.clear_resolve();
+            widgets.clear_draw();
+        }
     }
 }
 }

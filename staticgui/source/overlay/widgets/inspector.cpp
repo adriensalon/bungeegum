@@ -7,15 +7,24 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#pragma once
+#include <imgui.h>
+#include <implot.h>
+#include <iostream>
 
-#include <staticgui/state/context.hpp>
+#include <staticgui/overlay/widgets/inspector.hpp>
 
 namespace staticgui {
 namespace detail {
     namespace overlay {
 
-        void draw_inspector(context_state& context);
+        void draw_inspector(context_state& context)
+        {
+            ImGui::SetNextWindowSize({ 800, 250 });
+            if (ImGui::Begin("Inspector")) {
+
+                ImGui::End();
+            }
+        }
     }
 }
 }

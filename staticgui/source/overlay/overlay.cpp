@@ -13,6 +13,7 @@
 
 #include <staticgui/glue/imguarded.hpp>
 #include <staticgui/overlay/overlay.hpp>
+#include <staticgui/overlay/widgets/inspector.hpp>
 #include <staticgui/overlay/widgets/profiler.hpp>
 #include <staticgui/state/errors.hpp>
 
@@ -119,6 +120,7 @@ namespace detail {
                     ImGui::End();
                 }
 
+                draw_inspector(context);
                 draw_profiler(context);
             }
             ImGui::PopFont();
