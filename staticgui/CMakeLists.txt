@@ -14,6 +14,7 @@ set(staticgui_source
 	"source/glue/backtrace.cpp"
 	"source/glue/bspline.cpp"
 	"source/glue/console.cpp"
+	"source/glue/imguarded.cpp"
 	"source/glue/registry.cpp"
 	"source/glue/renderer.cpp"
 	"source/glue/simd.cpp"

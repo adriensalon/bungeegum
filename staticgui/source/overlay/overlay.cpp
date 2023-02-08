@@ -7,6 +7,7 @@
 //                           __/ |
 //                          |___/     v0.0
 
+#include <staticgui/glue/imguarded.hpp>
 #include <staticgui/overlay/overlay.hpp>
 #include <staticgui/state/errors.hpp>
 
@@ -20,6 +21,7 @@ namespace detail {
 
         void draw_overlay(context_state& context)
         {
+            ImGui::ShowDemoWindow();
             if (has_userspace_thrown() || ImGui::GetIO().KeysDown[ImGuiKey_Escape]) {
                 ImGui::StyleColorsLight();
                 ImGui::SetNextWindowSize({ 1000, 600 });
