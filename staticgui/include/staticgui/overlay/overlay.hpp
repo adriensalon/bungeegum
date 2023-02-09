@@ -17,7 +17,7 @@ namespace detail {
 
         void setup_overlay(context_state& context);
 
-        void draw_overlay(context_state& context);
+        void draw_overlay(context_state& context, bool& show, const std::function<void(ImDrawList*)>& draw_commands);
     }
 }
 }

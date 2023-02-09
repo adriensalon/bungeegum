@@ -57,28 +57,25 @@ namespace detail {
             }
         }
 
-        void draw_overlay(context_state& context)
+        void draw_overlay(context_state& context, bool& show, const std::function<void(ImDrawList*)>& draw_commands)
         {
-
             ImGui::PushFont(overlay_font);
-            static bool _debug = false;
-            static bool _debugcancel = true;
-            if (ImGui::GetIO().KeysDown[ImGuiKey_Escape] && _debugcancel) {
-                _debug = !_debug;
-                _debugcancel = false;
+            static bool _show_mem = true;
+            if (ImGui::GetIO().KeysDown[ImGuiKey_Escape] && _show_mem) {
+                show = !show;
+                _show_mem = false;
             }
             if (!ImGui::GetIO().KeysDown[ImGuiKey_Escape]) {
-                _debugcancel = true;
+                _show_mem = true;
             }
 
-            // ImGui::ShowDemoWindow();
-            if (has_userspace_thrown() || _debug) {
-                // set meilleur style
+            if (has_userspace_thrown())
+                show = true;
 
+            if (show) {
                 static bool _setup = false;
                 if (!_setup) {
                     ImGui::StyleColorsLight();
-                    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
                     ImGuiViewport* viewport = ImGui::GetMainViewport();
                     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
                     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
@@ -92,18 +89,24 @@ namespace detail {
                     ImGui::DockBuilderDockWindow("Hierarchy", dock_id_left);
                     ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
                     ImGui::DockBuilderDockWindow("Profiler", dock_id_down);
+                    ImGui::DockBuilderDockWindow("Application", dockspace_id);
                     ImGui::DockBuilderDockWindow("Debug", dockspace_id);
                     ImGui::DockBuilderFinish(dockspace_id);
                     _setup = true;
                 }
+                // ImGui::SetNextWindowFocus();
+                // ImGui::ShowDemoWindow();
 
-                draw_debug(context);
                 draw_hierarchy(context);
                 draw_inspector(context);
                 draw_profiler(context);
-
-                ImGui::SetNextWindowFocus();
-                ImGui::ShowDemoWindow();
+                draw_debug(context);
+                if (ImGui::Begin("Application")) {
+                    draw_commands(ImGui::GetWindowDrawList());
+                }
+                ImGui::End();
+            } else {
+                draw_commands(ImGui::GetBackgroundDrawList());
             }
             ImGui::PopFont();
         }

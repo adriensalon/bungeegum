@@ -64,13 +64,15 @@ namespace detail {
                 _data.drawer(_data.command.value());
             });
         });
-        widgets.iterate_datas([](widget_data& _data) {
-            if (_data.command.has_value())
-                _data.command.value().draw();
-        });
         frames_chronometer.end("draw");
 
-        overlay::draw_overlay(*this);
+        static bool _show_overlay = true;
+        overlay::draw_overlay(*this, _show_overlay, [&](ImDrawList* _imgui_drawlist) {
+            widgets.iterate_datas([&](widget_data& _data) {
+                if (_data.command.has_value())
+                    _data.command.value().draw(_imgui_drawlist);
+            });
+        });
 
         if (!has_userspace_thrown()) {
             widgets.clear_resolve();

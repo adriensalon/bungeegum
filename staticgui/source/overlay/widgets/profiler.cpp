@@ -72,8 +72,8 @@ namespace detail {
 
         void draw_profiler(context_state& context)
         {
-            ImGui::SetNextWindowSize({ 800, 250 });
-            if (ImGui::Begin("Profiler", 0, ImGuiWindowFlags_NoMove)) {
+            // ImGui::SetNextWindowSize({ 800, 250 });
+            if (ImGui::Begin("Profiler", 0)) {
                 static float history = 10.0f;
                 ImGui::SliderFloat("History", &history, 1, 30, "%.1f s");
                 static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels;

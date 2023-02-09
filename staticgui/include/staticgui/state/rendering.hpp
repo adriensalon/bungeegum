@@ -15,6 +15,8 @@
 #include <staticgui/glue/registry.hpp>
 #include <staticgui/glue/simd.hpp>
 
+struct ImDrawList;
+
 namespace staticgui {
 namespace detail {
 
@@ -47,11 +49,9 @@ namespace detail {
 
     struct command_data {
         void add_line(const line_command_data& line);
-
         void add_rectangle(const rectangle_command_data& rectangle);
-
         void draw();
-
+        void draw(ImDrawList* imgui_drawlist);
         void clear();
 
     private:

@@ -59,15 +59,20 @@ namespace detail {
 
     void command_data::draw()
     {
+        ImDrawList* _draw_list = ImGui::GetBackgroundDrawList();
+        draw(_draw_list);
+    }
+
+    void command_data::draw(ImDrawList* imgui_drawlist)
+    {
         // if (ImGui::Begin("hello")) {
         //     ImGui::Text("Ok...");
         // ImDrawList _draw_list(ImGui::GetDrawListSharedData());
-        ImDrawList* _draw_list = ImGui::GetBackgroundDrawList();
         for (auto& _line : _lines) {
             ImVec2 _first_point = get_vec2(_line.first_point);
             ImVec2 _second_point = get_vec2(_line.second_point);
             ImU32 _color = get_color(_line.color);
-            _draw_list->AddLine(_first_point, _second_point, _color, _line.thickness);
+            imgui_drawlist->AddLine(_first_point, _second_point, _color, _line.thickness);
         }
         for (auto& _rectangle : _rectangles) {
             ImVec2 _min_point = get_vec2(_rectangle.min_point);
@@ -76,7 +81,7 @@ namespace detail {
             ImDrawFlags _flags = get_rounding(_rectangle.rounding);
             // _draw_list->AddRectFilled(ImVec2(20.f, 20.f), ImVec2(200.f, 200.f), ImGui::GetColorU32(ImVec4(0.33f, 0.22f, 0.66f, 1.f)));
             // _draw_list->AddRectFilled(_min_point, _max_point, ImGui::GetColorU32(ImVec4(0.33f, 0.22f, 0.66f, 1.f)));
-            _draw_list->AddRect(_min_point, _max_point, _color, _rectangle.rounding.strength, _flags, _rectangle.thickness);
+            imgui_drawlist->AddRect(_min_point, _max_point, _color, _rectangle.rounding.strength, _flags, _rectangle.thickness);
         }
 
         // ImGui::End();
