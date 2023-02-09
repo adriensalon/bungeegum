@@ -91,6 +91,8 @@ namespace detail {
 
         void iterate_datas(const std::function<void(widget_data&)>& iterate_callback);
 
+        void iterate_root_datas(const std::function<void(widget_data&)>& iterate_callback);
+
         template <typename widget_t>
         void iterate_widgets(const std::function<void(widget_t&)>& iterate_callback);
 

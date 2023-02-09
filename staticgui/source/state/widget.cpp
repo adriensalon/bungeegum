@@ -107,8 +107,13 @@ namespace detail {
             for (auto& _child : _widget_data.children)
                 _iterate(_child);
         };
+        iterate_root_datas(_iterate);
+    }
+
+    void widget_registry::iterate_root_datas(const std::function<void(widget_data&)>& iterate_callback)
+    {
         for (auto& _root : _roots)
-            _iterate(_root);
+            iterate_callback(_root);
     }
 
     unsigned int widget_registry::get_depth(widget_data& data)

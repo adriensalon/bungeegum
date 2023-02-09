@@ -70,14 +70,17 @@ namespace detail {
             // ImGui::End();
 
             if (ImGui::Begin("Hierarchy")) {
-                context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
-                    unsigned int _depth = context.widgets.get_depth(_widget_data);
-                    for (unsigned int _k = 0; _k < _depth; _k++) {
-                        ImGui::Text("      ");
-                        ImGui::SameLine();
+                static unsigned int _depth_memory = 0;
+                std::function<void(const widget_data&)> _tf = [&](const widget_data& _widget_data) {
+                    const char* _clean_typename = clean_typename(_widget_data.kind->name()).c_str();
+                    if (ImGui::TreeNode(_clean_typename)) {
+                        for (auto& _child_widget_data_ref : _widget_data.children)
+                            _tf(_child_widget_data_ref.get());
+                        ImGui::TreePop();
                     }
-                    ImGui::Text(clean_typename(_widget_data.kind->name()).c_str());
-                });
+                };
+
+                context.widgets.iterate_root_datas(_tf);
             }
             ImGui::End();
         }
