@@ -16,12 +16,14 @@ namespace staticgui {
 namespace detail {
 
     template <typename widget_t>
-    void host_state::launch(widget_t& widget)
+    void host_state::launch(widget_t& widget, const std::function<void()>& on_renderer_started)
     {
         protect_library([&]() {
             this->context.widgets.declare_root(widget);
             _window = std::make_unique<glue::window>();
             _renderer = std::make_unique<glue::renderer>(*(_window.get()));
+            if (on_renderer_started)
+                on_renderer_started();
             overlay::setup_overlay(this->context);
             _renderer->rebuild_fonts();
             _window->on_input([this](const std::any& _event) {

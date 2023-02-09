@@ -7,6 +7,8 @@
 //                           __/ |
 //                          |___/     v0.0
 
+#include <imgui.h>
+
 #include <staticgui/staticgui.hpp>
 
 namespace staticgui {
@@ -52,69 +54,6 @@ curve& curve::operator=(curve&& other)
 
 #pragma endregion
 
-draw_rounding_command& draw_rounding_command::strength(const float z)
-{
-    _rounding.strength = z;
-    return *this;
-}
-
-draw_rounding_command& draw_rounding_command::top_left(const bool enable)
-{
-    _rounding.top_left = enable;
-    return *this;
-}
-
-draw_rounding_command& draw_rounding_command::top_right(const bool enable)
-{
-
-    _rounding.top_right = enable;
-    return *this;
-}
-
-draw_rounding_command& draw_rounding_command::bottom_left(const bool enable)
-{
-
-    _rounding.bottom_left = enable;
-    return *this;
-}
-
-draw_rounding_command& draw_rounding_command::bottom_right(const bool enable)
-{
-
-    _rounding.bottom_right = enable;
-    return *this;
-}
-
-draw_rectangle_command& draw_rectangle_command::min_point(const float2& first)
-{
-    _rectangle_command_data.min_point = first;
-    return *this;
-}
-
-draw_rectangle_command& draw_rectangle_command::max_point(const float2& second)
-{
-    _rectangle_command_data.max_point = second;
-    return *this;
-}
-
-draw_rectangle_command& draw_rectangle_command::color(const float4& col)
-{
-    _rectangle_command_data.color = col;
-    return *this;
-} // go color !!
-
-draw_rectangle_command& draw_rectangle_command::rounding(const draw_rounding_command& rounding_command)
-{
-    _rectangle_command_data.rounding = rounding_command._rounding;
-    return *this;
-}
-
-draw_rectangle_command& draw_rectangle_command::thickness(const float t)
-{
-    _rectangle_command_data.thickness = t;
-    return *this;
-}
-
 draw_command::draw_command(detail::command_data& data)
     : _command_data(data)
 {
@@ -140,16 +79,31 @@ draw_command& draw_command::operator=(draw_command&& other)
     return *this;
 }
 
-draw_command& draw_command::add_line(const draw_line_command& line_command)
+void draw_command::draw_line(
+    const float2& first_point, const float2& second_point,
+    const float4& color,
+    const float thickness)
 {
-    _command_data.add_line(line_command._line_command_data);
-    return *this;
+    ImVec2 _first_point { first_point.x(), first_point.y() };
+    ImVec2 _second_point { second_point.x(), second_point.y() };
+    ImU32 _color = ImGui::GetColorU32({ color.x(), color.y(), color.z(), color.w() });
+    _command_data.add_command([=](ImDrawList* _drawlist) {
+        _drawlist->AddLine(_first_point, _second_point, _color, thickness);
+    });
 }
 
-draw_command& draw_command::add_rectangle(const draw_rectangle_command& rectangle_command)
+void draw_command::draw_rect(
+    const float2& min_point, const float2& max_point,
+    const float4& color,
+    const float rounding,
+    const float thickness)
 {
-    this->_command_data.add_rectangle(rectangle_command._rectangle_command_data);
-    return *this;
+    ImVec2 _min_point { min_point.x(), min_point.y() };
+    ImVec2 _max_point { max_point.x(), max_point.y() };
+    ImU32 _color = ImGui::GetColorU32({ color.x(), color.y(), color.z(), color.w() });
+    _command_data.add_command([=](ImDrawList* _drawlist) {
+        _drawlist->AddRect(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All, thickness);
+    });
 }
 
 // layout::layout() { }

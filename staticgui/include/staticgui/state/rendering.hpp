@@ -20,18 +20,6 @@ struct ImDrawList;
 namespace staticgui {
 namespace detail {
 
-    // rectangle command etc
-    // text command etc
-    // image command etc
-
-    struct rounding_data {
-        float strength = 0.f;
-        bool top_left = true;
-        bool top_right = true;
-        bool bottom_left = true;
-        bool bottom_right = true;
-    };
-
     struct line_command_data {
         glue::simd_array<float, 2> first_point;
         glue::simd_array<float, 2> second_point;
@@ -39,25 +27,23 @@ namespace detail {
         float thickness = 1.f;
     };
 
-    struct rectangle_command_data {
+    struct rect_command_data {
         glue::simd_array<float, 2> min_point;
         glue::simd_array<float, 2> max_point;
         glue::simd_array<float, 4> color;
-        rounding_data rounding;
+        float rounding = 0.f;
         float thickness = 1.f;
     };
 
     struct command_data {
-        void add_line(const line_command_data& line);
-        void add_rectangle(const rectangle_command_data& rectangle);
+        void add_command(const std::function<void(ImDrawList*)>& commnad_callback);
         void draw();
         void draw(ImDrawList* imgui_drawlist);
         void clear();
 
     private:
         // std::any _command_impl = nullptr;
-        std::vector<line_command_data> _lines;
-        std::vector<rectangle_command_data> _rectangles;
+        std::vector<std::function<void(ImDrawList*)>> _commands;
     };
 
     using draw_function = std::function<void(command_data&)>;

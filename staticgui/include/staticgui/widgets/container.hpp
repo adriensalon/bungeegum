@@ -29,16 +29,13 @@ namespace widgets {
 
         void draw(draw_command& command)
         {
-            draw_rounding_command _rounding;
-            _rounding.strength(20);
-            draw_rectangle_command _rect;
-            _rect.min_point({ 20.f, 20.f })
-                .max_point({ 600.f, _tick_value })
-                .thickness(40)
-                .color({ _tick_value * 0.01f, 0.33f, 0.89f, 1.f })
-                .rounding(_rounding);
-            command.add_rectangle(_rect);
-            // std::cout << "DRAWING CONTAINER \n";
+            command.draw_rect(
+                { 20.f, 20.f },
+                { 600.f, _tick_value },
+                { _tick_value * 0.01f, 0.33f, 0.89f, 1.f },
+                12,
+                40);
+
             // detail::throw_library_bad_implementation("helloww");
             // detail::throw_library_bad_usage("helloww");
             // throw_error("my user error");

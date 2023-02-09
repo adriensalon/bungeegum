@@ -23,7 +23,7 @@ namespace detail {
     struct host_state {
 
         template <typename widget_t>
-        void launch(widget_t& widget);
+        void launch(widget_t& widget, const std::function<void()>& on_renderer_started);
 
         template <typename widget_t>
         [[nodiscard]] std::function<void()> launch_embedded(widget_t& widget);

@@ -9,9 +9,6 @@
 
 #pragma once
 
-#include <future>
-#include <iostream>
-
 #include <staticgui/state/host.hpp>
 
 using int2 = staticgui::glue::simd_array<int, 2>;
@@ -376,7 +373,7 @@ context& get_context();
 /// @tparam widget_t
 /// @param widget
 template <typename widget_t>
-void launch(widget_t& widget);
+void launch(widget_t& widget, const std::function<void()>& on_renderer_started = nullptr);
 
 /// @brief
 /// @tparam widget_t
@@ -405,13 +402,21 @@ void declare(widget_t* widget, children_widgets_t&... children_widgets);
 /// @details
 struct resolve_constraint {
     // getters
+    float2 available_size() const;
 };
 
 /// @brief
 /// @details
 struct resolve_advice {
 
+    void fixed_size(const float2& size);
     // setters
+};
+
+struct resolve_command {
+    void resolve_widget(const resolve_constraint& constraint, resolve_advice& advice);
+
+    const resolve_advice& resolve_child_widget(int child, const resolve_constraint& constraint);
 };
 
 /// @brief
@@ -423,59 +428,6 @@ void on_resolve(widget_t* widget, const std::function<void(const resolve_constra
 
 /// @brief
 /// @details
-struct draw_rounding_command {
-
-    draw_rounding_command& strength(const float z);
-
-    draw_rounding_command& top_left(const bool enable);
-
-    draw_rounding_command& top_right(const bool enable);
-
-    draw_rounding_command& bottom_left(const bool enable);
-
-    draw_rounding_command& bottom_right(const bool enable);
-
-private:
-    detail::rounding_data _rounding;
-    friend struct draw_rectangle_command;
-};
-
-/// @brief
-/// @details
-struct draw_line_command {
-    draw_line_command& first_point(const float2& first);
-
-    draw_line_command& second_point(const float2& second);
-
-    draw_line_command& color(const float4& col);
-
-    draw_line_command& thickness(const float t = 10.f);
-
-private:
-    detail::line_command_data _line_command_data;
-    friend struct draw_command;
-};
-
-/// @brief
-/// @details
-struct draw_rectangle_command {
-    draw_rectangle_command& min_point(const float2& first);
-
-    draw_rectangle_command& max_point(const float2& second);
-
-    draw_rectangle_command& color(const float4& col);
-
-    draw_rectangle_command& rounding(const draw_rounding_command& rounding_command);
-
-    draw_rectangle_command& thickness(const float t = 10.f);
-
-private:
-    detail::rectangle_command_data _rectangle_command_data;
-    friend struct draw_command;
-};
-
-/// @brief
-/// @details
 struct draw_command {
     draw_command(detail::command_data& data);
     draw_command(const draw_command& other);
@@ -483,9 +435,93 @@ struct draw_command {
     draw_command(draw_command&& other);
     draw_command& operator=(draw_command&& other);
 
-    draw_command& add_line(const draw_line_command& line_command);
+    /// @brief
+    /// @param first_point
+    /// @param second_point
+    /// @param color
+    /// @param thickness
+    void draw_line(
+        const float2& first_point, const float2& second_point,
+        const float4& color,
+        const float thickness = 1.f);
 
-    draw_command& add_rectangle(const draw_rectangle_command& rectangle_command);
+    /// @brief
+    /// @param min_point
+    /// @param max_point
+    /// @param color
+    /// @param rounding
+    /// @param thickness
+    void draw_rect(
+        const float2& min_point, const float2& max_point,
+        const float4& color,
+        const float rounding_strength = 0.f,
+        const float thickness = 1.f);
+
+    /// @brief
+    /// @param min_point
+    /// @param max_point
+    /// @param color
+    /// @param rounding
+    void draw_rect_filled(
+        const float2& min_point, const float2& max_point,
+        const float4& color,
+        const float rounding = 0.f);
+
+    /// @brief
+    /// @param min_corner
+    /// @param max_corner
+    /// @param color_top_left
+    /// @param color_top_right
+    /// @param color_bottom_left
+    /// @param color_bottom_right
+    void draw_rect_filled_multi_color(
+        const float2& min_corner, const float2& max_corner,
+        const float4& color_top_left, const float4& color_top_right,
+        const float4& color_bottom_left, const float4& color_bottom_right);
+
+    /// @brief
+    /// @param top_left_corner
+    /// @param top_right_corner
+    /// @param bottom_left_corner
+    /// @param bottom_right_corner
+    /// @param color
+    /// @param thickness
+    void draw_quad(
+        const float2& top_left_corner, const float2& top_right_corner,
+        const float2& bottom_left_corner, const float2& bottom_right_corner,
+        const float4& color,
+        const float thickness = 1.f);
+
+    /// @brief
+    /// @param top_left_corner
+    /// @param top_right_corner
+    /// @param bottom_left_corner
+    /// @param bottom_right_corner
+    /// @param color
+    void draw_quad_filled(
+        const float2& top_left_corner, const float2& top_right_corner,
+        const float2& bottom_left_corner, const float2& bottom_right_corner,
+        const float4& color);
+
+    /// @brief
+    /// @param first_corner
+    /// @param second_corner
+    /// @param third_corner
+    /// @param color
+    /// @param thickness
+    void draw_triangle(
+        const float2& first_corner, const float2& second_corner, const float2& third_corner,
+        const float4& color,
+        const float thickness = 1.f);
+
+    /// @brief
+    /// @param first_corner
+    /// @param second_corner
+    /// @param third_corner
+    /// @param color
+    void draw_triangle_filled(
+        const float2& first_corner, const float2& second_corner, const float2& third_corner,
+        const float4& color);
 
 private:
     detail::command_data& _command_data;
