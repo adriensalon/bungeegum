@@ -402,21 +402,27 @@ void declare(widget_t* widget, children_widgets_t&... children_widgets);
 /// @details
 struct resolve_constraint {
     // getters
-    float2 available_size() const;
+    float2 available_size();
 };
 
 /// @brief
 /// @details
 struct resolve_advice {
-
+    void fixed_width(const float width);
+    void fixed_height(const float height);
     void fixed_size(const float2& size);
-    // setters
+    void fixed_ratio(const float ratio);
+    void expand_width();
+    void expand_height();
+    void fit_width();
+    void fit_height();
 };
 
 struct resolve_command {
-    void resolve_widget(const resolve_constraint& constraint, resolve_advice& advice);
-
-    const resolve_advice& resolve_child_widget(int child, const resolve_constraint& constraint);
+    const resolve_constraint& parent_constraint();
+    const resolve_advice& constrain_child(const unsigned int index, const resolve_constraint& constraint);
+    const std::vector<resolve_advice>& constrain_children(const std::vector<resolve_constraint>& constraints);
+    void advise_parent(const resolve_advice& advice);
 };
 
 /// @brief

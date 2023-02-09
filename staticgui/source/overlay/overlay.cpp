@@ -91,11 +91,12 @@ namespace detail {
                     ImGui::DockBuilderDockWindow("Profiler", dock_id_down);
                     ImGui::DockBuilderDockWindow("Application", dockspace_id);
                     ImGui::DockBuilderDockWindow("Debug", dockspace_id);
+                    ImGui::DockBuilderDockWindow("Dear ImGui Demo", dockspace_id);
                     ImGui::DockBuilderFinish(dockspace_id);
                     _setup = true;
                 }
                 // ImGui::SetNextWindowFocus();
-                // ImGui::ShowDemoWindow();
+                ImGui::ShowDemoWindow();
 
                 draw_hierarchy(context);
                 draw_inspector(context);

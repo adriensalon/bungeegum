@@ -60,7 +60,7 @@ namespace detail {
         void on_resolve(widget_t* widget, const resolve_function& resolver);
 
         template <typename widget_t>
-        void on_draw(widget_t* widget, draw_function drawer);
+        void on_draw(widget_t* widget, const std::function<void(command_data&)>& drawer);
 
         template <typename... children_widgets_t>
         void declare_root(children_widgets_t&... children);

@@ -35,6 +35,12 @@ namespace widgets {
                 { _tick_value * 0.01f, 0.33f, 0.89f, 1.f },
                 12,
                 40);
+            command.draw_rect(
+                { 400.f, 400.f },
+                { 500.f, 420 + _tick_value },
+                { 0.81f, 0.53f, _tick_value * 0.0089f, 1.f },
+                10,
+                10);
 
             // detail::throw_library_bad_implementation("helloww");
             // detail::throw_library_bad_usage("helloww");
