@@ -83,9 +83,9 @@ namespace detail {
                     ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags);
                     ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
 
-                    auto dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.315f, nullptr, &dockspace_id);
-                    auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.315f, nullptr, &dockspace_id);
-                    auto dock_id_down = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.315f, nullptr, &dockspace_id);
+                    auto dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
+                    auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.25f, nullptr, &dockspace_id);
+                    auto dock_id_down = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
                     ImGui::DockBuilderDockWindow("Hierarchy", dock_id_left);
                     ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
                     ImGui::DockBuilderDockWindow("Profiler", dock_id_down);

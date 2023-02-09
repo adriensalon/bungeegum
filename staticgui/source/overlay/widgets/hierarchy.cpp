@@ -7,6 +7,7 @@
 //                           __/ |
 //                          |___/     v0.0
 
+#include <string>
 #include <unordered_map>
 
 #include <imgui.h>
@@ -51,35 +52,20 @@ namespace detail {
 
         void draw_hierarchy(context_state& context)
         {
-            // ImGui::SetNextWindowSize({ 800, 250 });
-            // if (ImGui::Begin("Hierarchy", 0, ImGuiWindowFlags_NoMove)) {
-            //     auto _black = ImVec4(0.f, 0.f, 0.f, 1.f);
-            //     context.widgets.iterate_datas([&](detail::widget_data& _widget_data) {
-            //         unsigned int _depth = context.widgets.get_depth(_widget_data);
-            //         for (unsigned int _k = 0; _k < _depth; _k++) {
-            //             ImGui::TextColored(_black, "      ");
-            //             ImGui::SameLine();
-            //         }
-            //         ImGui::TextColored(_black, clean_typename(_widget_data.kind->name()).c_str());
-            //         if (_widget_data.drawer) {
-            //             ImGui::SameLine();
-            //             ImGui::TextColored(_black, " [painter]");
-            //         }
-            //     });
-            // }
-            // ImGui::End();
-
             if (ImGui::Begin("Hierarchy")) {
-                static unsigned int _depth_memory = 0;
+                unsigned int _depth = 0;
+                unsigned int _id = 0;
                 std::function<void(const widget_data&)> _tf = [&](const widget_data& _widget_data) {
-                    const char* _clean_typename = clean_typename(_widget_data.kind->name()).c_str();
-                    if (ImGui::TreeNode(_clean_typename)) {
+                    _id++;
+                    std::string _clean_typename = clean_typename(_widget_data.kind->name());
+                    std::string _clean_id_typename = _clean_typename + "###__hierarchy__" + std::to_string(_id);
+                    if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), ImGuiTreeNodeFlags_FramePadding)) {
+                        _depth++;
                         for (auto& _child_widget_data_ref : _widget_data.children)
                             _tf(_child_widget_data_ref.get());
-                        ImGui::TreePop();
+                        ImGui::TreePop(); // seulement si pas un collapsing header
                     }
                 };
-
                 context.widgets.iterate_root_datas(_tf);
             }
             ImGui::End();
