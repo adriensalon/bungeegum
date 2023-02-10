@@ -24,6 +24,10 @@ namespace staticgui {
 namespace detail {
     namespace overlay {
 
+        static unsigned int vertices_count = 0;
+        static unsigned int indices_count = 0;
+        static unsigned int commands_count = 0;
+
         void DebugNodeDrawCmdShowMeshAndBoundingBox(ImDrawList* out_draw_list, const ImDrawList* draw_list, const ImDrawCmd* draw_cmd, bool show_mesh, bool show_aabb)
         {
             using namespace ImGui;
@@ -143,7 +147,7 @@ namespace detail {
             // }
         }
 
-        void ShowMetricsWindow(bool* p_open)
+        void ShowMetricsWindow(bool p_open)
         {
             using namespace ImGui;
 
@@ -151,51 +155,60 @@ namespace detail {
             ImGuiIO& io = g.IO;
             ImGuiMetricsConfig* cfg = &g.DebugMetricsConfig;
 
-            if (!Begin("Dear ImGui Metrics/Debugger", p_open) || GetCurrentWindow()->BeginCount > 1) {
-                End();
-                return;
-            }
+            // if (!Begin("Dear ImGui Metrics/Debugger", p_open) || GetCurrentWindow()->BeginCount > 1) {
+            //     End();
+            //     return;
+            // }
 
             // Basic info
-            Text("Dear ImGui %s", GetVersion());
-            Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
-            Text("%d visible windows, %d active allocations", io.MetricsRenderWindows, io.MetricsActiveAllocations);
+            // Text("Dear ImGui %s", GetVersion());
+            // Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            // Text("%d vertices, %d indices (%d triangles)", io.MetricsRenderVertices, io.MetricsRenderIndices, io.MetricsRenderIndices / 3);
+            // Text("%d visible windows, %d active allocations", io.MetricsRenderWindows, io.MetricsActiveAllocations);
 
             // DrawLists
             int drawlist_count = 0;
             for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++)
                 drawlist_count += g.Viewports[viewport_i]->DrawDataBuilder.GetDrawListCount();
-            Checkbox("Show ImDrawCmd mesh when hovering", &cfg->ShowDrawCmdMesh);
-            Checkbox("Show ImDrawCmd bounding boxes when hovering", &cfg->ShowDrawCmdBoundingBoxes);
+            // Checkbox("Show ImDrawCmd mesh when hovering", &cfg->ShowDrawCmdMesh);
+            // Checkbox("Show ImDrawCmd bounding boxes when hovering", &cfg->ShowDrawCmdBoundingBoxes);
             for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++) {
                 ImGuiViewportP* viewport = g.Viewports[viewport_i];
                 bool viewport_has_drawlist = false;
                 for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport->DrawDataBuilder.Layers); layer_i++)
                     for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++) {
                         if (std::string(viewport->DrawDataBuilder.Layers[layer_i][draw_list_i]->_OwnerName) == "Application") {
-                            DebugNodeDrawList(NULL, viewport, viewport->DrawDataBuilder.Layers[layer_i][draw_list_i], "DrawList");
+                            ImDrawList* _draw_list = viewport->DrawDataBuilder.Layers[layer_i][draw_list_i];
+                            vertices_count = _draw_list->VtxBuffer.Size;
+                            indices_count = _draw_list->IdxBuffer.Size;
+                            commands_count = _draw_list->CmdBuffer.Size;
+                            if (p_open)
+                                DebugNodeDrawList(NULL, viewport, _draw_list, "DrawList");
                         }
                     }
             }
 
-            End();
+            // End();
         }
 
         void draw_footer(context_state& context)
         {
+            static bool _show_metric = true;
             ImGuiViewportP* _viewport = (ImGuiViewportP*)(void*)ImGui::GetMainViewport();
             ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
             if (ImGui::BeginViewportSideBar("##MainFooterBar", _viewport, ImGuiDir_Down, ImGui::GetFrameHeight(), _window_flags)) {
                 if (ImGui::BeginMenuBar()) {
-
-                    static bool _show_metric = true;
-                    ShowMetricsWindow(&_show_metric);
-                    ImGui::Text("Menubar");
+                    // std::cout << ImGui::GetContentRegionAvail().y << std::endl;
+                    std::string _metrics_text(std::to_string(vertices_count) + " vertices, " + std::to_string(indices_count) + " indices (" + std::to_string(commands_count) + " commands)");
+                    ImGui::Text(_metrics_text.c_str());
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Debug", &_show_metric);
                     ImGui::EndMenuBar();
                 }
                 ImGui::End();
             }
+
+            ShowMetricsWindow(_show_metric);
         }
     }
 }
