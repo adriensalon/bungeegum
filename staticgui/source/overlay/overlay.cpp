@@ -86,7 +86,7 @@ namespace detail {
                     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
                     ImGui::DockBuilderRemoveNode(dockspace_id); // clear any previous layout
                     ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags);
-                    ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
+                    ImGui::DockBuilderSetNodeSize(dockspace_id, { viewport->Size.x, viewport->Size.y - 19 });
 
                     auto dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
                     auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.25f, nullptr, &dockspace_id);
@@ -94,10 +94,10 @@ namespace detail {
                     ImGui::DockBuilderDockWindow("Hierarchy", dock_id_left);
                     ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
                     ImGui::DockBuilderDockWindow("Profiler", dock_id_down);
-                    ImGui::DockBuilderDockWindow("Application", dockspace_id);
-                    ImGui::DockBuilderDockWindow("Debug", dockspace_id);
-                    ImGui::DockBuilderDockWindow("Dear ImGui Demo", dockspace_id);
-                    ImGui::DockBuilderDockWindow("Dear ImGui Metrics/Debugger", dockspace_id);
+                    ImGui::DockBuilderDockWindow("Viewport", dockspace_id);
+                    // ImGui::DockBuilderDockWindow("Debug", dockspace_id);
+                    // ImGui::DockBuilderDockWindow("Dear ImGui Demo", dockspace_id);
+                    // ImGui::DockBuilderDockWindow("Dear ImGui Metrics/Debugger", dockspace_id);
                     ImGui::DockBuilderFinish(dockspace_id);
                     _setup = true;
                 }
@@ -108,8 +108,8 @@ namespace detail {
                 draw_hierarchy(context);
                 draw_inspector(context);
                 draw_profiler(context);
-                draw_debug(context);
-                if (ImGui::Begin("Application")) {
+                // draw_debug(context);
+                if (ImGui::Begin("Viewport")) {
                     draw_commands(ImGui::GetWindowDrawList());
                 }
                 ImGui::End();
