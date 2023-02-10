@@ -31,7 +31,7 @@ namespace widgets {
         {
             command.draw_rect(
                 { 20.f, 20.f },
-                { 600.f, _tick_value },
+                { 600.f, 8 * _tick_value },
                 { _tick_value * 0.01f, 0.33f, 0.89f, 1.f },
                 12,
                 40);

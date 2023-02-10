@@ -66,13 +66,15 @@ namespace detail {
         });
         frames_chronometer.end("draw");
 
-        static bool _show_overlay = true;
-        overlay::draw_overlay(*this, _show_overlay, [&](ImDrawList* _imgui_drawlist) {
-            widgets.iterate_datas([&](widget_data& _data) {
-                if (_data.command.has_value())
-                    _data.command.value().draw(_imgui_drawlist);
+        if constexpr (true) {
+            overlay::draw_overlay(*this, [&](ImDrawList* _imgui_drawlist) {
+                widgets.iterate_datas([&](widget_data& _data) {
+                    if (_data.command.has_value())
+                        _data.command.value().draw(_imgui_drawlist);
+                });
             });
-        });
+        } else {
+        }
 
         if (!has_userspace_thrown()) {
             widgets.clear_resolve();

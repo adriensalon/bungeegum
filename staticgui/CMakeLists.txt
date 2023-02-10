@@ -31,11 +31,12 @@ set(staticgui_source
 
 	"source/overlay/embedded/fa4.cpp"
 	"source/overlay/embedded/helvetica.cpp"
-	"source/overlay/widgets/debug.cpp"
-	"source/overlay/widgets/footer.cpp"
+	
 	"source/overlay/widgets/hierarchy.cpp"
 	"source/overlay/widgets/inspector.cpp"
 	"source/overlay/widgets/profiler.cpp"
+	"source/overlay/widgets/report.cpp"
+	"source/overlay/widgets/wireframe.cpp"
 	"source/overlay/overlay.cpp"
 
 	"source/staticgui.cpp"

@@ -18,15 +18,12 @@
 #include <implot.h>
 #include <iostream>
 
-#include <staticgui/overlay/widgets/footer.hpp>
+#include <staticgui/overlay/overlay.hpp>
+#include <staticgui/overlay/widgets/wireframe.hpp>
 
 namespace staticgui {
 namespace detail {
     namespace overlay {
-
-        static unsigned int vertices_count = 0;
-        static unsigned int indices_count = 0;
-        static unsigned int commands_count = 0;
 
         void DebugNodeDrawCmdShowMeshAndBoundingBox(ImDrawList* out_draw_list, const ImDrawList* draw_list, const ImDrawCmd* draw_cmd)
         {
@@ -49,13 +46,13 @@ namespace detail {
         void DebugNodeDrawList(ImGuiViewportP* viewport, const ImDrawList* draw_list)
         {
             using namespace ImGui;
-            ImDrawList* fg_draw_list = viewport ? GetForegroundDrawList(viewport) : NULL; // Render additional visuals into the top-most draw list
+            ImDrawList* fg_draw_list = GetWindowDrawList(); // viewport ? GetForegroundDrawList(viewport) : NULL; // Render additional visuals into the top-most draw list
             for (const ImDrawCmd* pcmd = draw_list->CmdBuffer.Data; pcmd < draw_list->CmdBuffer.Data + draw_list->CmdBuffer.Size; pcmd++) {
                 DebugNodeDrawCmdShowMeshAndBoundingBox(fg_draw_list, draw_list, pcmd);
             }
         }
 
-        void ShowMetricsWindow(const bool p_open)
+        void draw_wireframe()
         {
             using namespace ImGui;
             ImGuiContext& g = *GImGui;
@@ -68,32 +65,13 @@ namespace detail {
                     for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++) {
                         if (std::string(viewport->DrawDataBuilder.Layers[layer_i][draw_list_i]->_OwnerName) == "Viewport") {
                             ImDrawList* _draw_list = viewport->DrawDataBuilder.Layers[layer_i][draw_list_i];
-                            vertices_count = _draw_list->VtxBuffer.Size;
-                            indices_count = _draw_list->IdxBuffer.Size;
-                            commands_count = _draw_list->CmdBuffer.Size;
-                            if (p_open)
-                                DebugNodeDrawList(viewport, _draw_list);
+                            shared_data::vertices_count = _draw_list->VtxBuffer.Size;
+                            shared_data::indices_count = _draw_list->IdxBuffer.Size;
+                            shared_data::commands_count = _draw_list->CmdBuffer.Size;
+                            DebugNodeDrawList(viewport, _draw_list);
                         }
                     }
             }
-        }
-
-        void draw_footer(context_state& context)
-        {
-            static bool _show_metric = true;
-            ImGuiViewportP* _viewport = (ImGuiViewportP*)(void*)ImGui::GetMainViewport();
-            ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
-            if (ImGui::BeginViewportSideBar("##MainFooterBar", _viewport, ImGuiDir_Down, ImGui::GetFrameHeight(), _window_flags)) {
-                if (ImGui::BeginMenuBar()) {
-                    std::string _metrics_text(std::to_string(vertices_count) + " vertices, " + std::to_string(indices_count) + " indices (" + std::to_string(commands_count) + " commands)");
-                    ImGui::Text(_metrics_text.c_str());
-                    ImGui::SameLine();
-                    ImGui::Checkbox("Debug", &_show_metric);
-                    ImGui::EndMenuBar();
-                }
-                ImGui::End();
-            }
-            ShowMetricsWindow(_show_metric);
         }
     }
 }

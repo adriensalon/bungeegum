@@ -11,7 +11,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <staticgui/overlay/widgets/debug.hpp>
+#include <staticgui/overlay/widgets/report.hpp>
 #include <staticgui/state/errors.hpp>
 
 namespace staticgui {

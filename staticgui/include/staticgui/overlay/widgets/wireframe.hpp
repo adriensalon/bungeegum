@@ -15,7 +15,7 @@ namespace staticgui {
 namespace detail {
     namespace overlay {
 
-        void draw_footer(context_state& context);
+        void draw_wireframe();
     }
 }
 }
