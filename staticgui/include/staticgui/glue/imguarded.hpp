@@ -57,9 +57,11 @@ namespace glue {
 
         void set(const int& target, const float value);
         void set(const int& target, const simd_array<float, 2>& value);
+        void release();
 
     private:
         bool _is_set = false;
+        bool _is_released = false;
     };
 
 }

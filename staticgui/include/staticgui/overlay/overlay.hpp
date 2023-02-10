@@ -15,6 +15,8 @@ namespace staticgui {
 namespace detail {
     namespace overlay {
 
+        constexpr inline float footer_height = 28.f;
+
         struct shared_data {
             inline static unsigned int vertices_count = 0;
             inline static unsigned int indices_count = 0;

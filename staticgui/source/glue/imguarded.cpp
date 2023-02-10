@@ -85,7 +85,7 @@ namespace glue {
 
     style_guard::~style_guard()
     {
-        if (_is_set)
+        if (_is_set && !_is_released)
             ImGui::PopStyleVar();
     }
 
@@ -102,6 +102,13 @@ namespace glue {
     {
         ImGui::PushStyleVar(target, ImVec2(value.x(), value.y()));
         _is_set = true;
+    }
+
+    void style_guard::release()
+    {
+        if (_is_set)
+            ImGui::PopStyleVar();
+        _is_released = true;
     }
 
 }

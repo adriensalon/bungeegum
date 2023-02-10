@@ -26,7 +26,9 @@
 
 #include "embedded/fa4.cpp"
 #include "embedded/fa4.hpp"
-#include "embedded/helvetica.cpp"
+#include "embedded/inter_extrabold.cpp"
+#include "embedded/inter_regular.cpp"
+#include "embedded/inter_thin.cpp"
 
 namespace staticgui {
 namespace detail {
@@ -49,7 +51,8 @@ namespace detail {
                 // config.
                 ImGuiIO& io = ImGui::GetIO();
                 // io.Fonts->AddFontFromMemoryCompressedTTF(helvetica_compressed_data, helvetica_compressed_size, 13.0f);
-                overlay_font = io.Fonts->AddFontFromMemoryCompressedTTF(helvetica_compressed_data, helvetica_compressed_size, 11.0f);
+                overlay_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_regular_compressed_data, inter_regular_compressed_size, 13.0f);
+                // overlay_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_extrabold_compressed_data, inter_extrabold_compressed_size, 13.0f);
 
                 // font awesome for the glyphs
                 ImFontConfig config;
@@ -71,7 +74,7 @@ namespace detail {
             ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
             ImGuiViewport* viewport = ImGui::GetMainViewport();
             ImGui::SetNextWindowPos(viewport->Pos);
-            ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() });
+            ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - footer_height });
             ImGui::SetNextWindowViewport(viewport->ID);
             {
                 glue::style_guard _sg0(ImGuiStyleVar_WindowRounding, 0.f);
@@ -91,7 +94,7 @@ namespace detail {
             static auto first_time = true;
             if (first_time) {
                 first_time = false;
-                ImGui::DockBuilderSetNodeSize(dockspace_id, { viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() });
+                ImGui::DockBuilderSetNodeSize(dockspace_id, { viewport->Size.x, viewport->Size.y - footer_height });
                 ImGui::DockBuilderFinish(dockspace_id);
             }
             ImGui::End();
@@ -101,8 +104,16 @@ namespace detail {
         {
             ImGuiViewportP* _viewport = (ImGuiViewportP*)(void*)ImGui::GetMainViewport();
             ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
-            if (ImGui::BeginViewportSideBar("##MainFooterBar", _viewport, ImGuiDir_Down, ImGui::GetFrameHeight(), _window_flags)) {
+            glue::style_guard _sg0(ImGuiStyleVar_FramePadding, { ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y });
+            // glue::color_guard _cg0(ImGuiCol_Button, { 0.627f, 0.627f, 0.627f, 1.f });
+            glue::color_guard _cg1(ImGuiCol_MenuBarBg, { 0.878f, 0.878f, 0.878f, 1.f });
+            glue::color_guard _cg2(ImGuiCol_Button, { 0.878f, 0.878f, 0.878f, 1.f });
+            if (ImGui::BeginViewportSideBar("##MainFooterBar", _viewport, ImGuiDir_Down, footer_height, _window_flags)) {
+
                 if (ImGui::BeginMenuBar()) {
+                    _sg0.release();
+                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (footer_height - ImGui::GetFrameHeight()) / 2.f);
+
                     if (ImGui::Button("hierarchy##__staticgui_footer_hierarchy_button__")) {
                         show_hierarchy = !show_hierarchy;
                     }
@@ -119,7 +130,9 @@ namespace detail {
                         show_wireframe = !show_wireframe;
                     }
                     ImGui::SameLine();
+                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (footer_height - ImGui::GetFrameHeight()) / 2.f);
                     std::string _metrics_text(std::to_string(shared_data::vertices_count) + " vertices, " + std::to_string(shared_data::indices_count) + " indices (" + std::to_string(shared_data::commands_count) + " commands)");
+                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(_metrics_text.c_str()).x);
                     ImGui::Text(_metrics_text.c_str());
                     ImGui::EndMenuBar();
                 }
@@ -131,8 +144,36 @@ namespace detail {
         {
             ImGui::PushFont(overlay_font);
 
+            glue::color_guard _cg0(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 1.f });
+            glue::color_guard _cg1(ImGuiCol_TitleBg, { 0.627f, 0.627f, 0.627f, 1.f });
+            glue::color_guard _cg2(ImGuiCol_TitleBgActive, { 0.627f, 0.627f, 0.627f, 1.f });
+            glue::color_guard _cg3(ImGuiCol_Text, { 0.023f, 0.023f, 0.023f, 1.f });
+            glue::color_guard _cg4(ImGuiCol_Tab, { 0.878f, 0.878f, 0.878f, 1.f });
+            glue::color_guard _cg5(ImGuiCol_TabUnfocusedActive, { 0.878f, 0.878f, 0.878f, 1.f });
+            glue::color_guard _cg6(ImGuiCol_FrameBg, { 0.980f, 0.980f, 0.980f, 1.f });
+
+            // border
+            glue::style_guard _sg0(ImGuiStyleVar_WindowBorderSize, 0.f);
+            glue::style_guard _sg1(ImGuiStyleVar_ChildBorderSize, 0.f);
+            glue::style_guard _sg2(ImGuiStyleVar_PopupBorderSize, 0.f);
+            glue::style_guard _sg3(ImGuiStyleVar_FrameBorderSize, 0.f);
+
+            // rounding
+            glue::style_guard _sg4(ImGuiStyleVar_WindowRounding, 3.f);
+            glue::style_guard _sg5(ImGuiStyleVar_ChildRounding, 3.f);
+            glue::style_guard _sg6(ImGuiStyleVar_FrameRounding, 3.f);
+            glue::style_guard _sg7(ImGuiStyleVar_PopupRounding, 3.f);
+            glue::style_guard _sg8(ImGuiStyleVar_ScrollbarRounding, 3.f);
+            glue::style_guard _sg9(ImGuiStyleVar_GrabRounding, 4.f);
+            glue::style_guard _sg10(ImGuiStyleVar_TabRounding, 4.f);
+
+            glue::style_guard _sg12(ImGuiStyleVar_ItemSpacing, { 5.f, 5.f });
+
             draw_dockspace(draw_commands);
             draw_footer();
+
+            glue::style_guard _sg11(ImGuiStyleVar_FramePadding, { 4.f, 4.f });
+
             if (show_hierarchy)
                 draw_hierarchy(context);
             if (show_inspector)

@@ -30,7 +30,9 @@ set(staticgui_source
 	"source/state/widget.cpp"
 
 	"source/overlay/embedded/fa4.cpp"
-	"source/overlay/embedded/helvetica.cpp"
+	"source/overlay/embedded/inter_extrabold.cpp"
+	"source/overlay/embedded/inter_regular.cpp"
+	"source/overlay/embedded/inter_thin.cpp"
 	
 	"source/overlay/widgets/hierarchy.cpp"
 	"source/overlay/widgets/inspector.cpp"
