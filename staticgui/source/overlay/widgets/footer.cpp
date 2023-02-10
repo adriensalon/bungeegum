@@ -64,7 +64,6 @@ namespace detail {
                 drawlist_count += g.Viewports[viewport_i]->DrawDataBuilder.GetDrawListCount();
             for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++) {
                 ImGuiViewportP* viewport = g.Viewports[viewport_i];
-                bool viewport_has_drawlist = false;
                 for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport->DrawDataBuilder.Layers); layer_i++)
                     for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++) {
                         if (std::string(viewport->DrawDataBuilder.Layers[layer_i][draw_list_i]->_OwnerName) == "Viewport") {
