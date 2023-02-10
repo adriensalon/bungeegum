@@ -63,6 +63,15 @@ namespace detail {
                     if (_widget_data.children.empty())
                         _node_flags |= ImGuiTreeNodeFlags_Leaf;
                     if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags)) {
+                        if (_widget_data.resolver)
+                            ImGui::Text("has advanced resolve");
+                        if (_widget_data.drawer)
+                            ImGui::Text("has advanced draw");
+                        // ImGui::Text((std::to_string(_widget_data.command.value()._commands.size()) + " advanced draw commands)").c_str());
+                        if (!_widget_data.detached_events_removers.empty())
+                            ImGui::Text((std::to_string(_widget_data.detached_events_removers.size()) + " detached events").c_str());
+                        if (!_widget_data.children.empty())
+                            ImGui::Text((std::to_string(_widget_data.children.size()) + " children :").c_str());
                         _depth++;
                         for (auto& _child_widget_data_ref : _widget_data.children)
                             _tf(_child_widget_data_ref.get());

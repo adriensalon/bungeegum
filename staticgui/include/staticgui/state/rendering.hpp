@@ -26,7 +26,7 @@ namespace detail {
         void draw(ImDrawList* imgui_drawlist);
         void clear();
 
-    private:
+        // private:
         std::vector<std::function<void(ImDrawList*)>> _commands;
     };
 
