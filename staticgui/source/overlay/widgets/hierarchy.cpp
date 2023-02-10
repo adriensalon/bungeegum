@@ -59,11 +59,14 @@ namespace detail {
                     _id++;
                     std::string _clean_typename = clean_typename(_widget_data.kind->name());
                     std::string _clean_id_typename = _clean_typename + "###__hierarchy__" + std::to_string(_id);
-                    if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), ImGuiTreeNodeFlags_FramePadding)) {
+                    ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow;
+                    if (_widget_data.children.empty())
+                        _node_flags |= ImGuiTreeNodeFlags_Leaf;
+                    if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags)) {
                         _depth++;
                         for (auto& _child_widget_data_ref : _widget_data.children)
                             _tf(_child_widget_data_ref.get());
-                        ImGui::TreePop(); // seulement si pas un collapsing header
+                        ImGui::TreePop();
                     }
                 };
                 context.widgets.iterate_root_datas(_tf);

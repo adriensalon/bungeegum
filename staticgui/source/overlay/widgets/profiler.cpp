@@ -47,7 +47,7 @@ namespace detail {
 
         static unsigned int _count = 0;
         static std::vector<std::string> _names;
-        static std::vector<unsigned int> _indices;
+        // static std::vector<unsigned int> _indices;
         static std::vector<ScrollingBuffer> _buffers;
         static float _delta_time = 0.f;
         static float _max = 0.f;
@@ -57,7 +57,7 @@ namespace detail {
             context.frames_chronometer.on_new_task([&](const std::string& _name, const unsigned int _index) {
                 _count++;
                 _names.push_back(_name);
-                _indices.push_back(_index);
+                // _indices.push_back(_index);
                 _buffers.emplace_back(ScrollingBuffer());
             });
             context.frames_chronometer.on_new_frame([&]() {
@@ -76,7 +76,9 @@ namespace detail {
             if (ImGui::Begin("Profiler", 0)) {
                 static float history = 10.0f;
                 ImGui::SliderFloat("History", &history, 1, 30, "%.1f s");
-                static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels;
+                static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight;
+                // ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 1.f, 1.f, 0.f, 1.f });
+                ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
                 if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, 150))) {
                     ImPlot::SetupAxes(NULL, NULL, flags, flags);
                     ImPlot::SetupAxisLimits(ImAxis_X1, _delta_time - history, _delta_time, ImGuiCond_Always);
@@ -91,6 +93,7 @@ namespace detail {
 
                     ImPlot::EndPlot();
                 }
+                ImPlot::PopStyleColor();
             }
             ImGui::End();
         }
