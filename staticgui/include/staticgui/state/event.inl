@@ -37,18 +37,18 @@ namespace detail {
     template <typename... values_t>
     event_impl<values_t...>& event_registry::make_event_and_data()
     {
-        glue::entity _entity = _registry.create_entity();
+        entity _entity = _registry.create_entity();
         event_impl<values_t...>& _event = _registry.create_component<event_impl<values_t...>>(_entity);
         event_data& _event_data = _registry.create_component<event_data>(_entity);
         _event_data.tick = [&]() {
             for (auto _future_it = _event.futures.begin(); _future_it != _event.futures.end();) {
                 if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    if constexpr (glue::future_typelist<values_t...>::is_void()) {
+                    if constexpr (future_typelist<values_t...>::is_void()) {
                         for (auto& _callback : _event.callbacks)
                             _callback();
                     } else {
-                        glue::future_typelist_t<values_t...> _vals = _future_it->get();
-                        if constexpr (glue::future_typelist<values_t...>::is_tuple()) {
+                        future_typelist_t<values_t...> _vals = _future_it->get();
+                        if constexpr (future_typelist<values_t...>::is_tuple()) {
                             for (auto& _callback : _event.callbacks)
                                 _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
                         } else {
@@ -63,12 +63,12 @@ namespace detail {
             for (auto _shared_future_it = _event.shared_futures.begin(); _shared_future_it != _event.shared_futures.end();) {
                 if (_shared_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
 
-                    if constexpr (glue::future_typelist<values_t...>::is_void()) {
+                    if constexpr (future_typelist<values_t...>::is_void()) {
                         for (auto& _callback : _event.callbacks)
                             _callback();
                     } else {
-                        glue::future_typelist_t<values_t...> _vals = _shared_future_it->get();
-                        if constexpr (glue::future_typelist<values_t...>::is_tuple()) {
+                        future_typelist_t<values_t...> _vals = _shared_future_it->get();
+                        if constexpr (future_typelist<values_t...>::is_tuple()) {
                             for (auto& _callback : _event.callbacks)
                                 _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
                         } else {
@@ -105,14 +105,14 @@ namespace detail {
     template <typename... values_t>
     void event_registry::destroy_event_and_data(const event_impl<values_t...>& event)
     {
-        glue::entity _entity = _registry.get_entity(event);
+        entity _entity = _registry.get_entity(event);
         _registry.destroy_entity_components(_entity);
     }
 
     template <typename... values_t>
     event_data& event_registry::get_data(event_impl<values_t...>& event)
     {
-        glue::entity _entity = _registry.get_entity(event);
+        entity _entity = _registry.get_entity(event);
         return _registry.get_component<event_data>(_entity);
     }
 
@@ -150,12 +150,12 @@ namespace detail {
         if (!event.is_attached)
             event.rattach_callback();
         event.is_attached = false;
-        event.detached_id = glue::generator::create();
+        event.detached_id = generator::create();
         event_data& _data = get_data(event);
         _detached_events.emplace(event.detached_id, _data);
         event.rattach_callback = [&]() {
             _detached_events.erase(event.detached_id);
-            glue::generator::destroy(event.detached_id);
+            generator::destroy(event.detached_id);
             event.detached_id = 0;
         };
     }

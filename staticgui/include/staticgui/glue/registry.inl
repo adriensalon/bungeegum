@@ -12,7 +12,7 @@
 #include <variant>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     // template <typename component_t, typename... args_t>
     // component_t& registry::bool has_component(const entity entity) const

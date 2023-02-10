@@ -31,9 +31,9 @@ namespace detail {
         context_state context;
 
     private:
-        glue::stopwatch _stopwatch;
-        std::unique_ptr<glue::window> _window = nullptr;
-        std::unique_ptr<glue::renderer> _renderer = nullptr;
+        stopwatch _stopwatch;
+        std::unique_ptr<window> _window = nullptr;
+        std::unique_ptr<renderer> _renderer = nullptr;
     };
 
 }

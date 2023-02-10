@@ -17,7 +17,7 @@
 #include <staticgui/glue/time.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     struct backtraced_source {
         std::filesystem::path file;

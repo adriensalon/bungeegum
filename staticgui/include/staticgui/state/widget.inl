@@ -17,7 +17,7 @@ namespace detail {
     template <typename widget_t, typename... widget_args_t>
     widget_t& widget_registry::make(widget_args_t&&... widget_args)
     {
-        glue::entity _entity = _registry.create_entity();
+        entity _entity = _registry.create_entity();
         widget_data& _widget_data = _registry.create_component<widget_data>(_entity);
         _widget_data.kind = std::make_unique<std::type_index>(typeid(widget_t));
         widget_t& _widget = _registry.create_component<widget_t>(_entity, std::forward<widget_args_t>(widget_args)...);
@@ -35,7 +35,7 @@ namespace detail {
     {
         widget_data& _widget_data = get_data(*widget);
         _widget_data.is_built = true;
-        glue::constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {
+        constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {
             widget_data& _child_widget_data = get_data(_child_widget);
             _child_widget_data.parent = _widget_data;
             _widget_data.children.emplace_back(_child_widget_data);
@@ -66,7 +66,7 @@ namespace detail {
     void widget_registry::declare_root(children_widgets_t&... children)
     {
         _roots.clear();
-        glue::constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {
+        constexpr_foreach<children_widgets_t...>([&](auto& _child_widget) {
             widget_data& _child_widget_data = get_data(_child_widget);
             _roots.emplace_back(_child_widget_data);
         },
@@ -109,14 +109,14 @@ namespace detail {
     template <typename widget_t>
     widget_data& widget_registry::get_data(widget_t& widget)
     {
-        glue::entity _entity = _registry.get_entity(widget);
+        entity _entity = _registry.get_entity(widget);
         return _registry.get_component<widget_data>(_entity);
     }
 
     template <typename widget_t>
     widget_t& widget_registry::get_widget(widget_data& data)
     {
-        glue::entity _entity = _registry.get_entity(data);
+        entity _entity = _registry.get_entity(data);
         return _registry.get_component<widget_t>(_entity);
     }
 
@@ -131,7 +131,7 @@ namespace detail {
         if (!event.is_attached)
             event.rattach_callback();
         event.is_attached = false;
-        event.detached_id = glue::generator::create();
+        event.detached_id = generator::create();
         widget_data& _data = get_data(widget);
         _data.detached_events_removers.emplace(event.detached_id, [&]() {
             event.~event_impl<values_t...>(); // destroy event with the widget

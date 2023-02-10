@@ -18,7 +18,7 @@
 #include <vector>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     struct timestamp {
         timestamp();

@@ -29,7 +29,7 @@ namespace detail {
         event_registry events;
 
         unsigned int max_fps = 60;
-        glue::chronometer<10, std::chrono::milliseconds> frames_chronometer;
+        chronometer<10, std::chrono::milliseconds> frames_chronometer;
     };
 
 }

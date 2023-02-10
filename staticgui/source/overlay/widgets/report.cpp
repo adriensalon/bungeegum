@@ -25,7 +25,7 @@ namespace detail {
                 ImGui::SetNextWindowBgAlpha(0.f);
             if (ImGui::Begin("Debug", 0, ImGuiWindowFlags_NoMove)) {
                 if (has_userspace_thrown()) {
-                    glue::backtraced_exception& _exception = get_userspace_thrown_exception().value();
+                    backtraced_exception& _exception = get_userspace_thrown_exception().value();
                     ImGui::Text(_exception.what());
                     ImGui::Spacing();
                     ImGui::Separator();

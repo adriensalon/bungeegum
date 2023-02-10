@@ -21,12 +21,12 @@ namespace detail {
         bool is_tight;
         bool has_infinite_width;
         bool has_infinite_height;
-        glue::simd_array<float, 2> min_size;
-        glue::simd_array<float, 2> max_size;
+        simd_array<float, 2> min_size;
+        simd_array<float, 2> max_size;
     };
 
     struct advice_data {
-        glue::simd_array<float, 2> size;
+        simd_array<float, 2> size;
     };
 
     using resolve_function = std::function<void(const constraint_data&, advice_data&)>;

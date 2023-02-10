@@ -10,7 +10,7 @@
 #pragma once
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     namespace detail {
         template <typename typelist_t>

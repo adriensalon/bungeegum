@@ -48,7 +48,7 @@
 #include <ImGui/interface/ImGuiImplSDL.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     struct renderer::diligent_renderer {
         Diligent::RefCntAutoPtr<Diligent::IRenderDevice> render_device;

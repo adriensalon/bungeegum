@@ -17,7 +17,7 @@
 #include <staticgui/glue/bspline.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     namespace impl {
         tinyspline::BSpline& get_bspline_impl(std::any& untyped)

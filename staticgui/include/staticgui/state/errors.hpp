@@ -24,6 +24,6 @@ namespace detail {
     void throw_user_bad_implementation(const std::string& what);
     void protect_userspace(const std::function<void()>& try_callback);
     bool has_userspace_thrown();
-    std::optional<glue::backtraced_exception>& get_userspace_thrown_exception();
+    std::optional<backtraced_exception>& get_userspace_thrown_exception();
 }
 }

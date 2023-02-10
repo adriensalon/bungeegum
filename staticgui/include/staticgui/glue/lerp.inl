@@ -10,7 +10,7 @@
 #pragma once
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     template <typename value_t>
     value_t lerp(enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t)

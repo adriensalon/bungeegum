@@ -18,7 +18,6 @@
 #include <staticgui/state/curve.hpp>
 #include <staticgui/state/event.hpp>
 
-
 namespace staticgui {
 namespace detail {
 
@@ -36,7 +35,7 @@ namespace detail {
         std::unique_ptr<std::type_index> kind;
         bool is_playing = false;
         curve_data curve;
-        glue::simd_array<float, 2> t_curve = std::array<float, 2> { 0.f, 0.f };
+        simd_array<float, 2> t_curve = std::array<float, 2> { 0.f, 0.f };
     };
 
     struct animation_registry {
@@ -93,7 +92,7 @@ namespace detail {
         void iterate_animations(const std::function<void(animation_impl<value_t>&)>& iterate_callback);
 
     private:
-        glue::registry _registry;
+        registry _registry;
     };
 
 }

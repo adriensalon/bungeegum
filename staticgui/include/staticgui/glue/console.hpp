@@ -13,7 +13,7 @@
 #include <vector>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     enum class console_color {
         black,

@@ -10,7 +10,7 @@
 #include <staticgui/glue/registry.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     registry::registry()
     {

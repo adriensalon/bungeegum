@@ -40,7 +40,7 @@ namespace detail {
         std::optional<command_data> command = std::nullopt;
         std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<widget_data>> children = {};
-        std::unordered_map<glue::entity, std::function<void()>> detached_events_removers;
+        std::unordered_map<entity, std::function<void()>> detached_events_removers;
     };
 
     struct widget_registry {
@@ -105,7 +105,7 @@ namespace detail {
         void detach_animation(animation_impl<value_t>& animation, widget_t& widget);
 
     private:
-        glue::registry _registry;
+        registry _registry;
         std::vector<std::reference_wrapper<widget_data>> _roots;
         std::vector<std::pair<std::reference_wrapper<widget_data>, bool>> _must_resolve_heads;
         std::vector<std::pair<std::reference_wrapper<widget_data>, bool>> _must_draw_heads;

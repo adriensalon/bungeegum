@@ -12,7 +12,7 @@
 #include <algorithm>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     // array
 

@@ -67,7 +67,7 @@ namespace detail {
                     ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow;
                     if (_widget_data.children.empty())
                         _node_flags |= ImGuiTreeNodeFlags_Leaf;
-                    glue::font_guard _fg0(shared_data::extrabold_font);
+                    font_guard _fg0(shared_data::extrabold_font);
                     if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags)) {
                         _fg0.release();
                         if (_widget_data.resolver)

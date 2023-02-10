@@ -12,7 +12,7 @@
 #include <type_traits>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     // add
     template <typename value_t, typename = std::void_t<>>

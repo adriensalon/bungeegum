@@ -24,7 +24,7 @@ namespace detail {
             ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
             if (ImGui::Begin("inspector##__staticgui_window_inspector_title__", 0, ImGuiWindowFlags_NoCollapse)) {
                 int _k = 0;
-                context.animations.iterate_datas([&](detail::animation_data& _animation_data) {
+                context.animations.iterate_datas([&](animation_data& _animation_data) {
                     // if (_animation_data.is_playing) {
                     std::string _title = "##StatsGraphTitle" + std::to_string(_k);
                     static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;

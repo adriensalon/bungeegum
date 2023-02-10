@@ -13,8 +13,8 @@
 TEST(staticgui_glue, toolchain_arch)
 {
     unsigned int _sum = 0
-        + staticgui::glue::is_arch_32
-        + staticgui::glue::is_arch_64;
+        + staticgui::detail::is_arch_32
+        + staticgui::detail::is_arch_64;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
@@ -22,9 +22,9 @@ TEST(staticgui_glue, toolchain_arch)
 TEST(staticgui_glue, toolchain_cpu)
 {
     unsigned int _sum = 0
-        + staticgui::glue::is_cpu_x86
-        + staticgui::glue::is_cpu_arm
-        + staticgui::glue::is_cpu_webasm;
+        + staticgui::detail::is_cpu_x86
+        + staticgui::detail::is_cpu_arm
+        + staticgui::detail::is_cpu_webasm;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
@@ -32,13 +32,13 @@ TEST(staticgui_glue, toolchain_cpu)
 TEST(staticgui_glue, toolchain_platform)
 {
     unsigned int _sum = 0
-        + staticgui::glue::is_platform_emscripten
-        + staticgui::glue::is_platform_win32
-        + staticgui::glue::is_platform_uwp
-        + staticgui::glue::is_platform_macos
-        + staticgui::glue::is_platform_ios
-        + staticgui::glue::is_platform_linux
-        + staticgui::glue::is_platform_android;
+        + staticgui::detail::is_platform_emscripten
+        + staticgui::detail::is_platform_win32
+        + staticgui::detail::is_platform_uwp
+        + staticgui::detail::is_platform_macos
+        + staticgui::detail::is_platform_ios
+        + staticgui::detail::is_platform_linux
+        + staticgui::detail::is_platform_android;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
@@ -46,9 +46,9 @@ TEST(staticgui_glue, toolchain_platform)
 TEST(staticgui_glue, toolchain_compiler)
 {
     unsigned int _sum = 0
-        + staticgui::glue::is_compiler_msvc
-        + staticgui::glue::is_compiler_clang
-        + staticgui::glue::is_compiler_gcc;
+        + staticgui::detail::is_compiler_msvc
+        + staticgui::detail::is_compiler_clang
+        + staticgui::detail::is_compiler_gcc;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }

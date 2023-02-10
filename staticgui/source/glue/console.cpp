@@ -7,7 +7,7 @@
 #include <staticgui/glue/console.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     void console_log(const std::string& message, const console_color color, const bool newline)
     {

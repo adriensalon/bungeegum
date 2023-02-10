@@ -14,7 +14,7 @@
 #include <staticgui/glue/toolchain.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     template <typename unit_t>
     unit_t stopwatch::lap()

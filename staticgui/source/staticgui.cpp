@@ -23,11 +23,11 @@ void throw_error(const std::string& what)
 curve::curve(const curve_preset preset)
 {
     // switch on preset
-    _data.spline = std::make_shared<glue::bspline>(0.f, 1.f, std::vector<float2> {});
+    _data.spline = std::make_shared<detail::bspline>(0.f, 1.f, std::vector<float2> {});
 }
 curve::curve(const float departure, const float arrival, const std::vector<float2>& controls)
 {
-    _data.spline = std::make_shared<glue::bspline>(departure, arrival, controls);
+    _data.spline = std::make_shared<detail::bspline>(departure, arrival, controls);
 }
 
 curve::curve(const curve& other)

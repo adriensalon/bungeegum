@@ -15,7 +15,7 @@
 #include <staticgui/glue/imguarded.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     font_guard::font_guard() { }
 

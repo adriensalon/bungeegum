@@ -14,7 +14,7 @@
 #include <staticgui/glue/typelist.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     using entity = ENTT_ID_TYPE;
 

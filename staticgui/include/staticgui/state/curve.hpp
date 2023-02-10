@@ -19,7 +19,7 @@ namespace staticgui {
 namespace detail {
 
     struct curve_data {
-        std::shared_ptr<glue::bspline> spline = nullptr;
+        std::shared_ptr<bspline> spline = nullptr;
     };
 
 }

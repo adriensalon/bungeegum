@@ -12,7 +12,7 @@
 #include <staticgui/glue/backtrace.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     namespace detail {
         void emplace_traces(std::vector<backtraced_result>& tracing, const unsigned int tracing_size)

@@ -21,9 +21,9 @@
 #include <staticgui/glue/window.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
-    namespace detail {
+    namespace {
 
 #if defined(__EMSCRIPTEN__)
 #else
@@ -48,9 +48,9 @@ namespace glue {
 
     window::window()
     {
-        if constexpr (glue::is_platform_emscripten) {
+        if constexpr (is_platform_emscripten) {
         } else {
-            if (!detail::is_sdl_main_ready) {
+            if (!is_sdl_main_ready) {
                 SDL_SetMainReady();
                 SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER); //, == 0)
                 detail::is_sdl_main_ready = true;
@@ -63,7 +63,7 @@ namespace glue {
 
     window::~window()
     {
-        if constexpr (glue::is_platform_emscripten) {
+        if constexpr (is_platform_emscripten) {
         } else {
             SDL_DestroyWindow(detail::get_window(_window_impl));
         }
@@ -80,12 +80,12 @@ namespace glue {
 
     SDL_Window* window::get_sdl_window() const
     {
-        return detail::get_window(_window_impl);
+        return get_window(_window_impl);
     }
 
     void window::set_title(const std::string& title)
     {
-        if constexpr (glue::is_platform_emscripten) {
+        if constexpr (is_platform_emscripten) {
         } else {
             SDL_SetWindowTitle(detail::get_window(_window_impl), title.c_str());
         }
@@ -93,7 +93,7 @@ namespace glue {
 
     void window::set_size(const float width, const float height)
     {
-        if constexpr (glue::is_platform_emscripten) {
+        if constexpr (is_platform_emscripten) {
         } else {
             int _width = static_cast<int>(std::floorf(width));
             int _height = static_cast<int>(std::floorf(height));
@@ -103,7 +103,7 @@ namespace glue {
 
     void window::set_fullscreen(const bool enabled)
     {
-        if constexpr (glue::is_platform_emscripten) {
+        if constexpr (is_platform_emscripten) {
         } else {
             if (enabled)
                 SDL_SetWindowFullscreen(detail::get_window(_window_impl), SDL_WINDOW_FULLSCREEN);
@@ -141,7 +141,7 @@ namespace glue {
 
     void window::run_loop()
     {
-        if constexpr (glue::is_platform_emscripten) {
+        if constexpr (is_platform_emscripten) {
         } else {
             _is_running = true;
             while (_is_running) {
@@ -152,7 +152,7 @@ namespace glue {
 
     void window::show_cursor(const bool enabled)
     {
-        if constexpr (glue::is_platform_emscripten) {
+        if constexpr (is_platform_emscripten) {
         } else {
             SDL_ShowCursor(enabled);
         }
@@ -171,14 +171,14 @@ namespace glue {
 
     void* window::get_native_window() const
     {
-        if constexpr (glue::is_platform_win32 || glue::is_platform_uwp) {
+        if constexpr (is_platform_win32 || is_platform_uwp) {
             SDL_SysWMinfo _wmi;
             SDL_VERSION(&_wmi.version);
             SDL_GetWindowWMInfo(detail::get_window(_window_impl), &_wmi); //, == SDL_TRUE)
             return _wmi.info.win.window;
-        } else if constexpr (glue::is_platform_linux) {
+        } else if constexpr (is_platform_linux) {
 
-        } else if constexpr (glue::is_platform_macos) {
+        } else if constexpr (is_platform_macos) {
         }
         return nullptr;
     }

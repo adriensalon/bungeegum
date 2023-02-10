@@ -14,7 +14,7 @@ struct ImFont;
 #include <staticgui/glue/simd.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     struct font_guard {
         font_guard();

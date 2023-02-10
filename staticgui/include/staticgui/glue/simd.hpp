@@ -14,7 +14,7 @@
 #include <vector>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     namespace intrinsics {
 

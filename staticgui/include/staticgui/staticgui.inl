@@ -150,9 +150,9 @@ const std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callb
 #pragma endregion
 
 template <typename value_t>
-value_t lerp(glue::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t)
+value_t lerp(detail::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t)
 {
-    return glue::lerp<value_t>(std::forward<value_t>(min_value), std::forward<value_t>(max_value), t);
+    return detail::lerp<value_t>(std::forward<value_t>(min_value), std::forward<value_t>(max_value), t);
 }
 
 #pragma region animation

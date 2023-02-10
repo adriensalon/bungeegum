@@ -43,7 +43,7 @@ using impl_double2 = int;
 #endif
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     namespace detail {
         constexpr bool is_simd_intrinsics_webasm = SIMD_INTRINSICS_WEBASM;

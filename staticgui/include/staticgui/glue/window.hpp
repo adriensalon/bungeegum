@@ -21,7 +21,7 @@ struct SDL_Window;
 #endif
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     struct window {
         window();

@@ -145,7 +145,7 @@
 #endif
 
 namespace staticgui {
-namespace glue {
+namespace detail {
     constexpr bool is_arch_32 = TOOLCHAIN_ARCH_32;
     constexpr bool is_arch_64 = TOOLCHAIN_ARCH_64;
 

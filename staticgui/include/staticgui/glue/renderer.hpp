@@ -19,7 +19,7 @@
 #define RENDERER_BACKEND_OPENGL (TOOLCHAIN_PLATFORM_EMSCRIPTEN || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_IOS)
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     constexpr bool is_renderer_backend_directx = RENDERER_BACKEND_DIRECTX;
     constexpr bool is_renderer_backend_vulkan = RENDERER_BACKEND_VULKAN;

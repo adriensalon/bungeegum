@@ -76,13 +76,13 @@ namespace detail {
             ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - footer_height });
             ImGui::SetNextWindowViewport(viewport->ID);
             {
-                glue::style_guard _sg0(ImGuiStyleVar_WindowRounding, 0.f);
-                glue::style_guard _sg1(ImGuiStyleVar_WindowBorderSize, 0.f);
+                style_guard _sg0(ImGuiStyleVar_WindowRounding, 0.f);
+                style_guard _sg1(ImGuiStyleVar_WindowBorderSize, 0.f);
                 window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
                 window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
                 if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
                     window_flags |= ImGuiWindowFlags_NoBackground;
-                glue::style_guard _sg2(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
+                style_guard _sg2(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
                 ImGui::Begin("Viewport", nullptr, window_flags);
             }
             draw_commands(ImGui::GetWindowDrawList());
@@ -104,16 +104,16 @@ namespace detail {
 
             ImGuiViewportP* _viewport = (ImGuiViewportP*)(void*)ImGui::GetMainViewport();
             ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
-            glue::style_guard _sg0(ImGuiStyleVar_FramePadding, { ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y });
-            glue::color_guard _cg1(ImGuiCol_MenuBarBg, { 0.878f, 0.878f, 0.878f, 1.f });
-            glue::color_guard _cg2(ImGuiCol_Button, { 0.878f, 0.878f, 0.878f, 1.f });
+            style_guard _sg0(ImGuiStyleVar_FramePadding, { ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y });
+            color_guard _cg1(ImGuiCol_MenuBarBg, { 0.878f, 0.878f, 0.878f, 1.f });
+            color_guard _cg2(ImGuiCol_Button, { 0.878f, 0.878f, 0.878f, 1.f });
             if (ImGui::BeginViewportSideBar("##MainFooterBar", _viewport, ImGuiDir_Down, footer_height, _window_flags)) {
 
                 if (ImGui::BeginMenuBar()) {
                     _sg0.release();
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (footer_height - ImGui::GetFrameHeight()) / 2.f);
 
-                    glue::font_guard _fg0;
+                    font_guard _fg0;
                     if (show_hierarchy)
                         _fg0.set(shared_data::extrabold_font);
                     if (ImGui::Button("hierarchy##__staticgui_footer_hierarchy_button__")) {
@@ -122,7 +122,7 @@ namespace detail {
                     _fg0.release();
                     ImGui::SameLine();
 
-                    glue::font_guard _fg1;
+                    font_guard _fg1;
                     if (show_inspector)
                         _fg1.set(shared_data::extrabold_font);
                     if (ImGui::Button("inspector##__staticgui_footer_inspector_button__")) {
@@ -131,7 +131,7 @@ namespace detail {
                     _fg1.release();
                     ImGui::SameLine();
 
-                    glue::font_guard _fg2;
+                    font_guard _fg2;
                     if (show_profiler)
                         _fg2.set(shared_data::extrabold_font);
                     if (ImGui::Button("profiler##__staticgui_footer_profiler_button__")) {
@@ -140,7 +140,7 @@ namespace detail {
                     _fg2.release();
                     ImGui::SameLine();
 
-                    glue::font_guard _fg3;
+                    font_guard _fg3;
                     if (show_wireframe)
                         _fg3.set(shared_data::extrabold_font);
                     if (ImGui::Button("wireframe##__staticgui_footer_wireframe_button__")) {
@@ -158,7 +158,7 @@ namespace detail {
                     ImGui::Text(_metrics_text_1.c_str());
                     ImGui::SetCursorPosY(_cursor_pos_mem.y);
                     {
-                        glue::font_guard _fg4(shared_data::extrabold_font);
+                        font_guard _fg4(shared_data::extrabold_font);
                         ImGui::Text(_metrics_text_2.c_str());
                     }
                     ImGui::EndMenuBar();
@@ -171,32 +171,32 @@ namespace detail {
         {
             ImGui::PushFont(shared_data::regular_font);
 
-            glue::color_guard _cg0(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 1.f });
-            glue::color_guard _cg1(ImGuiCol_TitleBg, { 0.627f, 0.627f, 0.627f, 1.f });
-            glue::color_guard _cg2(ImGuiCol_TitleBgActive, { 0.627f, 0.627f, 0.627f, 1.f });
-            glue::color_guard _cg3(ImGuiCol_Text, { 0.023f, 0.023f, 0.023f, 1.f });
-            glue::color_guard _cg4(ImGuiCol_Tab, { 0.878f, 0.878f, 0.878f, 1.f });
-            glue::color_guard _cg5(ImGuiCol_TabUnfocusedActive, { 0.878f, 0.878f, 0.878f, 1.f });
-            glue::color_guard _cg6(ImGuiCol_FrameBg, { 0.980f, 0.980f, 0.980f, 1.f });
-            glue::color_guard _cg7(ImGuiCol_PopupBg, { 0.980f, 0.980f, 0.980f, 1.f });
+            color_guard _cg0(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 1.f });
+            color_guard _cg1(ImGuiCol_TitleBg, { 0.627f, 0.627f, 0.627f, 1.f });
+            color_guard _cg2(ImGuiCol_TitleBgActive, { 0.627f, 0.627f, 0.627f, 1.f });
+            color_guard _cg3(ImGuiCol_Text, { 0.023f, 0.023f, 0.023f, 1.f });
+            color_guard _cg4(ImGuiCol_Tab, { 0.878f, 0.878f, 0.878f, 1.f });
+            color_guard _cg5(ImGuiCol_TabUnfocusedActive, { 0.878f, 0.878f, 0.878f, 1.f });
+            color_guard _cg6(ImGuiCol_FrameBg, { 0.980f, 0.980f, 0.980f, 1.f });
+            color_guard _cg7(ImGuiCol_PopupBg, { 0.980f, 0.980f, 0.980f, 1.f });
 
             // border
-            glue::style_guard _sg0(ImGuiStyleVar_WindowBorderSize, 0.f);
-            glue::style_guard _sg1(ImGuiStyleVar_ChildBorderSize, 0.f);
-            glue::style_guard _sg2(ImGuiStyleVar_PopupBorderSize, 0.f);
-            glue::style_guard _sg3(ImGuiStyleVar_FrameBorderSize, 0.f);
+            style_guard _sg0(ImGuiStyleVar_WindowBorderSize, 0.f);
+            style_guard _sg1(ImGuiStyleVar_ChildBorderSize, 0.f);
+            style_guard _sg2(ImGuiStyleVar_PopupBorderSize, 0.f);
+            style_guard _sg3(ImGuiStyleVar_FrameBorderSize, 0.f);
 
             // rounding
-            glue::style_guard _sg4(ImGuiStyleVar_WindowRounding, 3.f);
-            glue::style_guard _sg5(ImGuiStyleVar_ChildRounding, 3.f);
-            glue::style_guard _sg6(ImGuiStyleVar_FrameRounding, 3.f);
-            glue::style_guard _sg7(ImGuiStyleVar_PopupRounding, 3.f);
-            glue::style_guard _sg8(ImGuiStyleVar_ScrollbarRounding, 3.f);
-            glue::style_guard _sg9(ImGuiStyleVar_GrabRounding, 4.f);
-            glue::style_guard _sg10(ImGuiStyleVar_TabRounding, 4.f);
+            style_guard _sg4(ImGuiStyleVar_WindowRounding, 3.f);
+            style_guard _sg5(ImGuiStyleVar_ChildRounding, 3.f);
+            style_guard _sg6(ImGuiStyleVar_FrameRounding, 3.f);
+            style_guard _sg7(ImGuiStyleVar_PopupRounding, 3.f);
+            style_guard _sg8(ImGuiStyleVar_ScrollbarRounding, 3.f);
+            style_guard _sg9(ImGuiStyleVar_GrabRounding, 4.f);
+            style_guard _sg10(ImGuiStyleVar_TabRounding, 4.f);
 
-            glue::style_guard _sg12(ImGuiStyleVar_ItemSpacing, { 5.f, 5.f });
-            glue::style_guard _sg13(ImGuiStyleVar_WindowTitleAlign, { 0.5f, 0.5f });
+            style_guard _sg12(ImGuiStyleVar_ItemSpacing, { 5.f, 5.f });
+            style_guard _sg13(ImGuiStyleVar_WindowTitleAlign, { 0.5f, 0.5f });
 
             draw_dockspace(draw_commands);
 
@@ -220,7 +220,7 @@ namespace detail {
 
             draw_footer();
 
-            glue::style_guard _sg11(ImGuiStyleVar_FramePadding, { 4.f, 4.f });
+            style_guard _sg11(ImGuiStyleVar_FramePadding, { 4.f, 4.f });
 
             if (show_hierarchy)
                 draw_hierarchy(context);

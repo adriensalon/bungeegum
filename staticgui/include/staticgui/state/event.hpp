@@ -24,7 +24,7 @@ namespace detail {
 
     template <typename... values_t>
     struct event_impl {
-        using future_values = glue::future_typelist_t<values_t...>;
+        using future_values = future_typelist_t<values_t...>;
 
         event_impl();
         event_impl(const event_impl& other) = delete;
@@ -33,7 +33,7 @@ namespace detail {
         event_impl& operator=(event_impl&& other);
 
         bool is_attached = true;
-        glue::entity detached_id = 0;
+        entity detached_id = 0;
         std::function<void()> rattach_callback = nullptr;
         std::vector<std::function<void(values_t...)>> callbacks;
         std::vector<std::future<future_values>> futures;
@@ -53,7 +53,7 @@ namespace detail {
         event_registry& operator=(event_registry&& other);
 
         template <typename... values_t>
-        using future_values = glue::future_typelist_t<values_t...>;
+        using future_values = future_typelist_t<values_t...>;
 
         void tick();
 
@@ -93,9 +93,9 @@ namespace detail {
         void detach_to_registry(event_impl<values_t...>& event);
 
     private:
-        glue::registry _registry;
-        std::unordered_map<glue::entity, std::reference_wrapper<event_data>> _detached_events;
-        std::unordered_map<glue::entity, std::reference_wrapper<event_data>> _detached_events_to_widgets;
+        registry _registry;
+        std::unordered_map<entity, std::reference_wrapper<event_data>> _detached_events;
+        std::unordered_map<entity, std::reference_wrapper<event_data>> _detached_events_to_widgets;
     };
 
 }

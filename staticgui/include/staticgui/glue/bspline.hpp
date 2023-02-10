@@ -15,7 +15,7 @@
 #include <staticgui/glue/simd.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     struct bspline {
         bspline(const std::vector<float>& strided_controls, const bool drop_invalid = true);

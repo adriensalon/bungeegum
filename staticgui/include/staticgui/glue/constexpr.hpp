@@ -12,7 +12,7 @@
 #include <staticgui/glue/typelist.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     template <unsigned int start_t, unsigned int end_t, unsigned int increment_t, typename function_t>
     constexpr void constexpr_for(function_t&& function);

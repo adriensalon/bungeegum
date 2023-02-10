@@ -15,7 +15,7 @@
 #include <staticgui/glue/time.hpp>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     timestamp::timestamp()
     {

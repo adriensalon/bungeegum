@@ -12,7 +12,7 @@
 #include <variant>
 
 namespace staticgui {
-namespace glue {
+namespace detail {
 
     /// strong typelist filter pour les constexpr + pour les containers ecs
 

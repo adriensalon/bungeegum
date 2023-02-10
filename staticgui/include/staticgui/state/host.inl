@@ -20,8 +20,8 @@ namespace detail {
     {
         protect_library([&]() {
             this->context.widgets.declare_root(widget);
-            _window = std::make_unique<glue::window>();
-            _renderer = std::make_unique<glue::renderer>(*(_window.get()));
+            _window = std::make_unique<window>();
+            _renderer = std::make_unique<renderer>(*(_window.get()));
             if (on_renderer_started)
                 on_renderer_started();
             overlay::setup_overlay(this->context);

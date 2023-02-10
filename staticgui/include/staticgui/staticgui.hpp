@@ -11,21 +11,21 @@
 
 #include <staticgui/state/host.hpp>
 
-using int2 = staticgui::glue::simd_array<int, 2>;
-using int3 = staticgui::glue::simd_array<int, 3>;
-using int4 = staticgui::glue::simd_array<int, 4>;
-using int3x3 = staticgui::glue::simd_ordered_array<int, 9, staticgui::glue::simd_order::row_major>;
-using int4x4 = staticgui::glue::simd_ordered_array<int, 16, staticgui::glue::simd_order::row_major>;
-using float2 = staticgui::glue::simd_array<float, 2>;
-using float3 = staticgui::glue::simd_array<float, 3>;
-using float4 = staticgui::glue::simd_array<float, 4>;
-using float3x3 = staticgui::glue::simd_ordered_array<float, 9, staticgui::glue::simd_order::row_major>;
-using float4x4 = staticgui::glue::simd_ordered_array<float, 16, staticgui::glue::simd_order::row_major>;
-using double2 = staticgui::glue::simd_array<double, 2>;
-using double3 = staticgui::glue::simd_array<double, 3>;
-using double4 = staticgui::glue::simd_array<double, 4>;
-using double3x3 = staticgui::glue::simd_ordered_array<double, 9, staticgui::glue::simd_order::row_major>;
-using double4x4 = staticgui::glue::simd_ordered_array<double, 16, staticgui::glue::simd_order::row_major>;
+using int2 = staticgui::detail::simd_array<int, 2>;
+using int3 = staticgui::detail::simd_array<int, 3>;
+using int4 = staticgui::detail::simd_array<int, 4>;
+using int3x3 = staticgui::detail::simd_ordered_array<int, 9, staticgui::detail::simd_order::row_major>;
+using int4x4 = staticgui::detail::simd_ordered_array<int, 16, staticgui::detail::simd_order::row_major>;
+using float2 = staticgui::detail::simd_array<float, 2>;
+using float3 = staticgui::detail::simd_array<float, 3>;
+using float4 = staticgui::detail::simd_array<float, 4>;
+using float3x3 = staticgui::detail::simd_ordered_array<float, 9, staticgui::detail::simd_order::row_major>;
+using float4x4 = staticgui::detail::simd_ordered_array<float, 16, staticgui::detail::simd_order::row_major>;
+using double2 = staticgui::detail::simd_array<double, 2>;
+using double3 = staticgui::detail::simd_array<double, 3>;
+using double4 = staticgui::detail::simd_array<double, 4>;
+using double3x3 = staticgui::detail::simd_ordered_array<double, 9, staticgui::detail::simd_order::row_major>;
+using double4x4 = staticgui::detail::simd_ordered_array<double, 16, staticgui::detail::simd_order::row_major>;
 
 /// @brief
 /// @details
@@ -72,7 +72,7 @@ struct event {
     using on_trigger_callback = std::function<void(const values_t&...)>;
 
     /// @brief
-    using future_values = glue::future_typelist_t<values_t...>;
+    using future_values = detail::future_typelist_t<values_t...>;
 
     event();
     event(const on_trigger_callback& trigger_callback);
@@ -137,7 +137,7 @@ private:
 
 /// @brief
 template <typename value_t>
-value_t lerp(glue::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t);
+value_t lerp(detail::enable_if_lerpable_t<value_t>&& min_value, value_t&& max_value, const float t);
 
 /// @brief
 /// @details
@@ -154,7 +154,7 @@ enum struct animation_mode {
 template <typename value_t>
 struct animation {
 
-    using lerpable_value = glue::enable_if_lerpable_t<value_t>;
+    using lerpable_value = detail::enable_if_lerpable_t<value_t>;
 
     /// @brief
     using on_tick_callback = std::function<void(const value_t&)>;
@@ -232,7 +232,7 @@ private:
 template <typename value_t>
 struct animatable {
 
-    using lerpable_value = glue::enable_if_lerpable_t<value_t>;
+    using lerpable_value = detail::enable_if_lerpable_t<value_t>;
 
     animatable(const animation<value_t>& animated_value);
     animatable(const value_t& value);
