@@ -56,7 +56,7 @@ namespace detail {
 
         void draw_hierarchy(context_state& context)
         {
-            ImGui::SetNextWindowSize({ 300.f, 450.f });
+            ImGui::SetNextWindowSize({ 300.f, 450.f }, ImGuiCond_Once);
             if (ImGui::Begin("hierarchy##__staticgui_window_hierarchy_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
                 unsigned int _depth = 0;
                 unsigned int _id = 0;

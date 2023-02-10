@@ -21,6 +21,7 @@ namespace detail {
             inline static ImFont* regular_font = nullptr;
             inline static ImFont* extrabold_font = nullptr;
             inline static ImFont* icons_font = nullptr;
+
             inline static unsigned int vertices_count = 0;
             inline static unsigned int indices_count = 0;
             inline static unsigned int commands_count = 0;

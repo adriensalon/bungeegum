@@ -72,7 +72,7 @@ namespace detail {
 
         void draw_profiler(context_state& context)
         {
-            ImGui::SetNextWindowSize({ 800, 250 });
+            ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
             if (ImGui::Begin("profiler##__staticgui_window_profiler_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
                 static float history = 10.0f;
                 // ImGui::SliderFloat("History", &history, 1, 30, "%.1f s");

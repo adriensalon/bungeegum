@@ -21,7 +21,7 @@ namespace detail {
 
         void draw_inspector(context_state& context)
         {
-            ImGui::SetNextWindowSize({ 300, 450 });
+            ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
             if (ImGui::Begin("inspector##__staticgui_window_inspector_title__", 0, ImGuiWindowFlags_NoCollapse)) {
                 int _k = 0;
                 context.animations.iterate_datas([&](detail::animation_data& _animation_data) {

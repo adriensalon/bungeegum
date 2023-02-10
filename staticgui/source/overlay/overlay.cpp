@@ -101,10 +101,10 @@ namespace detail {
 
         void draw_footer()
         {
+
             ImGuiViewportP* _viewport = (ImGuiViewportP*)(void*)ImGui::GetMainViewport();
             ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
             glue::style_guard _sg0(ImGuiStyleVar_FramePadding, { ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y });
-            // glue::color_guard _cg0(ImGuiCol_Button, { 0.627f, 0.627f, 0.627f, 1.f });
             glue::color_guard _cg1(ImGuiCol_MenuBarBg, { 0.878f, 0.878f, 0.878f, 1.f });
             glue::color_guard _cg2(ImGuiCol_Button, { 0.878f, 0.878f, 0.878f, 1.f });
             if (ImGui::BeginViewportSideBar("##MainFooterBar", _viewport, ImGuiDir_Down, footer_height, _window_flags)) {
@@ -149,9 +149,18 @@ namespace detail {
                     _fg3.release();
                     ImGui::SameLine();
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (footer_height - ImGui::GetFrameHeight()) / 2.f);
-                    std::string _metrics_text(std::to_string(shared_data::vertices_count) + " vertices, " + std::to_string(shared_data::indices_count) + " indices (" + std::to_string(shared_data::commands_count) + " commands)");
-                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(_metrics_text.c_str()).x);
-                    ImGui::Text(_metrics_text.c_str());
+                    std::string _metrics_text_1(std::to_string(shared_data::vertices_count) + " vertices, " + std::to_string(shared_data::indices_count) + " indices,");
+                    std::string _metrics_text_2(std::to_string(shared_data::commands_count) + " draw calls");
+                    float _metrics_size_1 = ImGui::CalcTextSize(_metrics_text_1.c_str()).x + 5.f;
+                    float _metrics_size_2 = ImGui::CalcTextSize(_metrics_text_2.c_str()).x;
+                    ImVec2 _cursor_pos_mem = ImGui::GetCursorPos();
+                    ImGui::SetCursorPosX(_cursor_pos_mem.x + ImGui::GetContentRegionAvail().x - _metrics_size_1 - _metrics_size_2 - ImGui::GetStyle().ItemSpacing.x);
+                    ImGui::Text(_metrics_text_1.c_str());
+                    ImGui::SetCursorPosY(_cursor_pos_mem.y);
+                    {
+                        glue::font_guard _fg4(shared_data::extrabold_font);
+                        ImGui::Text(_metrics_text_2.c_str());
+                    }
                     ImGui::EndMenuBar();
                 }
                 ImGui::End();
@@ -190,6 +199,25 @@ namespace detail {
             glue::style_guard _sg13(ImGuiStyleVar_WindowTitleAlign, { 0.5f, 0.5f });
 
             draw_dockspace(draw_commands);
+
+            using namespace ImGui;
+            ImGuiContext& g = *GImGui;
+            int drawlist_count = 0;
+            for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++)
+                drawlist_count += g.Viewports[viewport_i]->DrawDataBuilder.GetDrawListCount();
+            for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++) {
+                ImGuiViewportP* viewport = g.Viewports[viewport_i];
+                for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport->DrawDataBuilder.Layers); layer_i++)
+                    for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++) {
+                        if (std::string(viewport->DrawDataBuilder.Layers[layer_i][draw_list_i]->_OwnerName) == "Viewport") {
+                            ImDrawList* _draw_list = viewport->DrawDataBuilder.Layers[layer_i][draw_list_i];
+                            shared_data::vertices_count = _draw_list->VtxBuffer.Size;
+                            shared_data::indices_count = _draw_list->IdxBuffer.Size;
+                            shared_data::commands_count = _draw_list->CmdBuffer.Size;
+                        }
+                    }
+            }
+
             draw_footer();
 
             glue::style_guard _sg11(ImGuiStyleVar_FramePadding, { 4.f, 4.f });
@@ -201,7 +229,7 @@ namespace detail {
             if (show_profiler)
                 draw_profiler(context);
 
-            ImGui::ShowDemoWindow();
+            // ImGui::ShowDemoWindow();
 
             ImGui::PopFont();
         }

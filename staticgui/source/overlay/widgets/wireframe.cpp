@@ -46,7 +46,7 @@ namespace detail {
         void DebugNodeDrawList(ImGuiViewportP* viewport, const ImDrawList* draw_list)
         {
             using namespace ImGui;
-            ImDrawList* fg_draw_list = GetWindowDrawList(); // viewport ? GetForegroundDrawList(viewport) : NULL; // Render additional visuals into the top-most draw list
+            ImDrawList* fg_draw_list = GetForegroundDrawList(); // viewport ? GetForegroundDrawList(viewport) : NULL; // Render additional visuals into the top-most draw list
             for (const ImDrawCmd* pcmd = draw_list->CmdBuffer.Data; pcmd < draw_list->CmdBuffer.Data + draw_list->CmdBuffer.Size; pcmd++) {
                 DebugNodeDrawCmdShowMeshAndBoundingBox(fg_draw_list, draw_list, pcmd);
             }
@@ -65,9 +65,6 @@ namespace detail {
                     for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++) {
                         if (std::string(viewport->DrawDataBuilder.Layers[layer_i][draw_list_i]->_OwnerName) == "Viewport") {
                             ImDrawList* _draw_list = viewport->DrawDataBuilder.Layers[layer_i][draw_list_i];
-                            shared_data::vertices_count = _draw_list->VtxBuffer.Size;
-                            shared_data::indices_count = _draw_list->IdxBuffer.Size;
-                            shared_data::commands_count = _draw_list->CmdBuffer.Size;
                             DebugNodeDrawList(viewport, _draw_list);
                         }
                     }
