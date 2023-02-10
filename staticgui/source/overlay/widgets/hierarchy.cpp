@@ -7,6 +7,7 @@
 //                           __/ |
 //                          |___/     v0.0
 
+#include <cctype>
 #include <string>
 #include <unordered_map>
 
@@ -14,6 +15,8 @@
 #include <implot.h>
 #include <iostream>
 
+#include <staticgui/glue/imguarded.hpp>
+#include <staticgui/overlay/overlay.hpp>
 #include <staticgui/overlay/widgets/hierarchy.hpp>
 
 namespace staticgui {
@@ -45,6 +48,7 @@ namespace detail {
                 size_t _last_underscore_pos = _typename.find_last_not_of('_');
                 if (ends_with(_typename, "_widget"))
                     _typename = _typename.substr(0, _typename.length() - 7);
+                _typename[0] = std::toupper(_typename[0]);
                 _typenames.emplace(raw_typename, _typename);
             }
             return _typenames[raw_typename];
@@ -52,7 +56,8 @@ namespace detail {
 
         void draw_hierarchy(context_state& context)
         {
-            if (ImGui::Begin("Hierarchy")) {
+            ImGui::SetNextWindowSize({ 300.f, 450.f });
+            if (ImGui::Begin("hierarchy##__staticgui_window_hierarchy_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
                 unsigned int _depth = 0;
                 unsigned int _id = 0;
                 std::function<void(const widget_data&)> _tf = [&](const widget_data& _widget_data) {
@@ -62,7 +67,9 @@ namespace detail {
                     ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow;
                     if (_widget_data.children.empty())
                         _node_flags |= ImGuiTreeNodeFlags_Leaf;
+                    glue::font_guard _fg0(shared_data::extrabold_font);
                     if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags)) {
+                        _fg0.release();
                         if (_widget_data.resolver)
                             ImGui::Text("has advanced resolve");
                         if (_widget_data.drawer)

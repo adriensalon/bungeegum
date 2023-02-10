@@ -17,15 +17,31 @@
 namespace staticgui {
 namespace glue {
 
-    // struct font_guard {
-    //     font_guard();
-    //     font_guard(const font_guard& other) = delete;
-    //     font_guard(const font& value);
-    //     ~font_guard();
+    font_guard::font_guard() { }
 
-    // private:
-    //     bool _is_set = false;
-    // };
+    font_guard::font_guard(ImFont* font)
+    {
+        set(font);
+    }
+
+    font_guard::~font_guard()
+    {
+        release();
+    }
+
+    void font_guard::set(ImFont* font)
+    {
+        if (!_is_set)
+            ImGui::PushFont(font);
+        _is_set = true;
+    }
+
+    void font_guard::release()
+    {
+        if (_is_set)
+            ImGui::PopFont();
+        _is_set = false;
+    }
 
     item_guard::item_guard() { }
 

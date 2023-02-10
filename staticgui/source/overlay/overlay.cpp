@@ -34,8 +34,6 @@ namespace staticgui {
 namespace detail {
     namespace overlay {
 
-        static ImFont* overlay_font = nullptr;
-        static ImFont* icons_font = nullptr;
         static bool show_hierarchy = false;
         static bool show_inspector = false;
         static bool show_profiler = false;
@@ -51,19 +49,20 @@ namespace detail {
                 // config.
                 ImGuiIO& io = ImGui::GetIO();
                 // io.Fonts->AddFontFromMemoryCompressedTTF(helvetica_compressed_data, helvetica_compressed_size, 13.0f);
-                overlay_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_regular_compressed_data, inter_regular_compressed_size, 13.0f);
-                // overlay_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_extrabold_compressed_data, inter_extrabold_compressed_size, 13.0f);
+                shared_data::regular_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_regular_compressed_data, inter_regular_compressed_size, 13.0f);
+                shared_data::extrabold_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_extrabold_compressed_data, inter_extrabold_compressed_size, 13.0f);
+                // shared_data::regular_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_extrabold_compressed_data, inter_extrabold_compressed_size, 13.0f);
 
                 // font awesome for the glyphs
-                ImFontConfig config;
-                config.MergeMode = true;
-                config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
-                static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-                icons_font = io.Fonts->AddFontFromMemoryCompressedTTF(fa4_compressed_data, fa4_compressed_size, 13.0f, &config, icon_ranges);
+                // ImFontConfig config;
+                // config.MergeMode = true;
+                // config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
+                // static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+                // icons_font = io.Fonts->AddFontFromMemoryCompressedTTF(fa4_compressed_data, fa4_compressed_size, 13.0f, &config, icon_ranges);
 
                 // build
                 io.Fonts->Build();
-                io.FontDefault = overlay_font;
+                io.FontDefault = shared_data::regular_font;
                 _installed = true;
             }
         }
@@ -114,21 +113,40 @@ namespace detail {
                     _sg0.release();
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (footer_height - ImGui::GetFrameHeight()) / 2.f);
 
+                    glue::font_guard _fg0;
+                    if (show_hierarchy)
+                        _fg0.set(shared_data::extrabold_font);
                     if (ImGui::Button("hierarchy##__staticgui_footer_hierarchy_button__")) {
                         show_hierarchy = !show_hierarchy;
                     }
+                    _fg0.release();
                     ImGui::SameLine();
+
+                    glue::font_guard _fg1;
+                    if (show_inspector)
+                        _fg1.set(shared_data::extrabold_font);
                     if (ImGui::Button("inspector##__staticgui_footer_inspector_button__")) {
                         show_inspector = !show_inspector;
                     }
+                    _fg1.release();
                     ImGui::SameLine();
+
+                    glue::font_guard _fg2;
+                    if (show_profiler)
+                        _fg2.set(shared_data::extrabold_font);
                     if (ImGui::Button("profiler##__staticgui_footer_profiler_button__")) {
                         show_profiler = !show_profiler;
                     }
+                    _fg2.release();
                     ImGui::SameLine();
+
+                    glue::font_guard _fg3;
+                    if (show_wireframe)
+                        _fg3.set(shared_data::extrabold_font);
                     if (ImGui::Button("wireframe##__staticgui_footer_wireframe_button__")) {
                         show_wireframe = !show_wireframe;
                     }
+                    _fg3.release();
                     ImGui::SameLine();
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (footer_height - ImGui::GetFrameHeight()) / 2.f);
                     std::string _metrics_text(std::to_string(shared_data::vertices_count) + " vertices, " + std::to_string(shared_data::indices_count) + " indices (" + std::to_string(shared_data::commands_count) + " commands)");
@@ -142,7 +160,7 @@ namespace detail {
 
         void draw_overlay(context_state& context, const std::function<void(ImDrawList*)>& draw_commands)
         {
-            ImGui::PushFont(overlay_font);
+            ImGui::PushFont(shared_data::regular_font);
 
             glue::color_guard _cg0(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 1.f });
             glue::color_guard _cg1(ImGuiCol_TitleBg, { 0.627f, 0.627f, 0.627f, 1.f });
@@ -151,6 +169,7 @@ namespace detail {
             glue::color_guard _cg4(ImGuiCol_Tab, { 0.878f, 0.878f, 0.878f, 1.f });
             glue::color_guard _cg5(ImGuiCol_TabUnfocusedActive, { 0.878f, 0.878f, 0.878f, 1.f });
             glue::color_guard _cg6(ImGuiCol_FrameBg, { 0.980f, 0.980f, 0.980f, 1.f });
+            glue::color_guard _cg7(ImGuiCol_PopupBg, { 0.980f, 0.980f, 0.980f, 1.f });
 
             // border
             glue::style_guard _sg0(ImGuiStyleVar_WindowBorderSize, 0.f);
@@ -168,6 +187,7 @@ namespace detail {
             glue::style_guard _sg10(ImGuiStyleVar_TabRounding, 4.f);
 
             glue::style_guard _sg12(ImGuiStyleVar_ItemSpacing, { 5.f, 5.f });
+            glue::style_guard _sg13(ImGuiStyleVar_WindowTitleAlign, { 0.5f, 0.5f });
 
             draw_dockspace(draw_commands);
             draw_footer();

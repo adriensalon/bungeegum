@@ -18,6 +18,9 @@ namespace detail {
         constexpr inline float footer_height = 28.f;
 
         struct shared_data {
+            inline static ImFont* regular_font = nullptr;
+            inline static ImFont* extrabold_font = nullptr;
+            inline static ImFont* icons_font = nullptr;
             inline static unsigned int vertices_count = 0;
             inline static unsigned int indices_count = 0;
             inline static unsigned int commands_count = 0;

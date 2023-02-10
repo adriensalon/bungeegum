@@ -72,17 +72,17 @@ namespace detail {
 
         void draw_profiler(context_state& context)
         {
-            // ImGui::SetNextWindowSize({ 800, 250 });
-            if (ImGui::Begin("Profiler", 0)) {
+            ImGui::SetNextWindowSize({ 800, 250 });
+            if (ImGui::Begin("profiler##__staticgui_window_profiler_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
                 static float history = 10.0f;
-                ImGui::SliderFloat("History", &history, 1, 30, "%.1f s");
-                static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight;
+                // ImGui::SliderFloat("History", &history, 1, 30, "%.1f s");
+                static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
                 // ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 1.f, 1.f, 0.f, 1.f });
                 ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
-                if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, 150))) {
+                if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, -1))) {
                     ImPlot::SetupAxes(NULL, NULL, flags, flags);
                     ImPlot::SetupAxisLimits(ImAxis_X1, _delta_time - history, _delta_time, ImGuiCond_Always);
-                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, _max);
+                    ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, _max);
                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
                     for (unsigned int _k = 0; _k < _count; _k++)
                         ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));

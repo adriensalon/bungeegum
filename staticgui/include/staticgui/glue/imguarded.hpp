@@ -9,20 +9,25 @@
 
 #pragma once
 
+struct ImFont;
+
 #include <staticgui/glue/simd.hpp>
 
 namespace staticgui {
 namespace glue {
 
-    // struct font_guard {
-    //     font_guard();
-    //     font_guard(const font_guard& other) = delete;
-    //     font_guard(const font& value);
-    //     ~font_guard();
+    struct font_guard {
+        font_guard();
+        font_guard(const font_guard& other) = delete;
+        font_guard(ImFont* font);
+        ~font_guard();
 
-    // private:
-    //     bool _is_set = false;
-    // };
+        void set(ImFont* font);
+        void release();
+
+    private:
+        bool _is_set = false;
+    };
 
     struct item_guard {
         item_guard();
