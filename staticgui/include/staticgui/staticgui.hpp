@@ -403,12 +403,37 @@ template <typename widget_t, typename... children_widgets_t>
 void declare(widget_t* widget, children_widgets_t&... children_widgets);
 
 /// @brief
-/// @details
+/// @details https://api.flutter.dev/flutter/rendering/BoxConstraints-class.html
 struct resolve_constraint {
-    float2 min_size = { 0.f, 0.f };
-    float2 max_size = { infinity<float>, infinity<float> };
+    resolve_constraint(const float2& min_size = { 0.f, 0.f }, const float2& max_size = { inf<float>, inf<float> });
+    resolve_constraint(const resolve_constraint& other);
+    resolve_constraint& operator=(const resolve_constraint& other);
+    resolve_constraint(resolve_constraint&& other);
+    resolve_constraint& operator=(resolve_constraint&& other);
 
-    // flutter impl here
+    [[nodiscard]] float2& min_size();
+    [[nodiscard]] const float2& min_size() const;
+    [[nodiscard]] float2& max_size();
+    [[nodiscard]] const float2& max_size() const;
+
+    resolve_constraint& flip();
+    resolve_constraint& normalize();
+    resolve_constraint& enforce(const resolve_constraint& constraint);
+    resolve_constraint& deflate(const float2& insets);
+    resolve_constraint& loosen();
+    resolve_constraint& tighten();
+
+    [[nodiscard]] bool has_bounded_height() const;
+    [[nodiscard]] bool has_bounded_width() const;
+    [[nodiscard]] bool has_infinite_height() const;
+    [[nodiscard]] bool has_infinite_width() const;
+    [[nodiscard]] bool has_tight_height() const;
+    [[nodiscard]] bool has_tight_width() const;
+    [[nodiscard]] bool is_normalized() const;
+
+    [[nodiscard]] float2 constrain(const float2& size) const;
+    [[nodiscard]] float2 biggest() const;
+    [[nodiscard]] float2 smallest() const;
 };
 
 /// @brief
@@ -425,13 +450,31 @@ struct resolve_advice {
 };
 
 struct resolve_command {
+    /// @brief First
+    /// @return
+    const resolve_constraint& get_constraints() const;
 
-    template <typename child_widget_t>
-    float2 constrain_child(child_widget_t& child_widget, const float2& min_size = { 0.f, 0.f }, const float2& max_size = { inf<float>, inf<float> });
-
+    /// @brief Then
+    /// @tparam child_widget_t
+    /// @param child_widget
+    /// @param constraint
+    /// @return
     template <typename child_widget_t>
     float2 constrain_child(child_widget_t& child_widget, const resolve_constraint& constraint);
 
+    template <typename child_widget_t>
+    float2 constrain_child_loose(child_widget_t& child_widget, const float2& max_size);
+
+    template <typename child_widget_t>
+    float2 constrain_child_tight(child_widget_t& child_widget, const float2& fixed_size);
+
+    template <typename child_widget_t>
+    float2 constrain_child_expanded(child_widget_t& child_widget);
+
+    /// @brief Thenafter
+    /// @tparam child_widget_t
+    /// @param child_widget
+    /// @param position
     template <typename child_widget_t>
     void position_child(child_widget_t& child_widget, const float2& position);
 };
