@@ -13,6 +13,8 @@
 #include <initializer_list>
 #include <vector>
 
+#include <staticgui/glue/infinity.hpp>
+
 namespace staticgui {
 namespace detail {
 

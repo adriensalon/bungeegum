@@ -9,7 +9,11 @@
 
 #pragma once
 
+#include <staticgui/glue/infinity.hpp>
 #include <staticgui/state/host.hpp>
+
+template <typename value_t>
+constexpr value_t infinity = staticgui::detail::infinity<value_t>;
 
 using int2 = staticgui::detail::simd_array<int, 2>;
 using int3 = staticgui::detail::simd_array<int, 3>;
@@ -401,28 +405,35 @@ void declare(widget_t* widget, children_widgets_t&... children_widgets);
 /// @brief
 /// @details
 struct resolve_constraint {
-    // getters
-    float2 available_size();
+    float2 min_size = { 0.f, 0.f };
+    float2 max_size = { infinity<float>, infinity<float> };
+
+    // flutter impl here
 };
 
 /// @brief
 /// @details
 struct resolve_advice {
-    void fixed_width(const float width);
-    void fixed_height(const float height);
-    void fixed_size(const float2& size);
-    void fixed_ratio(const float ratio);
-    void expand_width();
-    void expand_height();
-    void fit_width();
-    void fit_height();
+    // void fixed_width(const float width);
+    // void fixed_height(const float height);
+    // void fixed_size(const float2& size);
+    // void fixed_ratio(const float ratio);
+    // void expand_width();
+    // void expand_height();
+    // void fit_width();
+    // void fit_height();
 };
 
 struct resolve_command {
-    const resolve_constraint& parent_constraint();
-    const resolve_advice& constrain_child(const unsigned int index, const resolve_constraint& constraint);
-    const std::vector<resolve_advice>& constrain_children(const std::vector<resolve_constraint>& constraints);
-    void advise_parent(const resolve_advice& advice);
+
+    template <typename child_widget_t>
+    float2 constrain_child(child_widget_t& child_widget, const float2& min_size = { 0.f, 0.f }, const float2& max_size = { inf<float>, inf<float> });
+
+    template <typename child_widget_t>
+    float2 constrain_child(child_widget_t& child_widget, const resolve_constraint& constraint);
+
+    template <typename child_widget_t>
+    void position_child(child_widget_t& child_widget, const float2& position);
 };
 
 /// @brief

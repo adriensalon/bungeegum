@@ -22,9 +22,7 @@ namespace detail {
         {
             if (has_userspace_thrown()) {
                 ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
-                // ImGui::SetNextWindowBgAlpha(0.f);
                 if (ImGui::Begin("report", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_Modal)) {
-                    // if () {
                     backtraced_exception& _exception = get_userspace_thrown_exception().value();
                     ImGui::Text(_exception.what());
                     ImGui::Spacing();
@@ -33,10 +31,6 @@ namespace detail {
                     for (auto& _trace : _exception.tracing) {
                         ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
                     }
-                    // ImGui::Spacing();
-                    // ImGui::Separator();
-                    // ImGui::Spacing();
-                    // }
                 }
                 ImGui::End();
             }
