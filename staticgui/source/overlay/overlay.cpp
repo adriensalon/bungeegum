@@ -229,6 +229,8 @@ namespace detail {
             if (show_profiler)
                 draw_profiler(context);
 
+            draw_report(context);
+
             // ImGui::ShowDemoWindow();
 
             ImGui::PopFont();

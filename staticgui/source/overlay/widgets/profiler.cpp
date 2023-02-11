@@ -85,7 +85,8 @@ namespace detail {
                     ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, _max);
                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
                     for (unsigned int _k = 0; _k < _count; _k++)
-                        ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
+                        if (!_buffers[_k].Data.empty())
+                            ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
 
                     // ImPlot::PlotShaded(_names[0].c_str(), &(_buffers[0].Data[0].x), &(_buffers[0].Data[0].y), _buffers[0].Data.size(), -INFINITY, 0, _buffers[0].Offset, 2 * sizeof(float));
                     // for (unsigned int _k = 1; _k < _count; _k++)

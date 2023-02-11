@@ -18,13 +18,13 @@ namespace staticgui {
 namespace detail {
     namespace overlay {
 
-        void draw_debug(context_state& context)
+        void draw_report(context_state& context)
         {
-            ImGui::SetNextWindowSize({ 800, 250 });
-            if (has_userspace_thrown())
-                ImGui::SetNextWindowBgAlpha(0.f);
-            if (ImGui::Begin("Debug", 0, ImGuiWindowFlags_NoMove)) {
-                if (has_userspace_thrown()) {
+            if (has_userspace_thrown()) {
+                ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
+                // ImGui::SetNextWindowBgAlpha(0.f);
+                if (ImGui::Begin("report", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_Modal)) {
+                    // if () {
                     backtraced_exception& _exception = get_userspace_thrown_exception().value();
                     ImGui::Text(_exception.what());
                     ImGui::Spacing();
@@ -33,12 +33,13 @@ namespace detail {
                     for (auto& _trace : _exception.tracing) {
                         ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
                     }
-                    ImGui::Spacing();
-                    ImGui::Separator();
-                    ImGui::Spacing();
+                    // ImGui::Spacing();
+                    // ImGui::Separator();
+                    // ImGui::Spacing();
+                    // }
                 }
+                ImGui::End();
             }
-            ImGui::End();
         }
     }
 }

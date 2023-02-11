@@ -33,9 +33,10 @@ namespace detail {
                 std::chrono::microseconds _max_fps_period_microseconds = std::chrono::microseconds(static_cast<unsigned int>(std::floorf(1000000.f / context.max_fps)));
                 std::chrono::microseconds _delta_time = _stopwatch.lap_at_least(_max_fps_period_microseconds);
                 float _delta_milliseconds = 0.001f * static_cast<float>(_max_fps_period_microseconds.count());
-                bool _has_thrown = has_userspace_thrown();
+                // bool _has_thrown = has_userspace_thrown();
+                bool _has_polled = _window->poll();
                 if (!has_userspace_thrown()) {
-                    bool _has_polled = _window->poll();
+                    // bool _has_polled = _window->poll();
                     bool _has_ticked = this->context.tick(_delta_milliseconds);
                     if (_has_polled || _has_ticked) {
                         _renderer->new_frame();
