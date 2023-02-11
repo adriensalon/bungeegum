@@ -11,6 +11,7 @@
 
 #include <memory>
 
+#include <staticgui/glue/detection.hpp>
 #include <staticgui/glue/infinity.hpp>
 #include <staticgui/glue/renderer.hpp>
 #include <staticgui/glue/time.hpp>

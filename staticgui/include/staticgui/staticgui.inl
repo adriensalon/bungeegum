@@ -9,6 +9,15 @@
 
 #pragma once
 
+//
+//
+//
+//
+//
+//
+//
+//
+
 namespace staticgui {
 
 template <typename... values_t>
@@ -17,10 +26,11 @@ event(std::function<void(values_t...)>) -> event<values_t...>;
 namespace detail {
     inline static host_state state;
 
-    template <typename widget_t, typename = std::void_t<>>
-    constexpr bool has_resolve = false;
-    template <typename widget_t>
-    constexpr bool has_resolve<widget_t, std::void_t<decltype(std::declval<widget_t>().resolve(std::declval<const resolve_constraint&>(), std::declval<resolve_advice&>()))>> = true;
+    template <typename widget_t, typename... children_widgets_t>
+    using has_resolve_t = decltype(std::declval<widget_t>().resolve<children_widgets_t...>(std::declval<const resolve_command&>(), std::declval<children_widgets_t&>()...));
+
+    template <typename widget_t, typename... children_widgets_t>
+    constexpr bool has_resolve = is_detected_exact_v<float2, has_resolve_t, widget_t, children_widgets_t...>;
 
     template <typename widget_t, typename = std::void_t<>>
     constexpr bool has_draw = false;
@@ -384,10 +394,12 @@ template <typename widget_t, typename... children_widgets_t>
 void declare(widget_t* widget, children_widgets_t&... children_widgets)
 {
     detail::state.context.widgets.declare(widget, children_widgets...);
-    if constexpr (detail::has_resolve<widget_t>)
-        detail::state.context.widgets.on_resolve(widget, [&](const detail::constraint_data& constraints, detail::advice_data& advice) {
-            // TODO
-        });
+    if constexpr (detail::has_resolve<widget_t, children_widgets_t...>) {
+        std::cout << "yess = " << typeid(widget_t).name() << std::endl;
+    }
+    // detail::state.context.widgets.on_resolve(widget, [&](const detail::constraint_data& constraints, detail::advice_data& advice) {
+    //     // TODO
+    // });
     if constexpr (detail::has_draw<widget_t>)
         detail::state.context.widgets.on_draw(widget, [=](detail::command_data& command) { // [=] otherwise we pass a reference to ptr
             draw_command _hl_command(command);
@@ -396,11 +408,11 @@ void declare(widget_t* widget, children_widgets_t&... children_widgets)
 }
 
 template <typename widget_t>
-void on_resolve(widget_t* widget, const std::function<void(const resolve_constraint&, resolve_advice&)>& resolve_callback)
+void on_resolve(widget_t* widget, const std::function<float2(const resolve_command&)>& resolve_callback)
 {
-    detail::state.context.widgets.on_resolve(widget, [&](const detail::constraint_data& constraints, detail::advice_data& advice) {
-        // TODO
-    });
+    // detail::state.context.widgets.on_resolve(widget, [&](const detail::constraint_data& constraints, detail::advice_data& advice) {
+    //     // TODO
+    // });
 }
 
 template <typename widget_t>

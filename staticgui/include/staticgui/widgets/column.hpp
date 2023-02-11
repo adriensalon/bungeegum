@@ -31,9 +31,15 @@ namespace widgets {
             declare(this, center(children)...);
         }
 
-        inline void resolve(const resolve_constraint& cst, resolve_advice& adv) { }
+        template <typename... children_widgets_t>
+        float2 resolve(const resolve_command& command, children_widgets_t&... children)
+        {
+            return { 0.f, 0.f };
+        }
 
-        inline void draw(draw_command& cmd) { }
+        void draw(draw_command& command)
+        {
+        }
 
     private:
         int g;

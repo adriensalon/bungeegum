@@ -405,7 +405,7 @@ void declare(widget_t* widget, children_widgets_t&... children_widgets);
 /// @brief
 /// @details https://api.flutter.dev/flutter/rendering/BoxConstraints-class.html
 struct resolve_constraint {
-    resolve_constraint(const float2& min_size = { 0.f, 0.f }, const float2& max_size = { inf<float>, inf<float> });
+    resolve_constraint(const float2& min_size = { 0.f, 0.f }, const float2& max_size = { infinity<float>, infinity<float> });
     resolve_constraint(const resolve_constraint& other);
     resolve_constraint& operator=(const resolve_constraint& other);
     resolve_constraint(resolve_constraint&& other);
@@ -416,12 +416,12 @@ struct resolve_constraint {
     [[nodiscard]] float2& max_size();
     [[nodiscard]] const float2& max_size() const;
 
-    resolve_constraint& flip();
-    resolve_constraint& normalize();
-    resolve_constraint& enforce(const resolve_constraint& constraint);
-    resolve_constraint& deflate(const float2& insets);
-    resolve_constraint& loosen();
-    resolve_constraint& tighten();
+    resolve_constraint flip();
+    resolve_constraint normalize();
+    resolve_constraint enforce(const resolve_constraint& constraint);
+    resolve_constraint deflate(const float2& insets);
+    resolve_constraint loosen();
+    resolve_constraint tighten();
 
     [[nodiscard]] bool has_bounded_height() const;
     [[nodiscard]] bool has_bounded_width() const;
@@ -436,23 +436,10 @@ struct resolve_constraint {
     [[nodiscard]] float2 smallest() const;
 };
 
-/// @brief
-/// @details
-struct resolve_advice {
-    // void fixed_width(const float width);
-    // void fixed_height(const float height);
-    // void fixed_size(const float2& size);
-    // void fixed_ratio(const float ratio);
-    // void expand_width();
-    // void expand_height();
-    // void fit_width();
-    // void fit_height();
-};
-
 struct resolve_command {
     /// @brief First
     /// @return
-    const resolve_constraint& get_constraints() const;
+    const resolve_constraint& get_constraint() const;
 
     /// @brief Then
     /// @tparam child_widget_t
@@ -484,7 +471,7 @@ struct resolve_command {
 /// @param widget
 /// @param resolve_callback
 template <typename widget_t>
-void on_resolve(widget_t* widget, const std::function<void(const resolve_constraint&, resolve_advice&)>& resolve_callback);
+void on_resolve(widget_t* widget, const std::function<float2(const resolve_command&)>& resolve_callback);
 
 /// @brief
 /// @details

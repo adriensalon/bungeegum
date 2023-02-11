@@ -35,7 +35,7 @@ namespace detail {
 
         bool is_built = false;
         std::unique_ptr<std::type_index> kind = nullptr;
-        resolve_function resolver = nullptr;
+        std::function<simd_array<float, 2>(const constraint_data&)> resolver = nullptr;
         std::function<void(command_data&)> drawer = nullptr;
         std::optional<command_data> command = std::nullopt;
         std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
@@ -57,7 +57,7 @@ namespace detail {
         void declare(widget_t* widget, children_widgets_t&... children);
 
         template <typename widget_t>
-        void on_resolve(widget_t* widget, const resolve_function& resolver);
+        void on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const constraint_data&)>& resolver);
 
         template <typename widget_t>
         void on_draw(widget_t* widget, const std::function<void(command_data&)>& drawer);

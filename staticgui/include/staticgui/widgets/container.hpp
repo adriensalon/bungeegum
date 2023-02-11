@@ -25,7 +25,13 @@ namespace widgets {
             testanim.assign(this, _tick_value);
         }
 
-        inline void resolve(const resolve_constraint& cst, resolve_advice& adv) { }
+        template <typename child_widget_t>
+        float2 resolve(const resolve_command& command, child_widget_t& child_widget)
+        {
+            // return { 0.f, 0.f };
+        }
+
+        // template void resolve<float>(const resolve_command& command, float& child_widget);
 
         void draw(draw_command& command)
         {
