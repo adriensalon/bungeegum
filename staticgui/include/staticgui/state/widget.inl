@@ -44,16 +44,17 @@ namespace detail {
     }
 
     template <typename widget_t>
-    void widget_registry::on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const resolve_constraint_data&)>& resolver)
+    void widget_registry::on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const resolve_command_data&)>& resolver)
     {
         widget_data& _widget_data = get_data(*widget);
         _widget_data.is_built = true;
         _widget_data.resolver = resolver;
+        _widget_data.resolve_command = resolve_command_data(); //????? manque des trucs ici
         must_resolve<widget_t>(*widget);
     }
 
     template <typename widget_t>
-    void widget_registry::on_draw(widget_t* widget, const std::function<void(draw_command_data&)>& drawer)
+    void widget_registry::on_draw(widget_t* widget, const std::function<void(const simd_array<float, 2>&, draw_command_data&)>& drawer)
     {
         widget_data& _widget_data = get_data(*widget);
         _widget_data.is_built = true;

@@ -20,6 +20,8 @@ namespace detail {
     };
 
     struct resolve_command_data {
+        resolve_constraint_data constraint;
+        simd_array<float, 2> resolved_size;
     };
 
 }

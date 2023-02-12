@@ -37,7 +37,7 @@ namespace widgets {
             return { 0.f, 0.f };
         }
 
-        void draw(draw_command& command)
+        void draw(const float2& size, draw_command& command)
         {
         }
 

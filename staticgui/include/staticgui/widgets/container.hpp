@@ -28,12 +28,12 @@ namespace widgets {
         template <typename child_widget_t>
         float2 resolve(const resolve_command& command, child_widget_t& child_widget)
         {
-            // return { 0.f, 0.f };
+            return { 0.f, 0.f };
         }
 
         // template void resolve<float>(const resolve_command& command, float& child_widget);
 
-        void draw(draw_command& command)
+        void draw(const float2& size, draw_command& command)
         {
             command.draw_rect(
                 { 20.f, 20.f },

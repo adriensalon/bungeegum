@@ -447,6 +447,7 @@ private:
 };
 
 struct resolve_command {
+    resolve_command(const detail::resolve_command_data& data) { }
 
     /// @brief
     const resolve_constraint& constraint() const;
@@ -474,6 +475,9 @@ struct resolve_command {
     /// @param position
     template <typename child_widget_t>
     void position_child(child_widget_t& child_widget, const float2& position);
+
+private:
+    detail::resolve_command_data _data;
 };
 
 /// @brief
@@ -591,7 +595,7 @@ private:
 /// @param widget
 /// @param draw_callback
 template <typename widget_t>
-void on_draw(widget_t* widget, std::function<void(draw_command&)> draw_callback);
+void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback);
 
 }
 

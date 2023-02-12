@@ -25,6 +25,12 @@ namespace detail {
     struct widget_disabled {
     };
 
+    struct widget_has_resolve_tag {
+    };
+
+    struct widget_has_draw_tag {
+    };
+
     struct widget_data {
         widget_data();
         widget_data(const widget_data& other) = delete;
@@ -35,13 +41,24 @@ namespace detail {
 
         bool is_built = false;
         std::unique_ptr<std::type_index> kind = nullptr;
-        std::function<simd_array<float, 2>(const resolve_constraint_data&)> resolver = nullptr;
-        // std::optional<command_data> command = std::nullopt;
-        std::function<void(draw_command_data&)> drawer = nullptr;
+
+        // resolve
+        std::function<simd_array<float, 2>(const resolve_command_data&)> resolver = nullptr;
+        std::optional<resolve_command_data> resolve_command = std::nullopt;
+
+        // draw
+        std::function<void(const simd_array<float, 2>&, draw_command_data&)> drawer = nullptr;
         std::optional<draw_command_data> command = std::nullopt;
+
+        // hierarchy
         std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<widget_data>> children = {};
+
+        // detached events
         std::unordered_map<entity, std::function<void()>> detached_events_removers;
+
+        // input
+        bool passes_input = true; // used by context ?
     };
 
     struct widget_registry {
@@ -58,10 +75,10 @@ namespace detail {
         void declare(widget_t* widget, children_widgets_t&... children);
 
         template <typename widget_t>
-        void on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const resolve_constraint_data&)>& resolver);
+        void on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const resolve_command_data&)>& resolver);
 
         template <typename widget_t>
-        void on_draw(widget_t* widget, const std::function<void(draw_command_data&)>& drawer);
+        void on_draw(widget_t* widget, const std::function<void(const simd_array<float, 2>&, draw_command_data&)>& drawer);
 
         template <typename... children_widgets_t>
         void declare_root(children_widgets_t&... children);

@@ -45,7 +45,7 @@ namespace detail {
         frames_chronometer.begin("resolve");
         bool _must_draw = (!widgets.is_must_draw_empty());
         widgets.iterate_must_resolve([&](widget_data& _data, const bool _must_resolve_children) {
-
+            // _data.resolve_command.value().resolved_size = _data.resolver(_data.resolve_command.value())
         });
         frames_chronometer.end("resolve");
 
@@ -61,7 +61,8 @@ namespace detail {
             if (!has_userspace_thrown())
                 _data.command.value().clear();
             protect_userspace([&]() {
-                _data.drawer(_data.command.value());
+                // _data.drawer(_data.resolve_command.value().resolved_size, _data.command.value());
+                _data.drawer({ 500.f, 500.f }, _data.command.value());
             });
         });
         frames_chronometer.end("draw");
