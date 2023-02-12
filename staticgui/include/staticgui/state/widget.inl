@@ -44,7 +44,7 @@ namespace detail {
     }
 
     template <typename widget_t>
-    void widget_registry::on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const resolve_command_data&)>& resolver)
+    void widget_registry::on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(resolve_command_data&)>& resolver)
     {
         widget_data& _widget_data = get_data(*widget);
         _widget_data.is_built = true;

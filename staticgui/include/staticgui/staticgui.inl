@@ -27,7 +27,7 @@ namespace detail {
     inline static host_state state;
 
     template <typename widget_t, typename... children_widgets_t>
-    using detected_resolve_function = decltype(std::declval<widget_t>().resolve<children_widgets_t...>(std::declval<const resolve_command&>(), std::declval<children_widgets_t&>()...));
+    using detected_resolve_function = decltype(std::declval<widget_t>().resolve<children_widgets_t...>(std::declval<resolve_command&>(), std::declval<children_widgets_t&>()...));
 
     template <typename widget_t, typename... children_widgets_t>
     constexpr bool has_resolve = is_detected_exact_v<float2, detected_resolve_function, widget_t, children_widgets_t...>;
@@ -38,10 +38,6 @@ namespace detail {
     template <typename widget_t>
     constexpr bool has_draw = is_detected_exact_v<void, detected_draw_function, widget_t>;
 
-    // template <typename widget_t, typename = std::void_t<>>
-    // constexpr bool has_draw = false;
-    // template <typename widget_t>
-    // constexpr bool has_draw<widget_t, std::void_t<decltype(std::declval<widget_t>().draw(std::declval<draw_command&>()))>> = true;
 }
 
 #pragma region event

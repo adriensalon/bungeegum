@@ -43,7 +43,7 @@ namespace detail {
         std::unique_ptr<std::type_index> kind = nullptr;
 
         // resolve
-        std::function<simd_array<float, 2>(const resolve_command_data&)> resolver = nullptr;
+        std::function<simd_array<float, 2>(resolve_command_data&)> resolver = nullptr;
         std::optional<resolve_command_data> resolve_command = std::nullopt;
 
         // draw
@@ -75,7 +75,7 @@ namespace detail {
         void declare(widget_t* widget, children_widgets_t&... children);
 
         template <typename widget_t>
-        void on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const resolve_command_data&)>& resolver);
+        void on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(resolve_command_data&)>& resolver);
 
         template <typename widget_t>
         void on_draw(widget_t* widget, const std::function<void(const simd_array<float, 2>&, draw_command_data&)>& drawer);

@@ -32,8 +32,10 @@ namespace widgets {
         }
 
         template <typename... children_widgets_t>
-        float2 resolve(const resolve_command& command, children_widgets_t&... children)
+        float2 resolve(resolve_command& command, children_widgets_t&... children)
         {
+            // (command.constrain_child(children, command.constraint()), ...);
+            std::cout << "resolving column !!! \n";
             return { 0.f, 0.f };
         }
 

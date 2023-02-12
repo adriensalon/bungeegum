@@ -450,7 +450,7 @@ struct resolve_command {
     resolve_command(const detail::resolve_command_data& data) { }
 
     /// @brief
-    const resolve_constraint& constraint() const;
+    const resolve_constraint& constraint();
 
     /// @brief Then
     /// @tparam child_widget_t
