@@ -185,6 +185,10 @@ struct animation {
     animation& on_tick(const on_tick_callback& tick_callback);
 
     /// @brief
+    /// @param value
+    animation& on_tick(value_t& value, const bool must_draw = false, const bool must_resolve = false);
+
+    /// @brief
     animation& start();
 
     /// @brief
@@ -260,6 +264,9 @@ struct context {
 
     /// @brief
     context& max_fps(const unsigned int fps);
+
+    template <typename widget_t>
+    context& must_resolve(widget_t* widget);
 
     template <typename widget_t>
     context& must_draw(widget_t* widget);
@@ -421,7 +428,7 @@ struct resolve_constraint {
     resolve_constraint enforce(const resolve_constraint& constraint);
     resolve_constraint deflate(const float2& insets);
     resolve_constraint loosen();
-    resolve_constraint tighten();
+    resolve_constraint tighten(const float2& size);
 
     [[nodiscard]] bool has_bounded_height() const;
     [[nodiscard]] bool has_bounded_width() const;
@@ -434,12 +441,15 @@ struct resolve_constraint {
     [[nodiscard]] float2 constrain(const float2& size) const;
     [[nodiscard]] float2 biggest() const;
     [[nodiscard]] float2 smallest() const;
+
+private:
+    detail::resolve_constraint_data _data;
 };
 
 struct resolve_command {
-    /// @brief First
-    /// @return
-    const resolve_constraint& get_constraint() const;
+
+    /// @brief
+    const resolve_constraint& constraint() const;
 
     /// @brief Then
     /// @tparam child_widget_t
@@ -470,13 +480,13 @@ struct resolve_command {
 /// @tparam widget_t
 /// @param widget
 /// @param resolve_callback
-template <typename widget_t>
-void on_resolve(widget_t* widget, const std::function<float2(const resolve_command&)>& resolve_callback);
+template <typename widget_t, typename... children_widgets_t>
+void on_resolve(widget_t* widget, const std::function<float2(const resolve_command&, children_widgets_t&...)>& resolve_callback, children_widgets_t&... children_widgets);
 
 /// @brief
 /// @details
 struct draw_command {
-    draw_command(detail::command_data& data);
+    draw_command(detail::draw_command_data& data);
     draw_command(const draw_command& other);
     draw_command& operator=(const draw_command& other);
     draw_command(draw_command&& other);
@@ -570,8 +580,10 @@ struct draw_command {
         const float2& first_corner, const float2& second_corner, const float2& third_corner,
         const float4& color);
 
+    // draw bezier and bspline from points direct (sans curve)
+
 private:
-    detail::command_data& _command_data;
+    detail::draw_command_data& _command_data;
 };
 
 /// @brief

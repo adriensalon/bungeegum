@@ -20,7 +20,7 @@ struct ImDrawList;
 namespace staticgui {
 namespace detail {
 
-    struct command_data {
+    struct draw_command_data {
         void add_command(const std::function<void(ImDrawList*)>& commnad_callback);
         void draw();
         void draw(ImDrawList* imgui_drawlist);

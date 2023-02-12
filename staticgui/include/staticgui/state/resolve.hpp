@@ -14,9 +14,12 @@
 namespace staticgui {
 namespace detail {
 
-    struct constraint_data {
+    struct resolve_constraint_data {
         simd_array<float, 2> min_size;
         simd_array<float, 2> max_size;
+    };
+
+    struct resolve_command_data {
     };
 
 }

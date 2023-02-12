@@ -15,9 +15,9 @@
 #include <staticgui/glue/constexpr.hpp>
 #include <staticgui/glue/registry.hpp>
 #include <staticgui/state/animation.hpp>
+#include <staticgui/state/draw.hpp>
 #include <staticgui/state/event.hpp>
-#include <staticgui/state/layout.hpp>
-#include <staticgui/state/rendering.hpp>
+#include <staticgui/state/resolve.hpp>
 
 namespace staticgui {
 namespace detail {
@@ -35,9 +35,10 @@ namespace detail {
 
         bool is_built = false;
         std::unique_ptr<std::type_index> kind = nullptr;
-        std::function<simd_array<float, 2>(const constraint_data&)> resolver = nullptr;
-        std::function<void(command_data&)> drawer = nullptr;
-        std::optional<command_data> command = std::nullopt;
+        std::function<simd_array<float, 2>(const resolve_constraint_data&)> resolver = nullptr;
+        // std::optional<command_data> command = std::nullopt;
+        std::function<void(draw_command_data&)> drawer = nullptr;
+        std::optional<draw_command_data> command = std::nullopt;
         std::optional<std::reference_wrapper<widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<widget_data>> children = {};
         std::unordered_map<entity, std::function<void()>> detached_events_removers;
@@ -57,10 +58,10 @@ namespace detail {
         void declare(widget_t* widget, children_widgets_t&... children);
 
         template <typename widget_t>
-        void on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const constraint_data&)>& resolver);
+        void on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const resolve_constraint_data&)>& resolver);
 
         template <typename widget_t>
-        void on_draw(widget_t* widget, const std::function<void(command_data&)>& drawer);
+        void on_draw(widget_t* widget, const std::function<void(draw_command_data&)>& drawer);
 
         template <typename... children_widgets_t>
         void declare_root(children_widgets_t&... children);

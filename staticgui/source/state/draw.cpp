@@ -13,29 +13,29 @@
 
 #include <iostream>
 
-#include <staticgui/state/rendering.hpp>
+#include <staticgui/state/draw.hpp>
 
 namespace staticgui {
 namespace detail {
 
-    void command_data::add_command(const std::function<void(ImDrawList*)>& command_callback)
+    void draw_command_data::add_command(const std::function<void(ImDrawList*)>& command_callback)
     {
         _commands.emplace_back(command_callback);
     }
 
-    void command_data::draw()
+    void draw_command_data::draw()
     {
         ImDrawList* _draw_list = ImGui::GetBackgroundDrawList();
         draw(_draw_list);
     }
 
-    void command_data::draw(ImDrawList* imgui_drawlist)
+    void draw_command_data::draw(ImDrawList* imgui_drawlist)
     {
         for (auto& _command : _commands)
             _command(imgui_drawlist);
     }
 
-    void command_data::clear()
+    void draw_command_data::clear()
     {
         _commands.clear();
     }

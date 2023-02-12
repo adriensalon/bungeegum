@@ -27,10 +27,10 @@ namespace detail {
     inline static host_state state;
 
     template <typename widget_t, typename... children_widgets_t>
-    using has_resolve_t = decltype(std::declval<widget_t>().resolve<children_widgets_t...>(std::declval<const resolve_command&>(), std::declval<children_widgets_t&>()...));
+    using resolve_function = decltype(std::declval<widget_t>().resolve<children_widgets_t...>(std::declval<const resolve_command&>(), std::declval<children_widgets_t&>()...));
 
     template <typename widget_t, typename... children_widgets_t>
-    constexpr bool has_resolve = is_detected_exact_v<float2, has_resolve_t, widget_t, children_widgets_t...>;
+    constexpr bool has_resolve = is_detected_exact_v<float2, resolve_function, widget_t, children_widgets_t...>;
 
     template <typename widget_t, typename = std::void_t<>>
     constexpr bool has_draw = false;
@@ -394,31 +394,35 @@ template <typename widget_t, typename... children_widgets_t>
 void declare(widget_t* widget, children_widgets_t&... children_widgets)
 {
     detail::state.context.widgets.declare(widget, children_widgets...);
-    if constexpr (detail::has_resolve<widget_t, children_widgets_t...>) {
-        std::cout << "yess = " << typeid(widget_t).name() << std::endl;
-    }
-    // detail::state.context.widgets.on_resolve(widget, [&](const detail::constraint_data& constraints, detail::advice_data& advice) {
-    //     // TODO
-    // });
+    if constexpr (detail::has_resolve<widget_t, children_widgets_t...>)
+        // {
+        //     std::cout << "yess = " << typeid(widget_t).name() << std::endl;
+        // }
+        detail::state.context.widgets.on_resolve<widget_t>(widget, [&](const detail::resolve_constraint_data& constraints) {
+            // TODO
+            return float2 { 0.f, 0.f };
+        });
     if constexpr (detail::has_draw<widget_t>)
-        detail::state.context.widgets.on_draw(widget, [=](detail::command_data& command) { // [=] otherwise we pass a reference to ptr
+        detail::state.context.widgets.on_draw(widget, [=](detail::draw_command_data& command) { // [=] otherwise we pass a reference to ptr
             draw_command _hl_command(command);
             widget->draw(_hl_command);
         });
 }
 
-template <typename widget_t>
-void on_resolve(widget_t* widget, const std::function<float2(const resolve_command&)>& resolve_callback)
+template <typename widget_t, typename... children_widgets_t>
+void on_resolve(widget_t* widget, const std::function<float2(const resolve_command&, children_widgets_t&...)>& resolve_callback, children_widgets_t&... children_widgets)
 {
-    // detail::state.context.widgets.on_resolve(widget, [&](const detail::constraint_data& constraints, detail::advice_data& advice) {
-    //     // TODO
-    // });
+    // check les children un par un et verifie ce sont bien ceux du widget ^^
+    detail::state.context.widgets.on_resolve<widget_t>(widget, [&](const detail::resolve_constraint_data& constraints) {
+        // TODO
+        return float2 { 0.f, 0.f };
+    });
 }
 
 template <typename widget_t>
 void on_draw(widget_t* widget, std::function<void(draw_command&)> draw_callback)
 {
-    detail::state.context.widgets.on_draw(widget, [=](detail::command_data& command) { // [=] otherwise we pass a reference to ptr
+    detail::state.context.widgets.on_draw(widget, [=](detail::draw_command_data& command) { // [=] otherwise we pass a reference to ptr
         draw_command _hl_command(command);
         draw_callback(_hl_command);
     });

@@ -44,7 +44,7 @@ namespace detail {
     }
 
     template <typename widget_t>
-    void widget_registry::on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const constraint_data&)>& resolver)
+    void widget_registry::on_resolve(widget_t* widget, const std::function<simd_array<float, 2>(const resolve_constraint_data&)>& resolver)
     {
         widget_data& _widget_data = get_data(*widget);
         _widget_data.is_built = true;
@@ -53,12 +53,12 @@ namespace detail {
     }
 
     template <typename widget_t>
-    void widget_registry::on_draw(widget_t* widget, const std::function<void(command_data&)>& drawer)
+    void widget_registry::on_draw(widget_t* widget, const std::function<void(draw_command_data&)>& drawer)
     {
         widget_data& _widget_data = get_data(*widget);
         _widget_data.is_built = true;
         _widget_data.drawer = drawer;
-        _widget_data.command = command_data();
+        _widget_data.command = draw_command_data();
         must_draw<widget_t>(*widget);
     }
 

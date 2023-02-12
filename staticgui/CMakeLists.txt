@@ -23,10 +23,10 @@ set(staticgui_source
 
 	"source/state/animation.cpp"
 	"source/state/context.cpp"
+	"source/state/draw.cpp"
 	"source/state/errors.cpp"
 	"source/state/event.cpp"
-	"source/state/layout.cpp"
-	"source/state/rendering.cpp"
+	"source/state/resolve.cpp"
 	"source/state/widget.cpp"
 
 	"source/overlay/embedded/fa4.cpp"

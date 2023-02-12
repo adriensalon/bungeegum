@@ -50,7 +50,7 @@ namespace widgets {
 
             // detail::throw_library_bad_implementation("helloww");
             // detail::throw_library_bad_usage("helloww");
-            throw_error("my user error");
+            // throw_error("my user error");
         }
 
     private:

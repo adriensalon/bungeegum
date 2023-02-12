@@ -11,8 +11,8 @@
 
 #include <staticgui/glue/time.hpp>
 #include <staticgui/state/animatable.hpp>
-#include <staticgui/state/layout.hpp>
-#include <staticgui/state/rendering.hpp>
+#include <staticgui/state/draw.hpp>
+#include <staticgui/state/resolve.hpp>
 #include <staticgui/state/widget.hpp>
 
 #include <staticgui/state/event.hpp>
