@@ -13,29 +13,24 @@
 #include <vector>
 
 namespace staticgui {
-namespace detail {
 
-    enum class console_color {
-        black,
-        blue,
-        green,
-        cyan,
-        red,
-        magenta,
-        yellow
-    };
+enum struct console_color {
+    default,
+    blue,
+    green,
+    cyan,
+    red,
+    magenta,
+    yellow
+};
 
-    void console_log(const std::string& message, const console_color color = console_color::black, const bool newline = true);
+void console_log(const std::string& message, const console_color color = console_color::default);
 
-#if !defined(__EMSCRIPTEN__)
+struct console_command {
+    std::string name;
+    std::vector<std::string> args;
+};
 
-    struct console_command {
-        std::string name;
-        std::vector<std::string> args;
-    };
+std::vector<console_command> console_args(int argc, char* argv[]);
 
-    std::vector<console_command> console_args(int argc, char* argv[]);
-
-#endif
-}
 }

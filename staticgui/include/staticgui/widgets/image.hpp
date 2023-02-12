@@ -22,7 +22,7 @@ namespace widgets {
         image_widget()
         {
             // std::cout << "image ctor\n";
-            declare(this);
+            build(this);
         }
 
         ~image_widget()
@@ -42,4 +42,4 @@ namespace widgets {
 }
 }
 
-#define image staticgui::make<staticgui::widgets::image_widget>
+#define image staticgui::create<staticgui::widgets::image_widget>

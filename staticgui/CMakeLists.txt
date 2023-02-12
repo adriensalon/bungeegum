@@ -11,43 +11,40 @@ project(staticgui)
 
 set(staticgui_source
 
+	"source/context/animation.cpp"
+	"source/context/context.cpp"
+	"source/context/draw.cpp"
+	"source/context/event.cpp"
+	"source/context/exceptions.cpp"
+	"source/context/resolve.cpp"
+	"source/context/widget.cpp"
+
 	"source/glue/backtrace.cpp"
-	"source/glue/bspline.cpp"
 	"source/glue/console.cpp"
+	"source/glue/curve.cpp"
 	"source/glue/imguarded.cpp"
 	"source/glue/registry.cpp"
 	"source/glue/renderer.cpp"
-	"source/glue/simd.cpp"
 	"source/glue/time.cpp"
 	"source/glue/window.cpp"
 
-	"source/state/animation.cpp"
-	"source/state/context.cpp"
-	"source/state/draw.cpp"
-	"source/state/errors.cpp"
-	"source/state/event.cpp"
-	"source/state/resolve.cpp"
-	"source/state/widget.cpp"
-
-	"source/overlay/embedded/fa4.cpp"
-	"source/overlay/embedded/inter_extrabold.cpp"
-	"source/overlay/embedded/inter_regular.cpp"
-	"source/overlay/embedded/inter_thin.cpp"
-	
-	"source/overlay/widgets/hierarchy.cpp"
-	"source/overlay/widgets/inspector.cpp"
-	"source/overlay/widgets/profiler.cpp"
-	"source/overlay/widgets/report.cpp"
-	"source/overlay/widgets/wireframe.cpp"
+	"source/overlay/compressed/fa4.cpp"
+	"source/overlay/compressed/inter_extrabold.cpp"
+	"source/overlay/compressed/inter_regular.cpp"
+	"source/overlay/hierarchy.cpp"
+	"source/overlay/inspector.cpp"
 	"source/overlay/overlay.cpp"
+	"source/overlay/profiler.cpp"
+	"source/overlay/report.cpp"
+	"source/overlay/wireframe.cpp"
 
-	"source/staticgui.cpp"
 )
 
 add_library(staticgui "${staticgui_source}")
 target_include_directories(staticgui PUBLIC "include")
 set_property(TARGET staticgui PROPERTY CXX_STANDARD 17)
 
+target_link_libraries(staticgui glm)
 target_link_libraries(staticgui backward)
 target_link_libraries(staticgui imgui)
 target_link_libraries(staticgui implot)

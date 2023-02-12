@@ -12,10 +12,8 @@
 #include <limits>
 
 namespace staticgui {
-namespace detail {
 
-    template <typename value_t>
-    constexpr value_t infinity = std::numeric_limits<value_t>::max();
+template <typename value_t>
+constexpr value_t infinity = std::numeric_limits<value_t>::max();
 
-}
 }

@@ -9,116 +9,23 @@
 
 #pragma once
 
-#include <array>
-#include <initializer_list>
-#include <vector>
+#include <glm/glm.hpp>
 
 #include <staticgui/glue/infinity.hpp>
 
 namespace staticgui {
-namespace detail {
 
-    namespace intrinsics {
+using float2 = glm::vec2;
+using float3 = glm::vec3;
+using float4 = glm::vec4;
 
-        template <typename scalar_t, unsigned int count_t>
-        void add(const scalar_t* first, const scalar_t* second, scalar_t* result);
-    }
+template <>
+constexpr float2 infinity<float2> = { infinity<float>, infinity<float> };
 
-    enum struct simd_order {
-        row_major,
-        column_major
-    };
+template <>
+constexpr float3 infinity<float3> = { infinity<float>, infinity<float>, infinity<float> };
 
-    template <typename scalar_t, unsigned int count_t>
-    struct simd_array {
-        simd_array();
-        simd_array(const std::array<scalar_t, count_t>& array);
-        simd_array(const std::vector<scalar_t>& vector);
-        simd_array(std::initializer_list<scalar_t> initializer_list);
-        simd_array(const simd_array& other)
-        {
-            *this = other;
-        }
-        simd_array& operator=(const simd_array& other)
-        {
-            _array = other._array;
-            return *this;
-        }
-        simd_array(simd_array&& other)
-        {
-            *this = std::move(other);
-        }
-        simd_array& operator=(simd_array&& other)
-        {
-            _array = std::move(other._array);
-            return *this;
-        }
+template <>
+constexpr float4 infinity<float4> = { infinity<float>, infinity<float>, infinity<float>, infinity<float> };
 
-        template <typename = typename std::enable_if_t<count_t >= 1>>
-        scalar_t& x() { return _array[0]; }
-
-        template <typename = typename std::enable_if_t<count_t >= 1>>
-        const scalar_t& x() const { return _array[0]; }
-
-        template <typename = typename std::enable_if_t<count_t >= 2>>
-        scalar_t& y() { return _array[1]; }
-
-        template <typename = typename std::enable_if_t<count_t >= 2>>
-        scalar_t y() const { return _array[1]; }
-
-        template <typename = typename std::enable_if_t<count_t >= 3>>
-        scalar_t& z() { return _array[2]; }
-
-        template <typename = typename std::enable_if_t<count_t >= 3>>
-        scalar_t z() const { return _array[2]; }
-
-        template <typename = typename std::enable_if_t<count_t >= 4>>
-        scalar_t& w() { return _array[3]; }
-
-        template <typename = typename std::enable_if_t<count_t >= 4>>
-        scalar_t w() const { return _array[3]; }
-
-        scalar_t& at(const unsigned int index);
-
-        const scalar_t& at(const unsigned int index) const;
-
-        scalar_t& operator[](const unsigned int index);
-
-        const scalar_t& operator[](const unsigned int index) const;
-
-        scalar_t* data();
-
-        const scalar_t* data() const;
-
-        scalar_t* operator&();
-
-        const scalar_t* operator&() const;
-
-    private:
-        // alignas(128) std::array<scalar_t, count_t> _array;
-        alignas(128) std::array<scalar_t, count_t> _array;
-        // alignas(128) scalar_t _array[count_t];
-    };
-
-    template <typename scalar_t, unsigned int count_t, simd_order order_t>
-    struct simd_ordered_array {
-        simd_ordered_array();
-
-        scalar_t& at(const unsigned int index);
-
-    private:
-        simd_ordered_array<scalar_t, count_t, order_t> _array;
-    };
-
-    template <typename scalar_t, unsigned int count_t>
-    simd_array<scalar_t, count_t> operator+(const simd_array<scalar_t, count_t>& first, const simd_array<scalar_t, count_t>& second);
-
-    template <typename scalar_t, unsigned int count_t>
-    simd_array<scalar_t, count_t>& operator+=(const simd_array<scalar_t, count_t>& first, const simd_array<scalar_t, count_t>& second);
-
-    template <typename scalar_t, unsigned int count_t, simd_order order_t>
-    simd_ordered_array<scalar_t, count_t, order_t> operator+(const simd_ordered_array<scalar_t, count_t, order_t>& first, const simd_ordered_array<scalar_t, count_t, order_t>& second);
 }
-}
-
-#include <staticgui/glue/simd.inl>

@@ -9,27 +9,16 @@
 
 #pragma once
 
-#include <staticgui/state/context.hpp>
+#include <functional>
+
+#include <staticgui/context/context.hpp>
 
 namespace staticgui {
 namespace detail {
-    namespace overlay {
 
-        constexpr inline float footer_height = 28.f;
+    void setup_overlay();
 
-        struct shared_data {
-            inline static ImFont* regular_font = nullptr;
-            inline static ImFont* extrabold_font = nullptr;
-            inline static ImFont* icons_font = nullptr;
+    void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands);
 
-            inline static unsigned int vertices_count = 0;
-            inline static unsigned int indices_count = 0;
-            inline static unsigned int commands_count = 0;
-        };
-
-        void setup_overlay(context_state& context);
-
-        void draw_overlay(context_state& context, const std::function<void(ImDrawList*)>& draw_commands);
-    }
 }
 }

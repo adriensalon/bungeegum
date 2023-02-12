@@ -1,83 +1,89 @@
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+//       _        _   _                 _
+//      | |      | | (_)               (_)
+//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
+//  / __| __/ _` | __| |/ __/ _` | | | | |
+//  \__ \ || (_| | |_| | (_| (_| | |_| | |
+//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
+//                           __/ |
+//                          |___/     v0.0
 
 #include <iostream>
 
 #include <staticgui/glue/console.hpp>
+#include <staticgui/glue/toolchain.hpp>
+
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
+#include <windows.h>
+#endif
 
 namespace staticgui {
-namespace detail {
 
-    void console_log(const std::string& message, const console_color color, const bool newline)
-    {
-#if defined(__EMSCRIPTEN__)
-#elif defined(_WIN32)
-        HANDLE h_console = GetStdHandle(STD_OUTPUT_HANDLE);
-        int col = 7;
-        if (color == console_color::blue)
-            col = 1;
-        else if (color == console_color::green)
-            col = 2;
-        else if (color == console_color::cyan)
-            col = 3;
-        else if (color == console_color::red)
-            col = 4;
-        else if (color == console_color::magenta)
-            col = 5;
-        else if (color == console_color::yellow)
-            col = 6;
-        SetConsoleTextAttribute(h_console, col);
-#elif defined(__gnu_linux__)
-        std::string col = "\033[0m";
-        if (color == console_color::blue)
-            col = "\033[0;34m";
-        else if (color == console_color::green)
-            col = "\033[0;32m";
-        else if (color == console_color::cyan)
-            col = "\033[0;36m";
-        else if (color == console_color::red)
-            col = "\033[0;31m";
-        else if (color == console_color::magenta)
-            col = "\033[0;35m";
-        else if (color == console_color::yellow)
-            col = "\033[0;33m";
-        std::cout << col;
+void console_log(const std::string& message, const console_color color)
+{
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
+    HANDLE _handle;
 #endif
-        std::cout << message;
-#if defined(__EMSCRIPTEN__)
-#elif defined(_WIN32)
-        SetConsoleTextAttribute(h_console, 7);
-#elif defined(__gnu_linux__)
-        std::cout << "\033[0m";
-#endif
-        if (newline)
-            std::cout << std::endl;
+    if constexpr (is_platform_win32_v || is_platform_uwp_v) {
+        _handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        int _color = 7;
+        if (color == console_color::blue)
+            _color = 1;
+        else if (color == console_color::green)
+            _color = 2;
+        else if (color == console_color::cyan)
+            _color = 3;
+        else if (color == console_color::red)
+            _color = 4;
+        else if (color == console_color::magenta)
+            _color = 5;
+        else if (color == console_color::yellow)
+            _color = 6;
+        SetConsoleTextAttribute(_handle, _color);
+    } else if constexpr (is_platform_linux_v || is_platform_macos_v) {
+        std::string _color = "\033[0m";
+        if (color == console_color::blue)
+            _color = "\033[0;34m";
+        else if (color == console_color::green)
+            _color = "\033[0;32m";
+        else if (color == console_color::cyan)
+            _color = "\033[0;36m";
+        else if (color == console_color::red)
+            _color = "\033[0;31m";
+        else if (color == console_color::magenta)
+            _color = "\033[0;35m";
+        else if (color == console_color::yellow)
+            _color = "\033[0;33m";
+        std::cout << _color;
     }
+    std::cout << message;
+    if constexpr (is_platform_win32_v || is_platform_uwp_v)
+        SetConsoleTextAttribute(_handle, 7);
+    else if constexpr (is_platform_linux_v || is_platform_macos_v)
+        std::cout << "\033[0m";
+}
 
-#if !defined(__EMSCRIPTEN__)
-
-    std::vector<console_command> console_args(int argc, char* argv[])
-    {
-        auto result = std::vector<console_command>();
-        auto raw_options = std::vector<std::string>(argv + 1, argv + argc);
-        for (auto& raw_option : raw_options) {
+std::vector<console_command> console_args(int argc, char* argv[])
+{
+    auto _result = std::vector<console_command>();
+    auto _raw_options = std::vector<std::string>(argv + 1, argv + argc);
+    if constexpr (is_platform_emscripten_v) {
+        // todo
+    } else {
+        for (auto& raw_option : _raw_options) {
             if (!raw_option.empty()) {
                 if (raw_option[0] != '-') {
-                    if (result.empty())
+                    if (_result.empty())
                         return {};
-                    result.back().args.emplace_back(raw_option);
+                    _result.back().args.emplace_back(raw_option);
                 } else {
                     console_command cmd;
                     cmd.name = raw_option;
-                    result.emplace_back(cmd);
+                    _result.emplace_back(cmd);
                 }
             }
         }
-        return result;
     }
-
-#endif
+    return _result;
 }
 
 }

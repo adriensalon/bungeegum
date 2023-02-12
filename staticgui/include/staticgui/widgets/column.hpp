@@ -28,7 +28,7 @@ namespace widgets {
         template <typename... children_widgets_t>
         column_widget(children_widgets_t&... children)
         {
-            declare(this, center(children)...);
+            build(this, center(children)...);
         }
 
         template <typename... children_widgets_t>
@@ -39,7 +39,7 @@ namespace widgets {
             return { 0.f, 0.f };
         }
 
-        void draw(const float2& size, draw_command& command)
+        void draw(const float2 size, draw_command& command)
         {
         }
 
@@ -54,7 +54,7 @@ namespace widgets {
 /// @param ...children_widgets
 /// @endcond
 template <typename... children_widgets_t>
-widgets::column_widget& column(children_widgets_t&... children_widgets) { return make<widgets::column_widget>(children_widgets...); }
+widgets::column_widget& column(children_widgets_t&... children_widgets) { return create<widgets::column_widget>(children_widgets...); }
 
 // #define column staticgui::make<staticgui::widgets::column_widget>
 }

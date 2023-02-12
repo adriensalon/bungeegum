@@ -19,10 +19,18 @@ namespace widgets {
     struct container_widget {
 
         template <typename child_widget_t>
-        container_widget(child_widget_t& child_widget, const animatable<float>& testanim)
+        container_widget(child_widget_t& child_widget)
         {
-            declare(this, child_widget);
-            testanim.assign(this, _tick_value);
+            build(this, child_widget);
+            // testanim.assign(this, _tick_value);
+            curve mycurve(0.f, 1.f, { sgui::float2 { 0.6f, 0.88f } });
+            animation<float> myanim(mycurve, 0.5f, 1.5f);
+            myanim.max(100.f).min(20.f).duration(9).shape(mycurve);
+            myanim.on_tick([this](const float& _value) {
+                _tick_value = _value;
+                must_draw(this);
+            });
+            myanim.start().detach();
         }
 
         template <typename child_widget_t>
@@ -34,7 +42,7 @@ namespace widgets {
 
         void draw(const float2& size, draw_command& command)
         {
-            std::cout << "x = " << size.x() << std::endl;
+            // std::cout << "x = " << size.x() << std::endl;
             command.draw_rect(
                 { 20.f, 20.f },
                 { 600.f, 8 * _tick_value },
@@ -59,6 +67,6 @@ namespace widgets {
 }
 
 template <typename child_widget_t>
-widgets::container_widget& container(child_widget_t& child_widget, const animatable<float>& testanim) { return make<widgets::container_widget>(child_widget, testanim); }
+widgets::container_widget& container(child_widget_t& child_widget) { return create<widgets::container_widget>(child_widget); }
 
 }

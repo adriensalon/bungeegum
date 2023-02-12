@@ -10,57 +10,42 @@
 #pragma once
 
 #include <any>
-#include <chrono>
 #include <functional>
 #include <string>
 
-#include <staticgui/glue/time.hpp>
+#include <staticgui/glue/simd.hpp>
 
-#if !defined(__EMSCRIPTEN__)
 struct SDL_Window;
-#endif
 
 namespace staticgui {
-namespace detail {
 
-    struct window {
-        window();
-        ~window();
-        window(const window& other) = delete;
-        window& operator=(const window& other) = delete;
-        window(window&& other);
-        window& operator=(window&& other);
+struct window {
+    window();
+    window(void* native_window);
+    window(SDL_Window* sdl_window);
+    window(const window& other) = delete;
+    window& operator=(const window& other) = delete;
+    window(window&& other);
+    window& operator=(window&& other);
+    ~window();
 
-        SDL_Window* get_sdl_window() const;
+    [[nodiscard]] void* get_native_window() const;
+    [[nodiscard]] SDL_Window* get_sdl_window() const;
+    void set_title(const std::string& title);
+    void set_size(const float2 size);
+    void set_fullscreen(const bool enabled);
+    void on_input(const std::function<void(const std::any&)>& event_callback);
+    void on_update(const std::function<void()>& update_callback);
+    void run_loop();
+    bool poll();
 
-        void set_title(const std::string& title);
+    static void show_cursor(const bool show);
 
-        void set_size(const float width, const float height);
+private:
+    bool _is_running = false;
+    std::function<void(const std::any&)> _event_callback = nullptr;
+    std::function<void()> _update_callback = nullptr;
+    std::any _sdl_window = nullptr;
+};
 
-        void set_fullscreen(const bool enabled);
-
-        void on_input(const std::function<void(const std::any&)>& event_callback);
-
-        void on_update(const std::function<void()>& update_callback);
-
-        void run_loop();
-
-        static void show_cursor(const bool show);
-
-        bool poll();
-
-#if !defined(__EMSCRIPTEN__)
-        window(SDL_Window* sdl_window);
-        window(void* native_window);
-        void* get_native_window() const;
-#endif
-
-    private:
-        bool _is_running = false;
-        std::function<void(const std::any&)> _event_callback = nullptr;
-        std::function<void()> _update_callback = nullptr;
-        std::any _window_impl = nullptr;
-    };
-
-}
 }

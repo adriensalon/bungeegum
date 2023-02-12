@@ -28,7 +28,7 @@ namespace widgets {
         template <typename child_widget_t>
         center_widget(child_widget_t& child)
         {
-            declare(this, child);
+            build(this, child);
         }
 
         /// @brief
@@ -57,4 +57,4 @@ namespace widgets {
 }
 }
 
-#define center staticgui::make<staticgui::widgets::center_widget>
+#define center staticgui::create<staticgui::widgets::center_widget>
