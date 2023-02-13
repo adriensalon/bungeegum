@@ -15,7 +15,7 @@ This repository provides a basic implementation for a gui library that tries to 
  while taking advantage of the C++17 type system to achieve static polymorphism
 
 
- only needed elements when needed with gpu acceleration, with a declarative syntax similar to flutter widgets, but relying on templates to achieve static polymorphism. The doxygen-generated documentation can be found [here](https://okok.org/) or built along the library.
+ only needed elements when needed with gpu acceleration, with a declarative syntax similar to flutter widgets, but relying on templates to achieve static polymorphism. The doxygen-generated documentation can be found [here](https://okok.org/) or built along the library. 
 
  It comes with additional debugging tools on desktop platforms
 
@@ -28,20 +28,38 @@ Windows/MacOS/iOS/Linux/Android platform, but only tested on Windows so far
 
 ### __Quickstart__
 
+```
+auto& my_widget_tree = 
+	staticgui::center(
+		staticgui::row(
+			staticgui::container()
+				.width(120.f)
+				.color({ 0.2f, 0.2f, 0.2f, 1.f }),
+			staticgui::container()
+				.width(140.f)
+				.color({ 0.3f, 0.3f, 0.3f, 1.f })
+		)
+	);
+```
+
 #### _Launch_
 
-
-
-```
-#include <staticgui/staticgui.hpp>
-
-int main()
-{
-	
-}
-
+This library comes with everything needed to create a native window and a hardware accelerated renderer using [SDL2]() and [Diligent Engine]() on the most common platforms, such as Windows, MacOS, Linux, iOS, Android and Emscripten. If you want to use this library directly without binding with an existing game/engine, the `staticgui::launch` function starts a window, a renderer, and blocks the thread until the window is closed. 
 
 ```
+staticgui::launch(my_widget_tree);
+```
+
+You can define a function that will be called after the renderer is initialized and before the update loop begins. This can be useful to setup custom state that requires the window or the renderer to be initialized.
+
+```
+staticgui::launch(my_widget_tree, [&] () {
+	// this code will be executed after renderer is initialized
+	// but before update loop starts
+});
+```
+
+This library behaves by 
 
 
 
@@ -51,14 +69,14 @@ You may want to use this library to design guis along with an existing game/engi
 
 ```
 ImGui::CreateContext();
-auto update_callback = staticgui::embed(center(row(...));
+auto my_update_callback = staticgui::embed(my_widget_tree);
 ```
 
 It takes our widget tree as input and returns a callback we can call between our `ImGui::NewFrame` and `ImGui::Render` custom game/engine calls. 
 
 ```
 ImGui::NewFrame();
-update_callback();
+my_update_callback();
 ImGui::Render();
 ```
 
@@ -66,9 +84,9 @@ You may not care about the battery cost of swapping buffers each frame, especial
 
 ```
 ImGui::NewFrame();
-bind_framebuffer(); // we use a framebuffer to store the gui
-update_callback();
-blit_framebuffer_to_screen();
+my_bind_framebuffer_function(); // we use a framebuffer to store the gui
+my_update_callback();
+my_blit_framebuffer_to_screen_function();
 ImGui::Render();
 ```
 
@@ -76,7 +94,7 @@ If you dont want to do this and instead force redrawing the whole gui every fram
 
 ```
 ImGui::NewFrame();
-update_callback(bool); // instead we just force draw every frame
+my_update_callback(true); // instead we just force draw every frame
 ImGui::Render();
 ```
 
