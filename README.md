@@ -28,6 +28,9 @@ Windows/MacOS/iOS/Linux/Android platform, but only tested on Windows so far
 
 ### __Quickstart__
 
+Unlike Dart, the C++ language does not allow the use of named parameters. However the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter)
+
+
 ```
 auto& my_widget_tree = 
 	staticgui::center(
@@ -97,59 +100,83 @@ ImGui::NewFrame();
 my_update_callback(true); // instead we just force draw every frame
 ImGui::Render();
 ```
+### __Implementing widgets__
+
+No macro is required inside widget classes, but the user is not allowed to own them. They must be constructed with the `staticgui::create` function which forwards all the arguments required for constructor invocation. All the widgets are implemented inside the `staticgui::widgets` namespace.
+
+```
+auto& my_widget = staticgui::create(staticgui::widgets::center_widget(...));
+```
+
+As this requires a looot of typing, widgets implementations use the __widget_ suffix and define an alias of `staticgui::create<widget_t>` inside the `staticgui` namespace. Then we can instead do this :
+
+```
+auto& my_widget = staticgui::center(...);
+```
+
+On construction, widgets must build their children. The `staticgui::build` function will usually be called by each constructor. Widget inheritance is possible, and widgets can be declared more than once (explain here...).
+You are really encouraged to take advantage of template deduction when implementing generic widgets
+if you reaaally need virtual inheritance among widget classes see the [CRTP idiom]()
+
+```
+my_widget::my_widget() {
+	staticgui::build(this, my_child_widget_type());
+}
+```
+
+Widgets can build template children by templating their constructors and accepting children as non-const references. Templating the widget struct would allow storing pointers or references to its children and having its members access them, but this is not always desirable. Depending on the use case this would prevent some useful usage of the `staticgui::context::iterate` function. For example the widgets `my_widget_1<float>` and `my_widget_1<int>` would not be iterable at the same time.
+
+```
+template <typename... children_widgets_t>
+my_widget::my_widget(children_widgets_t&... my_other_children_widgets) {
+	staticgui::build(this, my_child_widget_type(), my_other_children_widgets...);
+}
+```
+
+
+
+
+#### _Resolve_
+
+#### _Draw_
+
+#### _Interact_
 
 
 #### _Events_
 
+To dynamically modify the gui state, event objects register callbacks of the same type and can be passed from a widget to its children to be triggered all at once when desired.
+
+```
+staticgui::event<float, float, std::string> my_event;
+```
+
+```
+my_event.on_trigger([] (const float& a, const float& b, const std::string& c) {
+	std::cout << "" << std::endl;
+});
+```
+```
+my_event.trigger(11.f, 22.f, "my string");
+```
+```
+my_event.trigger(std::async([](){
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	return std::make_tuple({ 11.f, 22.f, "my string" }); // callbacks are triggered here
+}));
+```
+
+merge
+
+attach/detach
+
+
+
 #### _Animations_
-
-
-### __Advanced usage__
-
-#### _Layout_
-
-#### _Rendering_
-
-#### _Input_
 
 ### __Limitations__
 
-No macro is required inside the widget types, but the user is not allowed to own them. They are created with the `staticgui::make` function which forwards all the template arguments required for custom constructor invocation. All the widgets are implemented inside the `staticgui::widgets` namespace.
-
-```
-auto& my_widget = staticgui::make(staticgui::widgets::center_widget(...))
-```
-
-As this requires a looot of typing, widgets implementations use the __widget_ suffix and define an alias of `staticgui::make<widget_t>(...)` inside the `staticgui` namespace. Then we can instead do this :
-
-```
-auto& my_widget = staticgui::center(...)
-```
-
-On construction, widgets must declare themselves along with their children, visible or not. The `staticgui::declare` function must be called by each constructor. Widget inheritance is possible, but widgets must be declared only once. All the `staticgui::context` functions must be called after the widget is declared.
-
-```
-my_widget::my_widget() {
-	staticgui::declare(this, 
-		my_other_widget(), 
-		center(
-			my_other_other_widget()
-		)			
-	);
-}
-```
-
-They can declare `template` children by templating their constructors and accepting children as non-const references. Templating the widget struct would allow storing pointers or references to its children and having its members access them, but this is not always desirable. Depending on the use case this would prevent some useful usage of the `staticgui::context::iterate` function. For example the widgets `my_widget_1<float>` and `my_widget_1<int>` would not be iterable at the same time.
-
-```
-template <typename... children_widgets_t>
-my_widget::my_widget(children_widgets_t&... children_widgets) {
-	staticgui::declare(this, 
-		my_other_widget_1(),
-		children_widgets...
-	);
-}
-```
+images fonts shaders etc
 
 
 ### __External dependencies__
