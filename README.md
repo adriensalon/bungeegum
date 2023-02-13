@@ -84,10 +84,7 @@ ImGui::Render();
 #### _Events_
 
 #### _Animations_
-Launch / Attach
 
-events
-animations
 
 ### __Advanced usage__
 
