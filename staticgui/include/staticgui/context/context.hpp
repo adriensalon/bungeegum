@@ -18,12 +18,4 @@ namespace detail {
     void draw();
 }
 
-/// @brief
-/// @param context
-void use(const std::string& context = "default");
-
-/// @brief
-/// @return
-const std::string& used();
-
 }

@@ -1,22 +1,101 @@
 # staticgui
 
-This repository provides a basic implementation for a gui library that repaint only needed elements when needed with gpu acceleration, with a declarative syntax similar to flutter widgets, but relying on templates to achieve static polymorphism. The doxygen-generated documentation can be found [here](https://okok.org/) or built along the library.
+This repository provides a basic implementation for a gui library that tries to mimick the declarative syntax of [flutter widgets](https://flutter.dev/) with C++17.
 
-### __Requirements to build__
+
+#### _Box layout implementation_
+
+#### _Immediate mode rendering_
+
+#### _No style policy is the best policy_
+
+#### _Build only when needed_
+
+
+ while taking advantage of the C++17 type system to achieve static polymorphism
+
+
+ only needed elements when needed with gpu acceleration, with a declarative syntax similar to flutter widgets, but relying on templates to achieve static polymorphism. The doxygen-generated documentation can be found [here](https://okok.org/) or built along the library.
+
+ It comes with additional debugging tools on desktop platforms
+
+### __Build__
 Windows/MacOS/iOS/Linux/Android platform, but only tested on Windows so far
 
 - a C++17 compiler is required
 - [CMake](https://cmake.org/) build files are provided to facilitate the compilation
 
-### __Features__
-#### _Flutter-like formalism_
-
-#### _No policy is the best policy_
-
-#### _Build only when needed_
 
 ### __Quickstart__
+
+#### _Launch_
+
+
+
+```
+#include <staticgui/staticgui.hpp>
+
+int main()
+{
+	
+}
+
+
+```
+
+
+
+#### _Embed_
+
+You may want to use this library to design guis along with an existing game/engine. As we use [ImGui](https://github.com/ocornut/imgui) as a backend for rendering geometry and collecting input events, we can initialize staticgui before starting a custom game loop after ImGui has created a context with the `staticgui::embed` function. 
+
+```
+ImGui::CreateContext();
+auto update_callback = staticgui::embed(center(row(...));
+```
+
+It takes our widget tree as input and returns a callback we can call between our `ImGui::NewFrame` and `ImGui::Render` custom game/engine calls. 
+
+```
+ImGui::NewFrame();
+update_callback();
+ImGui::Render();
+```
+
+You may not care about the battery cost of swapping buffers each frame, especially if you are already implementing 3D rendering. However the staticgui update callback given by `staticgui::embed` will by default only render geometry where visual changes have to be redrawn. This is useful because we can bind a framebuffer, call our embed callback that may or may not clear or repaint it, and blit the framebuffer at the end of the frame.
+
+```
+ImGui::NewFrame();
+bind_framebuffer(); // we use a framebuffer to store the gui
+update_callback();
+blit_framebuffer_to_screen();
+ImGui::Render();
+```
+
+If you dont want to do this and instead force redrawing the whole gui every frame, just pass `true` to the embed callback.
+
+```
+ImGui::NewFrame();
+update_callback(bool); // instead we just force draw every frame
+ImGui::Render();
+```
+
+
+#### _Events_
+
+#### _Animations_
 Launch / Attach
+
+events
+animations
+
+### __Advanced usage__
+
+#### _Layout_
+
+#### _Rendering_
+
+#### _Input_
 
 ### __Limitations__
 
@@ -56,12 +135,6 @@ my_widget::my_widget(children_widgets_t&... children_widgets) {
 	);
 }
 ```
-
-### __Advanced usage__
-
-#### _Layout_
-
-#### _Rendering_
 
 
 ### __External dependencies__
