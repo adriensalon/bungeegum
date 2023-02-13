@@ -13,6 +13,8 @@
 
 #include <staticgui/context/context.hpp>
 
+struct ImDrawList;
+
 namespace staticgui {
 namespace detail {
 

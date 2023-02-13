@@ -23,7 +23,7 @@ namespace widgets {
         {
             build(this, child_widget);
             // testanim.assign(this, _tick_value);
-            curve mycurve(0.f, 1.f, { sgui::float2 { 0.6f, 0.88f } });
+            curve mycurve(0.f, 1.f, { float2 { 0.6f, 0.88f } });
             animation<float> myanim(mycurve, 0.5f, 1.5f);
             myanim.max(100.f).min(20.f).duration(9).shape(mycurve);
             myanim.on_tick([this](const float& _value) {
