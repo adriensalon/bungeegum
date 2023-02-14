@@ -1,29 +1,44 @@
 # staticgui
 
-This repository provides a basic implementation for a gui library that tries to mimick the declarative syntax of [flutter widgets](https://flutter.dev/) with C++17.
 
+### __Roadmap v0.0__
 
-#### _Box layout implementation_
+- [NOT DONE] align_widget
+- [NOT DONE] container_widget
+- [NOT DONE] column_widget
+- [NOT DONE] row_widget
 
-#### _Immediate mode rendering_
+### __Requirements__
 
-#### _No style policy is the best policy_
+- C++17 is used extensively
+- [CMake](https://cmake.org/) build files are provided
 
-#### _Build only when needed_
+### __Motivation__
 
+Perhaps the best thing about the declarative syntax of [Flutter](https://flutter.dev/) is how we can instantiate widgets as trees, with each widget exposing the possibilities for customizing its behavior inside the tree with optional named parameters. This repository provides a basic implementation for a gui library that tries to mimick this syntax within C++17. However, we have to introduce several major architectural differences to Flutter in order to follow the [zero overhead principle](https://en.cppreference.com/w/cpp/language/Zero-overhead_principle) and guarantee that :
 
- while taking advantage of the C++17 type system to achieve static polymorphism
+ - no region of the screen will be drawn unless necessary
+ - no logic code will run unless necessary
+ - no widget data will be modified unless necessary
 
+ The Flutter framework makes extensive use of immutable data structures, fast memory allocation and garbage collection to instantiate widgets every time something has changed and some user code must react to it :
+ 
+> Apps update their user interface in response to events (such as a user interaction) by telling the framework to replace a widget in the hierarchy with another widget. The framework then compares the new and old widgets, and efficiently updates the user interface. 
 
- only needed elements when needed with gpu acceleration, with a declarative syntax similar to flutter widgets, but relying on templates to achieve static polymorphism. The doxygen-generated documentation can be found [here](https://okok.org/) or built along the library. 
+> Whenever the function is asked to build, the widget should return a new tree of widgets, regardless of what the widget previously returned. 
 
- It comes with additional debugging tools on desktop platforms
+It becomes really problematic as state data stored inside widgets grows, so Flutter solves this by separating widgets from their state :
 
-### __Build__
-Windows/MacOS/iOS/Linux/Android platform, but only tested on Windows so far
+> After being built, the widgets are held by the element tree, which retains the logical structure of the user interface. The element tree is necessary because the widgets themselves are immutable, which means (among other things), they cannot remember their parent or child relationships with other widgets. The element tree also holds the state objects associated with stateful widgets.
 
-- a C++17 compiler is required
-- [CMake](https://cmake.org/) build files are provided to facilitate the compilation
+This means that even though they mitigated the "relationships issue" and the "heavy data structures issue" you still pay the price of deleting and allocating data structures, binding to parent/children, and binding to an associated mutable state every time a widget's `build` method is called. And it happens recursively for all its children. 
+
+As we cannot afford this approach that both introduces some ugliness (users may want their widgets to store their data directly) and violates the "you don't pay for what you don't use" philosophy, what we want is a less sophisticated single tree of widgets, each containing its own data and relationships.
+
+> Mutable tree-based APIs suffer from a dichotomous access pattern: creating the tree’s original state typically uses a very different set of operations than subsequent updates.
+
+This is a fair point, let's try to achieve
+
 
 
 ### __Quickstart__
@@ -102,18 +117,6 @@ ImGui::Render();
 ```
 ### __Implementing widgets__
 
-No macro is required inside widget classes, but the user is not allowed to own them. They must be constructed with the `staticgui::create` function which forwards all the arguments required for constructor invocation. All the widgets are implemented inside the `staticgui::widgets` namespace.
-
-```
-auto& my_widget = staticgui::create(staticgui::widgets::center_widget(...));
-```
-
-As this requires a looot of typing, widgets implementations use the __widget_ suffix and define an alias of `staticgui::create<widget_t>` inside the `staticgui` namespace. Then we can instead do this :
-
-```
-auto& my_widget = staticgui::center(...);
-```
-
 On construction, widgets must build their children. The `staticgui::build` function will usually be called by each constructor. Widget inheritance is possible, and widgets can be declared more than once (explain here...).
 You are really encouraged to take advantage of template deduction when implementing generic widgets
 if you reaaally need virtual inheritance among widget classes see the [CRTP idiom]()
@@ -133,16 +136,6 @@ my_widget::my_widget(children_widgets_t&... my_other_children_widgets) {
 }
 ```
 
-
-
-
-#### _Resolve_
-
-#### _Draw_
-
-#### _Interact_
-
-
 #### _Events_
 
 To dynamically modify the gui state, event objects register callbacks of the same type and can be passed from a widget to its children to be triggered all at once when desired.
@@ -150,6 +143,7 @@ To dynamically modify the gui state, event objects register callbacks of the sam
 ```
 staticgui::event<float, float, std::string> my_event;
 ```
+
 
 ```
 my_event.on_trigger([] (const float& a, const float& b, const std::string& c) {
@@ -167,14 +161,170 @@ my_event.trigger(std::async([](){
 ```
 
 merge
+```
+staticgui::event my_event_1([] () { });
+staticgui::event my_event_2([] () { }).merge(my_event_1);
+```
 
 attach/detach
+
+```
+void my_widget_class_method() {
+	staticgui::event my_event_1([] () { });
+
+	// now the event will be destroyed when the update loop terminates
+	my_event_1.detach(); 
+
+	// now the event will be destroyed before this widget
+	my_event_1.detach(this);
+
+	// now the event will be destroyed when it exits scope (default behaviour !)
+	my_event_1.attach();
+}
+
+```
+
+Example : changing the width of a child widget when an asynchronous operation completes :
+
+```
+class my_widget_class {
+
+public:
+	my_widget_class() {
+		using namespace staticgui;
+
+		// we create a specific child and keep a pointer to it
+		_my_container_ptr = &(container()
+			.width(120.f)
+			.color({ 0.2f, 0.2f, 0.2f, 1.f }));
+
+		// when the event triggers we want to rebuild it with to a new width 
+		_my_event.on_triggered([this] (const my_http_result_class& my_http_result) {
+			_my_container_ptr->width(my_http_result.http_resolved_width); 
+		}));
+		
+		// we want to trigger the event when an asynchonous operation completes
+		my_event.trigger(std::async([this] () {
+			my_http_result_class result = my_http_getter_function();
+			return result;
+		}));
+
+		// we build our child 
+		build(
+			center(
+				row(
+					my_container,
+					container()
+						.width(120.f)
+						.color({ 0.2f, 0.2f, 0.2f, 1.f });
+				)
+			)
+		);
+	}
+
+private:
+	staticgui::event<my_http_result_class> _my_event;
+	staticgui::widgets::container_widget* _my_container_ptr = nullptr;
+};
+```
 
 
 
 #### _Animations_
 
+Example : changing the color of a child widget with an animation :
+
+```
+class my_widget_class {
+
+public:
+	my_widget_class() {
+		using namespace staticgui;
+
+		// we create a specific child and keep a pointer to it
+		_my_container_ptr = &(container()
+			.width(120.f)
+			.color({ 0.2f, 0.2f, 0.2f, 1.f }));
+
+		// when the animation ticks we want to rebuild it with a new color
+		_my_animation
+			.min(0.f)
+			.max(1.f)
+			.duration(std::chrono::seconds(1.f))
+			.shape(animation_preset::bounce_in)
+			.on_tick([this] (const float4 animated_color) {
+				_my_container_ptr->color(animated_color);
+			})
+			.start();
+
+		// we build our child 
+		build(
+			center(
+				row(
+					my_container,
+					container()
+						.width(120.f)
+						.color({ 0.2f, 0.2f, 0.2f, 1.f });
+				)
+			)
+		);
+	}
+
+private:
+	staticgui::animation<float4> _my_animation;
+	staticgui::widgets::container_widget* _my_container_ptr = nullptr;
+};
+```
+
+
+
+
+#### _Interact_
+
+```
+void on_interact(interact_command& command)
+{
+}
+```
+
+#### _Resolve_
+
+```
+template <typename... children_widgets_t>
+float2 on_resolve(resolve_command& command, children_widgets_t&... children)
+{
+	// (command.constrain_child(children, command.constraint()), ...);
+	std::cout << "resolving column !!! \n";
+	return { 0.f, 0.f };
+}
+```
+
+#### _Draw_
+
+
+```
+void on_draw(const float2 size, draw_command& command)
+{
+}
+```
+
 ### __Limitations__
+
+#### _Constructor encapsulation syntax_
+
+No macro is required inside widget classes, but the user is not allowed to own them. They must be constructed with the `staticgui::create` function which forwards all the arguments to the constructor. All the core widgets are implemented inside the `staticgui::widgets` namespace.
+
+```
+auto& my_widget = staticgui::create(staticgui::widgets::center_widget(...));
+```
+
+As this requires a looot of typing, they use the __widget_ suffix and define an alias of `staticgui::create<widget_t>` inside the `staticgui` namespace. Then we can instead do this :
+
+```
+auto& my_widget = staticgui::center(...);
+```
+
+#### _Images, fonts and shaders_
 
 images fonts shaders etc
 
