@@ -17,6 +17,7 @@ namespace detail {
     template <typename value_t>
     typed_animation_data<value_t>& animations_registry::create(events_registry& events)
     {
+        std::cout << "create anim \n";
         entity_t _entity = animations.create_entity();
         typed_animation_data<value_t>& _animation = animations.create_component<typed_animation_data<value_t>>(_entity);
         untyped_animation_data& _animation_data = animations.create_component<untyped_animation_data>(_entity);
@@ -243,7 +244,7 @@ template <typename value_t>
 template <typename widget_t>
 animation<value_t>& animation<value_t>::detach(widget_t& widget)
 {
-    detail::state.context.widgets.detach_animation(_data, widget);
+    detail::animations_context.detach_animation(_data, widget);
 }
 
 template <typename value_t>

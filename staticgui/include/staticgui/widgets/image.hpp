@@ -21,8 +21,9 @@ namespace widgets {
 
         image_widget()
         {
+            // register_widget(this);
             // std::cout << "image ctor\n";
-            build(this);
+            // build(this);
         }
 
         ~image_widget()

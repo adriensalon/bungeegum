@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include <staticgui/context/animation.hpp>
 
 namespace staticgui {

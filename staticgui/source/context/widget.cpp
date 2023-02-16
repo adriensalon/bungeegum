@@ -41,21 +41,21 @@ namespace detail {
             _detached_event_remover.second();
     }
 
-    widgets_registry::widgets_registry()
-    {
-    }
+    // widgets_registry::widgets_registry()
+    // {
+    // }
 
-    widgets_registry::widgets_registry(widgets_registry&& other)
-    {
-        *this = std::move(other);
-    }
+    // widgets_registry::widgets_registry(widgets_registry&& other)
+    // {
+    //     *this = std::move(other);
+    // }
 
-    widgets_registry& widgets_registry::operator=(widgets_registry&& other)
-    {
-        widgets = std::move(other.widgets);
-        root = std::move(other.root);
-        return *this;
-    }
+    // widgets_registry& widgets_registry::operator=(widgets_registry&& other)
+    // {
+    //     widgets = std::move(other.widgets);
+    //     root = std::move(other.root);
+    //     return *this;
+    // }
 
     void widgets_registry::clear_resolve()
     {

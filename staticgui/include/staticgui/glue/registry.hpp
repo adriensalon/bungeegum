@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <entt/entt.hpp>
@@ -44,6 +45,9 @@ struct registry {
 
     entity_t create_entity();
     void destroy_entity(const entity_t entity);
+
+    template <typename component_t>
+    std::optional<entity_t> try_get_entity(component_t& component);
 
     template <typename component_t>
     entity_t get_entity(component_t& component);

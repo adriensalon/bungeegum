@@ -58,14 +58,29 @@ namespace detail {
 
     void draw()
     {
+
         // frames_chronometer.begin("draw");
         widgets_context.iterate_must_draw([](untyped_widget_data& _data, const bool _must_draw_children) {
-            if (!has_userspace_thrown())
-                _data.widget_drawer_data.value().commands.clear();
+            if (!has_userspace_thrown()) {
+                std::function<void(untyped_widget_data&)> _ff = [&](untyped_widget_data& _data) {
+                    if (_data.widget_drawer_data.has_value())
+                        _data.widget_drawer_data.value().commands.clear();
+                    for (auto& _child_data : _data.children)
+                        _ff(_child_data.get());
+                };
+                _ff(_data);
+            }
             protect_userspace([&]() {
+                std::function<void(untyped_widget_data&)> _ff = [&](untyped_widget_data& _data) {
+                    if (_data.widget_drawer)
+                        _data.widget_drawer({ 500.f, 500.f }, _data.widget_drawer_data.value());
+                    for (auto& _child_data : _data.children)
+                        _ff(_child_data.get());
+                };
                 // _data.drawer(_data.resolve_command.value().resolved_size, _data.command.value());
                 // _data.widget_drawer(_data.widget_resolver_data.value().resolved_size, _data.widget_drawer_data.value());
-                _data.widget_drawer({ 500.f, 500.f }, _data.widget_drawer_data.value());
+                // _data.widget_drawer({ 500.f, 500.f }, _data.widget_drawer_data.value());
+                _ff(_data);
             });
         });
         // frames_chronometer.end("draw");

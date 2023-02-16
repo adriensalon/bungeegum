@@ -10,10 +10,11 @@
 
 ### __Requirements__
 
-- C++17 is used extensively
+- C++17 compiler is required
 - [CMake](https://cmake.org/) build files are provided
 
 ### __Motivation__
+
 
 Perhaps the best thing about the declarative syntax of [Flutter](https://flutter.dev/) is how we can instantiate widgets as trees, with each widget exposing the possibilities for customizing its behavior inside the tree with optional named parameters. This repository provides a basic implementation for a gui library that tries to mimick this syntax within C++17. However, we have to introduce several major architectural differences to Flutter in order to follow the [zero overhead principle](https://en.cppreference.com/w/cpp/language/Zero-overhead_principle) and guarantee that :
 
@@ -21,39 +22,44 @@ Perhaps the best thing about the declarative syntax of [Flutter](https://flutter
  - no logic code will run unless necessary
  - no widget data will be modified unless necessary
 
- The Flutter framework makes extensive use of immutable data structures, fast memory allocation and garbage collection to instantiate widgets every time something has changed and some user code must react to it :
+_Disclaimer : I don't hate Flutter_
+
+ The Flutter framework makes extensive use of immutable data structures, memory preallocation and garbage collection to instantiate widget trees every time something has changed and some user code must react to it :
  
 > Apps update their user interface in response to events (such as a user interaction) by telling the framework to replace a widget in the hierarchy with another widget. The framework then compares the new and old widgets, and efficiently updates the user interface. 
 
 > Whenever the function is asked to build, the widget should return a new tree of widgets, regardless of what the widget previously returned. 
 
-It becomes really problematic as state data stored inside widgets grows, so Flutter solves this by separating widgets from their state :
+It becomes really problematic as the state data stored inside widgets grows in size, so Flutter solves this by separating widgets from their state :
 
 > After being built, the widgets are held by the element tree, which retains the logical structure of the user interface. The element tree is necessary because the widgets themselves are immutable, which means (among other things), they cannot remember their parent or child relationships with other widgets. The element tree also holds the state objects associated with stateful widgets.
 
-This means that even though they mitigated the "relationships issue" and the "heavy data structures issue" you still pay the price of deleting and allocating data structures, binding to parent/children, and binding to an associated mutable state every time a widget's `build` method is called. And it happens recursively for all its children. 
+This means that even though they mitigated the "relationships issue" and the "heavy data structures issue" you still pay the price of deleting and allocating data structures, merging changes, binding to parent/children, and binding to an associated mutable state every time a widget's `build` method is called.
 
-As we cannot afford this approach that both introduces some ugliness (users may want their widgets to store their data directly) and violates the "you don't pay for what you don't use" philosophy, what we want is a less sophisticated single tree of widgets, each containing its own data and relationships.
+We cannot afford this approach that introduces some ugliness (users may want their widgets to store their data directly) and violates the "you don't pay for what you don't use" philosophy (you get huge overhead in the name of a specific coding syntax). What we want is a single tree of widgets, each containing its own data and relationships.
 
 > Mutable tree-based APIs suffer from a dichotomous access pattern: creating the tree’s original state typically uses a very different set of operations than subsequent updates.
 
-This is a fair point, let's try to achieve
-
-
+That is a fair point, we will get back to it.
 
 ### __Quickstart__
 
-Unlike Dart, the C++ language does not allow the use of named parameters. However the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter)
-
+All the core widgets are implemented inside the `staticgui::widgets` namespace.
 
 ```
-auto& my_widget_tree = 
-	staticgui::center(
-		staticgui::row(
-			staticgui::container()
+using namespace staticgui::widgets;
+```
+
+The user is not allowed to own the widgets. To be instantiated inside the staticgui registry they must be constructed with the `staticgui::create` function which forwards all the arguments to the constructor and returns a reference to the widget object. Unlike Dart, the C++ language does not allow the use of named parameters. However the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter) provides us the parameter passing style we need :
+
+```
+auto& my_widget_tree = staticgui::create<center>()
+	.child(staticgui::create<row>()			
+		.height(200.f)
+		.children(staticgui::create<container>()
 				.width(120.f)
 				.color({ 0.2f, 0.2f, 0.2f, 1.f }),
-			staticgui::container()
+			staticgui::create<container>()
 				.width(140.f)
 				.color({ 0.3f, 0.3f, 0.3f, 1.f })
 		)
@@ -62,7 +68,7 @@ auto& my_widget_tree =
 
 #### _Launch_
 
-This library comes with everything needed to create a native window and a hardware accelerated renderer using [SDL2]() and [Diligent Engine]() on the most common platforms, such as Windows, MacOS, Linux, iOS, Android and Emscripten. If you want to use this library directly without binding with an existing game/engine, the `staticgui::launch` function starts a window, a renderer, and blocks the thread until the window is closed. 
+This library comes with everything needed to create a native window and a hardware accelerated renderer using [SDL2]() and [Diligent Engine]() on the most common platforms, such as Windows, MacOS, Linux, iOS, Android and Emscripten. If you want to use this library directly without binding to an existing game/engine, the `staticgui::launch` function starts a window, a renderer, and blocks the thread until the window is closed. 
 
 ```
 staticgui::launch(my_widget_tree);
@@ -83,7 +89,7 @@ This library behaves by
 
 #### _Embed_
 
-You may want to use this library to design guis along with an existing game/engine. As we use [ImGui](https://github.com/ocornut/imgui) as a backend for rendering geometry and collecting input events, we can initialize staticgui before starting a custom game loop after ImGui has created a context with the `staticgui::embed` function. 
+You may want to use this library to design guis along with an existing game/engine. As we use [ImGui](https://github.com/ocornut/imgui) as a backend for rendering geometry and collecting input events, we can initialize staticgui before starting a custom game loop with the `staticgui::embed` function after ImGui has created a context. 
 
 ```
 ImGui::CreateContext();
@@ -117,9 +123,12 @@ ImGui::Render();
 ```
 ### __Implementing widgets__
 
-On construction, widgets must build their children. The `staticgui::build` function will usually be called by each constructor. Widget inheritance is possible, and widgets can be declared more than once (explain here...).
+Must declare pas forcement on construction
+
+
+> The `staticgui::build` function will usually be called by each constructor. Widget inheritance is possible, and widgets can be declared more than once (explain here...).
 You are really encouraged to take advantage of template deduction when implementing generic widgets
-if you reaaally need virtual inheritance among widget classes see the [CRTP idiom]()
+> Widgets can build template children by templating their constructors and accepting children as non-const references. Templating the widget struct would allow storing pointers or references to its children and having its members access them, but this is not always desirable. Depending on the use case this would prevent some useful usage of the `staticgui::context::iterate` function. For example the widgets `my_widget_1<float>` and `my_widget_1<int>` would not be iterable at the same time.
 
 ```
 my_widget::my_widget() {
@@ -127,14 +136,74 @@ my_widget::my_widget() {
 }
 ```
 
-Widgets can build template children by templating their constructors and accepting children as non-const references. Templating the widget struct would allow storing pointers or references to its children and having its members access them, but this is not always desirable. Depending on the use case this would prevent some useful usage of the `staticgui::context::iterate` function. For example the widgets `my_widget_1<float>` and `my_widget_1<int>` would not be iterable at the same time.
-
 ```
 template <typename... children_widgets_t>
 my_widget::my_widget(children_widgets_t&... my_other_children_widgets) {
 	staticgui::build(this, my_child_widget_type(), my_other_children_widgets...);
 }
 ```
+
+
+
+
+A basic widget looks like this :
+
+```
+struct my_widget_class {	
+
+	my_widget_class() {
+		auto& my_widget_tree = staticgui::create<center>()
+			.child(staticgui::create<row>()			
+				.height(200.f)
+				.children(staticgui::create<container>()
+						.width(120.f)
+						.color({ 0.2f, 0.2f, 0.2f, 1.f }),
+					staticgui::create<container>()
+						.width(140.f)
+						.color({ 0.3f, 0.3f, 0.3f, 1.f })
+				)
+			);
+		staticgui::declare_child(this, my_widget_tree);
+	}
+};
+```
+
+So far so good. But what if we need to modify `my_widget_tree` at runtime ? First we need to be able to keep references to our children widgets after widget creation :
+
+```
+struct my_widget_class {	
+
+	my_widget_class() :
+		_my_center_ref = staticgui::create<center>(),			// ugliest
+		_my_row_ref = staticgui::create<row>(),					// staticgui
+		_my_container_1_ref = staticgui::create<container>(),	// boilerplate
+		_my_container_2_ref = staticgui::create<container>(),	// ever
+	{
+		_my_center_ref
+			.child(_my_row_ref			
+				.height(200.f)
+				.children(_my_container1_ref
+						.width(120.f)
+						.color({ 0.2f, 0.2f, 0.2f, 1.f }),
+					_my_container2_ref
+						.width(140.f)
+						.color({ 0.3f, 0.3f, 0.3f, 1.f })
+				)
+			);
+		staticgui::declare_child(this, _my_center_ref);
+	}
+	
+private:
+	center& _my_center_ref;
+	row& _my_row_ref;
+	container& _my_container_1_ref;
+	container& _my_container_2_ref;
+};
+```
+
+With the named parameter idiom widgets are mostly default constructed, delaying the "logical" object construction to setter methods. This means we are already using a set of operations intended to update objects in order to construct them. This is the exact opposite of what Flutter tries to achieve when implementing state modification with constructors. 
+
+
 
 #### _Events_
 
@@ -277,7 +346,11 @@ private:
 ```
 
 
+### __Advanced usage__
 
+> In Flutter, everything is a widget. Widgets are just tiny chunks of UI that you can combine to make a complete app. Building an app Flutter is like building a lego set -- piece by piece. Widgets are nested inside of each other to build your app. Even the root of your app is just a widget. It's widgets all the way down. Flutter is unique in that every aspect of UI is handled with Widgets.
+
+In Flutter even tricky/specific/low level concepts have already been encapsulated by widgets 
 
 #### _Interact_
 
@@ -322,8 +395,11 @@ As this requires a looot of typing, they use the __widget_ suffix and define an 
 
 ```
 auto& my_widget = staticgui::center(...);
+
 ```
 
+
+if you reaaally need virtual inheritance among widget classes see the [CRTP idiom]()
 #### _Images, fonts and shaders_
 
 images fonts shaders etc

@@ -9,6 +9,46 @@
 
 #pragma once
 
+#include <chrono>
+
+/// @brief Creates a new widget that is not owned by the user
+/// @details
+/// @tparam widget_t
+/// @return
+template <typename widget_t>
+widget_t& make();
+
+/// @brief Registers a widget as a child of another widget
+/// @tparam widget_t
+/// @tparam child_widget_t
+/// @param widget
+/// @param child_widget
+template <typename widget_t, typename... children_widgets_t>
+void adopt(widget_t* widget, children_widgets_t&... children_widget);
+
+/// @brief Unregisters a
+/// @tparam widget_t
+/// @tparam ...children_widgets_t
+/// @param widget
+/// @param ...children_widget
+template <typename widget_t, typename... children_widgets_t>
+void abandon(widget_t* widget, children_widgets_t&... children_widget, const bool abandon_children = true);
+
+template <typename widget_t>
+void abandon(widget_t* widget, const bool abandon_children = true);
+
+/// @brief Replaces a wid
+/// @tparam widget_t
+/// @tparam replacing_widget_t
+/// @param widget
+/// @param replacing_widget
+/// @param duration
+// template <typename widget_t, typename replacing_widget_t>
+// void replace(widget_t& widget, replacing_widget_t& replacing_widget, const std::chrono::milliseconds coexistence = 0, const std::function);
+
+// template <typename widget_t, typename replacing_widget_t>
+// void replace(widget_t& widget, replacing_widget_t& replacing_widget, const std::chrono::milliseconds coexistence = 0, const std::function);
+
 #include <optional>
 #include <typeindex>
 
@@ -36,24 +76,44 @@ namespace detail {
         untyped_widget_data& operator=(untyped_widget_data&& other);
         ~untyped_widget_data();
 
+        void* widget = nullptr; // on peut enlever ?, besoin pour get data -> typed
         std::unique_ptr<std::type_index> kind = nullptr;
         std::optional<std::reference_wrapper<untyped_widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<untyped_widget_data>> children;
+        // sort -> index pour chaque untyped_widget_data -> entt::sort sur les indices
+
         std::unordered_map<entity_t, std::function<void()>> detached_events_removers;
+
         std::function<float2(resolve_command_data&)> widget_resolver = nullptr;
         std::optional<resolve_command_data> widget_resolver_data = std::nullopt;
+
         std::function<void(const float2, draw_command_data&)> widget_drawer = nullptr;
         std::optional<draw_command_data> widget_drawer_data = std::nullopt;
     };
 
+    // template <typename widget_t>
+    // struct typed_widget_data {
+    //     typed_widget_data(widget_t& widget)
+    //         : widget_ref(widget)
+    //     {
+    //     }
+    //     widget_t& widget_ref;
+    // };
+
+    // adopt
+    // reny
+    // replace
+
     struct widgets_registry {
-        widgets_registry();
-        widgets_registry(const widgets_registry& other) = delete;
-        widgets_registry& operator=(const widgets_registry& other) = delete;
-        widgets_registry(widgets_registry&& other);
-        widgets_registry& operator=(widgets_registry&& other);
+        // widgets_registry();
+        // widgets_registry(const widgets_registry& other) = delete;
+        // widgets_registry& operator=(const widgets_registry& other) = delete;
+        // widgets_registry(widgets_registry&& other);
+        // widgets_registry& operator=(widgets_registry&& other);
 
         registry widgets;
+        std::unordered_map<void*, entity_t> inline_widgets; // go pareil quen dessous
+        std::unordered_map<void*, untyped_widget_data*> accessors; // go cpy ctor pour le untyped data qui move
         std::optional<std::reference_wrapper<untyped_widget_data>> root;
         std::vector<std::pair<std::reference_wrapper<untyped_widget_data>, bool>> must_resolve_heads; // bool = must resolve children too
         std::vector<std::pair<std::reference_wrapper<untyped_widget_data>, bool>> must_draw_heads;
@@ -144,6 +204,18 @@ template <typename widget_t>
 void destroy(widget_t& widget);
 
 // nav et input ici ?
+
+template <typename widget_t>
+void register_widget(widget_t* widget);
+
+template <typename widget_t>
+void unregister_widget(widget_t* widget);
+
+template <typename widget_t, typename child_widget_t>
+void adopt_child_widget(widget_t* widget, child_widget_t& child_widget);
+
+template <typename widget_t, typename child_widget_t>
+void a_child_widget(widget_t* widget, child_widget_t& child_widget);
 
 }
 

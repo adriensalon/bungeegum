@@ -19,6 +19,18 @@ entity_t registry::get_entity(component_t& component)
     return entt::to_entity(_registry, component);
 }
 
+template <typename component_t>
+std::optional<entity_t> registry::try_get_entity(component_t& component)
+{
+    // maintain an std::unordered_set ?
+    std::optional<entity_t> _retval = std::nullopt;
+    iterate<component_t>([this, &component, &_retval](entity_t _entity, component_t& _component) {
+        if (&_component == &component)
+            _retval = _entity;
+    });
+    return _retval;
+}
+
 // TODO has component
 
 template <typename component_t, typename... args_t>

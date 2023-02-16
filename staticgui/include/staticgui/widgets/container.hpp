@@ -12,25 +12,53 @@
 #include <cstdint>
 
 #include <staticgui/staticgui.hpp>
+#include <staticgui/widgets/image.hpp>
 
 namespace staticgui {
 namespace widgets {
 
     struct container_widget {
 
-        template <typename child_widget_t>
-        container_widget(child_widget_t& child_widget)
+        // template <typename child_widget_t>
+        container_widget()
         {
-            build(this, child_widget);
-            // testanim.assign(this, _tick_value);
+            // register_widget(this);
+            // build(this, child_widget);
+            // // testanim.assign(this, _tick_value);
+            // curve mycurve(0.f, 1.f, { float2 { 0.6f, 0.88f } });
+            // animation<float> myanim(mycurve, 0.5f, 1.5f);
+            // myanim.max(100.f).min(20.f).duration(9).shape(mycurve);
+            // myanim.on_tick([this](const float& _value) {
+            //     _tick_value = _value;
+            //     must_draw(this);
+            // });
+            // myanim.start().detach();
             curve mycurve(0.f, 1.f, { float2 { 0.6f, 0.88f } });
-            animation<float> myanim(mycurve, 0.5f, 1.5f);
-            myanim.max(100.f).min(20.f).duration(9).shape(mycurve);
-            myanim.on_tick([this](const float& _value) {
+            myanim = std::make_unique<animation<float>>(mycurve, 0.5f, 1.5f);
+            myanim->max(100.f).min(20.f).duration(3).shape(mycurve);
+            myanim->on_tick([this](const float& _value) {
                 _tick_value = _value;
+                // std::cout << "playin " << reinterpret_cast<uintptr_t>(this) << std::endl;
                 must_draw(this);
             });
-            myanim.start().detach();
+
+            myanim->start(); //.detach(*this);
+            adopt_child_widget(this, create_widget<image_widget>());
+        }
+
+        container_widget& ok()
+        {
+            // register_widget(this);
+            return *this;
+        }
+
+        template <typename child_widget_t>
+        container_widget& child(child_widget_t& child_widget)
+        {
+            adopt_child_widget(this, child_widget);
+            // build(this, child_widget);
+            // testanim.assign(this, _tick_value);
+            return *this;
         }
 
         template <typename child_widget_t>
@@ -63,6 +91,7 @@ namespace widgets {
 
     private:
         float _tick_value = 20.f;
+        std::unique_ptr<animation<float>> myanim;
     };
 }
 
