@@ -7,11 +7,14 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <bungeegum/bungeegum.hpp>
-#include <gtest/gtest.h>
+#pragma once
 
+#include <functional>
 
-TEST(bungeegum_glue, registry_create_entity)
-{
-    EXPECT_STREQ("ok", "ok");
+namespace bungeegum {
+
+void try_catch_nullptr(
+    const std::function<void()>& try_callback,
+    const std::function<void()>& catch_callback);
+
 }

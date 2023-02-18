@@ -50,16 +50,16 @@ All the core widgets are implemented inside the `bungeegum::widgets` namespace.
 using namespace bungeegum::widgets;
 ```
 
-The user is not allowed to own the widgets. To be instantiated inside the bungeegum registry they must be constructed with the `bungeegum::create` function which forwards all the arguments to the constructor and returns a reference to the widget object. Unlike Dart, the C++ language does not allow the use of named parameters. However the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter) provides us the parameter passing style we need :
+The user is not allowed to own the widgets. To be instantiated inside the bungeegum registry they must be constructed with the `bungeegum::make` function which forwards all the arguments to the constructor and returns a reference to the widget object. Unlike Dart, the C++ language does not allow the use of named parameters. However the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter) provides us the parameter passing style we need :
 
 ```
-auto& my_widget_tree = bungeegum::create<center>()
-	.child(bungeegum::create<row>()			
+auto& my_widget_tree = bungeegum::make<center>()
+	.child(bungeegum::make<row>()			
 		.height(200.f)
-		.children(bungeegum::create<container>()
+		.children(bungeegum::make<container>()
 				.width(120.f)
 				.color({ 0.2f, 0.2f, 0.2f, 1.f }),
-			bungeegum::create<container>()
+			bungeegum::make<container>()
 				.width(140.f)
 				.color({ 0.3f, 0.3f, 0.3f, 1.f })
 		)
@@ -104,7 +104,7 @@ my_update_callback();
 ImGui::Render();
 ```
 
-You may not care about the battery cost of swapping buffers each frame, especially if you are already implementing 3D rendering. However the bungeegum update callback given by `bungeegum::embed` will by default only render geometry where visual changes have to be redrawn. This is useful because we can bind a framebuffer, call our embed callback that may or may not clear or repaint it, and blit the framebuffer at the end of the frame.
+You may not care about the battery cost of swapping buffers each frame, especially if you are already implementing 3D rendering. However the bungeegum update callback given by `bungeegum::embed` will by default only render geometry where visual changes have to be redrawn. This is useful because we can bind a framebuffer, call our embed callback that may or may not clear or repaint it, and blit the framebuffer at the very end of the frame anyway.
 
 ```
 ImGui::NewFrame();
@@ -152,18 +152,18 @@ A basic widget looks like this :
 struct my_widget_class {	
 
 	my_widget_class() {
-		auto& my_widget_tree = bungeegum::create<center>()
-			.child(bungeegum::create<row>()			
+		auto& my_widget_tree = bungeegum::make<center>()
+			.child(bungeegum::make<row>()			
 				.height(200.f)
-				.children(bungeegum::create<container>()
+				.children(bungeegum::make<container>()
 						.width(120.f)
 						.color({ 0.2f, 0.2f, 0.2f, 1.f }),
-					bungeegum::create<container>()
+					bungeegum::make<container>()
 						.width(140.f)
 						.color({ 0.3f, 0.3f, 0.3f, 1.f })
 				)
 			);
-		bungeegum::declare_child(this, my_widget_tree);
+		bungeegum::adopt(this, my_widget_tree);
 	}
 };
 ```
@@ -173,31 +173,27 @@ So far so good. But what if we need to modify `my_widget_tree` at runtime ? Firs
 ```
 struct my_widget_class {	
 
-	my_widget_class() :
-		_my_center_ref = bungeegum::create<center>(),			// ugliest
-		_my_row_ref = bungeegum::create<row>(),					// bungeegum
-		_my_container_1_ref = bungeegum::create<container>(),	// boilerplate
-		_my_container_2_ref = bungeegum::create<container>(),	// ever
+	my_widget_class()
 	{
-		_my_center_ref
-			.child(_my_row_ref			
+		_my_center
+			.child(_my_row		
 				.height(200.f)
-				.children(_my_container1_ref
+				.children(_my_container1
 						.width(120.f)
 						.color({ 0.2f, 0.2f, 0.2f, 1.f }),
-					_my_container2_ref
+					_my_container2
 						.width(140.f)
 						.color({ 0.3f, 0.3f, 0.3f, 1.f })
 				)
 			);
-		bungeegum::declare_child(this, _my_center_ref);
+		bungeegum::adopt(this, _my_center_ref);
 	}
 	
 private:
-	center& _my_center_ref;
-	row& _my_row_ref;
-	container& _my_container_1_ref;
-	container& _my_container_2_ref;
+	center _my_center;
+	row _my_row;
+	container _my_container_1;
+	container _my_container_2;
 };
 ```
 
@@ -256,20 +252,26 @@ void my_widget_class_method() {
 Example : changing the width of a child widget when an asynchronous operation completes :
 
 ```
-class my_widget_class {
+struct my_widget_class {
 
-public:
 	my_widget_class() {
-		using namespace bungeegum;
 
-		// we create a specific child and keep a pointer to it
-		_my_container_ptr = &(container()
-			.width(120.f)
-			.color({ 0.2f, 0.2f, 0.2f, 1.f }));
+		// we use only composition
+		bungeegum::adopt(bungeegum::make<center>()
+			.child(bungeegum::make<row>()
+				.children(_my_container
+					.width(120.f) // initial width
+					.color({ 0.2f, 0.2f, 0.2f, 1.f }), 
+				bungeegum::make<container>()
+					.width(120.f)
+					.color({ 0.2f, 0.2f, 0.2f, 1.f })
+				)
+			)			
+		);		
 
 		// when the event triggers we want to rebuild it with to a new width 
 		_my_event.on_triggered([this] (const my_http_result_class& my_http_result) {
-			_my_container_ptr->width(my_http_result.http_resolved_width); 
+			_my_container.width(my_http_result.http_resolved_width); 
 		}));
 		
 		// we want to trigger the event when an asynchonous operation completes
@@ -277,23 +279,11 @@ public:
 			my_http_result_class result = my_http_getter_function();
 			return result;
 		}));
-
-		// we build our child 
-		build(
-			center(
-				row(
-					my_container,
-					container()
-						.width(120.f)
-						.color({ 0.2f, 0.2f, 0.2f, 1.f });
-				)
-			)
-		);
 	}
 
 private:
 	bungeegum::event<my_http_result_class> _my_event;
-	bungeegum::widgets::container_widget* _my_container_ptr = nullptr;
+	container _my_container;
 };
 ```
 
@@ -385,13 +375,13 @@ void on_draw(const float2 size, draw_command& command)
 
 #### _Constructor encapsulation syntax_
 
-No macro is required inside widget classes, but the user is not allowed to own them. They must be constructed with the `bungeegum::create` function which forwards all the arguments to the constructor. All the core widgets are implemented inside the `bungeegum::widgets` namespace.
+No macro is required inside widget classes, but the user is not allowed to own them. They must be constructed with the `bungeegum::make` function which forwards all the arguments to the constructor. All the core widgets are implemented inside the `bungeegum::widgets` namespace.
 
 ```
-auto& my_widget = bungeegum::create(bungeegum::widgets::center_widget(...));
+auto& my_widget = bungeegum::make(bungeegum::widgets::center_widget(...));
 ```
 
-As this requires a looot of typing, they use the __widget_ suffix and define an alias of `bungeegum::create<widget_t>` inside the `bungeegum` namespace. Then we can instead do this :
+As this requires a looot of typing, they use the __widget_ suffix and define an alias of `bungeegum::make<widget_t>` inside the `bungeegum` namespace. Then we can instead do this :
 
 ```
 auto& my_widget = bungeegum::center(...);

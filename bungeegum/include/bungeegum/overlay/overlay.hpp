@@ -7,11 +7,20 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <bungeegum/bungeegum.hpp>
-#include <gtest/gtest.h>
+#pragma once
 
+#include <functional>
 
-TEST(bungeegum_glue, registry_create_entity)
-{
-    EXPECT_STREQ("ok", "ok");
+#include <bungeegum/context/context.hpp>
+
+struct ImDrawList;
+
+namespace bungeegum {
+namespace detail {
+
+    void setup_overlay();
+
+    void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands);
+
+}
 }

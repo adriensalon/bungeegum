@@ -1,17 +1,15 @@
-#       _        _   _                 _ 
-#      | |      | | (_)               (_)
-#   ___| |_ __ _| |_ _  ___ __ _ _   _ _ 
-#  / __| __/ _` | __| |/ __/ _` | | | | |
-#  \__ \ || (_| | |_| | (_| (_| | |_| | |
-#  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-#                           __/ |        
-#                          |___/         
+#    _
+#   | |__   _   _  _ __    __ _   ___   ___   __ _  _   _  _ __ ___
+#   | '_ \ | | | || '_ \  / _` | / _ \ / _ \ / _` || | | || '_ ` _ \
+#   | |_) || |_| || | | || (_| ||  __/|  __/| (_| || |_| || | | | | |
+#   |_.__/  \__,_||_| |_| \__, | \___| \___| \__, | \__,_||_| |_| |_|
+#                         |___/              |___/
 
 cmake_minimum_required(VERSION 3.0)
-project(staticgui_all)
+project(bungeegum_all)
 
 add_subdirectory("external")
-add_subdirectory("staticgui")
+add_subdirectory("bungeegum")
 add_subdirectory("doc")
 add_subdirectory("test")
 add_subdirectory("examples")

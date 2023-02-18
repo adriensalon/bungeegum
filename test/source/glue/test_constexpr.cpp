@@ -7,10 +7,11 @@
 //                           __/ |
 //                          |___/     v0.0
 
+#include <bungeegum/bungeegum.hpp>
 #include <gtest/gtest.h>
-#include <staticgui/staticgui.hpp>
 
-TEST(staticgui_glue, constexpr_for)
+
+TEST(bungeegum_glue, constexpr_for)
 {
     EXPECT_STREQ("ok", "ok");
     // this tests _that_ the expected exception is thrown
@@ -28,7 +29,7 @@ TEST(staticgui_glue, constexpr_for)
     // }, MyException );
 }
 
-TEST(staticgui_glue, constexpr_foreach)
+TEST(bungeegum_glue, constexpr_foreach)
 {
     EXPECT_STREQ("ok", "ok");
     // this tests _that_ the expected exception is thrown

@@ -10,8 +10,12 @@
 #include <bungeegum/bungeegum.hpp>
 #include <gtest/gtest.h>
 
+TEST(bungeegum, make)
+{
+    EXPECT_STREQ("ok", "ok");
+}
 
-TEST(bungeegum_glue, registry_create_entity)
+TEST(bungeegum, launch)
 {
     EXPECT_STREQ("ok", "ok");
 }

@@ -7,11 +7,20 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <bungeegum/bungeegum.hpp>
-#include <gtest/gtest.h>
+#pragma once
 
+#include <bungeegum/context/context.hpp>
 
-TEST(bungeegum_glue, registry_create_entity)
-{
-    EXPECT_STREQ("ok", "ok");
+namespace bungeegum {
+namespace detail {
+
+    constexpr inline float footer_height = 28.f;
+
+    inline static ImFont* regular_font = nullptr;
+    inline static ImFont* extrabold_font = nullptr;
+    inline static ImFont* icons_font = nullptr;
+
+    void setup_overlay_theme();
+
+}
 }

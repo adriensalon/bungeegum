@@ -7,15 +7,16 @@
 //                           __/ |
 //                          |___/     v0.0
 
+#include <bungeegum/glue/simd.hpp>
 #include <gtest/gtest.h>
-#include <staticgui/glue/simd.hpp>
 
-TEST(staticgui_glue, simd_intrinsics_add_float2)
+
+TEST(bungeegum_glue, simd_intrinsics_add_float2)
 {
     const std::array<float, 4> _v1({ 44, 10, 0, 0 });
     const std::array<float, 4> _v2({ 10, -5, 0, 0 });
     std::array<float, 4> _vr({ 0, 0, 0, 0 });
-    staticgui::detail::intrinsics::add<float, 2>(_v1.data(), _v2.data(), _vr.data());
+    bungeegum::detail::intrinsics::add<float, 2>(_v1.data(), _v2.data(), _vr.data());
     bool _valid = (_vr[0] == 54 && _vr[1] == 5);
     EXPECT_TRUE(_valid);
 }

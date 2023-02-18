@@ -7,11 +7,13 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <bungeegum/bungeegum.hpp>
-#include <gtest/gtest.h>
+#pragma once
 
+#include <limits>
 
-TEST(bungeegum_glue, registry_create_entity)
-{
-    EXPECT_STREQ("ok", "ok");
+namespace bungeegum {
+
+template <typename value_t>
+constexpr value_t infinity = std::numeric_limits<value_t>::max();
+
 }

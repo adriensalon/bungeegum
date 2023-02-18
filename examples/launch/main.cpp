@@ -1,4 +1,4 @@
-#include <staticgui/staticgui.hpp>
+#include <bungeegum/bungeegum.hpp>
 
 struct A {
 
@@ -25,18 +25,18 @@ int main()
 {
     std::cout << reinterpret_cast<std::uintptr_t>(&(okokoko())) << std::endl;
 
-    // staticgui::launch(
-    //     create<staticgui::widgets::container_widget>()
-    //         .child(staticgui::widgets::container_widget()
-    //                    .child(create<staticgui::widgets::container_widget>()
-    //                               .child(staticgui::widgets::container_widget()))));
+    // bungeegum::launch(
+    //     create<bungeegum::widgets::container_widget>()
+    //         .child(bungeegum::widgets::container_widget()
+    //                    .child(create<bungeegum::widgets::container_widget>()
+    //                               .child(bungeegum::widgets::container_widget()))));
 
-    staticgui::widgets::container_widget c1, c2;
+    bungeegum::widgets::container_widget c1, c2;
 
-    staticgui::launch(staticgui::create_widget<staticgui::widgets::container_widget>().ok().child(
-        staticgui::create_widget<staticgui::widgets::container_widget>().ok().child(c2).ok()));
-    // .child(staticgui::widgets::container_widget()
-    //    .child(staticgui::widgets::container_widget()
+    bungeegum::launch(bungeegum::create_widget<bungeegum::widgets::container_widget>().ok().child(
+        bungeegum::create_widget<bungeegum::widgets::container_widget>().ok().child(c2).ok()));
+    // .child(bungeegum::widgets::container_widget()
+    //    .child(bungeegum::widgets::container_widget()
     // .child(c2
     //            .child(c3)));
 

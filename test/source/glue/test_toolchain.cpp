@@ -7,48 +7,49 @@
 //                           __/ |
 //                          |___/     v0.0
 
+#include <bungeegum/glue/toolchain.hpp>
 #include <gtest/gtest.h>
-#include <staticgui/glue/toolchain.hpp>
 
-TEST(staticgui_glue, toolchain_arch)
+
+TEST(bungeegum_glue, toolchain_arch)
 {
     unsigned int _sum = 0
-        + staticgui::detail::is_arch_32
-        + staticgui::detail::is_arch_64;
+        + bungeegum::detail::is_arch_32
+        + bungeegum::detail::is_arch_64;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
 
-TEST(staticgui_glue, toolchain_cpu)
+TEST(bungeegum_glue, toolchain_cpu)
 {
     unsigned int _sum = 0
-        + staticgui::detail::is_cpu_x86
-        + staticgui::detail::is_cpu_arm
-        + staticgui::detail::is_cpu_webasm;
+        + bungeegum::detail::is_cpu_x86
+        + bungeegum::detail::is_cpu_arm
+        + bungeegum::detail::is_cpu_webasm;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
 
-TEST(staticgui_glue, toolchain_platform)
+TEST(bungeegum_glue, toolchain_platform)
 {
     unsigned int _sum = 0
-        + staticgui::detail::is_platform_emscripten
-        + staticgui::detail::is_platform_win32
-        + staticgui::detail::is_platform_uwp
-        + staticgui::detail::is_platform_macos
-        + staticgui::detail::is_platform_ios
-        + staticgui::detail::is_platform_linux
-        + staticgui::detail::is_platform_android;
+        + bungeegum::detail::is_platform_emscripten
+        + bungeegum::detail::is_platform_win32
+        + bungeegum::detail::is_platform_uwp
+        + bungeegum::detail::is_platform_macos
+        + bungeegum::detail::is_platform_ios
+        + bungeegum::detail::is_platform_linux
+        + bungeegum::detail::is_platform_android;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
 
-TEST(staticgui_glue, toolchain_compiler)
+TEST(bungeegum_glue, toolchain_compiler)
 {
     unsigned int _sum = 0
-        + staticgui::detail::is_compiler_msvc
-        + staticgui::detail::is_compiler_clang
-        + staticgui::detail::is_compiler_gcc;
+        + bungeegum::detail::is_compiler_msvc
+        + bungeegum::detail::is_compiler_clang
+        + bungeegum::detail::is_compiler_gcc;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }

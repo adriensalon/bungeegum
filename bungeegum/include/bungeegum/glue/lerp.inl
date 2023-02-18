@@ -7,11 +7,13 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <bungeegum/bungeegum.hpp>
-#include <gtest/gtest.h>
+#pragma once
 
+namespace bungeegum {
 
-TEST(bungeegum_glue, registry_create_entity)
+template <typename value_t>
+value_t lerp(lerpable_t<value_t>&& min_value, value_t&& max_value, const float t)
 {
-    EXPECT_STREQ("ok", "ok");
+    return (1.f - t) * min_value + t * max_value;
+}
 }

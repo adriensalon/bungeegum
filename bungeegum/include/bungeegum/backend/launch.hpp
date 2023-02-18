@@ -7,11 +7,18 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <bungeegum/bungeegum.hpp>
-#include <gtest/gtest.h>
+#pragma once
 
+#include <functional>
 
-TEST(bungeegum_glue, registry_create_entity)
-{
-    EXPECT_STREQ("ok", "ok");
+namespace bungeegum {
+
+/// @brief
+/// @tparam widget_t
+/// @param widget
+template <typename widget_t>
+void launch(widget_t& widget, const std::function<void()>& on_renderer_started = nullptr);
+
 }
+
+#include <bungeegum/backend/launch.inl>

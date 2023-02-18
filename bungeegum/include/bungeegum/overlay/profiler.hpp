@@ -7,11 +7,16 @@
 //                           __/ |
 //                          |___/     v0.0
 
-#include <bungeegum/bungeegum.hpp>
-#include <gtest/gtest.h>
+#pragma once
 
+#include <bungeegum/context/context.hpp>
+#include <bungeegum/glue/time.hpp>
 
-TEST(bungeegum_glue, registry_create_entity)
-{
-    EXPECT_STREQ("ok", "ok");
+namespace bungeegum {
+namespace detail {
+
+    void setup_profiler_overlay();
+
+    void draw_profiler_overlay();
+}
 }
