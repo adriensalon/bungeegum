@@ -1,20 +1,31 @@
 # bungeegum
 
+Although all guis share a lot of features, it's in the details that they can stand out.
 
-### __Roadmap v0.0__
+Although the energy consumption of our devices is becoming an important issue for the development of applications, I do not feel that the trend is to port them to compiled languages.
 
-- [NOT DONE] align_widget
-- [NOT DONE] container_widget
-- [NOT DONE] column_widget
-- [NOT DONE] row_widget
+bungeegum is a C++17 library to manage widgets and let them update themselves to achieve
+- user input interaction inspired by browser events
+- box layout inspired by flutter
+- immediate mode painting inspired by imgui / skia
 
-### __Requirements__
 
-- C++17 compiler is required
-- [CMake](https://cmake.org/) build files are provided
+In a effort to adhere to the [zero-overhead principle](https://en.cppreference.com/w/cpp/language/Zero-overhead_principle), this implementation only redraws the necessary areas of the screen. It also optimizes the storage and iteration of widgets in an ECS tree container as much as possible. All user code invocations are resolved at compile-time using static polymorphism. Performance can be measured using a profiler integrated into an overlay, along with other tools available in debug builds.
 
-### __Motivation__
 
+## Motivation
+
+When it comes to implementing a graphical user interface (GUI), I often struggle to determine the best tool for the job. For one, there are so many options available. Some tools are built on top of the operating system's pre-existing widgets, while others use Graphics Processing Unit (GPU) Graphics APIs to create their own widget systems, offering developers more granular control over the interface design.
+
+High-level frameworks enable developers to create prototypes quickly and offer a sense of ease, as they provide a predefined style of programming that avoids the need to spend time refactoring code. However, these frameworks are often proprietary and require a level of expertise, as they incorporate specific concepts that developers must learn in order to create basic interfaces. While these tools can greatly enhance the productivity of large teams, as a solo developer, I have often regretted using them. After learning the basics, I found myself unable to implement certain features because they required a greater understanding of the framework or extensive modification of it. In my experience, the most challenging aspect of using these frameworks is implementing features that were not necessarily anticipated by their developers.
+
+
+Then come the lower level solutions. They don't require this initial amount of specific knowledge to achieve what we want. Building on top of graphics APIs or wrappers to them can be tempting when we already have a game that is using them. However, and unless the GUIs are really minimal it's going to be a huge effort to implement simple interfaces. [ImGui](https://github.com/ocornut/imgui) tries to close this gap.
+
+
+Not easy to choose when you don't have much time and want your GUI to stand out. You must either demolish a castle to keep only the tower, or build it yourself in the middle of a field with cut stones. I guess I'm a bit of a maniac, but I feel a little sad when an application distributes Blink + V8 + Skia only to display a simple HTML page. Yes, the majority of devices will display this gui, but how much energy can we spend to save development time?
+
+Then I discovered Flutter. It is heavy, it uses a managed langage that I don't like, 
 
 Perhaps the best thing about the declarative syntax of [Flutter](https://flutter.dev/) is how we can instantiate widgets as trees, with each widget exposing the possibilities for customizing its behavior inside the tree with optional named parameters. This repository provides a basic implementation for a gui library that tries to mimick this syntax within C++17. However, we have to introduce several major architectural differences to Flutter in order to follow the [zero overhead principle](https://en.cppreference.com/w/cpp/language/Zero-overhead_principle) and guarantee that :
 
@@ -41,6 +52,12 @@ We cannot afford this approach that introduces some ugliness (users may want the
 > Mutable tree-based APIs suffer from a dichotomous access pattern: creating the tree’s original state typically uses a very different set of operations than subsequent updates.
 
 That is a fair point, we will get back to it.
+
+
+## Build
+
+- C++17 compiler is required
+- [CMake](https://cmake.org/) build files are provided
 
 ### __Quickstart__
 
@@ -394,6 +411,14 @@ if you reaaally need virtual inheritance among widget classes see the [CRTP idio
 
 images fonts shaders etc
 
+
+## Roadmap v0.0
+
+Implementing some Flutter widgets behavior with bungeegum should be a good way to demonstrate and ensure that 
+- [NOT DONE] align
+- [NOT DONE] container
+- [NOT DONE] column
+- [NOT DONE] row
 
 ### __External dependencies__
 

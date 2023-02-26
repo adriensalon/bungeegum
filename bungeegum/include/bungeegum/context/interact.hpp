@@ -29,6 +29,9 @@ struct interact_command {
 template <typename widget_t>
 void on_interact(widget_t* widget, const std::function<void(interact_command&)>& interact_callback);
 
+template <typename widget_t>
+void must_interact(widget_t* widget);
+
 }
 
 // #include <bungeegum/context/interact.inl>

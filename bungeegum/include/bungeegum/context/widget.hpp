@@ -30,7 +30,8 @@ void adopt(widget_t* widget, children_widgets_t&... children_widget);
 /// @param widget
 /// @param ...children_widget
 template <typename widget_t, typename... children_widgets_t>
-void abandon(widget_t* widget, children_widgets_t&... children_widget, const bool abandon_children = true);
+void abandon(widget_t* widget, children_widgets_t&... children_widget,
+    const bool abandon_children = true);
 
 template <typename widget_t>
 void abandon(widget_t* widget, const bool abandon_children = true);
@@ -42,10 +43,12 @@ void abandon(widget_t* widget, const bool abandon_children = true);
 /// @param replacing_widget
 /// @param duration
 // template <typename widget_t, typename replacing_widget_t>
-// void replace(widget_t& widget, replacing_widget_t& replacing_widget, const std::chrono::milliseconds coexistence = 0, const std::function);
+// void replace(widget_t& widget, replacing_widget_t& replacing_widget, const
+// std::chrono::milliseconds coexistence = 0, const std::function);
 
 // template <typename widget_t, typename replacing_widget_t>
-// void replace(widget_t& widget, replacing_widget_t& replacing_widget, const std::chrono::milliseconds coexistence = 0, const std::function);
+// void replace(widget_t& widget, replacing_widget_t& replacing_widget, const
+// std::chrono::milliseconds coexistence = 0, const std::function);
 
 #include <optional>
 #include <typeindex>
@@ -78,9 +81,11 @@ namespace detail {
         std::unique_ptr<std::type_index> kind = nullptr;
         std::optional<std::reference_wrapper<untyped_widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<untyped_widget_data>> children;
-        // sort -> index pour chaque untyped_widget_data -> entt::sort sur les indices
+        // sort -> index pour chaque untyped_widget_data -> entt::sort sur les
+        // indices
 
-        std::unordered_map<entity_t, std::function<void()>> detached_events_removers;
+        std::unordered_map<entity_t, std::function<void()>>
+            detached_events_removers;
 
         std::function<float2(resolve_command_data&)> widget_resolver = nullptr;
         std::optional<resolve_command_data> widget_resolver_data = std::nullopt;
@@ -110,19 +115,27 @@ namespace detail {
         // widgets_registry& operator=(widgets_registry&& other);
 
         registry widgets;
-        std::unordered_map<void*, entity_t> inline_widgets; // go pareil quen dessous
-        std::unordered_map<void*, untyped_widget_data*> accessors; // go cpy ctor pour le untyped data qui move
+        std::unordered_map<void*, entity_t>
+            inline_widgets; // go pareil quen dessous
+        std::unordered_map<void*, untyped_widget_data*>
+            accessors; // go cpy ctor pour le untyped data qui move
         std::optional<std::reference_wrapper<untyped_widget_data>> root;
-        std::vector<std::pair<std::reference_wrapper<untyped_widget_data>, bool>> must_resolve_heads; // bool = must resolve children too
-        std::vector<std::pair<std::reference_wrapper<untyped_widget_data>, bool>> must_draw_heads;
+        std::vector<std::pair<std::reference_wrapper<untyped_widget_data>, bool>>
+            must_resolve_heads; // bool = must resolve children too
+        std::vector<std::pair<std::reference_wrapper<untyped_widget_data>, bool>>
+            must_draw_heads;
 
         void clear_resolve();
         void clear_draw();
-        bool is_parent(const untyped_widget_data& parent, const untyped_widget_data& child);
-        void iterate_must_resolve(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback);
-        void iterate_must_draw(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback);
+        bool is_parent(const untyped_widget_data& parent,
+            const untyped_widget_data& child);
+        void iterate_must_resolve(
+            const std::function<void(untyped_widget_data&, const bool)>& iterate_callback);
+        void iterate_must_draw(
+            const std::function<void(untyped_widget_data&, const bool)>& iterate_callback);
         bool is_must_draw_empty() const;
-        void iterate(const std::function<void(untyped_widget_data&)>& iterate_callback);
+        void
+        iterate(const std::function<void(untyped_widget_data&)>& iterate_callback);
 
         template <typename widget_t, typename... widget_args_t>
         widget_t& create(widget_args_t&&... widget_args);
@@ -134,10 +147,14 @@ namespace detail {
         void build_root(widget_t& widget);
 
         template <typename widget_t>
-        void on_resolve(widget_t* widget, const std::function<float2(resolve_command_data&)>& resolver);
+        void
+        on_resolve(widget_t* widget,
+            const std::function<float2(resolve_command_data&)>& resolver);
 
         template <typename widget_t>
-        void on_draw(widget_t* widget, const std::function<void(const float2, draw_command_data&)>& drawer);
+        void on_draw(
+            widget_t* widget,
+            const std::function<void(const float2, draw_command_data&)>& drawer);
 
         template <typename widget_t>
         void must_resolve(widget_t& widget, const bool must_resolve_children = true);
@@ -164,16 +181,20 @@ namespace detail {
     inline widgets_registry widgets_context;
 
     template <typename widget_t, typename... children_widgets_t>
-    using resolve_function = decltype(std::declval<widget_t>().resolve<children_widgets_t...>(std::declval<resolve_command&>(), std::declval<children_widgets_t&>()...));
+    using resolve_function = decltype(std::declval<widget_t>().resolve<children_widgets_t...>(
+        std::declval<resolve_command&>(),
+        std::declval<children_widgets_t&>()...));
 
     template <typename widget_t>
-    using draw_function = decltype(std::declval<widget_t>().draw(std::declval<const float2&>(), std::declval<draw_command&>()));
+    using draw_function = decltype(std::declval<widget_t>().draw(
+        std::declval<const float2&>(), std::declval<draw_command&>()));
 
-}
+} // namespace detail
 
 /// @brief
 template <typename widget_t, typename... children_widgets_t>
-constexpr bool has_resolve_function_v = is_detected_exact_v<float2, detail::resolve_function, widget_t, children_widgets_t...>;
+constexpr bool has_resolve_function_v = is_detected_exact_v<float2, detail::resolve_function, widget_t,
+    children_widgets_t...>;
 
 /// @brief
 template <typename widget_t>
@@ -215,6 +236,6 @@ void adopt_child_widget(widget_t* widget, child_widget_t& child_widget);
 template <typename widget_t, typename child_widget_t>
 void a_child_widget(widget_t* widget, child_widget_t& child_widget);
 
-}
+} // namespace bungeegum
 
 #include <bungeegum/context/widget.inl>
