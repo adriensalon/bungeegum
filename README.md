@@ -31,7 +31,7 @@ using namespace bungeegum::widgets;
 
 The user is not allowed to own the widgets. To be instantiated inside the bungeegum registry they must be constructed with the `bungeegum::make` function which forwards all the arguments to the constructor and returns a reference to the widget object. Unlike Dart, the C++ language does not allow the use of named parameters. However the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter) provides us the parameter passing style we need :
 
-```
+```C++
 auto& my_widget_tree = bungeegum::make<center>()
     .child(bungeegum::make<row>()			
         .height(200.f)
@@ -53,13 +53,13 @@ auto& my_widget_tree = bungeegum::make<center>()
 
 This library comes with everything needed to create a native window and a hardware accelerated renderer using [SDL2]() and [Diligent Engine]() on the most common platforms, such as Windows, MacOS, Linux, iOS, Android and Emscripten. If you want to use this library directly without binding to an existing game/engine, the `bungeegum::launch` function starts a window, a renderer, and blocks the thread until the window is closed. 
 
-```
+```C++
 bungeegum::launch(my_widget_tree);
 ```
 
 You can define a function that will be called after the renderer is initialized and before the update loop begins. This can be useful to setup custom state that requires the window or the renderer to be initialized.
 
-```
+```C++
 bungeegum::launch(my_widget_tree, [&] () {
 	// this code will be executed after renderer is initialized
 	// but before update loop starts
@@ -74,14 +74,14 @@ This library behaves by
 
 You may want to use this library to design guis along with an existing game/engine. As we use [ImGui](https://github.com/ocornut/imgui) as a backend for rendering geometry and collecting input events, we can initialize bungeegum before starting a custom game loop with the `bungeegum::embed` function after ImGui has created a context. 
 
-```
+```C++
 ImGui::CreateContext();
 auto my_update_callback = bungeegum::embed(my_widget_tree);
 ```
 
 It takes our widget tree as input and returns a callback we can call between our `ImGui::NewFrame` and `ImGui::Render` custom game/engine calls. 
 
-```
+```C++
 ImGui::NewFrame();
 my_update_callback();
 ImGui::Render();
@@ -89,7 +89,7 @@ ImGui::Render();
 
 You may not care about the battery cost of swapping buffers each frame, especially if you are already implementing 3D rendering. However the bungeegum update callback given by `bungeegum::embed` will by default only render geometry where visual changes have to be redrawn. This is useful because we can bind a framebuffer, call our embed callback that may or may not clear or repaint it, and blit the framebuffer at the very end of the frame anyway.
 
-```
+```C++
 ImGui::NewFrame();
 my_bind_framebuffer_function(); // we use a framebuffer to store the gui
 my_update_callback();
@@ -99,7 +99,7 @@ ImGui::Render();
 
 If you dont want to do this and instead force redrawing the whole gui every frame, just pass `true` to the embed callback.
 
-```
+```C++
 ImGui::NewFrame();
 my_update_callback(true); // instead we just force draw every frame
 ImGui::Render();
@@ -113,13 +113,13 @@ Must declare pas forcement on construction
 You are really encouraged to take advantage of template deduction when implementing generic widgets
 > Widgets can build template children by templating their constructors and accepting children as non-const references. Templating the widget struct would allow storing pointers or references to its children and having its members access them, but this is not always desirable. Depending on the use case this would prevent some useful usage of the `bungeegum::context::iterate` function. For example the widgets `my_widget_1<float>` and `my_widget_1<int>` would not be iterable at the same time.
 
-```
+```C++
 my_widget::my_widget() {
 	bungeegum::build(this, my_child_widget_type());
 }
 ```
 
-```
+```C++
 template <typename... children_widgets_t>
 my_widget::my_widget(children_widgets_t&... my_other_children_widgets) {
 	bungeegum::build(this, my_child_widget_type(), my_other_children_widgets...);
@@ -131,7 +131,7 @@ my_widget::my_widget(children_widgets_t&... my_other_children_widgets) {
 
 A basic widget looks like this :
 
-```
+```C++
 struct my_widget_class {	
 
 	my_widget_class() {
@@ -153,7 +153,7 @@ struct my_widget_class {
 
 So far so good. But what if we need to modify `my_widget_tree` at runtime ? First we need to be able to keep references to our children widgets after widget creation :
 
-```
+```C++
 struct my_widget_class {	
 
 	my_widget_class()
@@ -188,12 +188,12 @@ With the named parameter idiom widgets are mostly default constructed, delaying 
 
 To dynamically modify the gui state, event objects register callbacks of the same type and can be passed from a widget to its children to be triggered all at once when desired.
 
-```
+```C++
 bungeegum::event<float, float, std::string> my_event;
 ```
 
 
-```
+```C++
 my_event.on_trigger([] (const float& a, const float& b, const std::string& c) {
 	std::cout << "" << std::endl;
 });
@@ -209,14 +209,14 @@ my_event.trigger(std::async([](){
 ```
 
 merge
-```
+```C++
 bungeegum::event my_event_1([] () { });
 bungeegum::event my_event_2([] () { }).merge(my_event_1);
 ```
 
 attach/detach
 
-```
+```C++
 void my_widget_class_method() {
 	bungeegum::event my_event_1([] () { });
 
@@ -234,7 +234,7 @@ void my_widget_class_method() {
 
 Example : changing the width of a child widget when an asynchronous operation completes :
 
-```
+```C++
 struct my_widget_class {
 
 	my_widget_class() {
@@ -276,7 +276,7 @@ private:
 
 Example : changing the color of a child widget with an animation :
 
-```
+```C++
 class my_widget_class {
 
 public:
@@ -327,7 +327,7 @@ In Flutter even tricky/specific/low level concepts have already been encapsulate
 
 #### _Interact_
 
-```
+```C++
 void on_interact(interact_command& command)
 {
 }
@@ -335,7 +335,7 @@ void on_interact(interact_command& command)
 
 #### _Resolve_
 
-```
+```C++
 template <typename... children_widgets_t>
 float2 on_resolve(resolve_command& command, children_widgets_t&... children)
 {
@@ -348,7 +348,7 @@ float2 on_resolve(resolve_command& command, children_widgets_t&... children)
 #### _Draw_
 
 
-```
+```C++
 void on_draw(const float2 size, draw_command& command)
 {
 }
@@ -360,7 +360,7 @@ void on_draw(const float2 size, draw_command& command)
 
 No macro is required inside widget classes, but the user is not allowed to own them. They must be constructed with the `bungeegum::make` function which forwards all the arguments to the constructor. All the core widgets are implemented inside the `bungeegum::widgets` namespace.
 
-```
+```C++
 auto& my_widget = bungeegum::make(bungeegum::widgets::center_widget(...));
 ```
 
