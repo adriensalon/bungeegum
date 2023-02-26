@@ -1,24 +1,16 @@
 # bungeegum
 
-Although all guis share a lot of features, it's in the details that they can stand out.
+While energy consumption of devices is becoming an increasingly important consideration in application development, I do not believe that the trend is moving towards porting applications to compiled languages.
 
-Although the energy consumption of our devices is becoming an important issue for the development of applications, I do not feel that the trend is to port them to compiled languages.
+bungeegum is a cross-platform C++17 library that offers a minimal and modular approach to managing GUI widgets. One way to use this library is by composing widgets from other widgets, as it ships with a collection of layouting widgets that mimic those of Flutter. Events and animations help facilitate synchronous and asynchronous operations that modify the GUI state and update changes on the screen. Additionally, bungeegum provides a more advanced interface that enables developers to augment widgets with lower-level functionalities. When a user interacts with the GUI, events are dispatched to the relevant widgets. These widgets can then react to the events and/or pass them on to their children. Widgets that require updating can modify their layout, following Flutter's BoxLayout model, where widgets provide minimum and maximum size constraints to their children, who return the size they've chosen to their parent, which then positions them accordingly. Meanwhile, widgets that require redrawing can make changes to their draw command by submitting primitives, images, text, and other elements. 
 
-bungeegum is a C++17 library to manage widgets and let them update themselves to achieve
-- user input interaction inspired by browser events
-- box layout inspired by flutter
-- immediate mode painting inspired by imgui / skia
-
-
-In a effort to adhere to the [zero-overhead principle](https://en.cppreference.com/w/cpp/language/Zero-overhead_principle), this implementation only redraws the necessary areas of the screen. It also optimizes the storage and iteration of widgets in an ECS tree container as much as possible. All user code invocations are resolved at compile-time using static polymorphism. Performance can be measured using a profiler integrated into an overlay, along with other tools available in debug builds.
-
+In a effort to adhere to the [zero-overhead principle](https://en.cppreference.com/w/cpp/language/Zero-overhead_principle), we only redraw the necessary areas of the screen. This library also optimizes the storage and iteration of widgets in an ECS tree container as much as possible. All user code invocations are resolved at compile-time using static polymorphism. Performance can be measured using a profiler integrated into an overlay, along with other tools available in debug builds.
 
 ## Motivation
 
-When it comes to implementing a graphical user interface (GUI), I often struggle to determine the best tool for the job. For one, there are so many options available. Some tools are built on top of the operating system's pre-existing widgets, while others use Graphics Processing Unit (GPU) Graphics APIs to create their own widget systems, offering developers more granular control over the interface design.
+When it comes to implementing a cross-platform GUI, I often struggle to determine the best tool for the job. For one, there are so many options available. Some tools are built on top of the operating system's pre-existing widgets, while others use GPU Graphics APIs to create their own widget systems, offering developers more granular control over the interface design.
 
-High-level frameworks enable developers to create prototypes quickly and offer a sense of ease, as they provide a predefined style of programming that avoids the need to spend time refactoring code. However, these frameworks are often proprietary and require a level of expertise, as they incorporate specific concepts that developers must learn in order to create basic interfaces. While these tools can greatly enhance the productivity of large teams, as a solo developer, I have often regretted using them. After learning the basics, I found myself unable to implement certain features because they required a greater understanding of the framework or extensive modification of it. In my experience, the most challenging aspect of using these frameworks is implementing features that were not necessarily anticipated by their developers.
-
+High-level frameworks enable developers to create prototypes quickly and offer a sense of ease, as they provide a predefined style of programming that avoids the need to spend time refactoring code. However, these frameworks are often proprietary and require a level of expertise, as they incorporate specific concepts that developers must learn in order to create basic interfaces. While these tools can greatly enhance the productivity of large teams, as a solo developer, I have often regretted using them. After learning the basics, I found myself unable to implement certain features because they required a much greater understanding of the framework or extensive modification of it. In my experience, the most challenging aspect of using these frameworks is implementing features that were not necessarily anticipated by their developers.
 
 Then come the lower level solutions. They don't require this initial amount of specific knowledge to achieve what we want. Building on top of graphics APIs or wrappers to them can be tempting when we already have a game that is using them. However, and unless the GUIs are really minimal it's going to be a huge effort to implement simple interfaces. [ImGui](https://github.com/ocornut/imgui) tries to close this gap.
 
@@ -27,13 +19,8 @@ Not easy to choose when you don't have much time and want your GUI to stand out.
 
 Then I discovered Flutter. It is heavy, it uses a managed langage that I don't like, 
 
-Perhaps the best thing about the declarative syntax of [Flutter](https://flutter.dev/) is how we can instantiate widgets as trees, with each widget exposing the possibilities for customizing its behavior inside the tree with optional named parameters. This repository provides a basic implementation for a gui library that tries to mimick this syntax within C++17. However, we have to introduce several major architectural differences to Flutter in order to follow the [zero overhead principle](https://en.cppreference.com/w/cpp/language/Zero-overhead_principle) and guarantee that :
+Perhaps the best thing about the declarative syntax of [Flutter](https://flutter.dev/) is how we can instantiate widgets as trees, with each widget exposing the possibilities for customizing its behavior inside the tree with optional named parameters. This repository provides a basic implementation for a gui library that tries to mimick this syntax within C++17. 
 
- - no region of the screen will be drawn unless necessary
- - no logic code will run unless necessary
- - no widget data will be modified unless necessary
-
-_Disclaimer : I don't hate Flutter_
 
  The Flutter framework makes extensive use of immutable data structures, memory preallocation and garbage collection to instantiate widget trees every time something has changed and some user code must react to it :
  
@@ -71,16 +58,16 @@ The user is not allowed to own the widgets. To be instantiated inside the bungee
 
 ```
 auto& my_widget_tree = bungeegum::make<center>()
-	.child(bungeegum::make<row>()			
-		.height(200.f)
-		.children(bungeegum::make<container>()
-				.width(120.f)
-				.color({ 0.2f, 0.2f, 0.2f, 1.f }),
-			bungeegum::make<container>()
-				.width(140.f)
-				.color({ 0.3f, 0.3f, 0.3f, 1.f })
-		)
-	);
+    .child(bungeegum::make<row>()			
+        .height(200.f)
+	.children(bungeegum::make<container>()
+	    .width(120.f)
+	    .color({ 0.2f, 0.2f, 0.2f, 1.f }),
+	bungeegum::make<container>()
+	    .width(140.f)
+	    .color({ 0.3f, 0.3f, 0.3f, 1.f })
+        )
+    );
 ```
 
 #### _Launch_
