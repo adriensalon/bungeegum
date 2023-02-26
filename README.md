@@ -14,11 +14,11 @@ High-level frameworks enable developers to create prototypes quickly and offer a
 
 Moving to lower level solutions may seem like a good idea, as they don't require as much specific knowledge to get started. However, using graphics APIs or wrappers to them can be a daunting task when building anything beyond very simple interfaces. [ImGui](https://github.com/imgui) attempts to bridge this gap by providing both low-level APIs for 2D rendering of text, images, and primitives, as well as higher-level APIs that implement many widgets, styles, docking, and other features. However, this approach of doing widgets can be difficult to extend. While it is simple and fast to create a basic GUI that works, achieving truly custom and polished GUIs can take much more time.
 
-Not easy to choose when you don't have much time and want your GUI to stand out. Then I discovered Flutter. It is heavy, it uses a managed langage that I don't like, but maybe it has the best syntax. One of its major advantages is its rich set of pre-built widgets, which can be combined to create complex GUIs. These widgets are highly customizable, and can be easily modified using named parameters to meet specific design needs. As i was frustrated with Dart, I wanted to try implementing this declarative syntax with generics, `std::future`, and so on.
+Not easy to choose when you don't have much and want your GUI to stand out. Then I discovered Flutter. It is heavy, it uses a managed langage that I don't like, but maybe it has the best vision about what a widget should be. They can be combined to create complex GUIs. They are highly customizable, and can be easily modified using named parameters to meet specific design needs. As i was frustrated with Dart, I wanted to try implementing this declarative syntax with generics, static polymorphism, `std::future`, etc...
 
 ## Build
 
-- C++17 compiler is required
+- A C++17 compiler is required
 - [CMake](https://cmake.org/) build files are provided
 
 ### __Quickstart__
