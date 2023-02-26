@@ -25,7 +25,7 @@ Not easy to choose when you don't have much and want your GUI to stand out. Then
 
 All the core widgets are implemented inside the `bungeegum::widgets` namespace.
 
-```
+```C++
 using namespace bungeegum::widgets;
 ```
 
