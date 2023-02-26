@@ -1,8 +1,8 @@
 # bungeegum
 
-While energy consumption of devices is becoming an increasingly important consideration in application development, I do not believe that the trend is moving towards porting applications to compiled languages.
+As energy consumption of devices is becoming an increasingly important consideration in application development, maybe we are moving towards porting GUIs to compiled languages...
 
-_bungeegum_ is a cross-platform C++17 library that offers a minimal and modular approach to managing GUI widgets. One way to use this library is by composing widgets from other widgets, as it ships with a collection of layouting widgets that mimic those of Flutter. Events and animations help facilitate synchronous and asynchronous operations that modify the GUI state and update changes on the screen. Additionally, _bungeegum_ provides a more advanced interface that enables developers to augment widgets with lower-level functionalities. When a user interacts with the GUI, events are dispatched to the relevant widgets. These widgets can then react to the events and/or pass them on to their children. Widgets that require updating can modify their layout, following [Flutter's BoxLayout model](https://docs.flutter.dev/development/ui/layout/constraints), where widgets provide minimum and maximum size constraints to their children, who return the size they've chosen to their parent, which then positions them accordingly. Meanwhile, widgets that require redrawing can make changes to their draw command by submitting primitives, images, text, and other elements. 
+_bungeegum_ is a cross-platform C++17 library that offers a minimal and modular approach to implementing GUI widgets. One way to use this library is by composing widgets from other widgets, as it ships with a collection of layouting widgets that mimic those of Flutter. Events and animations help facilitate synchronous and asynchronous operations that modify the GUI state and update changes on the screen. Additionally, _bungeegum_ provides a more advanced interface that enables developers to augment widgets with lower-level functionalities. When a user interacts with the GUI, events are dispatched to the relevant widgets. These widgets can then react to the events and/or pass them on to their children. Widgets that require updating can modify their layout, following [Flutter's BoxLayout model](https://docs.flutter.dev/development/ui/layout/constraints), where widgets provide minimum and maximum size constraints to their children, who return the size they've chosen to their parent, which then positions them accordingly. Widgets that require redrawing can make changes to their draw command by submitting primitives, images, text, and other elements. 
 
 In a effort to adhere to the [zero-overhead principle](https://en.cppreference.com/w/cpp/language/Zero-overhead_principle), we only redraw the necessary areas of the screen. This library also optimizes the storage and iteration of widgets in an ECS tree container as much as possible. All user code invocations are resolved at compile-time using static polymorphism. Performance can be measured using a profiler integrated into an overlay, along with other tools available in debug builds.
 
@@ -10,36 +10,11 @@ In a effort to adhere to the [zero-overhead principle](https://en.cppreference.c
 
 When it comes to implementing a cross-platform GUI, I often struggle to determine the best tool for the job. For one, there are so many options available. Some tools are built on top of the operating system's pre-existing widgets, while others use GPU Graphics APIs to create their own widget systems, offering developers more granular control over the interface design.
 
-High-level frameworks enable developers to create prototypes quickly and offer a sense of ease, as they provide a predefined style of programming that avoids the need to spend time refactoring code. However, these frameworks are often proprietary and require a level of expertise, as they incorporate specific concepts that developers must learn in order to create basic interfaces. While these tools can greatly enhance the productivity of large teams, as a solo developer, I have often regretted using them. After learning the basics, I found myself unable to implement certain features because they required a much greater understanding of the framework or extensive modification of it. In my experience, the most challenging aspect of using these frameworks is implementing features that were not necessarily anticipated by their developers.
+High-level frameworks enable developers to create prototypes quickly and offer a sense of ease, as they provide a predefined style of programming that avoids the need to spend time refactoring code. However, these frameworks are often proprietary and require a level of expertise, as they incorporate specific concepts that developers must learn in order to create basic interfaces. While these tools can greatly enhance the productivity of large teams, as a solo developer, I have often regretted using them. After learning the basics, I found myself having to spend a lot of time implementing certain features because they required a much greater understanding of the framework, modification of it, or obscure undocumented configuration. In my experience, the most challenging aspect of using these frameworks is implementing features that were not necessarily anticipated by their developers.
 
-Then come the lower level solutions. They don't require this initial amount of specific knowledge to achieve what we want. Building on top of graphics APIs or wrappers to them can be tempting when we already have a game that is using them. However, and unless the GUIs are really minimal it's going to be a huge effort to implement simple interfaces. [ImGui](https://github.com/ocornut/imgui) tries to close this gap.
+Moving to lower level solutions may seem like a good idea, as they don't require as much specific knowledge to get started. However, using graphics APIs or wrappers to them can be a daunting task when building anything beyond very simple interfaces. [ImGui](https://github.com/imgui) attempts to bridge this gap by providing both low-level APIs for 2D rendering of text, images, and primitives, as well as higher-level APIs that implement many widgets, styles, docking, and other features. However, this approach of doing widgets can be difficult to extend. While it is simple and fast to create a basic GUI that works, achieving truly custom and polished GUIs can take much more time.
 
-
-Not easy to choose when you don't have much time and want your GUI to stand out. You must either demolish a castle to keep only the tower, or build it yourself in the middle of a field with cut stones. I guess I'm a bit of a maniac, but I feel a little sad when an application distributes Blink + V8 + Skia only to display a simple HTML page. Yes, the majority of devices will display this gui, but how much energy can we spend to save development time?
-
-Then I discovered Flutter. It is heavy, it uses a managed langage that I don't like, 
-
-Perhaps the best thing about the declarative syntax of [Flutter](https://flutter.dev/) is how we can instantiate widgets as trees, with each widget exposing the possibilities for customizing its behavior inside the tree with optional named parameters. This repository provides a basic implementation for a gui library that tries to mimick this syntax within C++17. 
-
-
- The Flutter framework makes extensive use of immutable data structures, memory preallocation and garbage collection to instantiate widget trees every time something has changed and some user code must react to it :
- 
-> Apps update their user interface in response to events (such as a user interaction) by telling the framework to replace a widget in the hierarchy with another widget. The framework then compares the new and old widgets, and efficiently updates the user interface. 
-
-> Whenever the function is asked to build, the widget should return a new tree of widgets, regardless of what the widget previously returned. 
-
-It becomes really problematic as the state data stored inside widgets grows in size, so Flutter solves this by separating widgets from their state :
-
-> After being built, the widgets are held by the element tree, which retains the logical structure of the user interface. The element tree is necessary because the widgets themselves are immutable, which means (among other things), they cannot remember their parent or child relationships with other widgets. The element tree also holds the state objects associated with stateful widgets.
-
-This means that even though they mitigated the "relationships issue" and the "heavy data structures issue" you still pay the price of deleting and allocating data structures, merging changes, binding to parent/children, and binding to an associated mutable state every time a widget's `build` method is called.
-
-We cannot afford this approach that introduces some ugliness (users may want their widgets to store their data directly) and violates the "you don't pay for what you don't use" philosophy (you get huge overhead in the name of a specific coding syntax). What we want is a single tree of widgets, each containing its own data and relationships.
-
-> Mutable tree-based APIs suffer from a dichotomous access pattern: creating the tree’s original state typically uses a very different set of operations than subsequent updates.
-
-That is a fair point, we will get back to it.
-
+Not easy to choose when you don't have much time and want your GUI to stand out. Then I discovered Flutter. It is heavy, it uses a managed langage that I don't like, but maybe it has the best syntax. One of its major advantages is its rich set of pre-built widgets, which can be combined to create complex GUIs. These widgets are highly customizable, and can be easily modified using named parameters to meet specific design needs. As i was frustrated with Dart, I wanted to try implementing this declarative syntax with generics, `std::future`, and so on.
 
 ## Build
 
@@ -69,6 +44,10 @@ auto& my_widget_tree = bungeegum::make<center>()
         )
     );
 ```
+
+
+> Mutable tree-based APIs suffer from a dichotomous access pattern: creating the tree’s original state typically uses a very different set of operations than subsequent updates.
+
 
 #### _Launch_
 
