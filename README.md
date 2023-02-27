@@ -29,6 +29,19 @@ All the core widgets are implemented inside the `bungeegum::widgets` namespace.
 using namespace bungeegum::widgets;
 ```
 
+As stated by the Flutter dev team :
+
+> Mutable tree-based APIs suffer from a dichotomous access pattern: creating the tree’s original state typically uses a very different set of operations than subsequent updates.
+
+
+We can either own the widgets or let __bungeegum__ own them for us when won't need to modify them later :
+
+```C++
+// both are possible
+center my_center_widget;
+center& my_center_widget = bungeegum::make<center>();
+```
+
 The user is not allowed to own the widgets. To be instantiated inside the bungeegum registry they must be constructed with the `bungeegum::make` function which forwards all the arguments to the constructor and returns a reference to the widget object. Unlike Dart, the C++ language does not allow the use of named parameters. However the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter) provides us the parameter passing style we need :
 
 ```C++
@@ -44,9 +57,6 @@ auto& my_widget_tree = bungeegum::make<center>()
         )
     );
 ```
-
-
-> Mutable tree-based APIs suffer from a dichotomous access pattern: creating the tree’s original state typically uses a very different set of operations than subsequent updates.
 
 
 #### _Launch_
