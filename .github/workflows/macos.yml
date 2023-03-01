@@ -1,6 +1,7 @@
 name: bungeegum_macos
 
 on:
+  workflow_dispatch
   pull_request:
     branches: [ "master" ]
 

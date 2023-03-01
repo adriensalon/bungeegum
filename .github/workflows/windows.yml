@@ -1,6 +1,7 @@
 name: bungeegum_windows
 
 on:
+  workflow_dispatch
   pull_request:
     branches: [ "master" ]
 
