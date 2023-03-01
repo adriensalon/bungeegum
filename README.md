@@ -1,8 +1,12 @@
+
+<p style="text-align: center;">
+	
 ![licence badge](https://img.shields.io/badge/licence-MIT-blue?style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/windows.yml?label=windows&style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/macos.yml?label=macos&style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/ubuntu.yml?label=ubuntu&style=for-the-badge)
-
+	
+</p>
 
 
 As energy consumption of devices is becoming an increasingly important consideration in application development, maybe we are moving towards porting GUIs to compiled languages...
