@@ -1,5 +1,6 @@
 # bungeegum
 
+![GitHub](https://img.shields.io/github/license/adriensalon/bungeegum?style=plastic)
 ![windows](https://github.com/adriensalon/bungeegum/actions/workflows/windows.yml/badge.svg)
 ![macos](https://github.com/adriensalon/bungeegum/actions/workflows/macos.yml/badge.svg)
 ![ubuntu](https://github.com/adriensalon/bungeegum/actions/workflows/ubuntu.yml/badge.svg)
