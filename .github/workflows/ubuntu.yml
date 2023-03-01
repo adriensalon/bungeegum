@@ -1,4 +1,4 @@
-name: bungeegum_ubuntu
+name: ubuntu
 
 on:
   workflow_dispatch

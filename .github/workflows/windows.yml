@@ -1,4 +1,4 @@
-name: bungeegum_windows
+name: windows
 
 on:
   workflow_dispatch
