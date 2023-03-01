@@ -294,11 +294,12 @@ void draw(bungeegum::draw_command& command)
 
 ## Roadmap v0.0
 
-Implementing some Flutter widgets behavior with _bungeegum_ should be a good way to demonstrate and ensure that any widget can be implemented in few lines of code without involving any ugly trick.
-- [NOT DONE] align
-- [NOT DONE] container
-- [NOT DONE] column
-- [NOT DONE] row
+Implementing some Flutter widgets behavior with _bungeegum_ should be a good way to demonstrate and ensure that any widget can be implemented in few lines of code without involving any ugly trick.  
+
+- 📕 align  
+- 📕 container  
+- 📕 column  
+- 📕 row  
 
 ## External dependencies
 
