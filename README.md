@@ -1,6 +1,7 @@
 # bungeegum
 
 ![GitHub](https://img.shields.io/github/license/adriensalon/bungeegum?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/windows?style=for-the-badge)
 
 ![windows](https://github.com/adriensalon/bungeegum/actions/workflows/windows.yml/badge.svg)
 ![macos](https://github.com/adriensalon/bungeegum/actions/workflows/macos.yml/badge.svg)
