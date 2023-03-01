@@ -43,14 +43,14 @@ container& my_container_widget_ref = bungeegum::make<container>();
 auto& my_widget_tree = bungeegum::make<center>()
     .child(bungeegum::make<row>()			
         .height(200.f)
-		.children(my_container_widget
-			.width(120.f)
-			.color({ 0.2f, 0.2f, 0.2f, 1.f }),
-		my_container_widget_ref
-			.width(140.f)
-			.color({ 0.3f, 0.3f, 0.3f, 1.f })
-		)
-	);
+        .children(my_container_widget
+            .width(120.f)
+            .color({ 0.2f, 0.2f, 0.2f, 1.f }),
+        my_container_widget_ref
+            .width(140.f)
+            .color({ 0.3f, 0.3f, 0.3f, 1.f })
+        )
+    );
 ```
 
 
