@@ -1,11 +1,10 @@
 # bungeegum
 
 ![GitHub](https://img.shields.io/github/license/adriensalon/bungeegum?style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/windows?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/windows?label=windows&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/macos?label=macos&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/ubuntu?label=ubuntu&style=for-the-badge)
 
-![windows](https://github.com/adriensalon/bungeegum/actions/workflows/windows.yml/badge.svg)
-![macos](https://github.com/adriensalon/bungeegum/actions/workflows/macos.yml/badge.svg)
-![ubuntu](https://github.com/adriensalon/bungeegum/actions/workflows/ubuntu.yml/badge.svg)
 
 
 As energy consumption of devices is becoming an increasingly important consideration in application development, maybe we are moving towards porting GUIs to compiled languages...
