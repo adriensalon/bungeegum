@@ -1,6 +1,6 @@
 # bungeegum
 
-![GitHub](https://img.shields.io/github/license/adriensalon/bungeegum?style=for-the-badge)
+![licence badge](https://img.shields.io/badge/licence-MIT-blue?style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/windows.yml?label=windows&style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/macos.yml?label=macos&style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/ubuntu.yml?label=ubuntu&style=for-the-badge)
