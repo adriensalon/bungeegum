@@ -33,8 +33,8 @@ template <typename widget_t, typename... children_widgets_t>
 void abandon(widget_t* widget, children_widgets_t&... children_widget,
     const bool abandon_children = true);
 
-template <typename widget_t>
-void abandon(widget_t* widget, const bool abandon_children = true);
+// template <typename widget_t>
+// void abandon(widget_t* widget, const bool abandon_children = true);
 
 /// @brief Replaces a wid
 /// @tparam widget_t
