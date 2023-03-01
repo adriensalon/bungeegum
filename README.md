@@ -1,8 +1,8 @@
 # bungeegum
 
-![windows](https://github.com/adriensalon/bungeegum/.github/workflows/windows.yml/badge.svg)
-![macos](https://github.com/adriensalon/bungeegum/.github/workflows/macos.yml/badge.svg)
-![ubuntu](https://github.com/adriensalon/bungeegum/.github/workflows/ubuntu.yml/badge.svg)
+![windows](https://github.com/adriensalon/bungeegum/actions/workflows/windows.yml/badge.svg)
+![macos](https://github.com/adriensalon/bungeegum/actions/workflows/macos.yml/badge.svg)
+![ubuntu](https://github.com/adriensalon/bungeegum/actions/workflows/ubuntu.yml/badge.svg)
 
 
 As energy consumption of devices is becoming an increasingly important consideration in application development, maybe we are moving towards porting GUIs to compiled languages...
