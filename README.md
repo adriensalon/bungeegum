@@ -1,5 +1,10 @@
 # bungeegum
 
+![windows](https://github.com/adriensalon/bungeegum/.github/workflows/windows.yml/badge.svg)
+![macos](https://github.com/adriensalon/bungeegum/.github/workflows/macos.yml/badge.svg)
+![ubuntu](https://github.com/adriensalon/bungeegum/.github/workflows/ubuntu.yml/badge.svg)
+
+
 As energy consumption of devices is becoming an increasingly important consideration in application development, maybe we are moving towards porting GUIs to compiled languages...
 
 _bungeegum_ is a cross-platform C++17 library that offers a minimal and modular approach to implementing GUI widgets. One way to use this library is by composing widgets from other widgets, as it ships with a collection of layouting widgets that mimic those of Flutter. Events and animations help facilitate synchronous and asynchronous operations that modify the GUI state and update changes on the screen. Additionally, _bungeegum_ provides a more advanced interface that enables developers to augment widgets with lower-level functionalities. When a user interacts with the GUI, events are dispatched to the relevant widgets. These widgets can then react to the events and/or pass them on to their children. Widgets that require updating can modify their layout, following [Flutter's BoxLayout model](https://docs.flutter.dev/development/ui/layout/constraints), where widgets provide minimum and maximum size constraints to their children, who return the size they've chosen to their parent, which then positions them accordingly. Widgets that require redrawing can make changes to their draw command by submitting primitives, images, text, and other elements. 
