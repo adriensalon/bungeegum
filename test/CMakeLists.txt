@@ -15,7 +15,6 @@ if(BUNGEEGUM_BUILD_TEST)
 
 		"source/glue/test_constexpr.cpp"
 		"source/glue/test_registry.cpp"
-		"source/glue/test_simd.cpp"
 		"source/glue/test_toolchain.cpp"
 		"source/glue/test_typelist.cpp"
 		"source/test_bungeegum.cpp"

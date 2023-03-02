@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <tuple>
+
 namespace bungeegum {
 
 namespace detail {

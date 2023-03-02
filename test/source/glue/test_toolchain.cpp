@@ -14,8 +14,8 @@
 TEST(bungeegum_glue, toolchain_arch)
 {
     unsigned int _sum = 0
-        + bungeegum::detail::is_arch_32
-        + bungeegum::detail::is_arch_64;
+        + bungeegum::detail::is_arch_32_v
+        + bungeegum::detail::is_arch_64_v;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
@@ -23,9 +23,9 @@ TEST(bungeegum_glue, toolchain_arch)
 TEST(bungeegum_glue, toolchain_cpu)
 {
     unsigned int _sum = 0
-        + bungeegum::detail::is_cpu_x86
-        + bungeegum::detail::is_cpu_arm
-        + bungeegum::detail::is_cpu_webasm;
+        + bungeegum::detail::is_cpu_x86_v
+        + bungeegum::detail::is_cpu_arm_v
+        + bungeegum::detail::is_cpu_webasm_v;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
@@ -33,13 +33,13 @@ TEST(bungeegum_glue, toolchain_cpu)
 TEST(bungeegum_glue, toolchain_platform)
 {
     unsigned int _sum = 0
-        + bungeegum::detail::is_platform_emscripten
-        + bungeegum::detail::is_platform_win32
-        + bungeegum::detail::is_platform_uwp
-        + bungeegum::detail::is_platform_macos
-        + bungeegum::detail::is_platform_ios
-        + bungeegum::detail::is_platform_linux
-        + bungeegum::detail::is_platform_android;
+        + bungeegum::detail::is_platform_emscripten_v
+        + bungeegum::detail::is_platform_win32_v
+        + bungeegum::detail::is_platform_uwp_v
+        + bungeegum::detail::is_platform_macos_v
+        + bungeegum::detail::is_platform_ios_v
+        + bungeegum::detail::is_platform_linux_v
+        + bungeegum::detail::is_platform_android_v;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
@@ -47,9 +47,9 @@ TEST(bungeegum_glue, toolchain_platform)
 TEST(bungeegum_glue, toolchain_compiler)
 {
     unsigned int _sum = 0
-        + bungeegum::detail::is_compiler_msvc
-        + bungeegum::detail::is_compiler_clang
-        + bungeegum::detail::is_compiler_gcc;
+        + bungeegum::detail::is_compiler_msvc_v
+        + bungeegum::detail::is_compiler_clang_v
+        + bungeegum::detail::is_compiler_gcc_v;
     bool _defined = (_sum == 1);
     EXPECT_TRUE(_defined);
 }
