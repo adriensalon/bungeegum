@@ -28,14 +28,10 @@
 #pragma once
 
 #include <memory>
-#include "../../../DiligentCore/Primitives/interface/BasicTypes.h"
-#include "../../../DiligentCore/Common/interface/BasicMath.hpp"
-#include "../../../DiligentCore/Common/interface/RefCntAutoPtr.hpp"
-#include "../../../DiligentCore/Graphics/GraphicsEngine/interface/GraphicsTypes.h"
-// #include "Primitives/interface/BasicTypes.h"
-// #include "Common/interface/BasicMath.hpp"
-// #include "Common/interface/RefCntAutoPtr.hpp"
-// #include "Graphics/GraphicsEngine/interface/GraphicsTypes.h"
+#include <Primitives/interface/BasicTypes.h>
+#include <Common/interface/BasicMath.hpp>
+#include <Common/interface/RefCntAutoPtr.hpp>
+#include <Graphics/GraphicsEngine/interface/GraphicsTypes.h>
 #include "imgui.h"
 
 struct ImDrawData;

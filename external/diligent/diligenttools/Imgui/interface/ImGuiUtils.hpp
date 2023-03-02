@@ -32,7 +32,7 @@
 #include <limits>
 #include <memory>
 
-#include "../../../DiligentCore/Platforms/Basic/interface/DebugUtilities.hpp"
+#include <Platforms/Basic/interface/DebugUtilities.hpp>
 
 namespace ImGui
 {

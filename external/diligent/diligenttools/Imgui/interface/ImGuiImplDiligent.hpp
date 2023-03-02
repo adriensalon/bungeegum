@@ -28,8 +28,7 @@
 #pragma once
 
 #include <memory>
-#include "../../../DiligentCore/Primitives/interface/BasicTypes.h"
-// #include "Primitives/interface/BasicTypes.h"
+#include <Primitives/interface/BasicTypes.h>
 
 namespace Diligent
 {
