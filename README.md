@@ -33,7 +33,7 @@ using namespace bungeegum::widgets;
 
 We can either own the widgets or let _bungeegum_ own them and get references. With the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter) and the factory function `bungeegum::make` we can defer the moment widgets are customized to after they are created, so that we can both create and modify them with the same syntax.
 
-~~~~~~~~~~~~~~~{.cpp}
+```C++
 // we own the widget
 container my_container_widget;
 
@@ -51,7 +51,7 @@ auto& my_widget_tree = bungeegum::make<center>()
             .color({ 0.3f, 0.3f, 0.3f, 1.f })
         )
     );
-~~~~~~~~~~~~~~~
+```
 
 
 ### Create a window and a renderer
@@ -121,7 +121,7 @@ bungeegum::event<float, float, std::string> my_event;
 auto& my_event_ref = bungeegum::make_event<float, float, std::string>();
 ```
 
-The `event::on_trigger` method
+The `bungeegum::event::on_trigger` method
 
 ```C++
 my_event.on_trigger([] (const float& a, const float& b, const std::string& c) {
@@ -129,7 +129,7 @@ my_event.on_trigger([] (const float& a, const float& b, const std::string& c) {
 });
 ```
 
-The `event::trigger` method
+The `bungeegum::event::trigger` method
 
 ```
 my_event.trigger(11.f, 22.f, "my string");
@@ -142,7 +142,7 @@ my_event.trigger(std::async([](){
 ```
 
 
-The `event::merge` method
+The `bungeegum::event::merge` method
 
 ```C++
 bungeegum::event my_event_1([] () { });
@@ -200,10 +200,10 @@ bungeegum::animation<float> my_animation;
 auto& my_animation_ref = bungeegum::make_animation<float>();
 ```
 
-The `animation::shape` method
-The `animation::duration` method
-The `animation::min` method
-The `animation::max` method
+The `bungeegum::animation::shape` method
+The `bungeegum::animation::duration` method
+The `bungeegum::animation::min` method
+The `bungeegum::animation::max` method
 
 
 ```C++
@@ -214,10 +214,10 @@ bungeegum::animation<float4> my_animation
 	.max(1.f)
 ```
 
-The `animation::on_tick` method
-The `animation::start` method
-The `animation::stop` method
-The `animation::reset` method
+The `animation::bungeegum::on_tick` method
+The `animation::bungeegum::start` method
+The `animation::bungeegum::stop` method
+The `animation::bungeegum::reset` method
 
 
 ```C++
