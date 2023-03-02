@@ -3,6 +3,8 @@
 
 cmake_minimum_required(VERSION 3.5)
 
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
 if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)

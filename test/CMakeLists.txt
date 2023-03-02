@@ -9,7 +9,6 @@
 
 if(BUNGEEGUM_BUILD_TEST)
 	project(bungeegum_test)
-	set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 	set(bungeegum_test_source
 
