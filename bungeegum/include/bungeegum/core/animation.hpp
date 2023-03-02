@@ -107,7 +107,7 @@ enum struct animation_mode {
 template <typename value_t>
 struct animation {
 
-    using lerpable_value = lerpable_t<value_t>;
+    using lerpable_value = detail::lerpable_t<value_t>;
 
     /// @brief
     using on_tick_callback = std::function<void(const value_t&)>;
@@ -130,11 +130,15 @@ struct animation {
     animation& on_value_changed(const event<value_t>& value_changed_event);
 
     /// @brief
-    /// @param value_changed_event
+    /// @param tick_callback
+    /// @return
     animation& on_tick(const on_tick_callback& tick_callback);
 
     /// @brief
     /// @param value
+    /// @param must_draw
+    /// @param must_resolve
+    /// @return
     animation& on_tick(value_t& value, const bool must_draw = false, const bool must_resolve = false);
 
     /// @brief

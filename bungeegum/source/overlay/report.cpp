@@ -11,7 +11,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/context/exceptions.hpp>
+#include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/overlay/report.hpp>
 
 namespace bungeegum {

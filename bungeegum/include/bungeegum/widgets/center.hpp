@@ -23,10 +23,10 @@ namespace widgets {
     /// be the product of the child's dimension and the size factor. For example if 'width_factor' is
     /// 2.0 then the width of this widget will always be twice its child's width.
     /// @tparam child_widget_t
-    struct center_widget {
+    struct center {
 
         template <typename child_widget_t>
-        center_widget(child_widget_t& child)
+        center(child_widget_t& child)
         {
             build(this, child);
         }
@@ -34,7 +34,7 @@ namespace widgets {
         /// @brief
         /// @param factor
         /// @return
-        center_widget& width_factor(const float& factor)
+        center& width_factor(const float& factor)
         {
             // factor.assign(_width_factor);
             return *this;
@@ -43,7 +43,7 @@ namespace widgets {
         /// @brief
         /// @param factor
         /// @return
-        center_widget& height_factor(const float& factor)
+        center& height_factor(const float& factor)
         {
             // factor.assign(_height_factor);
             return *this;
@@ -53,8 +53,5 @@ namespace widgets {
         float _width_factor = 1.f;
         float _height_factor = 1.f;
     };
-
 }
 }
-
-#define center bungeegum::create<bungeegum::widgets::center_widget>

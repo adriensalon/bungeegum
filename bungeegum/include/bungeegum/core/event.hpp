@@ -101,7 +101,7 @@ struct event {
     using on_trigger_callback = std::function<void(const values_t&...)>;
 
     /// @brief
-    using future_values = future_typelist_t<values_t...>;
+    using future_values = detail::future_typelist_t<values_t...>;
 
     event();
     event(const on_trigger_callback& trigger_callback);
@@ -151,7 +151,7 @@ struct event {
     void trigger(std::future<future_values>&& future_value); // + operator() overload
 
     /// @brief
-    /// @param future_value
+    /// @param shared_future_value
     void trigger(const std::shared_future<future_values>& shared_future_value); // + operator() overload
 
     /// @brief

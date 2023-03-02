@@ -17,10 +17,10 @@
 namespace bungeegum {
 namespace widgets {
 
-    struct container_widget {
+    struct container {
 
         // template <typename child_widget_t>
-        container_widget()
+        container()
         {
             // register_widget(this);
             // build(this, child_widget);
@@ -43,19 +43,19 @@ namespace widgets {
             });
 
             myanim->start(); //.detach(*this);
-            adopt_child_widget(this, create_widget<image_widget>());
+            adopt(this, make<image>());
         }
 
-        container_widget& ok()
+        container& ok()
         {
             // register_widget(this);
             return *this;
         }
 
         template <typename child_widget_t>
-        container_widget& child(child_widget_t& child_widget)
+        container& child(child_widget_t& child_widget)
         {
-            adopt_child_widget(this, child_widget);
+            adopt(this, child_widget);
             // build(this, child_widget);
             // testanim.assign(this, _tick_value);
             return *this;
@@ -94,8 +94,4 @@ namespace widgets {
         std::unique_ptr<animation<float>> myanim;
     };
 }
-
-template <typename child_widget_t>
-widgets::container_widget& container(child_widget_t& child_widget) { return create<widgets::container_widget>(child_widget); }
-
 }

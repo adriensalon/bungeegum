@@ -15,25 +15,25 @@ namespace bungeegum {
 namespace widgets {
 
     /// @brief A widget that displays an image.
-    struct image_widget {
+    struct image {
         constexpr static char* internal_name = "image";
-        // bungeegum_WIDGET(image_widget)
+        // bungeegum_WIDGET(image)
 
-        image_widget()
+        image()
         {
             // register_widget(this);
             // std::cout << "image ctor\n";
             // build(this);
         }
 
-        ~image_widget()
+        ~image()
         {
             // std::cout << "image dtor\n";
         }
 
         float x = 0.f;
 
-        image_widget& set(float xx)
+        image& set(float xx)
         {
             x = xx;
             return *this;
@@ -42,5 +42,3 @@ namespace widgets {
 
 }
 }
-
-#define image bungeegum::create<bungeegum::widgets::image_widget>

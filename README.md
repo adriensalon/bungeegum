@@ -1,4 +1,5 @@
-# bungeegum
+bungeegum
+=========
 	
 ![licence badge](https://img.shields.io/badge/licence-MIT-blue?style=for-the-badge)
 ![cpp badge](https://img.shields.io/badge/C%2B%2B-17-blue?style=for-the-badge)
@@ -32,7 +33,7 @@ using namespace bungeegum::widgets;
 
 We can either own the widgets or let _bungeegum_ own them and get references. With the [method chaining idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Named_Parameter) and the factory function `bungeegum::make` we can defer the moment widgets are customized to after they are created, so that we can both create and modify them with the same syntax.
 
-```C++
+~~~~~~~~~~~~~~~{.cpp}
 // we own the widget
 container my_container_widget;
 
@@ -50,7 +51,7 @@ auto& my_widget_tree = bungeegum::make<center>()
             .color({ 0.3f, 0.3f, 0.3f, 1.f })
         )
     );
-```
+~~~~~~~~~~~~~~~
 
 
 ### Create a window and a renderer

@@ -21,12 +21,11 @@ namespace bungeegum {
 template <typename widget_t>
 void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
 {
-
     // detail::protect_library([&]() {
     detail::widgets_context.build_root(widget);
-    stopwatch _stopwatch;
-    window _window;
-    renderer _renderer(_window);
+    detail::stopwatch _stopwatch;
+    detail::window _window;
+    detail::renderer _renderer(_window);
     detail::setup_overlay();
     if (on_renderer_started)
         on_renderer_started();
@@ -59,5 +58,4 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
     _window.run_loop();
     // });
 }
-
 }

@@ -16,6 +16,7 @@ namespace bungeegum {
 /// @brief
 /// @tparam widget_t
 /// @param widget
+/// @param on_renderer_started
 template <typename widget_t>
 void launch(widget_t& widget, const std::function<void()>& on_renderer_started = nullptr);
 

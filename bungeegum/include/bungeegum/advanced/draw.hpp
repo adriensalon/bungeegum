@@ -51,7 +51,7 @@ struct draw_command {
     /// @param min_point
     /// @param max_point
     /// @param color
-    /// @param rounding
+    /// @param rounding_strength
     /// @param thickness
     void draw_rect(
         const float2 min_point, const float2 max_point,

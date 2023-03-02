@@ -102,8 +102,10 @@ private:
 
 /// @brief
 /// @tparam widget_t
+/// @tparam ...children_widgets_t
 /// @param widget
 /// @param resolve_callback
+/// @param ...children_widgets
 template <typename widget_t, typename... children_widgets_t>
 void on_resolve(
     widget_t* widget,

@@ -12,13 +12,15 @@
 #include <bungeegum/glue/typelist.hpp>
 
 namespace bungeegum {
+namespace detail {
 
-template <unsigned int start_t, unsigned int end_t, unsigned int increment_t, typename function_t>
-constexpr void constexpr_for(function_t&& function);
+    template <unsigned int start_t, unsigned int end_t, unsigned int increment_t, typename function_t>
+    constexpr void constexpr_for(function_t&& function);
 
-template <typename... values_t, typename function_t>
-constexpr void constexpr_foreach(function_t&& function, values_t&... values);
+    template <typename... values_t, typename function_t>
+    constexpr void constexpr_foreach(function_t&& function, values_t&... values);
 
+}
 }
 
 #include <bungeegum/glue/foreach.inl>

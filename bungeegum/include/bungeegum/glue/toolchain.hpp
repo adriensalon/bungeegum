@@ -145,27 +145,29 @@
 #endif
 
 namespace bungeegum {
+namespace detail {
 
-constexpr bool is_arch_32_v = TOOLCHAIN_ARCH_32;
-constexpr bool is_arch_64_v = TOOLCHAIN_ARCH_64;
+    constexpr bool is_arch_32_v = TOOLCHAIN_ARCH_32;
+    constexpr bool is_arch_64_v = TOOLCHAIN_ARCH_64;
 
-constexpr bool is_cpu_x86_v = TOOLCHAIN_CPU_X86;
-constexpr bool is_cpu_arm_v = TOOLCHAIN_CPU_ARM;
-constexpr bool is_cpu_webasm_v = TOOLCHAIN_CPU_WEBASM;
+    constexpr bool is_cpu_x86_v = TOOLCHAIN_CPU_X86;
+    constexpr bool is_cpu_arm_v = TOOLCHAIN_CPU_ARM;
+    constexpr bool is_cpu_webasm_v = TOOLCHAIN_CPU_WEBASM;
 
-constexpr bool is_platform_emscripten_v = TOOLCHAIN_PLATFORM_EMSCRIPTEN;
-constexpr bool is_platform_win32_v = TOOLCHAIN_PLATFORM_WIN32;
-constexpr bool is_platform_uwp_v = TOOLCHAIN_PLATFORM_UWP;
-constexpr bool is_platform_macos_v = TOOLCHAIN_PLATFORM_MACOS;
-constexpr bool is_platform_ios_v = TOOLCHAIN_PLATFORM_IOS;
-constexpr bool is_platform_linux_v = TOOLCHAIN_PLATFORM_LINUX;
-constexpr bool is_platform_android_v = TOOLCHAIN_PLATFORM_ANDROID;
+    constexpr bool is_platform_emscripten_v = TOOLCHAIN_PLATFORM_EMSCRIPTEN;
+    constexpr bool is_platform_win32_v = TOOLCHAIN_PLATFORM_WIN32;
+    constexpr bool is_platform_uwp_v = TOOLCHAIN_PLATFORM_UWP;
+    constexpr bool is_platform_macos_v = TOOLCHAIN_PLATFORM_MACOS;
+    constexpr bool is_platform_ios_v = TOOLCHAIN_PLATFORM_IOS;
+    constexpr bool is_platform_linux_v = TOOLCHAIN_PLATFORM_LINUX;
+    constexpr bool is_platform_android_v = TOOLCHAIN_PLATFORM_ANDROID;
 
-constexpr bool is_compiler_msvc_v = TOOLCHAIN_COMPILER_MSVC;
-constexpr bool is_compiler_clang_v = TOOLCHAIN_COMPILER_CLANG;
-constexpr bool is_compiler_gcc_v = TOOLCHAIN_COMPILER_GCC;
+    constexpr bool is_compiler_msvc_v = TOOLCHAIN_COMPILER_MSVC;
+    constexpr bool is_compiler_clang_v = TOOLCHAIN_COMPILER_CLANG;
+    constexpr bool is_compiler_gcc_v = TOOLCHAIN_COMPILER_GCC;
 
-constexpr bool is_build_debug_v = TOOLCHAIN_BUILD_DEBUG;
-constexpr bool is_build_release_v = TOOLCHAIN_BUILD_RELEASE;
+    constexpr bool is_build_debug_v = TOOLCHAIN_BUILD_DEBUG;
+    constexpr bool is_build_release_v = TOOLCHAIN_BUILD_RELEASE;
 
+}
 }

@@ -23,10 +23,10 @@ namespace widgets {
     /// line of widgets and want them to be able to scroll if there is insufficient room, consider
     /// using a 'list_view'. For a horizontal variant see 'row'. If you only have one child, then
     /// consider using 'align' or 'center' to position the child.
-    struct column_widget {
+    struct column {
 
         template <typename... children_widgets_t>
-        column_widget(children_widgets_t&... children)
+        column(children_widgets_t&... children)
         {
             build(this, center(children)...);
         }
@@ -47,14 +47,4 @@ namespace widgets {
         int g;
     };
 }
-
-/// @cond DO_NOT_DOCUMENT
-/// @brief A widget that displays its children in a vertical array.
-/// @tparam ...children_widgets_t
-/// @param ...children_widgets
-/// @endcond
-template <typename... children_widgets_t>
-widgets::column_widget& column(children_widgets_t&... children_widgets) { return create<widgets::column_widget>(children_widgets...); }
-
-// #define column bungeegum::make<bungeegum::widgets::column_widget>
 }

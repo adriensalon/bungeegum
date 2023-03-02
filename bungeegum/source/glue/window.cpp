@@ -19,8 +19,9 @@
 #endif
 
 namespace bungeegum {
+namespace detail {
 
-namespace {
+    namespace {
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #else
@@ -185,4 +186,5 @@ void window::show_cursor(const bool enabled)
     }
 }
 
+}
 }

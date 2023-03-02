@@ -23,11 +23,12 @@ relou& okokoko()
 
 int main()
 {
-    std::cout << reinterpret_cast<std::uintptr_t>(&(okokoko())) << std::endl;
-    bungeegum::widgets::container_widget c1, c2;
 
-    bungeegum::launch(bungeegum::create_widget<bungeegum::widgets::container_widget>().ok().child(
-        bungeegum::create_widget<bungeegum::widgets::container_widget>().ok().child(c2).ok()));
+    std::cout << reinterpret_cast<std::uintptr_t>(&(okokoko())) << std::endl;
+    bungeegum::widgets::container c1, c2;
+
+    bungeegum::launch(bungeegum::make<bungeegum::widgets::container>().ok().child(
+        bungeegum::make<bungeegum::widgets::container>().ok().child(c2).ok()));
 
     return 0;
 }

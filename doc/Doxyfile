@@ -1,13 +1,16 @@
-PROJECT_NAME 			= staticgui
+PROJECT_NAME 			= bungeegum
 GENERATE_LATEX 			= NO
 HTML_OUTPUT 			= build/doc/doxygen/
 ENABLE_PREPROCESSING   	= YES
 EXTRACT_ALL 			= YES
 RECURSIVE 				= YES
 FILE_PATTERNS        	= *.hpp
-INCLUDE_PATH         	= staticgui/include/staticgui/
+INCLUDE_PATH         	= bungeegum/include/bungeegum/
+INPUT					= .
+INPUT					+= README.md
 EXCLUDE 				= external/
 EXCLUDE_SYMBOLS 		= detail impl 
+MARKDOWN_SUPPORT 		= YES
 USE_MDFILE_AS_MAINPAGE 	= README.md
 GENERATE_TREEVIEW      	= YES
 HTML_EXTRA_STYLESHEET  	= external/doxygen-awesome/doxygen-awesome.css
@@ -15,3 +18,4 @@ DOT_GRAPH_MAX_NODES = 2
 MAX_DOT_GRAPH_DEPTH = 0
 HAVE_DOT 				= NO
 QUIET = YES
+

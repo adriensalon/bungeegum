@@ -52,17 +52,15 @@ namespace detail {
     template <typename value_t>
     constexpr bool has_float_multiply_v = (has_outside_float_left_multiply_v<value_t> || has_outside_float_right_multiply_v<value_t> || has_inside_float_multiply_v<value_t>);
 
+    template <typename value_t>
+    constexpr bool is_lerpable_v = (detail::has_float_multiply_v<value_t> && detail::has_add_v<value_t>);
+
+    template <typename value_t>
+    using lerpable_t = typename std::enable_if_t<is_lerpable_v<value_t>, value_t>;
+
+    template <typename value_t>
+    value_t lerp(lerpable_t<value_t>&& min_value, value_t&& max_value, const float t);
 }
-
-template <typename value_t>
-constexpr bool is_lerpable_v = (detail::has_float_multiply_v<value_t> && detail::has_add_v<value_t>);
-
-template <typename value_t>
-using lerpable_t = typename std::enable_if_t<is_lerpable_v<value_t>, value_t>;
-
-template <typename value_t>
-value_t lerp(lerpable_t<value_t>&& min_value, value_t&& max_value, const float t);
-
 }
 
 #include <bungeegum/glue/lerp.inl>
