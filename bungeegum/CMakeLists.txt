@@ -11,13 +11,15 @@ project(bungeegum)
 
 set(bungeegum_source
 
-	"source/context/animation.cpp"
-	"source/context/context.cpp"
-	"source/context/draw.cpp"
-	"source/context/event.cpp"
-	"source/context/exceptions.cpp"
-	"source/context/resolve.cpp"
-	"source/context/widget.cpp"
+	"source/advanced/draw.cpp"
+	"source/advanced/interact.cpp"
+	"source/advanced/resolve.cpp"
+
+	"source/core/animation.cpp"
+	"source/core/context.cpp"
+	"source/core/event.cpp"
+	"source/core/exceptions.cpp"
+	"source/core/widget.cpp"
 
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"

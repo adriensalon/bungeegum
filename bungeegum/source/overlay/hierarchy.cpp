@@ -15,7 +15,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/context/widget.hpp>
+#include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/imguarded.hpp>
 #include <bungeegum/overlay/hierarchy.hpp>
 #include <bungeegum/overlay/theme.hpp>

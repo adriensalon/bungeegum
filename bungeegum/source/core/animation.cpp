@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-#include <bungeegum/context/animation.hpp>
+#include <bungeegum/core/animation.hpp>
 
 namespace bungeegum {
 namespace detail {

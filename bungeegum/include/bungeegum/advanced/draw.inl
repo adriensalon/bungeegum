@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <bungeegum/context/widget.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 

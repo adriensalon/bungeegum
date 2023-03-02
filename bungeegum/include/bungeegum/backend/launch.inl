@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <bungeegum/context/context.hpp>
-#include <bungeegum/context/exceptions.hpp>
+#include <bungeegum/core/context.hpp>
+#include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/glue/renderer.hpp>
 #include <bungeegum/glue/time.hpp>
 #include <bungeegum/glue/window.hpp>

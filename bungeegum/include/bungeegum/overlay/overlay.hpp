@@ -11,7 +11,7 @@
 
 #include <functional>
 
-#include <bungeegum/context/context.hpp>
+#include <bungeegum/core/context.hpp>
 
 struct ImDrawList;
 

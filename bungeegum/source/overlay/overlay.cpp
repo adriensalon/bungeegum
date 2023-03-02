@@ -15,7 +15,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/context/exceptions.hpp>
+#include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/glue/imguarded.hpp>
 #include <bungeegum/overlay/hierarchy.hpp>
 #include <bungeegum/overlay/inspector.hpp>

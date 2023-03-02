@@ -9,7 +9,7 @@
 
 #include <imgui.h>
 
-#include <bungeegum/bungeegum.hpp>
+#include <bungeegum/advanced/resolve.hpp>
 
 namespace bungeegum {
 

@@ -53,10 +53,11 @@ void abandon(widget_t* widget, children_widgets_t&... children_widget,
 #include <optional>
 #include <typeindex>
 
-#include <bungeegum/context/animation.hpp>
-#include <bungeegum/context/draw.hpp>
-#include <bungeegum/context/event.hpp>
-#include <bungeegum/context/resolve.hpp>
+#include <bungeegum/advanced/draw.hpp>
+#include <bungeegum/advanced/interact.hpp>
+#include <bungeegum/advanced/resolve.hpp>
+#include <bungeegum/core/animation.hpp>
+#include <bungeegum/core/event.hpp>
 #include <bungeegum/glue/foreach.hpp>
 #include <bungeegum/glue/registry.hpp>
 
@@ -238,4 +239,4 @@ void a_child_widget(widget_t* widget, child_widget_t& child_widget);
 
 } // namespace bungeegum
 
-#include <bungeegum/context/widget.inl>
+#include <bungeegum/core/widget.inl>

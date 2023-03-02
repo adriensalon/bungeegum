@@ -13,11 +13,11 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/context/animation.hpp>
-#include <bungeegum/context/context.hpp>
-#include <bungeegum/context/event.hpp>
-#include <bungeegum/context/exceptions.hpp>
-#include <bungeegum/context/widget.hpp>
+#include <bungeegum/core/animation.hpp>
+#include <bungeegum/core/context.hpp>
+#include <bungeegum/core/event.hpp>
+#include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/curve.hpp>
 #include <bungeegum/overlay/overlay.hpp>

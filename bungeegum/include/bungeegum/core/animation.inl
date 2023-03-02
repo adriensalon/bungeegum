@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <bungeegum/context/exceptions.hpp>
+#include <bungeegum/core/exceptions.hpp>
 
 namespace bungeegum {
 namespace detail {

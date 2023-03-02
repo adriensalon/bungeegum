@@ -15,7 +15,7 @@
 #include <typeindex>
 #include <vector>
 
-#include <bungeegum/context/event.hpp>
+#include <bungeegum/core/event.hpp>
 #include <bungeegum/glue/curve.hpp>
 #include <bungeegum/glue/lerp.hpp>
 
@@ -186,4 +186,4 @@ private:
 
 }
 
-#include <bungeegum/context/animation.inl>
+#include <bungeegum/core/animation.inl>

@@ -13,7 +13,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/context/animation.hpp>
+#include <bungeegum/core/animation.hpp>
 #include <bungeegum/overlay/inspector.hpp>
 
 namespace bungeegum {

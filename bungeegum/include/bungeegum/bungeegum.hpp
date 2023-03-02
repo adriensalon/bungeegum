@@ -7,16 +7,6 @@
 
 #pragma once
 
-#include <bungeegum/backend/embed.hpp>
-#include <bungeegum/backend/launch.hpp>
-
-#include <bungeegum/context/animation.hpp>
-#include <bungeegum/context/context.hpp>
-#include <bungeegum/context/draw.hpp>
-#include <bungeegum/context/event.hpp>
-#include <bungeegum/context/resolve.hpp>
-#include <bungeegum/context/widget.hpp>
-
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/catch.hpp>
 #include <bungeegum/glue/console.hpp>
@@ -31,6 +21,18 @@
 #include <bungeegum/glue/toolchain.hpp>
 #include <bungeegum/glue/typelist.hpp>
 #include <bungeegum/glue/window.hpp>
+
+#include <bungeegum/backend/embed.hpp>
+#include <bungeegum/backend/launch.hpp>
+
+#include <bungeegum/core/animation.hpp>
+#include <bungeegum/core/context.hpp>
+#include <bungeegum/core/event.hpp>
+#include <bungeegum/core/widget.hpp>
+
+#include <bungeegum/advanced/draw.hpp>
+#include <bungeegum/advanced/interact.hpp>
+#include <bungeegum/advanced/resolve.hpp>
 
 #include <bungeegum/overlay/hierarchy.hpp>
 #include <bungeegum/overlay/inspector.hpp>

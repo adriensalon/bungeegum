@@ -24,7 +24,7 @@ Not easy to choose when you don't have much and want your GUI to stand out. Then
 
 ## Quickstart
 
-_bungeegum_ requires a C++17 compiler. CMake is used to build the library, gtest targets can be enabled with the `BUNGEEGUM_BUILD_TEST` option. A doxygen documentation target can be enabled with the `BUNGEEGUM_BUILD_DOC` option. All the core widgets are implemented inside the `bungeegum::widgets` namespace.
+_bungeegum_ requires a C++17 compiler. CMake is used to build the library, gtest targets can be enabled with the `BUNGEEGUM_BUILD_TEST` option. A doxygen documentation target can be enabled with the `BUNGEEGUM_BUILD_DOC` option. All the widgets that ship with _bungeegum_ are implemented inside the `bungeegum::widgets` namespace.
 
 ```C++
 using namespace bungeegum::widgets;
@@ -80,7 +80,7 @@ ImGui::Render();
 
 ## Implementing widgets
 
-No macro or inheritance is required to implement widget classes. The `bungeegum::adopt` function registers widgets as children of the current widget. It can be called at any time, but core widgets call it within their `child` or `children` methods to mimic the syntax of Flutter. We can use it inside our constructor to implement a basic widget with composition.
+No macro or inheritance is required to implement widget classes. The `bungeegum::adopt` function registers widgets as children of the current widget. It can be called at any time, but usually widgets call it within their `child` or `children` methods to mimic the syntax of Flutter. We can use it inside our constructor to implement a basic widget with composition.
 
 The `bungeegum::abandon` function unregisters widgets from being children of the current widget. All the widgets must have been adopted by this widget first. We are not required to call it before this widget gets destroyed.
 

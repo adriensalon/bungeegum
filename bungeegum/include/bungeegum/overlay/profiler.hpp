@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <bungeegum/context/context.hpp>
+#include <bungeegum/core/context.hpp>
 #include <bungeegum/glue/time.hpp>
 
 namespace bungeegum {

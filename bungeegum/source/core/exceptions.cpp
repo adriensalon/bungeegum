@@ -13,8 +13,8 @@
 
 #include <imgui.h>
 
-#include <bungeegum/context/exceptions.hpp>
-#include <bungeegum/context/widget.hpp>
+#include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/console.hpp>
 

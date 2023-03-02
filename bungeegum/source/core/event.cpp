@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <bungeegum/context/event.hpp>
+#include <bungeegum/core/event.hpp>
 
 namespace bungeegum {
 namespace detail {
