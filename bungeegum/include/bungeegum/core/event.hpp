@@ -164,31 +164,31 @@ private:
     detail::typed_event_data<values_t...>& _data;
 };
 
-/// @brief
-/// @tparam ...values_t
-/// @tparam widget_t
-/// @param widget
-/// @return
-template <typename widget_t, typename... values_t>
-[[nodiscard]] event<values_t...>& make_event(widget_t* widget);
+// /// @brief
+// /// @tparam ...values_t
+// /// @tparam widget_t
+// /// @param widget
+// /// @return
+// template <typename widget_t, typename... values_t>
+// [[nodiscard]] event<values_t...>& make_event(widget_t* widget);
 
-/// @brief
-/// @tparam widget_t
-/// @tparam ...values_t
-/// @param widget
-/// @param trigger_callback
-/// @return
-template <typename widget_t, typename... values_t>
-[[nodiscard]] event<values_t...>& make_event(widget_t* widget, typename const event<values_t...>::on_trigger_callback& trigger_callback);
+// /// @brief
+// /// @tparam widget_t
+// /// @tparam ...values_t
+// /// @param widget
+// /// @param trigger_callback
+// /// @return
+// template <typename widget_t, typename... values_t>
+// [[nodiscard]] event<values_t...>& make_event(widget_t* widget, typename const event<values_t...>::on_trigger_callback& trigger_callback);
 
-/// @brief
-/// @tparam widget_t
-/// @tparam ...values_t
-/// @param widget
-/// @param other
-/// @return
-template <typename widget_t, typename... values_t>
-[[nodiscard]] event<values_t...>& make_event(widget_t* widget, const event<values_t...>& other);
+// /// @brief
+// /// @tparam widget_t
+// /// @tparam ...values_t
+// /// @param widget
+// /// @param other
+// /// @return
+// template <typename widget_t, typename... values_t>
+// [[nodiscard]] event<values_t...>& make_event(widget_t* widget, const event<values_t...>& other);
 }
 
 #include <bungeegum/core/event.inl>
