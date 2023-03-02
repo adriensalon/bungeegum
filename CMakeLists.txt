@@ -8,7 +8,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(bungeegum_all)
 
-option(BUNGEEGUM_BUILD_LAUNCHER "Build SDL + Diligent Engine launcher" OFF)
+option(BUNGEEGUM_BUILD_LAUNCHER "Build SDL + Diligent Engine launcher" ON)
 option(BUNGEEGUM_BUILD_DOC "Build doxygen documentation" OFF)
 option(BUNGEEGUM_BUILD_TEST "Build gtest executable" OFF)
 
