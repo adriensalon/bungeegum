@@ -13,6 +13,10 @@ add_subdirectory("implot")
 add_subdirectory("tinyspline")
 add_subdirectory("entt")
 add_subdirectory("backwardcpp")
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 add_subdirectory("googletest")
 
 if(BUNGEEGUM_BUILD_LAUNCHER)
