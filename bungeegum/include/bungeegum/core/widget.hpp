@@ -141,6 +141,7 @@ void adopt(widget_t* widget, children_widgets_t&... children_widgets);
 /// @brief
 /// @param widget
 /// @param ...children_widgets
+template <typename widget_t, typename... children_widgets_t>
 void abandon(widget_t* widget, children_widgets_t&... children_widgets);
 }
 

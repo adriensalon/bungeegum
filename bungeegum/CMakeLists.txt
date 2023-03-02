@@ -10,7 +10,6 @@
 project(bungeegum)
 
 set(bungeegum_source
-
 	"source/advanced/draw.cpp"
 	"source/advanced/interact.cpp"
 	"source/advanced/resolve.cpp"
@@ -26,9 +25,7 @@ set(bungeegum_source
 	"source/glue/curve.cpp"
 	"source/glue/imguarded.cpp"
 	"source/glue/registry.cpp"
-	"source/glue/renderer.cpp"
 	"source/glue/time.cpp"
-	"source/glue/window.cpp"
 
 	"source/overlay/compressed/fa4.cpp"
 	"source/overlay/compressed/inter_extrabold.cpp"
@@ -38,8 +35,13 @@ set(bungeegum_source
 	"source/overlay/overlay.cpp"
 	"source/overlay/profiler.cpp"
 	"source/overlay/report.cpp"
-	"source/overlay/wireframe.cpp"
-)
+	"source/overlay/wireframe.cpp")
+
+if(BUNGEEGUM_BUILD_LAUNCHER)
+	set(bungeegum_source ${bungeegum_source}
+		"source/glue/renderer.cpp"
+		"source/glue/window.cpp")
+endif()
 
 add_library(bungeegum "${bungeegum_source}")
 target_include_directories(bungeegum PUBLIC "include")
@@ -50,19 +52,21 @@ target_link_libraries(bungeegum backward)
 target_link_libraries(bungeegum imgui)
 target_link_libraries(bungeegum implot)
 target_link_libraries(bungeegum tinysplinecxx)
-target_link_libraries(bungeegum SDL2-static)
 target_link_libraries(bungeegum EnTT)
-target_link_libraries(bungeegum vectorclass)
-target_link_libraries(bungeegum Diligent-GraphicsEngine)
-target_link_libraries(bungeegum Diligent-GraphicsTools)
-target_link_libraries(bungeegum Diligent-ShaderTools)
-target_link_libraries(bungeegum Diligent-Imgui)
 
-target_include_directories(bungeegum PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
-target_include_directories(bungeegum PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
+if(BUNGEEGUM_BUILD_LAUNCHER)
+	target_link_libraries(bungeegum SDL2-static)
+	target_link_libraries(bungeegum Diligent-GraphicsEngine)
+	target_link_libraries(bungeegum Diligent-GraphicsTools)
+	target_link_libraries(bungeegum Diligent-ShaderTools)
+	target_link_libraries(bungeegum Diligent-Imgui)
 
-target_link_libraries(bungeegum Diligent-GraphicsEngineD3D11-static)
+	target_include_directories(bungeegum PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
+	target_include_directories(bungeegum PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
 
-# target_link_libraries(librender Diligent-GraphicsEngineD3D12-static)
-# target_link_libraries(librender Diligent-GraphicsEngineOpenGL-static)
-# target_link_libraries(librender Diligent-GraphicsEngineVulkan-static)
+	target_link_libraries(bungeegum Diligent-GraphicsEngineD3D11-static)
+	# target_link_libraries(librender Diligent-GraphicsEngineD3D12-static)
+	# target_link_libraries(librender Diligent-GraphicsEngineOpenGL-static)
+	# target_link_libraries(librender Diligent-GraphicsEngineVulkan-static)
+	
+endif()

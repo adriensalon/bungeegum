@@ -179,7 +179,7 @@ template <typename widget_t, typename... values_t>
 /// @param trigger_callback
 /// @return
 template <typename widget_t, typename... values_t>
-[[nodiscard]] event<values_t...>& make_event(widget_t* widget, const event<values_t...>::on_trigger_callback& trigger_callback);
+[[nodiscard]] event<values_t...>& make_event(widget_t* widget, typename const event<values_t...>::on_trigger_callback& trigger_callback);
 
 /// @brief
 /// @tparam widget_t
