@@ -20,6 +20,6 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --target bungeegum_test --config ${{env.BUILD_TYPE}}
 
     - name: Test
-      working-directory: ${{github.workspace}}/build/${{env.BUILD_TYPE}}
+      working-directory: ${{github.workspace}}/build/test/${{env.BUILD_TYPE}}
       run: bungeegum_test
 
