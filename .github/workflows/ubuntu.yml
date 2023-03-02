@@ -12,6 +12,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: mesa-common-dev mesa-utils libgl-dev libgl1-mesa-dev
+          version: 1.0
+
+    - name: Install xmllint
+      run: sudo apt-get install -y libxml2-utils
 
     - name: Configure
       run: cmake -B ${{github.workspace}}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
