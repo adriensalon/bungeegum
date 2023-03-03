@@ -49,7 +49,7 @@ namespace detail {
     template <typename component_t>
     const component_t& registry::get_component(const entity_t entity) const
     {
-        return _registry.template view<component_t>().get<component_t>(entity);
+        return _registry.template view<component_t>().template get<component_t>(entity);
     }
 
     template <typename... components_t>

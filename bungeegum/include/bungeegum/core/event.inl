@@ -229,13 +229,13 @@ event<values_t...>& event<values_t...>::attach()
     return *this;
 }
 
-template <typename... values_t>
-template <typename widget_t>
-event<values_t...>& event<values_t...>::detach(widget_t& widget)
-{
-    detail::state.context.widgets.detach_to_widget(_data, widget);
-    return *this;
-}
+// template <typename... values_t>
+// template <typename widget_t>
+// event<values_t...>& event<values_t...>::detach(widget_t& widget)
+// {
+//     detail::state.context.widgets.detach_to_widget(_data, widget);
+//     return *this;
+// }
 
 template <typename... values_t>
 event<values_t...>& event<values_t...>::detach()
@@ -271,15 +271,14 @@ void event<values_t...>::trigger(const std::shared_future<future_values>& shared
 }
 
 template <typename... values_t>
-std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callbacks()
+std::vector<std::function<void(const values_t&...)>>& event<values_t...>::trigger_callbacks()
 {
     return _data.callbacks;
 }
 
-template <typename... values_t>
-const std::vector<event::on_trigger_callback>& event<values_t...>::trigger_callbacks() const
-{
-    return _data.callbacks;
-}
-
+// template <typename... values_t>
+// const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::trigger_callbacks() const
+// {
+//     return _data.callbacks;
+// }
 }
