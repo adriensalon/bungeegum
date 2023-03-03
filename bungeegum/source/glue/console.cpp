@@ -39,7 +39,7 @@ namespace detail {
                 _color = 5;
             else if (color == console_color::yellow)
                 _color = 6;
-            SetConsoleTextAttribute(_handle, _color);
+            SetConsoleTextAttribute(_handle, static_cast<WORD>(_color));
         } else if constexpr (is_platform_linux_v || is_platform_macos_v) {
             std::string _color = "\033[0m";
             if (color == console_color::blue)

@@ -47,10 +47,10 @@ namespace detail {
                 size_t _last_colon_pos = _typename.find_last_of(':');
                 if (_last_colon_pos != std::string::npos)
                     _typename = _typename.substr(_last_colon_pos + 1, _typename.length() - _last_colon_pos - 1);
-                size_t _last_underscore_pos = _typename.find_last_not_of('_');
+                // size_t _last_underscore_pos = _typename.find_last_not_of('_');
                 if (ends_with(_typename, "_widget"))
                     _typename = _typename.substr(0, _typename.length() - 7);
-                _typename[0] = std::toupper(_typename[0]);
+                _typename[0] = static_cast<char>(std::toupper(_typename[0]));
                 _typenames.emplace(raw_typename, _typename);
             }
             return _typenames[raw_typename];

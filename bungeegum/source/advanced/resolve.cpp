@@ -15,23 +15,29 @@ namespace bungeegum {
 
 resolve_constraint::resolve_constraint(const float2 min_size, const float2 max_size)
 {
+    (void)min_size;
+    (void)max_size;
 }
 
 resolve_constraint::resolve_constraint(const resolve_constraint& other)
 {
+    (void)other;
 }
 
 resolve_constraint& resolve_constraint::operator=(const resolve_constraint& other)
 {
+    (void)other;
     return *this;
 }
 
 resolve_constraint::resolve_constraint(resolve_constraint&& other)
 {
+    (void)other;
 }
 
 resolve_constraint& resolve_constraint::operator=(resolve_constraint&& other)
 {
+    (void)other;
     return *this;
 }
 

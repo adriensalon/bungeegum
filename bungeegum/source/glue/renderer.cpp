@@ -54,15 +54,19 @@ namespace detail {
             diligent_renderer() { }
             diligent_renderer(const diligent_renderer& other)
             {
+                (void)other;
             }
             diligent_renderer& operator=(const diligent_renderer& other)
             {
+                (void)other;
             }
             diligent_renderer(diligent_renderer&& other) noexcept
             {
+                (void)other;
             }
             diligent_renderer& operator=(diligent_renderer&& other)
             {
+                (void)other;
             }
 
             Diligent::RefCntAutoPtr<Diligent::IRenderDevice> render_device;
@@ -106,6 +110,7 @@ namespace detail {
 
     renderer::renderer(renderer&& other)
     {
+        (void)other;
         // TODO !!!!!
     }
 
@@ -139,15 +144,16 @@ namespace detail {
     void renderer::process_input(const std::any& input)
     {
         // window resize devrait etre manage par un diligent SDLNativeWindow
-        const SDL_Event* _event = &(std::any_cast<SDL_Event>(input));
-        if (_event->type == SDL_WINDOWEVENT) {
-            if (_event->window.event == SDL_WINDOWEVENT_RESIZED) {
+        SDL_Event _event = std::any_cast<SDL_Event>(input);
+        const SDL_Event* _event_ptr = &_event;
+        if (_event_ptr->type == SDL_WINDOWEVENT) {
+            if (_event_ptr->window.event == SDL_WINDOWEVENT_RESIZED) {
                 int _w, _h;
                 SDL_GetWindowSize(get(_diligent_renderer).sdl_window, &_w, &_h);
                 get(_diligent_renderer).swap_chain->Resize(_w, _h);
             }
         }
-        get(_diligent_renderer).imgui_renderer->ProcessEvent(&(std::any_cast<SDL_Event>(input)));
+        get(_diligent_renderer).imgui_renderer->ProcessEvent(_event_ptr);
     }
 
 }

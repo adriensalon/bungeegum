@@ -30,6 +30,7 @@ namespace detail {
         }
         inline static void destroy(const entity_t& ent)
         {
+            (void)ent;
         }
 
     private:

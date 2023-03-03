@@ -47,6 +47,12 @@ add_library(bungeegum "${bungeegum_source}")
 target_include_directories(bungeegum PUBLIC "include")
 set_property(TARGET bungeegum PROPERTY CXX_STANDARD 17)
 
+if(MSVC)
+	target_compile_options(bungeegum PRIVATE /W4 /WX)
+else()
+	target_compile_options(bungeegum PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
 target_link_libraries(bungeegum glm)
 target_link_libraries(bungeegum backward)
 target_link_libraries(bungeegum imgui)

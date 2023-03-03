@@ -70,7 +70,7 @@ namespace detail {
     bool widgets_registry::is_parent(const untyped_widget_data& parent, const untyped_widget_data& child)
     {
         bool _found = false;
-        const untyped_widget_data* _ancestor_widget_data_ptr = nullptr;
+        // const untyped_widget_data* _ancestor_widget_data_ptr = nullptr;
         std::function<void(const untyped_widget_data&, const untyped_widget_data&)> _iterate = [&](const untyped_widget_data& _parent, const untyped_widget_data& _child) {
             // _ancestor_widget_data_ptr = &(_child);
             if (_child.parent.has_value()) {

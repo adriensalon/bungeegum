@@ -27,11 +27,14 @@ namespace {
 
 curve::curve(const std::vector<float>& strided_controls, const bool drop_invalid)
 {
+    (void)drop_invalid;
     _tinyspline_curve = tinyspline::BSpline::interpolateCubicNatural(strided_controls, 2);
 }
 
 curve::curve(const std::vector<float2>& controls, const bool drop_invalid)
 {
+    (void)controls;
+    (void)drop_invalid;
     // TODO
     // size_t _size = controls.size();
     // std::vector<float> _data(_size);
@@ -48,13 +51,19 @@ curve::curve(const std::vector<float2>& controls, const bool drop_invalid)
 
 curve::curve(const float departure, const float arrival, const std::vector<float>& strided_controls, const bool drop_invalid)
 {
+    (void)departure;
+    (void)arrival;
+    (void)strided_controls;
+    (void)drop_invalid;
     // TODO
 }
 
 curve::curve(const float departure, const float arrival, const std::vector<float2>& controls, const bool drop_invalid)
 {
+    (void)drop_invalid;
     // VERIFY HEIN
-    size_t _size = controls.size() + 2U;
+    size_t _size
+        = controls.size() + 2U;
     std::vector<float> _data(2 * _size);
     _data[0] = 0.f;
     _data[1] = departure;
@@ -92,7 +101,7 @@ curve& curve::operator=(curve&& other)
 float2 curve::eval(const float t)
 {
     float _clamped = std::fmin(1.f, std::fmax(0.f, t));
-    auto& _vector = get_bspline_impl(_tinyspline_curve).eval(_clamped).result();
+    auto _vector = get_bspline_impl(_tinyspline_curve).eval(_clamped).result();
     return { _vector[0], _vector[1] };
 }
 

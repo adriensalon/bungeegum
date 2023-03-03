@@ -67,7 +67,10 @@ private:
 };
 
 struct resolve_command {
-    resolve_command(const detail::resolve_command_data& data) { }
+    resolve_command(const detail::resolve_command_data& data)
+    {
+        (void)data;
+    }
 
     /// @brief
     const resolve_constraint& constraint();

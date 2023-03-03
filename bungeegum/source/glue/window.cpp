@@ -69,15 +69,18 @@ window::window(SDL_Window* sdl_window)
 window::window(void* native_window)
 {
     static_assert(!is_platform_emscripten_v);
+    (void)native_window;
 }
 
 window::window(window&& other)
 {
     // TODO !!!
+    (void)other;
 }
 
 window& window::operator=(window&& other)
 {
+    (void)other;
     // TODO !!!
     return *this;
 }
@@ -102,7 +105,6 @@ void* window::get_native_window() const
 
     } else if constexpr (is_platform_macos_v) {
     }
-    return nullptr;
 }
 
 SDL_Window* window::get_sdl_window() const

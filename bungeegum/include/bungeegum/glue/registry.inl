@@ -37,25 +37,25 @@ namespace detail {
     template <typename component_t, typename... args_t>
     decltype(auto) registry::create_component(const entity_t entity, args_t&&... args)
     {
-        return _registry.emplace<component_t>(entity, std::forward<args_t>(args)...);
+        return _registry.template emplace<component_t>(entity, std::forward<args_t>(args)...);
     }
 
     template <typename component_t>
     component_t& registry::get_component(const entity_t entity)
     {
-        return _registry.get<component_t>(entity);
+        return _registry.template get<component_t>(entity);
     }
 
     template <typename component_t>
     const component_t& registry::get_component(const entity_t entity) const
     {
-        return _registry.view<component_t>().get<component_t>(entity);
+        return _registry.template view<component_t>().get<component_t>(entity);
     }
 
     template <typename... components_t>
     void registry::iterate(const std::function<void(components_t&...)>& iterate_function)
     {
-        auto& _view = _registry.view<components_t...>();
+        auto _view = _registry.template view<components_t...>();
         _view.each([&](components_t&... _components) {
             iterate_function(_components...);
         });
@@ -64,7 +64,7 @@ namespace detail {
     template <typename... components_t>
     void registry::iterate(const std::function<void(entity_t, components_t&...)>& iterate_function)
     {
-        auto& _view = _registry.view<components_t...>();
+        auto _view = _registry.template view<components_t...>();
         _view.each([&](entity_t _entity, components_t&... _components) {
             iterate_function(_entity, _components...);
         });

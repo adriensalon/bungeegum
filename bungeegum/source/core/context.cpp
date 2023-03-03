@@ -40,7 +40,7 @@ namespace detail {
         // frames_chronometer.end("events");
 
         // on window resize on resolve
-        bool _has_window_been_resized = false;
+        // bool _has_window_been_resized = false;
 
         // resolve si besoin
         // bool _must_draw = (!widgets.is_must_resolve_empty() && !widgets.is_must_draw_empty());
@@ -48,6 +48,7 @@ namespace detail {
         // frames_chronometer.begin("resolve");
         bool _must_draw = (!widgets_context.is_must_draw_empty());
         widgets_context.iterate_must_resolve([&](untyped_widget_data& _data, const bool _must_resolve_children) {
+            (void)_must_resolve_children;
             _data.widget_resolver_data.value().resolved_size = _data.widget_resolver(_data.widget_resolver_data.value());
         });
         // frames_chronometer.end("resolve");
@@ -61,6 +62,7 @@ namespace detail {
 
         // frames_chronometer.begin("draw");
         widgets_context.iterate_must_draw([](untyped_widget_data& _data, const bool _must_draw_children) {
+            (void)_must_draw_children;
             if (!has_userspace_thrown()) {
                 std::function<void(untyped_widget_data&)> _ff = [&](untyped_widget_data& _data) {
                     if (_data.widget_drawer_data.has_value())
