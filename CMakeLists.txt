@@ -10,11 +10,11 @@ project(bungeegum_all)
 
 option(BUNGEEGUM_BUILD_LAUNCHER "Build SDL + Diligent Engine launcher" ON)
 option(BUNGEEGUM_BUILD_DOC "Build doxygen documentation" OFF)
+option(BUNGEEGUM_BUILD_DEMO "Build demo executable" OFF)
 option(BUNGEEGUM_BUILD_TEST "Build gtest executable" OFF)
 
 add_subdirectory("external")
 add_subdirectory("bungeegum")
 add_subdirectory("doc")
+add_subdirectory("demo")
 add_subdirectory("test")
-
-add_subdirectory("examples")
