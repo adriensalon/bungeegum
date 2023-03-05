@@ -59,6 +59,7 @@ namespace detail {
             diligent_renderer& operator=(const diligent_renderer& other)
             {
                 (void)other;
+                return *this;
             }
             diligent_renderer(diligent_renderer&& other) noexcept
             {
