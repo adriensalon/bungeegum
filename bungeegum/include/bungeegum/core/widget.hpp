@@ -30,8 +30,10 @@ namespace detail {
         // sort -> index pour chaque untyped_widget_data -> entt::sort sur les
         // indices
 
-        std::unordered_map<entity_t, std::function<void()>>
-            detached_events_removers;
+        std::unordered_map<entity_t, std::function<void()>> detached_events_removers;
+
+        std::function<void(interact_command&)> widget_interactor = nullptr; // clean
+        std::optional<interact_command> widget_interactor_command = std::nullopt; // clean
 
         std::function<float2(resolve_command_data&)> widget_resolver = nullptr;
         std::optional<resolve_command_data> widget_resolver_data = std::nullopt;

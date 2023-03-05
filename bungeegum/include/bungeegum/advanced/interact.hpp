@@ -4,6 +4,12 @@
 #include <vector>
 
 namespace bungeegum {
+namespace detail {
+
+    struct interact_command_data {
+    };
+
+}
 
 /// @brief
 /// @details
@@ -13,6 +19,9 @@ struct interact_command {
     interact_command& operator=(const interact_command& other);
     interact_command(interact_command&& other);
     interact_command& operator=(interact_command&& other);
+
+private:
+    detail::interact_command_data _data;
 };
 
 /// @brief
@@ -30,4 +39,4 @@ void must_interact(widget_t* widget);
 
 }
 
-// #include <bungeegum/context/interact.inl>
+#include <bungeegum/advanced/interact.inl>
