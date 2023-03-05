@@ -204,6 +204,7 @@ namespace detail {
                 _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
                 detail::widgets_context.accessors[_data.widget] = &_data;
 
+                intrusive_on_interact(widget);
                 if constexpr (detail::has_draw_function_v<widget_t>)
                     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
                         draw_command _command(command);

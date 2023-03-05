@@ -79,6 +79,8 @@ namespace detail {
                     for (auto& _child_data : _data.children)
                         _ff(_child_data.get());
                 };
+                if (_data.widget_interactor_command.has_value())
+                    _data.widget_interactor(_data.widget_interactor_command.value()); // TEST INTERACT
                 // _data.drawer(_data.resolve_command.value().resolved_size, _data.command.value());
                 // _data.widget_drawer(_data.widget_resolver_data.value().resolved_size, _data.widget_drawer_data.value());
                 // _data.widget_drawer({ 500.f, 500.f }, _data.widget_drawer_data.value());

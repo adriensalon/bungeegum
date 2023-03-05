@@ -61,6 +61,11 @@ namespace widgets {
             return *this;
         }
 
+        inline void interact(interact_command& command)
+        {
+            // std::cout << "~~~~~~ interacting... \n";
+        }
+
         template <typename child_widget_t>
         float2 resolve(resolve_command& command, child_widget_t& child_widget)
         {

@@ -9,16 +9,18 @@ namespace detail {
     struct interact_command_data {
     };
 
+    template <typename widget_t>
+    constexpr bool intrusive_on_interact(widget_t* widget);
 }
 
 /// @brief
 /// @details
 struct interact_command {
-    interact_command();
-    interact_command(const interact_command& other);
-    interact_command& operator=(const interact_command& other);
-    interact_command(interact_command&& other);
-    interact_command& operator=(interact_command&& other);
+    // interact_command();
+    // interact_command(const interact_command& other);
+    // interact_command& operator=(const interact_command& other);
+    // interact_command(interact_command&& other);
+    // interact_command& operator=(interact_command&& other);
 
 private:
     detail::interact_command_data _data;
