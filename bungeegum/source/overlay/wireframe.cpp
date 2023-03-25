@@ -1,12 +1,3 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #include <string>
 #include <unordered_map>
 
@@ -18,8 +9,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/overlay/overlay.hpp>
-#include <bungeegum/overlay/wireframe.hpp>
+#include <bungeegum/core/context.fwd>
 
 namespace bungeegum {
 namespace detail {
@@ -49,6 +39,7 @@ namespace detail {
         for (const ImDrawCmd* pcmd = draw_list->CmdBuffer.Data; pcmd < draw_list->CmdBuffer.Data + draw_list->CmdBuffer.Size; pcmd++) {
             DebugNodeDrawCmdShowMeshAndBoundingBox(fg_draw_list, draw_list, pcmd);
         }
+        (void)viewport;
     }
 
     void draw_wireframe_overlay()

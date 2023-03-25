@@ -1,12 +1,3 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #pragma once
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
@@ -43,7 +34,7 @@
 // #endif
 #include <Common/interface/RefCntAutoPtr.hpp>
 
-#include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/glue/renderer.fwd>
 
 namespace bungeegum {
 namespace detail {

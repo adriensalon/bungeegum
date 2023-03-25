@@ -1,0 +1,82 @@
+#pragma once
+
+#include <functional>
+#include <future>
+#include <optional>
+#include <typeindex>
+#include <unordered_map>
+#include <vector>
+
+#include <bungeegum/glue/registry.fwd>
+#include <bungeegum/glue/typelist.fwd>
+
+namespace bungeegum {
+namespace detail {
+
+    template <typename... values_t>
+    struct typed_event_data {
+        typed_event_data();
+        typed_event_data(const typed_event_data& other) = delete;
+        typed_event_data& operator=(const typed_event_data& other) = delete;
+        typed_event_data(typed_event_data&& other);
+        typed_event_data& operator=(typed_event_data&& other);
+
+        bool is_attached = true;
+        entity_t detached_id = 0;
+        std::function<void()> rattach_callback = nullptr;
+        std::vector<std::function<void(values_t...)>> callbacks;
+        std::vector<std::future<future_typelist_t<values_t...>>> futures;
+        std::vector<std::shared_future<future_typelist_t<values_t...>>> shared_futures;
+    };
+
+    template <typename... values_t>
+    void merge(typed_event_data<values_t...>& merger, typed_event_data<values_t...>& merged);
+
+    template <typename... values_t>
+    void trigger(typed_event_data<values_t...>& event, values_t&&... values);
+
+    template <typename... values_t>
+    void trigger(typed_event_data<values_t...>& event, std::future<future_typelist_t<values_t...>>&& future_value);
+
+    template <typename... values_t>
+    void trigger(typed_event_data<values_t...>& event, const std::shared_future<future_typelist_t<values_t...>>& shared_future_value);
+
+    template <typename... values_t>
+    void attach(typed_event_data<values_t...>& event);
+
+    struct untyped_event_data {
+        std::vector<std::type_index> kinds;
+        std::function<void()> tick = nullptr;
+    };
+
+    struct events_registry {
+        registry events;
+        std::unordered_map<entity_t, std::reference_wrapper<untyped_event_data>> detached_events;
+        std::unordered_map<entity_t, std::reference_wrapper<untyped_event_data>> detached_events_to_widgets;
+
+        void tick();
+        void iterate(const std::function<void(untyped_event_data&)>& iterate_callback);
+
+        template <typename... values_t>
+        typed_event_data<values_t...>& create();
+
+        template <typename... values_t>
+        void destroy(const typed_event_data<values_t...>& event);
+
+        template <typename... values_t>
+        untyped_event_data& get(typed_event_data<values_t...>& event);
+
+        template <typename... values_t>
+        typed_event_data<values_t...>& get(untyped_event_data& data);
+
+        template <typename... values_t>
+        void iterate(const std::function<void(typed_event_data<values_t...>&)>& iterate_callback);
+
+        template <typename... values_t>
+        void detach(typed_event_data<values_t...>& event);
+    };
+
+    inline events_registry events_context;
+
+}
+}

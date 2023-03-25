@@ -1,12 +1,3 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #include <imgui.h>
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -16,7 +7,7 @@
 #include <iostream>
 
 #include <bungeegum/core/exceptions.hpp>
-#include <bungeegum/glue/imguarded.hpp>
+#include <bungeegum/glue/imguarded.fwd>
 #include <bungeegum/overlay/hierarchy.hpp>
 #include <bungeegum/overlay/inspector.hpp>
 #include <bungeegum/overlay/overlay.hpp>

@@ -1,18 +1,9 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #pragma once
 
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include <bungeegum/glue/imguarded.hpp>
+#include <bungeegum/glue/imguarded.fwd>
 
 namespace bungeegum {
 namespace detail {

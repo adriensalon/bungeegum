@@ -1,17 +1,8 @@
 #pragma once
 
-#include <functional>
-#include <vector>
+#include <bungeegum/advanced/interact.fwd>
 
 namespace bungeegum {
-namespace detail {
-
-    struct interact_command_data {
-    };
-
-    template <typename widget_t>
-    constexpr bool intrusive_on_interact(widget_t* widget);
-}
 
 /// @brief
 /// @details

@@ -1,0 +1,12 @@
+#pragma once
+
+#include <functional>
+#include <vector>
+
+namespace bungeegum {
+namespace detail {
+
+    struct interact_command_data {
+    };
+}
+}

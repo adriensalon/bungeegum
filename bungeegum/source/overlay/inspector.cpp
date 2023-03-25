@@ -1,12 +1,3 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #include <string>
 
 #include <imgui.h>
@@ -14,7 +5,7 @@
 #include <iostream>
 
 #include <bungeegum/core/animation.hpp>
-#include <bungeegum/overlay/inspector.hpp>
+#include <bungeegum/core/context.fwd>
 
 namespace bungeegum {
 namespace detail {

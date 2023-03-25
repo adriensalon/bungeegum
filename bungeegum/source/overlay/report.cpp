@@ -1,18 +1,9 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #include <imgui.h>
 #include <implot.h>
 #include <iostream>
 
+#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
-#include <bungeegum/overlay/report.hpp>
 
 namespace bungeegum {
 namespace detail {

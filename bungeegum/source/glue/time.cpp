@@ -1,18 +1,9 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #pragma once
 
 #include <iomanip>
 #include <sstream>
 
-#include <bungeegum/glue/time.hpp>
+#include <bungeegum/glue/time.fwd>
 
 namespace bungeegum {
 namespace detail {

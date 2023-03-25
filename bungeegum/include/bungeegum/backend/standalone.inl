@@ -1,20 +1,10 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #pragma once
 
-#include <bungeegum/core/context.hpp>
+#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
-#include <bungeegum/glue/renderer.hpp>
-#include <bungeegum/glue/time.hpp>
-#include <bungeegum/glue/window.hpp>
-#include <bungeegum/overlay/overlay.hpp>
+#include <bungeegum/glue/renderer.fwd>
+#include <bungeegum/glue/time.fwd>
+#include <bungeegum/glue/window.fwd>
 
 namespace bungeegum {
 

@@ -1,16 +1,7 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #include <iostream>
 
-#include <bungeegum/glue/console.hpp>
-#include <bungeegum/glue/toolchain.hpp>
+#include <bungeegum/glue/console.fwd>
+#include <bungeegum/glue/toolchain.fwd>
 
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
 #include <windows.h>

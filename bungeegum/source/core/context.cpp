@@ -1,12 +1,3 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #pragma once
 
 #include <imgui.h>
@@ -14,13 +5,12 @@
 #include <iostream>
 
 #include <bungeegum/core/animation.hpp>
-#include <bungeegum/core/context.hpp>
+#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/backtrace.fwd>
 #include <bungeegum/glue/curve.hpp>
-#include <bungeegum/overlay/overlay.hpp>
 
 namespace bungeegum {
 namespace detail {

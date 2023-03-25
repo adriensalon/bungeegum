@@ -1,12 +1,3 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #pragma once
 
 #include <optional>
@@ -15,8 +6,8 @@
 
 #include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/backtrace.hpp>
-#include <bungeegum/glue/console.hpp>
+#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/console.fwd>
 
 namespace bungeegum {
 namespace detail {

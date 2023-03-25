@@ -23,7 +23,6 @@ relou& okokoko()
 
 int main()
 {
-
     std::cout << reinterpret_cast<std::uintptr_t>(&(okokoko())) << std::endl;
     bungeegum::widgets::container c1, c2;
 
