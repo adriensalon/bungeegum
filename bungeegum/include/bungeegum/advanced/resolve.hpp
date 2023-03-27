@@ -16,11 +16,7 @@ namespace bungeegum {
 /// @brief
 /// @details https://api.flutter.dev/flutter/rendering/BoxConstraints-class.html
 struct resolve_constraint {
-    resolve_constraint(const float2 min_size = { 0.f, 0.f }, const float2 max_size = { infinity<float>, infinity<float> });
-    resolve_constraint(const resolve_constraint& other);
-    resolve_constraint& operator=(const resolve_constraint& other);
-    resolve_constraint(resolve_constraint&& other);
-    resolve_constraint& operator=(resolve_constraint&& other);
+    resolve_constraint(const float2 min_size = zero<float2>, const float2 max_size = infinity<float2>);
 
     [[nodiscard]] float2& min_size();
     [[nodiscard]] const float2 min_size() const;

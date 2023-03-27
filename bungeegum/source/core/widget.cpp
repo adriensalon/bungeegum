@@ -19,10 +19,12 @@ namespace detail {
         parent = std::move(other.parent);
         children = std::move(other.children);
         detached_events_removers = std::move(other.detached_events_removers);
+        widget_drawer = std::move(other.widget_drawer);
+        widget_drawer_command = std::move(other.widget_drawer_command);
+        widget_interactor = std::move(other.widget_interactor);
+        widget_interactor_command = std::move(other.widget_interactor_command);
         widget_resolver = std::move(other.widget_resolver);
         widget_resolver_data = std::move(other.widget_resolver_data);
-        widget_drawer = std::move(other.widget_drawer);
-        widget_drawer_data = std::move(other.widget_drawer_data);
         return *this;
     }
 
@@ -83,8 +85,10 @@ namespace detail {
 
     void widgets_registry::iterate_must_draw(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback)
     {
-        for (std::pair<std::reference_wrapper<bungeegum::detail::untyped_widget_data>, bool>& _must_draw : must_draw_heads)
-            iterate_callback(_must_draw.first.get(), _must_draw.second);
+        for (std::pair<std::reference_wrapper<bungeegum::detail::untyped_widget_data>, bool>& _must_draw : must_draw_heads) {
+            bungeegum::detail::untyped_widget_data& _d = _must_draw.first.get();
+            iterate_callback(_d, _must_draw.second);
+        }
     }
 
     bool widgets_registry::is_must_draw_empty() const
@@ -97,7 +101,7 @@ namespace detail {
         std::function<void(untyped_widget_data&)> _iterate = [&](untyped_widget_data& _widget_data) {
             iterate_callback(_widget_data);
             for (auto& _child : _widget_data.children)
-                _iterate(_child);
+                _iterate(_child.get());
         };
         if (root.has_value())
             _iterate(root.value().get());

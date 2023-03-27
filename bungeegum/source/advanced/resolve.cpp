@@ -1,12 +1,3 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
 #include <imgui.h>
 
 #include <bungeegum/advanced/resolve.hpp>
@@ -19,27 +10,27 @@ resolve_constraint::resolve_constraint(const float2 min_size, const float2 max_s
     (void)max_size;
 }
 
-resolve_constraint::resolve_constraint(const resolve_constraint& other)
-{
-    (void)other;
-}
+// resolve_constraint::resolve_constraint(const resolve_constraint& other)
+// {
+//     (void)other;
+// }
 
-resolve_constraint& resolve_constraint::operator=(const resolve_constraint& other)
-{
-    (void)other;
-    return *this;
-}
+// resolve_constraint& resolve_constraint::operator=(const resolve_constraint& other)
+// {
+//     (void)other;
+//     return *this;
+// }
 
-resolve_constraint::resolve_constraint(resolve_constraint&& other)
-{
-    (void)other;
-}
+// resolve_constraint::resolve_constraint(resolve_constraint&& other)
+// {
+//     (void)other;
+// }
 
-resolve_constraint& resolve_constraint::operator=(resolve_constraint&& other)
-{
-    (void)other;
-    return *this;
-}
+// resolve_constraint& resolve_constraint::operator=(resolve_constraint&& other)
+// {
+//     (void)other;
+//     return *this;
+// }
 
 float2& resolve_constraint::min_size()
 {
@@ -63,6 +54,8 @@ const float2 resolve_constraint::max_size() const
 
 resolve_constraint resolve_constraint::flip()
 {
+    resolve_constraint _retval;
+
     return resolve_constraint(
         { min_size().y, min_size().x },
         { max_size().y, max_size().x });

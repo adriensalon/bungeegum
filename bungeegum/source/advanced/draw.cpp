@@ -16,46 +16,50 @@ namespace detail {
 
     void draw_command_data::draw()
     {
+        std::cout << "drawwww 2 \n";
         ImDrawList* _draw_list = ImGui::GetBackgroundDrawList();
         draw(_draw_list);
     }
 
     void draw_command_data::draw(ImDrawList* imgui_drawlist)
     {
-        for (auto& _command : commands)
+        std::cout << "drawwww \n";
+        for (auto& _command : commands) {
+
             _command(imgui_drawlist);
+        }
     }
 
 }
 
-draw_command::draw_command(detail::draw_command_data& data)
-    : _data(data)
-{
-    (void)data;
-}
+// draw_command::draw_command(detail::draw_command_data& data)
+//     : _data(data)
+// {
+//     (void)data;
+// }
 
-draw_command::draw_command(const draw_command& other)
-    : _data(other._data)
-{
-    (void)other;
-}
+// draw_command::draw_command(const draw_command& other)
+//     : _data(other._data)
+// {
+//     (void)other;
+// }
 
-draw_command& draw_command::operator=(const draw_command& other)
-{
-    (void)other;
-    return *this;
-}
+// draw_command& draw_command::operator=(const draw_command& other)
+// {
+//     (void)other;
+//     return *this;
+// }
 
-draw_command::draw_command(draw_command&& other)
-    : _data(other._data)
-{
-}
+// draw_command::draw_command(draw_command&& other)
+//     : _data(other._data)
+// {
+// }
 
-draw_command& draw_command::operator=(draw_command&& other)
-{
-    (void)other;
-    return *this;
-}
+// draw_command& draw_command::operator=(draw_command&& other)
+// {
+//     (void)other;
+//     return *this;
+// }
 
 void draw_command::draw_line(
     const float2 first_point, const float2 second_point,

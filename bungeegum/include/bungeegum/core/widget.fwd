@@ -33,30 +33,16 @@ namespace detail {
 
         std::unordered_map<entity_t, std::function<void()>> detached_events_removers;
 
+        std::function<void(draw_command&)> widget_drawer = nullptr;
+        std::optional<draw_command> widget_drawer_command = std::nullopt;
+
         std::function<void(interact_command&)> widget_interactor = nullptr; // clean
         std::optional<interact_command> widget_interactor_command = std::nullopt; // clean
 
         std::function<float2(resolve_command_data&)> widget_resolver = nullptr;
         std::optional<resolve_command_data> widget_resolver_data = std::nullopt;
-
-        std::function<void(const float2, draw_command_data&)> widget_drawer = nullptr;
-        std::optional<draw_command> widget_drawer_command = std::nullopt;
-        //
-        std::optional<draw_command_data> widget_drawer_data = std::nullopt;
+        
     };
-
-    // template <typename widget_t>
-    // struct typed_widget_data {
-    //     typed_widget_data(widget_t& widget)
-    //         : widget_ref(widget)
-    //     {
-    //     }
-    //     widget_t& widget_ref;
-    // };
-
-    // adopt
-    // reny
-    // replace
 
     struct widgets_registry {
         registry widgets;

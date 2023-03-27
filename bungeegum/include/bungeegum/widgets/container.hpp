@@ -63,7 +63,7 @@ namespace widgets {
 
         inline void interact(interact_command& command)
         {
-            // std::cout << "~~~~~~ interacting... \n";
+            std::cout << "~~~~~~ interacting... \n";
         }
 
         template <typename child_widget_t>
@@ -73,8 +73,9 @@ namespace widgets {
             return { 600.f, 0.f };
         }
 
-        void draw(const float2& size, draw_command& command)
+        inline void draw(draw_command& command)
         {
+            std::cout << "drawwww \n";
             // std::cout << "x = " << size.x() << std::endl;
             command.draw_rect(
                 { 20.f, 20.f },

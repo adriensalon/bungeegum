@@ -14,7 +14,7 @@ namespace detail {
     constexpr bool has_interact_function_v = detail::is_detected_exact_v<void, interact_function, widget_t>;
 
     template <typename widget_t>
-    constexpr void intrusive_on_interact(widget_t* widget)
+    constexpr void detect_on_interact(widget_t* widget)
     {
         if constexpr (detail::has_interact_function_v<widget_t>) {
             detail::untyped_widget_data& _widget_data = detail::widgets_context.get(*widget);
@@ -42,6 +42,7 @@ void on_interact(widget_t* widget, const std::function<void(interact_command&)>&
 template <typename widget_t>
 void must_interact(widget_t* widget)
 {
+	
     // todo
 }
 }

@@ -26,8 +26,11 @@ int main()
     std::cout << reinterpret_cast<std::uintptr_t>(&(okokoko())) << std::endl;
     bungeegum::widgets::container c1, c2;
 
-    bungeegum::launch(bungeegum::make<bungeegum::widgets::container>().ok().child(
-        bungeegum::make<bungeegum::widgets::container>().ok().child(c2).ok()));
+    auto& c3 = bungeegum::make<bungeegum::widgets::container>();
+    auto& c4 = bungeegum::make<bungeegum::widgets::container>();
+
+    bungeegum::launch(c3.ok().child(
+        c4.ok().child(c2).ok()));
 
     return 0;
 }

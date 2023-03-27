@@ -6,46 +6,46 @@
 namespace bungeegum {
 namespace detail {
 
-    template <typename widget_t>
-    struct typed_widget_data {
-        typed_widget_data(widget_t& widget)
-            : _is_external(true)
-        {
-            _widget = &widget;
-        }
+    // template <typename widget_t>
+    // struct typed_widget_data {
+    //     typed_widget_data(widget_t& widget)
+    //         : _is_external(true)
+    //     {
+    //         _widget = &widget;
+    //     }
 
-        template <typename... args_t>
-        typed_widget_data(args_t&&... args)
-            : _is_external(false)
-        {
-            _widget = widget_t(std::forward<args_t>(args)...);
-        }
+    //     template <typename... args_t>
+    //     typed_widget_data(args_t&&... args)
+    //         : _is_external(false)
+    //     {
+    //         _widget = widget_t(std::forward<args_t>(args)...);
+    //     }
 
-        typed_widget_data(const typed_widget_data& other) = delete;
-        typed_widget_data& operator=(const typed_widget_data& other) = delete;
+    //     typed_widget_data(const typed_widget_data& other) = delete;
+    //     typed_widget_data& operator=(const typed_widget_data& other) = delete;
 
-        typed_widget_data(typed_widget_data&& other)
-            : _is_external(other._is_external)
-        {
-            *this = std::move(other);
-        }
-        typed_widget_data& operator=(typed_widget_data&& other)
-        {
-            _widget = std::move(other._widget);
-            return *this;
-        }
+    //     typed_widget_data(typed_widget_data&& other)
+    //         : _is_external(other._is_external)
+    //     {
+    //         *this = std::move(other);
+    //     }
+    //     typed_widget_data& operator=(typed_widget_data&& other)
+    //     {
+    //         _widget = std::move(other._widget);
+    //         return *this;
+    //     }
 
-        widget_t& operator->()
-        {
-            if (_is_external)
-                return std::get<widget_t*>(_widget);
-            return std::get<widget_t&>(_widget);
-        }
+    //     widget_t& operator->()
+    //     {
+    //         if (_is_external)
+    //             return std::get<widget_t*>(_widget);
+    //         return std::get<widget_t&>(_widget);
+    //     }
 
-        // private:
-        const bool _is_external;
-        std::variant<widget_t, widget_t*> _widget = nullptr;
-    };
+    //     // private:
+    //     const bool _is_external;
+    //     std::variant<widget_t, widget_t*> _widget = nullptr;
+    // };
 
     template <typename widget_t>
     void widgets_registry::on_resolve(widget_t* widget, const std::function<float2(resolve_command_data&)>& resolver)
@@ -179,11 +179,14 @@ namespace detail {
             _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
             detail::widgets_context.accessors[_data.widget] = &_data;
 
-            if constexpr (detail::has_draw_function_v<widget_t>)
-                detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
-                    draw_command _command(command);
-                    widget->draw(size, _command);
-                });
+            // if constexpr (detail::has_draw_function_v<widget_t>)
+            //     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
+            //         draw_command _command(command);
+            //         widget->draw(size, _command);
+            //     });
+
+            detect_on_draw(widget);
+            detect_on_interact(widget);
             std::cout << "register created widget [SIMPLE] ... " << reinterpret_cast<std::uintptr_t>(widget) << std::endl;
             return;
         } else {
@@ -196,12 +199,13 @@ namespace detail {
                 _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
                 detail::widgets_context.accessors[_data.widget] = &_data;
 
-                intrusive_on_interact(widget);
-                if constexpr (detail::has_draw_function_v<widget_t>)
-                    detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
-                        draw_command _command(command);
-                        widget->draw(size, _command);
-                    });
+                detect_on_draw(widget);
+                detect_on_interact(widget);
+                // if constexpr (detail::has_draw_function_v<widget_t>)
+                //     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
+                //         draw_command _command(command);
+                //         widget->draw(size, _command);
+                //     });
                 std::cout << "register created widget [COMPLEX] ... " << reinterpret_cast<std::uintptr_t>(widget) << std::endl;
                 return;
             } else {
@@ -210,7 +214,8 @@ namespace detail {
             }
         }
 
-        std::cout << detail::widgets_context.widgets.create_component<detail::typed_widget_data<widget_t>>(_entity, *widget)._is_external << std::endl;
+        // std::cout << detail::widgets_context.widgets.create_component<detail::typed_widget_data<widget_t>>(_entity, *widget)._is_external << std::endl;
+        detail::widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, *widget);
 
         detail::untyped_widget_data& _data = detail::widgets_context.widgets.create_component<detail::untyped_widget_data>(_entity);
 
@@ -221,11 +226,14 @@ namespace detail {
         _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
         detail::widgets_context.accessors[_data.widget] = &_data;
 
-        if constexpr (detail::has_draw_function_v<widget_t>)
-            detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
-                draw_command _command(command);
-                widget->draw(size, _command);
-            });
+        // if constexpr (detail::has_draw_function_v<widget_t>)
+        //     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
+        //         draw_command _command(command);
+        //         widget->draw(size, _command);
+        //     });
+
+        detect_on_draw(widget);
+        detect_on_interact(widget);
     }
 
     template <typename widget_t>
@@ -256,7 +264,8 @@ widget_t& make(widget_args_t&&... widget_args)
     detail::widgets_context.widgets.create_component<detail::untyped_widget_data>(_entity);
     widget_t& _w = detail::widgets_context.widgets.create_component<widget_t>(_entity, std::forward<widget_args_t>(widget_args)...);
 
-    std::cout << detail::widgets_context.widgets.create_component<detail::typed_widget_data<widget_t>>(_entity, _w)._is_external << std::endl;
+    // std::cout << detail::widgets_context.widgets.create_component<detail::typed_widget_data<widget_t>>(_entity, _w)._is_external << std::endl;
+    // detail::widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, _w);
 
     if (detail::widgets_context.accessors.find(&_w) == detail::widgets_context.accessors.end())
         detail::widgets_context.inline_widgets.emplace(reinterpret_cast<void*>(&_w), _entity);

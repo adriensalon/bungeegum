@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bungeegum/core/context.fwd>
 #include <bungeegum/advanced/draw.fwd>
 
 namespace bungeegum {
@@ -7,11 +8,9 @@ namespace bungeegum {
 /// @brief
 /// @details
 struct draw_command {
-    draw_command(detail::draw_command_data& data);
-    draw_command(const draw_command& other);
-    draw_command& operator=(const draw_command& other);
-    draw_command(draw_command&& other);
-    draw_command& operator=(draw_command&& other);
+
+    /// @brief
+    [[nodiscard]] float2 get_available_size() const;
 
     /// @brief
     /// @param first_point
@@ -104,7 +103,8 @@ struct draw_command {
     // draw bezier and bspline from points direct (sans curve)
 
 private:
-    detail::draw_command_data& _data;
+    detail::draw_command_data _data;
+	friend void detail::draw();
 };
 
 /// @brief

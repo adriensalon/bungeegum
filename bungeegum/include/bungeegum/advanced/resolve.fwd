@@ -8,8 +8,8 @@ namespace bungeegum {
 namespace detail {
 
     struct resolve_constraint_data {
-        float2 min_size;
-        float2 max_size;
+        float2 min_size = zero<float2>;
+        float2 max_size = infinity<float2>;
     };
 
     struct resolve_command_data {
