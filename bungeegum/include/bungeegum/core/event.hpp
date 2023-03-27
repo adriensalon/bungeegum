@@ -104,6 +104,8 @@ private:
 // /// @return
 // template <typename widget_t, typename... values_t>
 // [[nodiscard]] event<values_t...>& make_event(widget_t* widget, const event<values_t...>& other);
+
+// + move
 }
 
 #include <bungeegum/core/event.inl>

@@ -55,10 +55,10 @@ namespace detail {
         //     (void)_must_draw_children;
         //     if (!has_userspace_thrown()) {
         //         std::function<void(untyped_widget_data&)> _ff = [&](untyped_widget_data& _data2) {
-        //             if (_data2.widget_drawer_command.has_value())
-        //                 _data2.widget_drawer_command.value()._data.commands.clear();
-        //             if (_data2.widget_drawer)
-        //                 _data2.widget_drawer(_data2.widget_drawer_command.value());
+        //             if (_data2.drawer_command.has_value())
+        //                 _data2.drawer_command.value()._data.commands.clear();
+        //             if (_data2.drawer)
+        //                 _data2.drawer(_data2.drawer_command.value());
         //             for (auto& _child_data : _data2.children)
         //                 _ff(_child_data.get());
         //         };
@@ -66,33 +66,33 @@ namespace detail {
         //     }
         //     protect_userspace([&]() {
         //         std::function<void(untyped_widget_data&)> _ff = [&](untyped_widget_data& _data2) {
-        //             if (_data2.widget_drawer && _data2.widget_drawer_command.has_value())
-        //                 _data2.widget_drawer(_data2.widget_drawer_command.value());
+        //             if (_data2.drawer && _data2.drawer_command.has_value())
+        //                 _data2.drawer(_data2.drawer_command.value());
         //             for (auto& _child_data : _data2.children)
         //                 _ff(_child_data.get());
         //         };
-        //         if (_data.widget_interactor_command.has_value())
-        //             _data.widget_interactor(_data.widget_interactor_command.value()); // TEST INTERACT
+        //         if (_data.interactor_command.has_value())
+        //             _data.widget_interactor(_data.interactor_command.value()); // TEST INTERACT
         //         // _data.drawer(_data.resolve_command.value().resolved_size, _data.command.value());
-        //         // _data.widget_drawer(_data.widget_resolver_data.value().resolved_size, _data.widget_drawer_data.value());
-        //         // _data.widget_drawer({ 500.f, 500.f }, _data.widget_drawer_data.value());
+        //         // _data.drawer(_data.widget_resolver_data.value().resolved_size, _data.widget_drawer_data.value());
+        //         // _data.drawer({ 500.f, 500.f }, _data.widget_drawer_data.value());
         //         _ff(_data);
         //     });
         // });
         // frames_chronometer.end("draw");
 
         widgets_context.iterate([=](untyped_widget_data& _data) {
-            if (_data.widget_drawer_command.has_value()) {
-                _data.widget_drawer_command.value()._data.commands.clear();
-                _data.widget_drawer(_data.widget_drawer_command.value());
+            if (_data.drawer_command.has_value()) {
+                _data.drawer_command.value()._data.commands.clear();
+                _data.drawer(_data.drawer_command.value());
             }
         });
 
         if constexpr (true) {
             draw_overlay([&](ImDrawList* _imgui_drawlist) {
                 widgets_context.iterate([=](untyped_widget_data& _data) {
-                    if (_data.widget_drawer_command.has_value()) {
-                        _data.widget_drawer_command.value()._data.draw(_imgui_drawlist);
+                    if (_data.drawer_command.has_value()) {
+                        _data.drawer_command.value()._data.draw(_imgui_drawlist);
                     }
                 });
             });
@@ -100,8 +100,8 @@ namespace detail {
         }
 
         if (!has_userspace_thrown()) {
-            widgets_context.clear_resolve();
-            widgets_context.clear_draw();
+            // widgets_context.clear_resolve();
+            // widgets_context.clear_draw();
         }
     }
 }

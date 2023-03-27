@@ -16,8 +16,8 @@ namespace detail {
     {
         if constexpr (detail::has_draw_function_v<widget_t>) {
             detail::untyped_widget_data& _widget_data = detail::widgets_context.get(*widget);
-            _widget_data.widget_drawer_command = draw_command();
-            _widget_data.widget_drawer = [widget](draw_command& command) { // [=widget] otherwise we pass a reference to ptr
+            _widget_data.drawer_command = draw_command();
+            _widget_data.drawer = [widget](draw_command& command) { // [=widget] otherwise we pass a reference to ptr
                 widget->draw(command);
             };
             std::cout << "YES \n";
@@ -44,7 +44,7 @@ void must_draw(widget_t* widget)
     if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
         detail::register_widget(&widget);
     detail::untyped_widget_data& _data = detail::widgets_context.get(widget);
-    detail::widgets_context.must_draw_heads.emplace_back(std::pair<std::reference_wrapper<detail::untyped_widget_data>, bool> { _data, true });
+    detail::widgets_context.drawables.emplace_back(std::pair<std::reference_wrapper<detail::untyped_widget_data>, bool> { _data, true });
 }
 
 }

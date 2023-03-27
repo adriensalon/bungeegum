@@ -65,11 +65,11 @@ namespace detail {
                     _fg0.release();
                     if (_widget_data.widget_resolver)
                         ImGui::Text("has advanced resolve");
-                    if (_widget_data.widget_drawer)
+                    if (_widget_data.drawer)
                         ImGui::Text("has advanced draw");
                     // ImGui::Text((std::to_string(_widget_data.command.value()._commands.size()) + " advanced draw commands)").c_str());
-                    if (!_widget_data.detached_events_removers.empty())
-                        ImGui::Text((std::to_string(_widget_data.detached_events_removers.size()) + " detached events").c_str());
+                    // if (!_widget_data.detached_events_removers.empty())
+                    //     ImGui::Text((std::to_string(_widget_data.detached_events_removers.size()) + " detached events").c_str());
                     if (!_widget_data.children.empty())
                         ImGui::Text((std::to_string(_widget_data.children.size()) + " children :").c_str());
                     _depth++;

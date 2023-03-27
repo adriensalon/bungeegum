@@ -47,73 +47,74 @@ namespace detail {
     //     std::variant<widget_t, widget_t*> _widget = nullptr;
     // };
 
-    template <typename widget_t>
-    void widgets_registry::on_resolve(widget_t* widget, const std::function<float2(resolve_command_data&)>& resolver)
-    {
-        untyped_widget_data& _widget_data = get(*widget);
-        _widget_data.widget_resolver = resolver;
-        _widget_data.widget_resolver_data = resolve_command_data(); //????? manque des trucs ici
-        must_resolve<widget_t>(*widget);
-    }
+    // template <typename widget_t>
+    // void widgets_registry::on_resolve(widget_t* widget, const std::function<float2(resolve_command_data&)>& resolver)
+    // {
+    //     untyped_widget_data& _widget_data = get(*widget);
+    //     _widget_data.widget_resolver = resolver;
+    //     _widget_data.widget_resolver_data = resolve_command_data(); //????? manque des trucs ici
+    //     must_resolve<widget_t>(*widget);
+    // }
 
-    template <typename widget_t>
-    void widgets_registry::on_draw(widget_t* widget, const std::function<void(const float2, draw_command_data&)>& drawer)
-    {
-        untyped_widget_data& _widget_data = get(*widget);
-        _widget_data.widget_drawer = drawer;
-        _widget_data.widget_drawer_data = draw_command_data();
-        must_draw<widget_t>(*widget);
-    }
+    // template <typename widget_t>
+    // void widgets_registry::on_draw(widget_t* widget, const std::function<void(const float2, draw_command_data&)>& drawer)
+    // {
+    //     untyped_widget_data& _widget_data = get(*widget);
+    //     _widget_data.drawer = drawer;
+    //     _widget_data.widget_drawer_data = draw_command_data();
+    //     must_draw<widget_t>(*widget);
+    // }
 
     template <typename widget_t>
     void widgets_registry::build_root(widget_t& widget)
     {
 
-        if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
-            register_widget(&widget);
+        // if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
+        //     register_widget(&widget);
         root = get(widget);
     }
 
-    template <typename widget_t>
-    void widgets_registry::must_resolve(widget_t& widget, const bool must_resolve_children)
-    {
-        // resolve pareil
-        must_resolve_heads.emplace_back(std::pair<std::reference_wrapper<untyped_widget_data>, bool> { get(widget), must_resolve_children });
-    }
+    // template <typename widget_t>
+    // void widgets_registry::must_resolve(widget_t& widget, const bool must_resolve_children)
+    // {
+    //     // resolve pareil
+    //     must_resolve_heads.emplace_back(std::pair<std::reference_wrapper<untyped_widget_data>, bool> { get(widget), must_resolve_children });
+    // }
 
-    template <typename widget_t>
-    void widgets_registry::must_draw(widget_t& widget, const bool must_draw_children)
-    {
-        if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
-            register_widget(&widget);
-        untyped_widget_data& _data = get(widget);
-        must_draw_heads.emplace_back(std::pair<std::reference_wrapper<untyped_widget_data>, bool> { _data, must_draw_children });
-        // if (must_draw_heads.empty())
-        //     must_draw_heads.emplace_back(std::pair<std::reference_wrapper<untyped_widget_data>, bool> { _data, must_draw_children });
-        // else {
-        //     if (must_draw_children) {
-        //         unsigned int _index = 0;
-        //         std::vector<unsigned int> _remove_indices;
-        //         for (const std::pair<std::reference_wrapper<untyped_widget_data>, bool>& _head : must_draw_heads) {
-        //             if (is_parent(_data, _head.first.get()))
-        //                 _remove_indices.emplace_back(_index);
-        //             _index++;
-        //         }
-        //         for (std::vector<unsigned int>::reverse_iterator _it = _remove_indices.rbegin(); _it != _remove_indices.rend(); _it++) {
-        //             must_draw_heads.erase(must_draw_heads.begin() + *_it);
-        //         }
-        //     }
-        //     for (std::pair<std::reference_wrapper<untyped_widget_data>, bool>& _head : must_draw_heads) {
-        //         // if (_head.second && !is_parent(_head.first.get(), _data))
-        //         must_draw_heads.emplace_back(std::pair<std::reference_wrapper<untyped_widget_data>, bool> { _data, must_draw_children });
-        //     }
-        // }
-    }
+    // template <typename widget_t>
+    // void widgets_registry::must_draw(widget_t& widget, const bool must_draw_children)
+    // {
+    //     if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
+    //         register_widget(&widget);
+    //     untyped_widget_data& _data = get(widget);
+    //     must_draw_heads.emplace_back(std::pair<std::reference_wrapper<untyped_widget_data>, bool> { _data, must_draw_children });
+    //     // if (must_draw_heads.empty())
+    //     //     must_draw_heads.emplace_back(std::pair<std::reference_wrapper<untyped_widget_data>, bool> { _data, must_draw_children });
+    //     // else {
+    //     //     if (must_draw_children) {
+    //     //         unsigned int _index = 0;
+    //     //         std::vector<unsigned int> _remove_indices;
+    //     //         for (const std::pair<std::reference_wrapper<untyped_widget_data>, bool>& _head : must_draw_heads) {
+    //     //             if (is_parent(_data, _head.first.get()))
+    //     //                 _remove_indices.emplace_back(_index);
+    //     //             _index++;
+    //     //         }
+    //     //         for (std::vector<unsigned int>::reverse_iterator _it = _remove_indices.rbegin(); _it != _remove_indices.rend(); _it++) {
+    //     //             must_draw_heads.erase(must_draw_heads.begin() + *_it);
+    //     //         }
+    //     //     }
+    //     //     for (std::pair<std::reference_wrapper<untyped_widget_data>, bool>& _head : must_draw_heads) {
+    //     //         // if (_head.second && !is_parent(_head.first.get(), _data))
+    //     //         must_draw_heads.emplace_back(std::pair<std::reference_wrapper<untyped_widget_data>, bool> { _data, must_draw_children });
+    //     //     }
+    //     // }
+    // }
 
     template <typename widget_t>
     untyped_widget_data& widgets_registry::get(widget_t& widget)
     {
-        return *(accessors[reinterpret_cast<void*>(&widget)]);
+        void* _void_widget = reinterpret_cast<void*>(&widget);
+        return accessors.at(_void_widget).get();
         // return widgets.get_component<untyped_widget_data>(widgets.get_entity(widget));
     }
 
@@ -123,32 +124,32 @@ namespace detail {
     //     return *(reinterpret_cast<widget_t*>(data.widget));
     // }
 
-    template <typename widget_t>
-    void widgets_registry::iterate(const std::function<void(widget_t&)>& iterate_callback)
-    {
-    }
+    // template <typename widget_t>
+    // void widgets_registry::iterate(const std::function<void(widget_t&)>& iterate_callback)
+    // {
+    // }
 
-    template <typename... values_t, typename widget_t>
-    void widgets_registry::detach(typed_event_data<values_t...>& event, widget_t& widget)
-    {
-        if (!event.is_attached)
-            event.rattach_callback();
-        event.is_attached = false;
-        event.detached_id = generator::create();
-        untyped_widget_data& _data = get_data(widget);
-        _data.detached_events_removers.emplace(event.detached_id, [&]() {
-            event.~event_impl<values_t...>(); // destroy event with the widget
-        });
-        event.rattach_callback = [&]() {
-            _data.detached_events_removers.erase(event.detached_id);
-        };
-    }
+    // template <typename... values_t, typename widget_t>
+    // void widgets_registry::detach(typed_event_data<values_t...>& event, widget_t& widget)
+    // {
+    //     if (!event.is_attached)
+    //         event.rattach_callback();
+    //     event.is_attached = false;
+    //     event.detached_id = generator::create();
+    //     untyped_widget_data& _data = get_data(widget);
+    //     _data.detached_events_removers.emplace(event.detached_id, [&]() {
+    //         event.~event_impl<values_t...>(); // destroy event with the widget
+    //     });
+    //     event.rattach_callback = [&]() {
+    //         _data.detached_events_removers.erase(event.detached_id);
+    //     };
+    // }
 
-    template <typename value_t, typename widget_t>
-    void widgets_registry::detach(typed_animation_data<value_t>& animation, widget_t& widget)
-    {
-        detach(animation.event, widget);
-    }
+    // template <typename value_t, typename widget_t>
+    // void widgets_registry::detach(typed_animation_data<value_t>& animation, widget_t& widget)
+    // {
+    //     detach(animation.event, widget);
+    // }
 
     // template <typename parent_widget_t, typename widget_t>
     // std::optional<parent_widget_t&> _get_parent_widget(widget_t& widget)
@@ -168,16 +169,17 @@ namespace detail {
     template <typename widget_t>
     void register_widget(widget_t* widget)
     {
+        void* _void_widget = reinterpret_cast<void*>(widget);
         // std::cout << "register ! \n";
         detail::entity_t _entity;
-        if (detail::widgets_context.inline_widgets.find(reinterpret_cast<void*>(widget)) != detail::widgets_context.inline_widgets.end()) {
-            _entity = detail::widgets_context.inline_widgets.at(reinterpret_cast<void*>(widget));
-            detail::widgets_context.inline_widgets.erase(reinterpret_cast<void*>(widget));
+        if (detail::widgets_context.possessed.find(_void_widget) != detail::widgets_context.possessed.end()) {
+            _entity = detail::widgets_context.possessed.at(_void_widget);
+            detail::widgets_context.possessed.erase(_void_widget);
             std::cout << "register created ! \n";
             detail::untyped_widget_data& _data = detail::widgets_context.widgets.get_component<detail::untyped_widget_data>(_entity);
-            _data.widget = reinterpret_cast<void*>(widget);
+
             _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
-            detail::widgets_context.accessors[_data.widget] = &_data;
+            detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));
 
             // if constexpr (detail::has_draw_function_v<widget_t>)
             //     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
@@ -195,9 +197,9 @@ namespace detail {
             if (_existing_entity != std::nullopt) {
                 _entity = _existing_entity.value();
                 detail::untyped_widget_data& _data = detail::widgets_context.widgets.get_component<detail::untyped_widget_data>(_entity);
-                _data.widget = reinterpret_cast<void*>(widget);
+                // _data.widget = reinterpret_cast<void*>(widget);
                 _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
-                detail::widgets_context.accessors[_data.widget] = &_data;
+                detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));
 
                 detect_on_draw(widget);
                 detect_on_interact(widget);
@@ -222,9 +224,9 @@ namespace detail {
         // static std::vector<detail::untyped_widget_data> _datas(10);
         // detail::untyped_widget_data& _data = _datas.emplace_back();
 
-        _data.widget = reinterpret_cast<void*>(widget);
+        // _data.widget = reinterpret_cast<void*>(widget);
         _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
-        detail::widgets_context.accessors[_data.widget] = &_data;
+        detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));
 
         // if constexpr (detail::has_draw_function_v<widget_t>)
         //     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
@@ -268,7 +270,7 @@ widget_t& make(widget_args_t&&... widget_args)
     // detail::widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, _w);
 
     if (detail::widgets_context.accessors.find(&_w) == detail::widgets_context.accessors.end())
-        detail::widgets_context.inline_widgets.emplace(reinterpret_cast<void*>(&_w), _entity);
+        detail::widgets_context.possessed.emplace(reinterpret_cast<void*>(&_w), _entity);
 
     // else {
     //     std::cout << "ICI !! \n";
