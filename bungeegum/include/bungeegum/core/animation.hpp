@@ -19,11 +19,19 @@ enum struct animation_mode {
 template <typename value_t>
 struct animation {
 
+    /// @brief
     using lerpable_value = detail::lerpable_t<value_t>;
 
     /// @brief
     using on_tick_callback = std::function<void(const value_t&)>;
 
+    /// @brief
+    /// @tparam duration_unit_t
+    /// @param curved_shape
+    /// @param min_value
+    /// @param max_value
+    /// @param duration_count
+    /// @param mode
     template <typename duration_unit_t = std::chrono::seconds>
     animation(
         const curve& curved_shape,
@@ -43,14 +51,12 @@ struct animation {
 
     /// @brief
     /// @param tick_callback
-    /// @return
     animation& on_tick(const on_tick_callback& tick_callback);
 
     /// @brief
     /// @param value
     /// @param must_draw
     /// @param must_resolve
-    /// @return
     animation& on_tick(value_t& value, const bool must_draw = false, const bool must_resolve = false);
 
     /// @brief
@@ -63,41 +69,25 @@ struct animation {
     animation& reset();
 
     /// @brief
+    /// @param curved_shape
     animation& shape(const curve& curved_shape);
 
     /// @brief
+    /// @param min_value
     animation& min(value_t&& min_value);
 
     /// @brief
+    /// @param min_value
     animation& max(value_t&& min_value);
 
     /// @brief
+    /// @tparam duration_unit_t
+    /// @param count
     template <typename duration_unit_t = std::chrono::seconds>
     animation& duration(const unsigned int count);
 
-    /// @brief Transfers ownership of the underlying callback dispatcher back to this animation object
-    /// @details This allows you to
-    animation& attach();
-
-    /// @brief Transfers ownership of the underlying callback dispatcher to the specified widget
-    /// @details This allows you to let this animation object exit scope without destroying its
-    /// callback dispatch subroutine. While an animation is detached to a widget both will be destroyed
-    /// at the same time
-    /// @tparam widget_t
-    /// @param widget
-    template <typename widget_t>
-    animation& detach(widget_t& widget);
-
-    /// @brief Transfers ownership of the underlying callback dispatcher to the internal registry
-    /// @details This allows you to let this animation object exit scope without destroying its
-    /// callback dispatch subroutine. While an animation is detached to the internal registry it will
-    /// be destroyed when the application terminates
-    animation& detach();
-
 private:
-    detail::typed_animation_data<value_t>& _data;
-    // template <typename value_t>
-    // friend struct animatable;
+    detail::typed_animation_data<value_t>& _data; // GO VALUE
 };
 
 }

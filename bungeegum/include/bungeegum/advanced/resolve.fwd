@@ -1,0 +1,22 @@
+#pragma once
+
+#include <functional>
+
+#include <bungeegum/glue/simd.hpp>
+
+namespace bungeegum {
+namespace detail {
+
+    struct resolve_constraint_data {
+        float2 min_size;
+        float2 max_size;
+    };
+
+    struct resolve_command_data {
+        resolve_constraint_data constraint; // given by parent
+        float2 resolved_size; // set by widget after children
+        float2 resolved_position; // given by parent
+    };
+
+}
+}

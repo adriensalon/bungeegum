@@ -1,14 +1,17 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <limits>
 
-#include <bungeegum/glue/infinity.hpp>
+#include <glm/glm.hpp>
 
 namespace bungeegum {
 
 using float2 = glm::vec2;
 using float3 = glm::vec3;
 using float4 = glm::vec4;
+
+template <typename value_t>
+constexpr value_t infinity = std::numeric_limits<value_t>::max();
 
 template <>
 constexpr float2 infinity<float2> = { infinity<float>, infinity<float> };

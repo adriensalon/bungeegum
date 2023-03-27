@@ -50,11 +50,7 @@ namespace detail {
     template <typename widget_t>
     void widgets_registry::on_resolve(widget_t* widget, const std::function<float2(resolve_command_data&)>& resolver)
     {
-
-        // if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
-        //     register_widget(&widget);
         untyped_widget_data& _widget_data = get(*widget);
-        // _widget_data.is_built = true;
         _widget_data.widget_resolver = resolver;
         _widget_data.widget_resolver_data = resolve_command_data(); //????? manque des trucs ici
         must_resolve<widget_t>(*widget);
@@ -63,11 +59,7 @@ namespace detail {
     template <typename widget_t>
     void widgets_registry::on_draw(widget_t* widget, const std::function<void(const float2, draw_command_data&)>& drawer)
     {
-
-        // if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
-        //     register_widget(&widget);
         untyped_widget_data& _widget_data = get(*widget);
-        // _widget_data.is_built = true;
         _widget_data.widget_drawer = drawer;
         _widget_data.widget_drawer_data = draw_command_data();
         must_draw<widget_t>(*widget);

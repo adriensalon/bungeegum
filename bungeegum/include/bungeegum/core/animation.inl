@@ -224,25 +224,24 @@ animation<value_t>& animation<value_t>::duration(const unsigned int count)
     return *this;
 }
 
-template <typename value_t>
-animation<value_t>& animation<value_t>::attach()
-{
-    detail::animations_context.attach_animation(_data);
-    return *this;
-}
+// template <typename value_t>
+// animation<value_t>& animation<value_t>::attach()
+// {
+//     detail::animations_context.attach_animation(_data);
+//     return *this;
+// }
 
-template <typename value_t>
-template <typename widget_t>
-animation<value_t>& animation<value_t>::detach(widget_t& widget)
-{
-    detail::animations_context.detach_animation(_data, widget);
-}
+// template <typename value_t>
+// template <typename widget_t>
+// animation<value_t>& animation<value_t>::detach(widget_t& widget)
+// {
+//     detail::animations_context.detach_animation(_data, widget);
+// }
 
-template <typename value_t>
-animation<value_t>& animation<value_t>::detach()
-{
-    detail::animations_context.detach_animation(_data);
-    return *this;
-}
-
+// template <typename value_t>
+// animation<value_t>& animation<value_t>::detach()
+// {
+//     detail::animations_context.detach_animation(_data);
+//     return *this;
+// }
 }

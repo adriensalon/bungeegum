@@ -6,15 +6,9 @@
 #include <implot.h>
 #include <iostream>
 
+#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/glue/imguarded.fwd>
-#include <bungeegum/overlay/hierarchy.hpp>
-#include <bungeegum/overlay/inspector.hpp>
-#include <bungeegum/overlay/overlay.hpp>
-#include <bungeegum/overlay/profiler.hpp>
-#include <bungeegum/overlay/report.hpp>
-#include <bungeegum/overlay/theme.hpp>
-#include <bungeegum/overlay/wireframe.hpp>
 
 #include "compressed/fa4.cpp"
 #include "compressed/fa4.hpp"
