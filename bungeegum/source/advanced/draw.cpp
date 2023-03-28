@@ -1,13 +1,4 @@
-//       _        _   _                 _
-//      | |      | | (_)               (_)
-//   ___| |_ __ _| |_ _  ___ __ _ _   _ _
-//  / __| __/ _` | __| |/ __/ _` | | | | |
-//  \__ \ || (_| | |_| | (_| (_| | |_| | |
-//  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-//                           __/ |
-//                          |___/     v0.0
-
-#include <imgui.h>
+#include <ImGui.h>
 
 #include <bungeegum/advanced/draw.hpp>
 
@@ -22,10 +13,8 @@ namespace detail {
 
     void draw_command_data::draw(ImDrawList* imgui_drawlist)
     {
-        for (auto& _command : commands) {
-
+        for (auto& _command : commands)
             _command(imgui_drawlist);
-        }
     }
 }
 

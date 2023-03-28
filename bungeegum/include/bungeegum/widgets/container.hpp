@@ -10,6 +10,7 @@
 #pragma once
 
 #include <cstdint>
+#include <mutex>
 
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum/widgets/image.hpp>
@@ -39,7 +40,10 @@ namespace widgets {
             myanim->on_tick([this](const float& _value) {
                 _tick_value = _value;
                 // std::cout << "playin " << reinterpret_cast<uintptr_t>(this) << std::endl;
+                std::mutex _mut;
+                _mut.lock();
                 must_draw(this);
+                _mut.unlock();
             });
 
             myanim->start(); //.detach(*this);
