@@ -2,6 +2,7 @@
 
 #include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/renderer.fwd>
 #include <bungeegum/glue/time.fwd>
 #include <bungeegum/glue/window.fwd>
@@ -34,11 +35,15 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
             // bool _has_polled = _window.poll();
             bool _has_ticked = detail::tick(_delta_milliseconds);
             if (_has_polled || _has_ticked) {
+                detail::interact();
+                detail::resolve();
                 _renderer.new_frame();
                 detail::draw();
                 _renderer.present();
             }
         } else {
+            detail::interact();
+            detail::resolve();
             _renderer.new_frame();
             detail::draw();
             _renderer.present();

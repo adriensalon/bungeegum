@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include <bungeegum/core/animation.hpp>
-#include <bungeegum/core/context.fwd>
+#include <bungeegum/core/overlay.fwd>
 
 namespace bungeegum {
 namespace detail {

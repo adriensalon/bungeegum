@@ -69,13 +69,13 @@ namespace widgets {
         template <typename child_widget_t>
         float2 resolve(resolve_command& command, child_widget_t& child_widget)
         {
+            std::cout << "resolving..." << std::endl;
             // return command.constraint().biggest();
             return { 600.f, 0.f };
         }
 
         inline void draw(draw_command& command)
         {
-            std::cout << "drawwww \n";
             // std::cout << "x = " << size.x() << std::endl;
             command.draw_rect(
                 { 20.f, 20.f },

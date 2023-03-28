@@ -2,8 +2,9 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/overlay.fwd>
+
 
 namespace bungeegum {
 namespace detail {

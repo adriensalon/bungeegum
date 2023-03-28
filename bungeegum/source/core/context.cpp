@@ -8,6 +8,7 @@
 #include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/backtrace.fwd>
 #include <bungeegum/glue/curve.hpp>
@@ -47,16 +48,32 @@ namespace detail {
         // return true;
     }
 
+    void interact()
+    {
+        // 1 go impl ca
+    }
+
+    void resolve()
+    {
+        bool _resolve_done = false;
+        while (!_resolve_done) {
+            std::vector<std::reference_wrapper<untyped_widget_data>>::iterator _resolve_iterator;
+            for (_resolve_iterator = widgets_context.resolvables.begin(); _resolve_iterator != widgets_context.resolvables.end(); _resolve_iterator++) {
+                untyped_widget_data& _data = _resolve_iterator->get();
+                if (_data.resolver_command.has_value())
+                    _data.resolver(_data.resolver_command.value());
+            }
+            widgets_context.resolvables.erase(widgets_context.resolvables.begin(), widgets_context.resolvables.end());
+            _resolve_done = widgets_context.resolvables.empty();
+        }
+    }
+
     void draw()
     {
-        using untyped_widget_data_reference = std::reference_wrapper<untyped_widget_data>;
-        using untyped_widget_data_reference_vector = std::vector<untyped_widget_data_reference>;
-        using untyped_widget_data_reference_iterator = untyped_widget_data_reference_vector::iterator;
-
         draw_overlay([](ImDrawList* _imgui_drawlist) {
             bool _draw_done = false;
             while (!_draw_done) {
-                untyped_widget_data_reference_iterator _draw_iterator;
+                std::vector<std::reference_wrapper<untyped_widget_data>>::iterator _draw_iterator;
                 for (_draw_iterator = widgets_context.drawables.begin(); _draw_iterator != widgets_context.drawables.end(); _draw_iterator++) {
                     untyped_widget_data& _data = _draw_iterator->get();
                     if (_data.drawer_command.has_value()) {
