@@ -36,75 +36,39 @@ namespace detail {
         // bool _must_draw = (!widgets.is_must_resolve_empty() && !widgets.is_must_draw_empty());
 
         // frames_chronometer.begin("resolve");
-        bool _must_draw = (!widgets_context.drawables.empty());
-        for (auto& _must_resolve : widgets_context.resolvables) {
-            auto& _data = _must_resolve.first.get();
-            _data.widget_resolver_data.value().resolved_size = _data.widget_resolver(_data.widget_resolver_data.value());
-        };
+        // bool _must_draw = (!widgets_context.drawables.empty());
+        // for (auto& _must_resolve : widgets_context.resolvables) {
+        //     auto& _data = _must_resolve.first.get();
+        //     _data.widget_resolver_data.value().resolved_size = _data.widget_resolver(_data.widget_resolver_data.value());
+        // };
         // frames_chronometer.end("resolve");
 
-        return _must_draw;
+        return true;
         // return true;
     }
 
     void draw()
     {
+        using untyped_widget_data_reference = std::reference_wrapper<untyped_widget_data>;
+        using untyped_widget_data_reference_vector = std::vector<untyped_widget_data_reference>;
+        using untyped_widget_data_reference_iterator = untyped_widget_data_reference_vector::iterator;
 
-        // frames_chronometer.begin("draw");
-        // widgets_context.iterate_must_draw([](untyped_widget_data& _data, const bool _must_draw_children) {
-        //     (void)_must_draw_children;
-        //     if (!has_userspace_thrown()) {
-        //         std::function<void(untyped_widget_data&)> _ff = [&](untyped_widget_data& _data2) {
-        //             if (_data2.drawer_command.has_value())
-        //                 _data2.drawer_command.value()._data.commands.clear();
-        //             if (_data2.drawer)
-        //                 _data2.drawer(_data2.drawer_command.value());
-        //             for (auto& _child_data : _data2.children)
-        //                 _ff(_child_data.get());
-        //         };
-        //         _ff(_data);
-        //     }
-        //     protect_userspace([&]() {
-        //         std::function<void(untyped_widget_data&)> _ff = [&](untyped_widget_data& _data2) {
-        //             if (_data2.drawer && _data2.drawer_command.has_value())
-        //                 _data2.drawer(_data2.drawer_command.value());
-        //             for (auto& _child_data : _data2.children)
-        //                 _ff(_child_data.get());
-        //         };
-        //         if (_data.interactor_command.has_value())
-        //             _data.widget_interactor(_data.interactor_command.value()); // TEST INTERACT
-        //         // _data.drawer(_data.resolve_command.value().resolved_size, _data.command.value());
-        //         // _data.drawer(_data.widget_resolver_data.value().resolved_size, _data.widget_drawer_data.value());
-        //         // _data.drawer({ 500.f, 500.f }, _data.widget_drawer_data.value());
-        //         _ff(_data);
-        //     });
-        // });
-        // frames_chronometer.end("draw");
-
-        widgets_context.traverse(widgets_context.root.value().get(), [=](untyped_widget_data& _data) {
-            if (_data.drawer_command.has_value()) {
-                _data.drawer_command.value()._data.commands.clear();
-                _data.drawer(_data.drawer_command.value());
-            }
-            return true;
-        });
-
-        if constexpr (true) {
-            draw_overlay([&](ImDrawList* _imgui_drawlist) {
-                widgets_context.traverse(widgets_context.root.value().get(), [=](untyped_widget_data& _data) {
+        draw_overlay([](ImDrawList* _imgui_drawlist) {
+            bool _draw_done = false;
+            while (!_draw_done) {
+                untyped_widget_data_reference_iterator _draw_iterator;
+                for (_draw_iterator = widgets_context.drawables.begin(); _draw_iterator != widgets_context.drawables.end(); _draw_iterator++) {
+                    untyped_widget_data& _data = _draw_iterator->get();
                     if (_data.drawer_command.has_value()) {
+                        _data.drawer_command.value()._data.commands.clear();
+                        _data.drawer(_data.drawer_command.value());
                         _data.drawer_command.value()._data.draw(_imgui_drawlist);
                     }
-                    return true;
-                });
-            });
-        } else {
-        }
-
-        if (!has_userspace_thrown()) {
-            // widgets_context.clear_resolve();
-            // widgets_context.clear_draw();
-        }
+                }
+                widgets_context.drawables.erase(widgets_context.drawables.begin(), widgets_context.drawables.end());
+                _draw_done = widgets_context.drawables.empty();
+            }
+        });
     }
 }
 }

@@ -16,20 +16,17 @@ namespace detail {
 
     void draw_command_data::draw()
     {
-        std::cout << "drawwww 2 \n";
         ImDrawList* _draw_list = ImGui::GetBackgroundDrawList();
         draw(_draw_list);
     }
 
     void draw_command_data::draw(ImDrawList* imgui_drawlist)
     {
-        std::cout << "drawwww \n";
         for (auto& _command : commands) {
 
             _command(imgui_drawlist);
         }
     }
-
 }
 
 // draw_command::draw_command(detail::draw_command_data& data)

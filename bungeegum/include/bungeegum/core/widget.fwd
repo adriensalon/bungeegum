@@ -36,15 +36,14 @@ namespace detail {
     struct widgets_registry {
         using untyped_widget_data_reference = std::reference_wrapper<untyped_widget_data>;
         using untyped_widget_data_callback = std::function<bool(untyped_widget_data&)>;
-        using untyped_widget_data_must_do = std::pair<untyped_widget_data_reference, bool>; // non go ref direct les widgets sont responsables
 
         registry widgets = {};
         std::unordered_map<void*, entity_t> possessed = {};
         std::unordered_map<void*, untyped_widget_data_reference> accessors = {};
         std::optional<untyped_widget_data_reference> root = std::nullopt;
-        std::vector<untyped_widget_data_must_do> drawables = {};
-        std::vector<untyped_widget_data_must_do> interactables = {};
-        std::vector<untyped_widget_data_must_do> resolvables = {};
+        std::vector<untyped_widget_data_reference> drawables = {};
+        std::vector<untyped_widget_data_reference> interactables = {};
+        std::vector<untyped_widget_data_reference> resolvables = {};
 
         // bof ! pas ici peut etre jsp
         void traverse(untyped_widget_data& iterate_root, const untyped_widget_data_callback& iterate_callback);

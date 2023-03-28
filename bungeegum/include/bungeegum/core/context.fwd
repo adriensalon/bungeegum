@@ -8,8 +8,11 @@
 namespace bungeegum {
 namespace detail {
 
-    bool tick(const std::chrono::milliseconds& delta_time);
     void draw();
+    void interact();
+    void resolve();
+
+    bool tick(const std::chrono::milliseconds& delta_time);
 
     void setup_overlay();
     void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands);

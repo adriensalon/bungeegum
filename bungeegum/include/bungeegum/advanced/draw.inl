@@ -41,10 +41,10 @@ template <typename widget_t>
 void must_draw(widget_t* widget)
 {
     // detail::widgets_context.must_draw(*widget);
-    if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
+    if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(widget)) == detail::widgets_context.accessors.end())
         detail::register_widget(&widget);
-    detail::untyped_widget_data& _data = detail::widgets_context.get(widget);
-    detail::widgets_context.drawables.emplace_back(std::pair<std::reference_wrapper<detail::untyped_widget_data>, bool> { _data, true });
+    detail::untyped_widget_data& _data = detail::widgets_context.get(*widget);
+    detail::widgets_context.drawables.emplace_back(_data);
 }
 
 }
