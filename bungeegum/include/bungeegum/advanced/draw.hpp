@@ -104,7 +104,7 @@ struct draw_command {
 
 private:
     detail::draw_command_data _data;
-	friend void detail::draw();
+    friend struct detail::context;
 };
 
 /// @brief

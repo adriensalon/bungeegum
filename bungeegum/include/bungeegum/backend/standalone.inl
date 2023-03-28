@@ -35,15 +35,12 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
             // bool _has_polled = _window.poll();
             bool _has_ticked = detail::tick(_delta_milliseconds);
             if (_has_polled || _has_ticked) {
-                detail::interact();
-                detail::resolve();
                 _renderer.new_frame();
                 detail::draw();
                 _renderer.present();
             }
         } else {
-            detail::interact();
-            detail::resolve();
+            detail::tick(_delta_milliseconds);
             _renderer.new_frame();
             detail::draw();
             _renderer.present();

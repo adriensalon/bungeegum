@@ -2,12 +2,18 @@
 
 #include <chrono>
 
+#include <ImGui.h>
+
 namespace bungeegum {
 namespace detail {
 
+    struct context {
+        static void interact(const std::chrono::milliseconds& delta_time);
+        static void resolve(const std::chrono::milliseconds& delta_time);
+        static void draw(ImDrawList* imgui_drawlist);
+    };
+
     bool tick(const std::chrono::milliseconds& delta_time);
-    void interact();
-    void resolve();
     void draw();
 }
 }
