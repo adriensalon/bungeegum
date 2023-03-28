@@ -12,7 +12,7 @@ template <typename widget_t>
 void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
 {
     // detail::protect_library([&]() {
-    detail::widgets_context.build_root(widget);
+    detail::widgets_context.root = detail::widgets_context.get(widget);
     detail::stopwatch _stopwatch;
     detail::window _window;
     detail::renderer _renderer(_window);

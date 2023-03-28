@@ -36,11 +36,11 @@ namespace detail {
         // bool _must_draw = (!widgets.is_must_resolve_empty() && !widgets.is_must_draw_empty());
 
         // frames_chronometer.begin("resolve");
-        bool _must_draw = (!widgets_context.is_must_draw_empty());
-        widgets_context.iterate_must_resolve([&](untyped_widget_data& _data, const bool _must_resolve_children) {
-            (void)_must_resolve_children;
+        bool _must_draw = (!widgets_context.drawables.empty());
+        for (auto& _must_resolve : widgets_context.resolvables) {
+            auto& _data = _must_resolve.first.get();
             _data.widget_resolver_data.value().resolved_size = _data.widget_resolver(_data.widget_resolver_data.value());
-        });
+        };
         // frames_chronometer.end("resolve");
 
         return _must_draw;
@@ -81,19 +81,21 @@ namespace detail {
         // });
         // frames_chronometer.end("draw");
 
-        widgets_context.iterate([=](untyped_widget_data& _data) {
+        widgets_context.traverse(widgets_context.root.value().get(), [=](untyped_widget_data& _data) {
             if (_data.drawer_command.has_value()) {
                 _data.drawer_command.value()._data.commands.clear();
                 _data.drawer(_data.drawer_command.value());
             }
+            return true;
         });
 
         if constexpr (true) {
             draw_overlay([&](ImDrawList* _imgui_drawlist) {
-                widgets_context.iterate([=](untyped_widget_data& _data) {
+                widgets_context.traverse(widgets_context.root.value().get(), [=](untyped_widget_data& _data) {
                     if (_data.drawer_command.has_value()) {
                         _data.drawer_command.value()._data.draw(_imgui_drawlist);
                     }
+                    return true;
                 });
             });
         } else {

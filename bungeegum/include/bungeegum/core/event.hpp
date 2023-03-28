@@ -3,7 +3,6 @@
 #include <bungeegum/core/event.fwd>
 
 namespace bungeegum {
-
 /// @brief Event objects store same type callbacks and can be passed around the user code to be
 /// triggered all at once when desired. Events can be fired on std::future completion, taking its
 /// return value as input parameters for callbacks

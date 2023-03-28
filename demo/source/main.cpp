@@ -29,6 +29,10 @@ int main()
     auto& c3 = bungeegum::make<bungeegum::widgets::container>();
     auto& c4 = bungeegum::make<bungeegum::widgets::container>();
 
+    bungeegum::iterate<bungeegum::widgets::container>([](bungeegum::widgets::container& cont) {
+        std::cout << "container ! \n";
+    });
+
     bungeegum::launch(c3.ok().child(
         c4.ok().child(c2).ok()));
 

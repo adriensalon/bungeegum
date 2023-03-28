@@ -16,7 +16,7 @@ namespace detail {
     {
         // maintain an std::unordered_set ?
         std::optional<entity_t> _retval = std::nullopt;
-        iterate<component_t>([this, &component, &_retval](entity_t _entity, component_t& _component) {
+        iterate_with_entities<component_t>([this, &component, &_retval](entity_t _entity, component_t& _component) {
             if (&_component == &component)
                 _retval = _entity;
         });
@@ -53,7 +53,7 @@ namespace detail {
     }
 
     template <typename... components_t>
-    void registry::iterate(const std::function<void(entity_t, components_t&...)>& iterate_function)
+    void registry::iterate_with_entities(const std::function<void(entity_t, components_t&...)>& iterate_function)
     {
         auto _view = _registry.template view<components_t...>();
         _view.each([&](entity_t _entity, components_t&... _components) {

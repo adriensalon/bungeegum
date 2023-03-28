@@ -7,11 +7,6 @@ namespace bungeegum {
 /// @brief
 /// @details
 struct interact_command {
-    // interact_command();
-    // interact_command(const interact_command& other);
-    // interact_command& operator=(const interact_command& other);
-    // interact_command(interact_command&& other);
-    // interact_command& operator=(interact_command&& other);
 
 private:
     detail::interact_command_data _data;

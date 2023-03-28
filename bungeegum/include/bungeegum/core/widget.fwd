@@ -35,7 +35,8 @@ namespace detail {
 
     struct widgets_registry {
         using untyped_widget_data_reference = std::reference_wrapper<untyped_widget_data>;
-        using untyped_widget_data_must_do = std::pair<untyped_widget_data_reference, bool>;
+        using untyped_widget_data_callback = std::function<bool(untyped_widget_data&)>;
+        using untyped_widget_data_must_do = std::pair<untyped_widget_data_reference, bool>; // non go ref direct les widgets sont responsables
 
         registry widgets = {};
         std::unordered_map<void*, entity_t> possessed = {};
@@ -45,52 +46,11 @@ namespace detail {
         std::vector<untyped_widget_data_must_do> interactables = {};
         std::vector<untyped_widget_data_must_do> resolvables = {};
 
-        // TO DELETE
-        // TO DELETE
-        // TO DELETE
-        // TO DELETE
-        // TO DELETE
-        // TO DELETE
-        // TO DELETE
-        // TO DELETE
-        // TO DELETE
-        // void clear_resolve();
-        // void clear_draw();
-        // bool is_parent(const untyped_widget_data& parent, const untyped_widget_data& child);
-        void iterate_must_resolve(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback);
-        void iterate_must_draw(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback);
-        bool is_must_draw_empty() const;
-        void iterate(const std::function<void(untyped_widget_data&)>& iterate_callback);
-
-        template <typename widget_t>
-        void build_root(widget_t& widget);
-
-        // template <typename widget_t>
-        // void on_resolve(widget_t* widget, const std::function<float2(resolve_command_data&)>& resolver);
-
-        // template <typename widget_t>
-        // void on_draw(widget_t* widget, const std::function<void(const float2, draw_command_data&)>& drawer);
-
-        // template <typename widget_t>
-        // void must_resolve(widget_t& widget, const bool must_resolve_children = true);
-
-        // template <typename widget_t>
-        // void must_draw(widget_t& widget, const bool must_draw_children = true);
+        // bof ! pas ici peut etre jsp
+        void traverse(untyped_widget_data& iterate_root, const untyped_widget_data_callback& iterate_callback);
 
         template <typename widget_t>
         untyped_widget_data& get(widget_t& widget);
-
-        // template <typename widget_t>
-        // widget_t& get(untyped_widget_data& data);
-
-        // template <typename widget_t>
-        // void iterate(const std::function<void(widget_t&)>& iterate_callback);
-
-        // template <typename... values_t, typename widget_t>
-        // void detach(typed_event_data<values_t...>& event, widget_t& widget);
-
-        // template <typename value_t, typename widget_t>
-        // void detach(typed_animation_data<value_t>& animation, widget_t& widget);
     };
 
     inline widgets_registry widgets_context;

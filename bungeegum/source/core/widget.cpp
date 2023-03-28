@@ -77,36 +77,46 @@ namespace detail {
     //     return _found;
     // }
 
-    void widgets_registry::iterate_must_resolve(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback)
-    {
-        for (auto& _must_resolve : resolvables)
-            iterate_callback(_must_resolve.first.get(), _must_resolve.second);
-    }
+    // void widgets_registry::iterate_must_resolve(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback)
+    // {
+    //     for (auto& _must_resolve : resolvables)
+    //         iterate_callback(_must_resolve.first.get(), _must_resolve.second);
+    // }
 
-    void widgets_registry::iterate_must_draw(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback)
-    {
-        for (std::pair<std::reference_wrapper<bungeegum::detail::untyped_widget_data>, bool>& _must_draw : drawables) {
-            bungeegum::detail::untyped_widget_data& _d = _must_draw.first.get();
-            iterate_callback(_d, _must_draw.second);
-        }
-    }
+    // void widgets_registry::iterate_must_draw(const std::function<void(untyped_widget_data&, const bool)>& iterate_callback)
+    // {
+    //     for (std::pair<std::reference_wrapper<bungeegum::detail::untyped_widget_data>, bool>& _must_draw : drawables) {
+    //         bungeegum::detail::untyped_widget_data& _d = _must_draw.first.get();
+    //         iterate_callback(_d, _must_draw.second);
+    //     }
+    // }
 
-    bool widgets_registry::is_must_draw_empty() const
-    {
-        return drawables.empty();
-    }
+    // bool widgets_registry::is_must_draw_empty() const
+    // {
+    //     return drawables.empty();
+    // }
 
-    void widgets_registry::iterate(const std::function<void(untyped_widget_data&)>& iterate_callback)
+    // void widgets_registry::iterate(const std::function<void(untyped_widget_data&)>& iterate_callback)
+    // {
+    //     std::function<void(untyped_widget_data&)> _iterate = [&](untyped_widget_data& _widget_data) {
+    //         iterate_callback(_widget_data);
+    //         for (auto& _child : _widget_data.children)
+    //             _iterate(_child.get());
+    //     };
+    //     if (root.has_value())
+    //         _iterate(root.value().get());
+    //     else
+    //         std::cout << "ROOT IS NULL \n";
+    // }
+
+    void widgets_registry::traverse(untyped_widget_data& iterate_root, const untyped_widget_data_callback& iterate_callback)
     {
         std::function<void(untyped_widget_data&)> _iterate = [&](untyped_widget_data& _widget_data) {
             iterate_callback(_widget_data);
             for (auto& _child : _widget_data.children)
                 _iterate(_child.get());
         };
-        if (root.has_value())
-            _iterate(root.value().get());
-        else
-            std::cout << "ROOT IS NULL \n";
+        _iterate(iterate_root);
     }
 }
 }

@@ -65,14 +65,14 @@ namespace detail {
     //     must_draw<widget_t>(*widget);
     // }
 
-    template <typename widget_t>
-    void widgets_registry::build_root(widget_t& widget)
-    {
+    // template <typename widget_t>
+    // void widgets_registry::build_root(widget_t& widget)
+    // {
 
-        // if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
-        //     register_widget(&widget);
-        root = get(widget);
-    }
+    //     // if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&widget)) == detail::widgets_context.accessors.end())
+    //     //     register_widget(&widget);
+    //     root = get(widget);
+    // }
 
     // template <typename widget_t>
     // void widgets_registry::must_resolve(widget_t& widget, const bool must_resolve_children)
@@ -181,12 +181,6 @@ namespace detail {
             _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
             detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));
 
-            // if constexpr (detail::has_draw_function_v<widget_t>)
-            //     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
-            //         draw_command _command(command);
-            //         widget->draw(size, _command);
-            //     });
-
             detect_on_draw(widget);
             detect_on_interact(widget);
             std::cout << "register created widget [SIMPLE] ... " << reinterpret_cast<std::uintptr_t>(widget) << std::endl;
@@ -203,11 +197,6 @@ namespace detail {
 
                 detect_on_draw(widget);
                 detect_on_interact(widget);
-                // if constexpr (detail::has_draw_function_v<widget_t>)
-                //     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
-                //         draw_command _command(command);
-                //         widget->draw(size, _command);
-                //     });
                 std::cout << "register created widget [COMPLEX] ... " << reinterpret_cast<std::uintptr_t>(widget) << std::endl;
                 return;
             } else {
@@ -216,23 +205,12 @@ namespace detail {
             }
         }
 
-        // std::cout << detail::widgets_context.widgets.create_component<detail::typed_widget_data<widget_t>>(_entity, *widget)._is_external << std::endl;
         detail::widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, *widget);
 
         detail::untyped_widget_data& _data = detail::widgets_context.widgets.create_component<detail::untyped_widget_data>(_entity);
 
-        // static std::vector<detail::untyped_widget_data> _datas(10);
-        // detail::untyped_widget_data& _data = _datas.emplace_back();
-
-        // _data.widget = reinterpret_cast<void*>(widget);
         _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
         detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));
-
-        // if constexpr (detail::has_draw_function_v<widget_t>)
-        //     detail::widgets_context.on_draw(widget, [widget](const float2& size, detail::draw_command_data& command) { // [=widget] otherwise we pass a reference to ptr
-        //         draw_command _command(command);
-        //         widget->draw(size, _command);
-        //     });
 
         detect_on_draw(widget);
         detect_on_interact(widget);
@@ -293,4 +271,11 @@ void abandon(widget_t* widget, children_widgets_t&... children_widgets)
 {
 }
 
+template <typename widget_t>
+void iterate(const std::function<void(widget_t&)>& iterate_function)
+{
+    detail::widgets_context.widgets.iterate<std::reference_wrapper<widget_t>>([&iterate_function](std::reference_wrapper<widget_t>& widget) {
+        iterate_function(widget.get());
+    });
+}
 }

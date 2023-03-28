@@ -61,7 +61,7 @@ namespace detail {
         void iterate(const std::function<void(components_t&...)>& iterate_function);
 
         template <typename... components_t> // exclude filter
-        void iterate(const std::function<void(entity_t, components_t&...)>& iterate_function);
+        void iterate_with_entities(const std::function<void(entity_t, components_t&...)>& iterate_function);
 
     private:
         entt::basic_registry<entity_t> _registry;
