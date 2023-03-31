@@ -4,7 +4,7 @@
 
 namespace bungeegum {
 
-/// @brief
+/// @brief Starts an infinite loop
 /// @tparam widget_t
 /// @param widget
 /// @param on_renderer_started

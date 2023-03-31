@@ -1,12 +1,47 @@
 #pragma once
 
 #include <functional>
+#include <optional>
+#include <variant>
 #include <vector>
+
+#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/glue/window.fwd>
 
 namespace bungeegum {
 namespace detail {
 
+    struct window_resized_interaction_data {
+        bool is_fullscreen;
+        float2 new_size;
+    };
+
+    struct mouse_moved_interaction_data {
+        float2 absolute_position;
+        float2 relative_position;
+    };
+
+    struct mouse_down_interaction_data {
+        unsigned int button_index;
+    };
+
+    struct mouse_up_interaction_data {
+        unsigned int button_index;
+    };
+
+    struct mouse_pressed_interaction_data {
+        unsigned int button_index;
+    };
+
     struct interact_command_data {
+        bool is_blocked = false;
+        std::variant<
+            window_resized_interaction_data,
+            mouse_moved_interaction_data,
+            mouse_down_interaction_data,
+            mouse_up_interaction_data,
+            mouse_pressed_interaction_data>
+            command_data;
     };
 }
 }

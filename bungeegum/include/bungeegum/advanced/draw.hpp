@@ -10,7 +10,7 @@ namespace bungeegum {
 struct draw_command {
 
     /// @brief
-    [[nodiscard]] float2 get_available_size() const;
+    [[nodiscard]] float2 available_size() const;
 
     /// @brief
     /// @param first_point

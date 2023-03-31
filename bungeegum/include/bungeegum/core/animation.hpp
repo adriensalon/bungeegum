@@ -90,6 +90,7 @@ private:
     detail::typed_animation_data<value_t>& _data; // GO VALUE
 };
 
+// make animation
 }
 
 #include <bungeegum/core/animation.inl>

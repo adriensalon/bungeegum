@@ -38,13 +38,13 @@ private:
 };
 
 struct resolve_command {
-    resolve_command(const detail::resolve_command_data& data)
-    {
-        (void)data;
-    }
 
     /// @brief
-    const resolve_constraint& constraint();
+    [[nodiscard]] const resolve_constraint& constraint();
+
+    /// @brief
+    /// @param size
+    void resize(const float2 size);
 
     /// @brief Then
     /// @tparam child_widget_t
@@ -52,16 +52,16 @@ struct resolve_command {
     /// @param constraint
     /// @return
     template <typename child_widget_t>
-    float2 constrain_child(child_widget_t& child_widget, const resolve_constraint& constraint);
+    float2 resolve_child(child_widget_t& child_widget, const resolve_constraint& constraint);
 
     template <typename child_widget_t>
-    float2 constrain_child_loose(child_widget_t& child_widget, const float2 max_size);
+    float2 resolve_child_loose(child_widget_t& child_widget, const float2 max_size);
 
     template <typename child_widget_t>
-    float2 constrain_child_tight(child_widget_t& child_widget, const float2 fixed_size);
+    float2 resolve_child_tight(child_widget_t& child_widget, const float2 fixed_size);
 
     template <typename child_widget_t>
-    float2 constrain_child_expanded(child_widget_t& child_widget);
+    float2 resolve_child_expanded(child_widget_t& child_widget);
 
     /// @brief Thenafter
     /// @tparam child_widget_t

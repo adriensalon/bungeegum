@@ -1,16 +1,12 @@
 #pragma once
 
 #include <execution>
-#include <iostream>
 
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
-#include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/backtrace.fwd>
-#include <bungeegum/glue/curve.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -27,7 +23,7 @@ namespace detail {
                 [](auto&& _data_reference) {
                     untyped_widget_data& _data = _data_reference.get();
                     if (_data.interactor_command.has_value())
-                        _data.interactor(_data.interactor_command.value()); // tick = true ?
+                        _data.interactor(_data.interactor_command.value());
                 });
             widgets_context.resolvables.erase(widgets_context.resolvables.begin(), widgets_context.resolvables.end());
             _interact_done = widgets_context.resolvables.empty();
@@ -46,7 +42,7 @@ namespace detail {
                 [](auto&& _data_reference) {
                     untyped_widget_data& _data = _data_reference.get();
                     if (_data.resolver_command.has_value())
-                        _data.resolver(_data.resolver_command.value()); // tick = true ?
+                        _data.resolver(_data.resolver_command.value());
                 });
             widgets_context.resolvables.erase(widgets_context.resolvables.begin(), widgets_context.resolvables.end());
             _resolve_done = widgets_context.resolvables.empty();
@@ -80,7 +76,6 @@ namespace detail {
         events_context.tick();
         context::interact(delta_time);
         context::resolve(delta_time);
-
         return (!widgets_context.drawables.empty());
     }
 
