@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bungeegum/core/context.fwd>
 #include <bungeegum/advanced/draw.fwd>
 
 namespace bungeegum {

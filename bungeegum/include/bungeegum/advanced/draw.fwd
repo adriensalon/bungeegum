@@ -10,6 +10,8 @@ struct ImDrawList;
 namespace bungeegum {
 namespace detail {
 
+    struct context;
+
     struct draw_command_data {
         float2 available_size = zero<float2>;
         std::vector<std::function<void(ImDrawList*)>> commands = {};

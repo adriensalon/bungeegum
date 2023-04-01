@@ -93,3 +93,5 @@ template <typename widget_t>
 void must_resolve(widget_t* widget);
 
 }
+
+#include <bungeegum/advanced/resolve.inl>

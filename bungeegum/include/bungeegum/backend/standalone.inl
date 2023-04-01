@@ -23,6 +23,7 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
     _renderer.rebuild_fonts();
     _window.on_input([&_renderer](const std::any& _event) {
         _renderer.process_input(_event);
+        detail::process_input(_event);		
     });
     _window.on_update([&_window, &_renderer, &_stopwatch]() {
         std::chrono::microseconds _max_fps_period_microseconds = std::chrono::microseconds(static_cast<unsigned int>(
@@ -31,21 +32,22 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
         std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
         // bool _has_thrown = has_userspace_thrown();
         bool _has_polled = _window.poll();
-        if (!detail::has_userspace_thrown()) {
-            // bool _has_polled = _window.poll();
-            bool _has_ticked = detail::tick(_delta_milliseconds);
-            if (_has_polled || _has_ticked) {
-                _renderer.new_frame();
-                detail::draw();
-                _renderer.present();
-            }
-        } else {
-            detail::tick(_delta_milliseconds);
+        // if (!detail::has_userspace_thrown()) {
+        // bool _has_polled = _window.poll();
+        bool _has_ticked = detail::tick(_delta_milliseconds);
+        if (_has_ticked) {
             _renderer.new_frame();
-            detail::draw();
+            detail::draw(false);
             _renderer.present();
         }
-    });
+    }
+        // else {
+        //     detail::tick(_delta_milliseconds);
+        //     _renderer.new_frame();
+        //     detail::draw(false);
+        //     _renderer.present();
+        // }
+    );
     _renderer.set_clear_color({ 1.f, 1.f, 1.f, 1.f });
     _window.run_loop();
     // });

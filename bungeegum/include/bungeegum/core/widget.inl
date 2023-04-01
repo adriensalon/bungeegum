@@ -25,8 +25,9 @@ namespace detail {
             _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
             detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));
 
-            detect_on_draw(widget);
             detect_on_interact(widget);
+            detect_on_resolve(widget);
+            detect_on_draw(widget);
             std::cout << "register created widget [SIMPLE] ... " << reinterpret_cast<std::uintptr_t>(widget) << std::endl;
             return;
         } else {
@@ -39,8 +40,9 @@ namespace detail {
                 _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
                 detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));
 
-                detect_on_draw(widget);
                 detect_on_interact(widget);
+                detect_on_resolve(widget);
+                detect_on_draw(widget);
                 std::cout << "register created widget [COMPLEX] ... " << reinterpret_cast<std::uintptr_t>(widget) << std::endl;
                 return;
             } else {
@@ -56,8 +58,9 @@ namespace detail {
         _data.kind = std::make_unique<std::type_index>(typeid(widget_t));
         detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));
 
-        detect_on_draw(widget);
         detect_on_interact(widget);
+        detect_on_resolve(widget);
+        detect_on_draw(widget);
     }
 
     template <typename widget_t>

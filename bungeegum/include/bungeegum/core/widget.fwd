@@ -27,10 +27,6 @@ namespace detail {
         std::optional<draw_command> drawer_command = std::nullopt;
         std::optional<interact_command> interactor_command = std::nullopt;
         std::optional<resolve_command> resolver_command = std::nullopt;
-
-        // TO DELETE
-        std::function<float2(resolve_command_data&)> widget_resolver = nullptr; // todo
-        std::optional<resolve_command_data> widget_resolver_data = std::nullopt; // todo
     };
 
     struct widgets_registry {
@@ -41,9 +37,9 @@ namespace detail {
         std::unordered_map<void*, entity_t> possessed = {};
         std::unordered_map<void*, untyped_widget_data_reference> accessors = {};
         std::optional<untyped_widget_data_reference> root = std::nullopt;
-        std::vector<untyped_widget_data_reference> drawables = {};
         std::vector<untyped_widget_data_reference> interactables = {};
         std::vector<untyped_widget_data_reference> resolvables = {};
+        std::vector<untyped_widget_data_reference> drawables = {};
 
         // bof ! pas ici peut etre jsp
         void traverse(untyped_widget_data& iterate_root, const untyped_widget_data_callback& iterate_callback);

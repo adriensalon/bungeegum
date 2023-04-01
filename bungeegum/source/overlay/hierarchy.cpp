@@ -63,7 +63,7 @@ namespace detail {
                 font_guard _fg0(extrabold_font);
                 if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags)) {
                     _fg0.release();
-                    if (_widget_data.widget_resolver)
+                    if (_widget_data.resolver)
                         ImGui::Text("has advanced resolve");
                     if (_widget_data.drawer)
                         ImGui::Text("has advanced draw");

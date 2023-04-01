@@ -11,6 +11,8 @@
 namespace bungeegum {
 namespace detail {
 
+    struct context;
+
     struct window_resized_interaction_data {
         bool is_fullscreen;
         float2 new_size;

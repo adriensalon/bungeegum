@@ -67,15 +67,32 @@ namespace widgets {
 
         inline void interact(interact_command& command)
         {
-            std::cout << "~~~~~~ interacting... \n";
+            // std::cout << "~~~~~~ interacting... \n";
+            command.block();
+            switch (command.type()) {
+            case interaction_type::window_resized: {
+                const window_resized_interaction& _interaction_wr = command.window_resized().value();
+                std::cout << "window_resized" << std::endl;
+                must_resolve(this);
+                break;
+            }
+            case interaction_type::mouse_moved: {
+                const mouse_moved_interaction& _interaction_mm = command.mouse_moved().value();
+                std::cout << "mouse_moved" << std::endl;
+                must_draw(this);
+                break;
+            }
+            default:
+                break;
+            }
         }
 
-        template <typename child_widget_t>
-        float2 resolve(resolve_command& command, child_widget_t& child_widget)
+        inline void resolve(resolve_command& command)
         {
-            std::cout << "resolving..." << std::endl;
+            // std::cout << "resolving..." << std::endl;
             // return command.constraint().biggest();
-            return { 600.f, 0.f };
+            // return { 600.f, 0.f };
+            must_draw(this);
         }
 
         inline void draw(draw_command& command)

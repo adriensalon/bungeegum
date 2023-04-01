@@ -1,0 +1,17 @@
+#pragma once
+
+#include <functional>
+
+#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/glue/time.fwd>
+
+namespace bungeegum {
+namespace detail {
+
+    struct bungeegum_functor_data {
+
+        detail::stopwatch stopwatch;
+    };
+
+}
+}

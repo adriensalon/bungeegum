@@ -31,6 +31,7 @@ struct window_resized_interaction {
 private:
     detail::window_resized_interaction_data _data;
     friend struct interact_command;
+    friend struct detail::context;
 };
 
 /// @brief
@@ -47,6 +48,7 @@ struct mouse_moved_interaction {
 private:
     detail::mouse_moved_interaction_data _data;
     friend struct interact_command;
+    friend struct detail::context;
 };
 
 /// @brief
@@ -68,6 +70,7 @@ struct mouse_down_interaction {
 private:
     detail::mouse_down_interaction_data _data;
     friend struct interact_command;
+    friend struct detail::context;
 };
 
 /// @brief
@@ -80,6 +83,7 @@ struct mouse_up_interaction {
 private:
     detail::mouse_up_interaction_data _data;
     friend struct interact_command;
+    friend struct detail::context;
 };
 
 /// @brief
@@ -92,6 +96,7 @@ struct mouse_pressed_interaction {
 private:
     detail::mouse_pressed_interaction_data _data;
     friend struct interact_command;
+    friend struct detail::context;
 };
 
 /// @brief
@@ -127,6 +132,7 @@ struct interact_command {
 
 private:
     detail::interact_command_data _data;
+    friend struct detail::context;
 };
 
 /// @brief
