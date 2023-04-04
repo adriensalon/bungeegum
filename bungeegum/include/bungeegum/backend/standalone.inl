@@ -31,7 +31,7 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
             std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
             bool _has_polled = _window.poll();
             bool _has_ticked = detail::tick(_delta_milliseconds);
-            if (_has_polled || _has_ticked) {
+            if (_has_ticked) {
                 _renderer.new_frame();
                 detail::draw(false);
                 _renderer.present();

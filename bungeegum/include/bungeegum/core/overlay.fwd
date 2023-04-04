@@ -14,23 +14,29 @@ namespace detail {
     constexpr bool is_overlay_enabled = false;
 #endif
 
-    void setup_overlay();
-    void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands);
-
     constexpr inline float footer_height = 28.f;
 
     inline static ImFont* regular_font = nullptr;
     inline static ImFont* extrabold_font = nullptr;
     inline static ImFont* icons_font = nullptr;
 
+    void setup_overlay();
+
+    void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands);
+
     void setup_profiler_overlay();
-    void setup_overlay_theme();
+    
+	void setup_overlay_theme();
 
     void draw_hierarchy_overlay();
-    void draw_inspector_overlay();
-    void draw_profiler_overlay();
-    void draw_report_overlay();
-    void draw_wireframe_overlay();
+    
+	void draw_inspector_overlay();
+    
+	void draw_profiler_overlay();
+    
+	void draw_report_overlay();
+    
+	void draw_wireframe_overlay();
 
 }
 }

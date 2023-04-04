@@ -5,7 +5,7 @@
 namespace bungeegum {
 
 /// @brief
-/// @details https://api.flutter.dev/flutter/rendering/BoxConstraints-class.html
+/// @details We mimick the Flutter RenderBox layout model : https://api.flutter.dev/flutter/rendering/BoxConstraints-class.html
 struct resolve_constraint {
 
     /// @brief
