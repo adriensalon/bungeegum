@@ -10,7 +10,6 @@
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/imguarded.fwd>
 
-
 #include "compressed/fa4.cpp"
 #include "compressed/fa4.hpp"
 #include "compressed/inter_extrabold.cpp"
@@ -92,7 +91,6 @@ namespace detail {
 
     void draw_footer()
     {
-
         ImGuiViewportP* _viewport = (ImGuiViewportP*)(void*)ImGui::GetMainViewport();
         ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
         style_guard _sg0(ImGuiStyleVar_FramePadding, { ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y });

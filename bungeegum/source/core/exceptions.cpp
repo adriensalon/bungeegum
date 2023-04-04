@@ -34,14 +34,14 @@ namespace detail {
     template <>
     void throw_error<error_type::bad_usage>(const std::string& what)
     {
-        throw library_bad_usage_exception(what, backtrace_size_v);
+        throw library_bad_usage_exception(what, backtrace_size);
     }
 
     template <>
     void throw_error<error_type::bad_implementation>(const std::string& what)
     {
         // if not protecting => console
-        throw library_bad_implementation_exception(what, backtrace_size_v);
+        throw library_bad_implementation_exception(what, backtrace_size);
     }
 
     void protect_library(const std::function<void()>& try_callback)
@@ -118,7 +118,7 @@ namespace detail {
 /// @param what
 void throw_error(const std::string& what)
 {
-    throw detail::user_bad_implementation_exception(what, detail::backtrace_size_v);
+    throw detail::user_bad_implementation_exception(what, detail::backtrace_size);
 }
 
 }

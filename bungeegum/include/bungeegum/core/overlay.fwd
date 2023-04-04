@@ -1,8 +1,9 @@
 #pragma once
 
-#include <ImGui.h>
-
 #include <functional>
+
+struct ImDrawList;
+struct ImFont;
 
 namespace bungeegum {
 namespace detail {

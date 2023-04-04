@@ -4,11 +4,11 @@
 
 namespace bungeegum {
 
-resolve_constraint::resolve_constraint(const float2 min_size, const float2 max_size)
-{
-    (void)min_size;
-    (void)max_size;
-}
+// resolve_constraint::resolve_constraint(const float2 min_size, const float2 max_size)
+// {
+//     (void)min_size;
+//     (void)max_size;
+// }
 
 // resolve_constraint::resolve_constraint(const resolve_constraint& other)
 // {
@@ -52,25 +52,25 @@ const float2 resolve_constraint::max_size() const
     return _data.max_size;
 }
 
-resolve_constraint resolve_constraint::flip()
-{
-    resolve_constraint _retval;
+// resolve_constraint resolve_constraint::flip()
+// {
+//     resolve_constraint _retval;
 
-    return resolve_constraint(
-        { min_size().y, min_size().x },
-        { max_size().y, max_size().x });
-}
+//     return resolve_constraint(
+//         { min_size().y, min_size().x },
+//         { max_size().y, max_size().x });
+// }
 
-resolve_constraint resolve_constraint::normalize()
-{
-    float _min_width = std::fmax(min_size().x, 0.f);
-    float _min_height = std::fmax(min_size().y, 0.f);
-    float _max_width = std::fmax(_min_width, max_size().x);
-    float _max_height = std::fmax(_min_height, max_size().y);
-    return resolve_constraint(
-        { _min_width, _min_height },
-        { _max_width, _max_height });
-}
+// resolve_constraint resolve_constraint::normalize()
+// {
+//     float _min_width = std::fmax(min_size().x, 0.f);
+//     float _min_height = std::fmax(min_size().y, 0.f);
+//     float _max_width = std::fmax(_min_width, max_size().x);
+//     float _max_height = std::fmax(_min_height, max_size().y);
+//     return resolve_constraint(
+//         { _min_width, _min_height },
+//         { _max_width, _max_height });
+// }
 
 // resolve_constraint resolve_constraint::enforce(const resolve_constraint& constraint) {
 //     minWidth : clampDouble(minWidth, constraints.minWidth, constraints.maxWidth),
@@ -83,12 +83,12 @@ resolve_constraint resolve_constraint::normalize()
 // {
 // }
 
-resolve_constraint resolve_constraint::loosen()
-{
-    return resolve_constraint(
-        { 0.f, 0.f },
-        max_size());
-}
+// resolve_constraint resolve_constraint::loosen()
+// {
+//     return resolve_constraint(
+//         { 0.f, 0.f },
+//         max_size());
+// }
 
 // resolve_constraint resolve_constraint::tighten(const float2& size)
 // {

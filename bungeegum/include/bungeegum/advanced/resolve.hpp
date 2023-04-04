@@ -7,30 +7,69 @@ namespace bungeegum {
 /// @brief
 /// @details https://api.flutter.dev/flutter/rendering/BoxConstraints-class.html
 struct resolve_constraint {
-    resolve_constraint(const float2 min_size = zero<float2>, const float2 max_size = infinity<float2>);
 
+    /// @brief
     [[nodiscard]] float2& min_size();
+
+    /// @brief
     [[nodiscard]] const float2 min_size() const;
+
+    /// @brief
     [[nodiscard]] float2& max_size();
+
+    /// @brief
     [[nodiscard]] const float2 max_size() const;
 
-    resolve_constraint flip();
-    resolve_constraint normalize();
-    resolve_constraint enforce(const resolve_constraint& constraint);
-    resolve_constraint deflate(const float2 insets);
-    resolve_constraint loosen();
-    resolve_constraint tighten(const float2 size);
+    /// @brief
+    void flip();
 
+    /// @brief
+    void normalize();
+
+    /// @brief
+    /// @param constraint
+    void enforce(const resolve_constraint& constraint);
+
+    /// @brief
+    /// @param insets
+    void deflate(const float2 insets);
+
+    /// @brief
+    void loosen();
+
+    /// @brief
+    /// @param size
+    void tighten(const float2 size);
+
+    /// @brief
     [[nodiscard]] bool has_bounded_height() const;
+
+    /// @brief
     [[nodiscard]] bool has_bounded_width() const;
+
+    /// @brief
     [[nodiscard]] bool has_infinite_height() const;
+
+    /// @brief
     [[nodiscard]] bool has_infinite_width() const;
+
+    /// @brief
     [[nodiscard]] bool has_tight_height() const;
+
+    /// @brief
     [[nodiscard]] bool has_tight_width() const;
+
+    /// @brief
     [[nodiscard]] bool is_normalized() const;
 
+    /// @brief
+    /// @param size
     [[nodiscard]] float2 constrain(const float2 size) const;
+
+    /// @brief
     [[nodiscard]] float2 biggest() const;
+
+    /// @brief
     [[nodiscard]] float2 smallest() const;
 
 private:
@@ -51,16 +90,26 @@ struct resolve_command {
     /// @tparam child_widget_t
     /// @param child_widget
     /// @param constraint
-    /// @return
     template <typename child_widget_t>
     float2 resolve_child(child_widget_t& child_widget, const resolve_constraint& constraint);
 
+    /// @brief
+    /// @tparam child_widget_t
+    /// @param child_widget
+    /// @param max_size
     template <typename child_widget_t>
     float2 resolve_child_loose(child_widget_t& child_widget, const float2 max_size);
 
+    /// @brief
+    /// @tparam child_widget_t
+    /// @param child_widget
+    /// @param fixed_size
     template <typename child_widget_t>
     float2 resolve_child_tight(child_widget_t& child_widget, const float2 fixed_size);
 
+    /// @brief
+    /// @tparam child_widget_t
+    /// @param child_widget
     template <typename child_widget_t>
     float2 resolve_child_expanded(child_widget_t& child_widget);
 

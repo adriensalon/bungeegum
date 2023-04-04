@@ -39,8 +39,6 @@ namespace detail {
     template <typename widget_t>
     untyped_widget_data& get_untyped_widget(widget_t& widget);
 
-    void traverse_untyped_widgets(
-        untyped_widget_data& iterate_root,
-        const std::function<bool(untyped_widget_data&)>& iterate_callback);
+    void traverse_untyped_widgets(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback);
 }
 }

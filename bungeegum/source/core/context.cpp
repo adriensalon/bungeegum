@@ -13,7 +13,7 @@
 namespace bungeegum {
 namespace detail {
 
-    void context::interact()
+    void context::execute_interact()
     {
 #define traverse_interact_impl(interaction_name)                                                                    \
     for (const interaction_name##_interaction_data& _interaction : interaction_name##_interactions) {               \
@@ -41,7 +41,7 @@ namespace detail {
 #undef traverse_interact_impl
     }
 
-    void context::resolve(const std::chrono::milliseconds& delta_time)
+    void context::execute_resolve(const std::chrono::milliseconds& delta_time)
     {
         (void)delta_time;
         bool _resolve_done = false;
@@ -63,7 +63,7 @@ namespace detail {
         }
     }
 
-    void context::draw(ImDrawList* imgui_drawlist, const bool heads_start)
+    void context::execute_draw(ImDrawList* imgui_drawlist, const bool heads_start)
     {
         bool _draw_done = false;
         if (heads_start) {
@@ -123,15 +123,15 @@ namespace detail {
     {
         animations_context.tick(delta_time);
         events_context.tick();
-        context::interact();
-        context::resolve(delta_time);
+        context::execute_interact();
+        context::execute_resolve(delta_time);
         return (has_userspace_thrown() || !widgets_context.drawables.empty());
     }
 
     void draw(const bool heads_start)
     {
         draw_overlay([heads_start](ImDrawList* imgui_drawlist) {
-            context::draw(imgui_drawlist, heads_start);
+            context::execute_draw(imgui_drawlist, heads_start);
         });
     }
 }

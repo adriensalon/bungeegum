@@ -18,11 +18,11 @@ namespace detail {
         inline static std::vector<mouse_up_interaction_data> mouse_up_interactions = {};
         inline static std::vector<mouse_pressed_interaction_data> mouse_pressed_interactions = {};
 
-        static void interact();
+        static void execute_interact();
 
-        static void resolve(const std::chrono::milliseconds& delta_time);
+        static void execute_resolve(const std::chrono::milliseconds& delta_time);
 
-        static void draw(ImDrawList* imgui_drawlist, const bool heads_start);
+        static void execute_draw(ImDrawList* imgui_drawlist, const bool heads_start);
     };
 
     void process_input(const std::any& input);
