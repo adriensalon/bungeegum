@@ -5,7 +5,7 @@
 namespace bungeegum {
 namespace detail {
 
-    void widgets_registry::traverse(untyped_widget_data& iterate_root, const untyped_widget_data_callback& iterate_callback)
+    void traverse_untyped_widgets(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback)
     {
         std::function<void(untyped_widget_data&)> _iterate = [&](untyped_widget_data& _widget_data) {
             bool _continue = iterate_callback(_widget_data);

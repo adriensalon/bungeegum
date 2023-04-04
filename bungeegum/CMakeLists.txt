@@ -1,5 +1,7 @@
 project(bungeegum)
 
+option(BUNGEEGUM_ENABLE_OVERLAY "Enables an overlay diplaying errors etc" ON)
+
 set(bungeegum_source
 	"source/advanced/draw.cpp"
 	"source/advanced/interact.cpp"
@@ -37,6 +39,12 @@ endif()
 add_library(bungeegum "${bungeegum_source}")
 target_include_directories(bungeegum PUBLIC "include")
 set_property(TARGET bungeegum PROPERTY CXX_STANDARD 17)
+
+if(BUNGEEGUM_ENABLE_OVERLAY)
+	target_compile_definitions(bungeegum PUBLIC BUNGEEGUM_ENABLE_OVERLAY)
+endif()
+
+target_compile_definitions(bungeegum PUBLIC BUNGEEGUM_BACKTRACE_SIZE=5)
 
 if(MSVC)
 	target_compile_options(bungeegum PRIVATE /W4 /WX)

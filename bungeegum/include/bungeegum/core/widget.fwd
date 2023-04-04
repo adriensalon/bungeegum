@@ -1,8 +1,6 @@
 #pragma once
 
-#include <chrono>
 #include <functional>
-#include <memory>
 #include <optional>
 #include <typeindex>
 
@@ -16,38 +14,33 @@ namespace bungeegum {
 namespace detail {
 
     struct untyped_widget_data {
-        using untyped_widget_data_reference = std::reference_wrapper<untyped_widget_data>;
-
         std::unique_ptr<std::type_index> kind = nullptr;
-        std::optional<untyped_widget_data_reference> parent = std::nullopt;
-        std::vector<untyped_widget_data_reference> children = {};
-        std::function<void(draw_command&)> drawer = nullptr;
+        std::optional<std::reference_wrapper<untyped_widget_data>> parent = std::nullopt;
+        std::vector<std::reference_wrapper<untyped_widget_data>> children = {};
         std::function<void(interact_command&)> interactor = nullptr;
         std::function<void(resolve_command&)> resolver = nullptr;
-        std::optional<draw_command> drawer_command = std::nullopt;
+        std::function<void(draw_command&)> drawer = nullptr;
         std::optional<interact_command> interactor_command = std::nullopt;
         std::optional<resolve_command> resolver_command = std::nullopt;
+        std::optional<draw_command> drawer_command = std::nullopt;
     };
 
     struct widgets_registry {
-        using untyped_widget_data_reference = std::reference_wrapper<untyped_widget_data>;
-        using untyped_widget_data_callback = std::function<bool(untyped_widget_data&)>;
-
         registry widgets = {};
         std::unordered_map<void*, entity_t> possessed = {};
-        std::unordered_map<void*, untyped_widget_data_reference> accessors = {};
-        std::optional<untyped_widget_data_reference> root = std::nullopt;
-        std::vector<untyped_widget_data_reference> interactables = {};
-        std::vector<untyped_widget_data_reference> resolvables = {};
-        std::vector<untyped_widget_data_reference> drawables = {};
-
-        // bof ! pas ici peut etre jsp
-        void traverse(untyped_widget_data& iterate_root, const untyped_widget_data_callback& iterate_callback);
-
-        template <typename widget_t>
-        untyped_widget_data& get(widget_t& widget);
+        std::unordered_map<void*, std::reference_wrapper<untyped_widget_data>> accessors = {};
+        std::optional<std::reference_wrapper<untyped_widget_data>> root = std::nullopt;
+        std::vector<std::reference_wrapper<untyped_widget_data>> resolvables = {};
+        std::vector<std::reference_wrapper<untyped_widget_data>> drawables = {};
     };
 
     inline widgets_registry widgets_context;
+
+    template <typename widget_t>
+    untyped_widget_data& get_untyped_widget(widget_t& widget);
+
+    void traverse_untyped_widgets(
+        untyped_widget_data& iterate_root,
+        const std::function<bool(untyped_widget_data&)>& iterate_callback);
 }
 }

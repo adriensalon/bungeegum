@@ -7,6 +7,12 @@
 namespace bungeegum {
 namespace detail {
 
+#if defined(BUNGEEGUM_ENABLE_OVERLAY)
+    constexpr bool is_overlay_enabled = true;
+#else
+    constexpr bool is_overlay_enabled = false;
+#endif
+
     void setup_overlay();
     void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands);
 

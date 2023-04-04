@@ -66,7 +66,7 @@ namespace detail {
         animation.min_value = std::make_unique<value_t>(std::forward<value_t>(min_value));
         if (animation.min_value && animation.max_value)
             if ((*animation.max_value) < (*animation.min_value))
-                throw_library_bad_usage("Bad animation min value");
+                throw_error<error_type::bad_usage>("Bad animation min value");
     }
 
     template <typename value_t>
@@ -75,7 +75,7 @@ namespace detail {
         animation.max_value = std::make_unique<value_t>(std::forward<value_t>(max_value));
         if (animation.min_value && animation.max_value)
             if ((*animation.max_value) < (*animation.min_value))
-                throw_library_bad_usage("Bad animation max value");
+                throw_error<error_type::bad_usage>("Bad animation max value");
     }
 
     template <typename value_t, typename duration_unit_t>

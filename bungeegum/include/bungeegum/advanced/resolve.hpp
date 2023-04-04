@@ -35,6 +35,7 @@ struct resolve_constraint {
 
 private:
     detail::resolve_constraint_data _data;
+    friend struct detail::context;
 };
 
 struct resolve_command {
@@ -72,19 +73,15 @@ struct resolve_command {
 
 private:
     detail::resolve_command_data _data;
+    friend struct detail::context;
 };
 
 /// @brief
 /// @tparam widget_t
-/// @tparam ...children_widgets_t
 /// @param widget
 /// @param resolve_callback
-/// @param ...children_widgets
-template <typename widget_t, typename... children_widgets_t>
-void on_resolve(
-    widget_t* widget,
-    const std::function<float2(resolve_command&, children_widgets_t&...)>& resolve_callback,
-    children_widgets_t&... children_widgets);
+template <typename widget_t>
+void on_resolve(widget_t* widget, const std::function<void(resolve_command&)>& resolve_callback);
 
 /// @brief
 /// @tparam widget_t

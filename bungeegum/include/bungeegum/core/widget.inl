@@ -4,10 +4,10 @@ namespace bungeegum {
 namespace detail {
 
     template <typename widget_t>
-    untyped_widget_data& widgets_registry::get(widget_t& widget)
+    untyped_widget_data& get_untyped_widget(widget_t& widget)
     {
         void* _void_widget = reinterpret_cast<void*>(&widget);
-        return accessors.at(_void_widget).get();
+        return widgets_context.accessors.at(_void_widget).get();
     }
 
     template <typename widget_t>
@@ -76,8 +76,8 @@ namespace detail {
         if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&child_widget)) == detail::widgets_context.accessors.end())
             register_widget(&child_widget);
         std::cout << "adopt ! \n";
-        detail::untyped_widget_data& _data = detail::widgets_context.get(*widget);
-        detail::untyped_widget_data& _child_data = detail::widgets_context.get(child_widget);
+        detail::untyped_widget_data& _data = get_untyped_widget(*widget);
+        detail::untyped_widget_data& _child_data = get_untyped_widget(child_widget);
         _child_data.parent = _data;
         _data.children.emplace_back(_child_data);
     }

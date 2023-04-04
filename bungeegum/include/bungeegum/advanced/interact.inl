@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bungeegum/advanced/interact.hpp>
 #include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/widget.hpp>
 
@@ -17,7 +16,7 @@ namespace detail {
     constexpr void detect_on_interact(widget_t* widget)
     {
         if constexpr (detail::has_interact_function_v<widget_t>) {
-            detail::untyped_widget_data& _widget_data = detail::widgets_context.get(*widget);
+            detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(*widget);
             _widget_data.interactor_command = interact_command();
             _widget_data.interactor = [widget](interact_command& command) { // [=widget] otherwise we pass a reference to ptr
                 widget->interact(command);

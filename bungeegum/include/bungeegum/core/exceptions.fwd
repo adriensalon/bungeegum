@@ -9,19 +9,26 @@
 namespace bungeegum {
 namespace detail {
 
-#if defined(bungeegum_BACKTRACE_SIZE)
-    constexpr unsigned int backtrace_size_v = bungeegum_BACKTRACE_SIZE;
+#if defined(BUNGEEGUM_BACKTRACE_SIZE)
+    constexpr unsigned int backtrace_size_v = BUNGEEGUM_BACKTRACE_SIZE;
 #else
     constexpr unsigned int backtrace_size_v = 10;
 #endif
 
-    void throw_library_bad_usage(const std::string& what);
-    void throw_library_bad_implementation(const std::string& what);
+    enum struct error_type {
+        bad_usage,
+        bad_implementation,
+    };
+
+    template <error_type error_t>
+    void throw_error(const std::string& what);
+
     void protect_library(const std::function<void()>& try_callback);
 
     void protect_userspace(const std::function<void()>& try_callback);
-    bool has_userspace_thrown();
-    std::optional<backtraced_exception>& get_userspace_thrown_exception();
 
+    bool has_userspace_thrown();
+
+    std::optional<backtraced_exception>& get_userspace_thrown_exception();
 }
 }

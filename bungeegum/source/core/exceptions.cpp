@@ -31,12 +31,14 @@ namespace detail {
         };
     }
 
-    void throw_library_bad_usage(const std::string& what)
+    template <>
+    void throw_error<error_type::bad_usage>(const std::string& what)
     {
         throw library_bad_usage_exception(what, backtrace_size_v);
     }
 
-    void throw_library_bad_implementation(const std::string& what)
+    template <>
+    void throw_error<error_type::bad_implementation>(const std::string& what)
     {
         // if not protecting => console
         throw library_bad_implementation_exception(what, backtrace_size_v);

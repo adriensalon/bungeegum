@@ -160,6 +160,9 @@ namespace detail {
 
     void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands)
     {
+#if !defined(BUNGEEGUM_ENABLE_OVERLAY)
+        draw_commands(ImGui::GetForegroundDrawList());
+#else
         font_guard _fg0(regular_font);
 
         color_guard _cg0(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 1.f });
@@ -223,6 +226,7 @@ namespace detail {
         draw_report_overlay();
 
         // ImGui::ShowDemoWindow();
+#endif
     }
 }
 

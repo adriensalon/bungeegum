@@ -15,34 +15,34 @@ namespace detail {
     constexpr void detect_on_draw(widget_t* widget)
     {
         if constexpr (detail::has_draw_function_v<widget_t>) {
-            detail::untyped_widget_data& _widget_data = detail::widgets_context.get(*widget);
+            detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(*widget);
             _widget_data.drawer_command = draw_command();
             _widget_data.drawer = [widget](draw_command& command) { // [=widget] otherwise we pass a reference to ptr
                 widget->draw(command);
             };
-            std::cout << "YES \n";
         }
     }
 }
 
-/// @brief
-/// @tparam widget_t
-/// @param widget
-/// @param draw_callback
 template <typename widget_t>
 void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback)
 {
+    if (!draw_callback)
+        detail::throw_library_bad_usage("resolve callback is nullptr");
+    detail::untyped_widget_data& _widget_data = detail::widgets_context.get(*widget);
+    if (!_widget_data.drawer_command.has_value())
+        _widget_data.drawer_command = draw_command();
+    _widget_data.drawer = [widget](draw_command& command) { // [=widget] otherwise we pass a reference to ptr
+        draw_callback(command);
+    };
 }
 
-/// @brief
-/// @tparam widget_t
-/// @param widget
 template <typename widget_t>
 void must_draw(widget_t* widget)
 {
     if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(widget)) == detail::widgets_context.accessors.end())
         detail::register_widget(&widget);
-    detail::untyped_widget_data& _data = detail::widgets_context.get(*widget);
+    detail::untyped_widget_data& _data = detail::get_untyped_widget(*widget);
     detail::widgets_context.drawables.emplace_back(_data);
 }
 }

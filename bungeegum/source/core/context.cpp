@@ -6,21 +6,24 @@
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
+#include <bungeegum/core/exceptions.fwd>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 namespace detail {
 
-    void context::interact(const std::chrono::milliseconds& delta_time)
+    void context::interact()
     {
 #define traverse_interact_impl(interaction_name)                                                                    \
     for (const interaction_name##_interaction_data& _interaction : interaction_name##_interactions) {               \
-        widgets_context.traverse(widgets_context.root.value(), [&_interaction](untyped_widget_data& _widget_data) { \
+        traverse_untyped_widgets(widgets_context.root.value(), [&_interaction](untyped_widget_data& _widget_data) { \
             if (_widget_data.interactor_command.has_value()) {                                                      \
                 _widget_data.interactor_command.value()._data.is_blocked = false;                                   \
                 _widget_data.interactor_command.value()._data.command_data = _interaction;                          \
-                _widget_data.interactor(_widget_data.interactor_command.value());                                   \
+                protect_userspace([&_widget_data]() {                                                               \
+                    _widget_data.interactor(_widget_data.interactor_command.value());                               \
+                });                                                                                                 \
                 bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                         \
                 return _retval;                                                                                     \
             }                                                                                                       \
@@ -36,8 +39,6 @@ namespace detail {
         traverse_interact_impl(mouse_pressed);
 
 #undef traverse_interact_impl
-
-        (void)delta_time;
     }
 
     void context::resolve(const std::chrono::milliseconds& delta_time)
@@ -50,9 +51,12 @@ namespace detail {
                 widgets_context.resolvables.begin(),
                 widgets_context.resolvables.end(),
                 [](auto&& _data_reference) {
-                    untyped_widget_data& _data = _data_reference.get();
-                    if (_data.resolver_command.has_value())
-                        _data.resolver(_data.resolver_command.value());
+                    untyped_widget_data& _widget_data = _data_reference.get();
+                    if (_widget_data.resolver_command.has_value()) {
+                        protect_userspace([&_widget_data]() {
+                            _widget_data.resolver(_widget_data.resolver_command.value());
+                        });
+                    }
                 });
             widgets_context.resolvables.erase(widgets_context.resolvables.begin(), widgets_context.resolvables.end());
             _resolve_done = widgets_context.resolvables.empty();
@@ -71,11 +75,13 @@ namespace detail {
                     widgets_context.drawables.begin(),
                     widgets_context.drawables.end(),
                     [imgui_drawlist](auto&& _data_reference) {
-                        untyped_widget_data& _data = _data_reference.get();
-                        if (_data.drawer_command.has_value()) {
-                            _data.drawer_command.value()._data.commands.clear();
-                            _data.drawer(_data.drawer_command.value());
-                            _data.drawer_command.value()._data.draw(imgui_drawlist);
+                        untyped_widget_data& _widget_data = _data_reference.get();
+                        if (_widget_data.drawer_command.has_value()) {
+                            _widget_data.drawer_command.value()._data.commands.clear();
+                            protect_userspace([&_widget_data]() {
+                                _widget_data.drawer(_widget_data.drawer_command.value());
+                            });
+                            _widget_data.drawer_command.value()._data.draw(imgui_drawlist);
                         }
                     });
                 widgets_context.drawables.erase(widgets_context.drawables.begin(), widgets_context.drawables.end());
@@ -117,9 +123,9 @@ namespace detail {
     {
         animations_context.tick(delta_time);
         events_context.tick();
-        context::interact(delta_time);
+        context::interact();
         context::resolve(delta_time);
-        return (!widgets_context.drawables.empty());
+        return (has_userspace_thrown() || !widgets_context.drawables.empty());
     }
 
     void draw(const bool heads_start)
