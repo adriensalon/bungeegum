@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bungeegum/core/exceptions.fwd>
+
 namespace bungeegum {
 namespace detail {
 
@@ -105,6 +107,19 @@ widget_t& make(widget_args_t&&... widget_args)
 
     std::cout << "creating widget... " << reinterpret_cast<std::uintptr_t>(&_w) << std::endl;
     return _w;
+}
+
+template <typename widget_t>
+void unmake(widget_t& widget)
+{
+    void* _void_widget = reinterpret_cast<void*>(&widget);
+    detail::entity_t _entity;
+    if (detail::widgets_context.accessors.find(_void_widget) == detail::widgets_context.accessors.end())
+        detail::throw_error<detail::error_type::bad_implementation>("widget not found in accessors");
+    _entity = detail::widgets_context.possessed.at(_void_widget);
+    detail::widgets_context.widgets.destroy_entity(_entity);
+    detail::widgets_context.possessed.erase(_void_widget);
+    detail::widgets_context.accessors.erase(_void_widget);
 }
 
 template <typename widget_t, typename... children_widgets_t>

@@ -37,6 +37,7 @@ namespace detail {
         registry& operator=(registry&& other);
 
         entity_t create_entity();
+
         void destroy_entity(const entity_t entity);
 
         template <typename component_t>

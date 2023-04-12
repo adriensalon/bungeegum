@@ -11,8 +11,11 @@ namespace widgets {
 
     struct container {
 
+        image* _image_child = nullptr;
+
         // template <typename child_widget_t>
         container()
+            : _image_child(&(make<image>()))
         {
             // register_widget(this);
             // build(this, child_widget);
@@ -38,7 +41,7 @@ namespace widgets {
             });
 
             myanim->start(); //.detach(*this);
-            adopt(this, make<image>());
+            adopt(this, _image_child);
         }
 
         container& ok()
@@ -64,9 +67,10 @@ namespace widgets {
             case interaction_type::window_resized: {
                 const window_resized_interaction& _interaction_wr = command.window_resized().value();
                 std::cout << "window_resized" << std::endl;
-                must_resolve(this);
                 // throw_error("okok");
-                detail::throw_error<detail::error_type::bad_usage>("okok");
+                // detail::throw_error<detail::error_type::bad_usage>("okok");
+                // unmake(_image_child);
+                must_resolve(this);
                 break;
             }
             case interaction_type::mouse_moved: {
