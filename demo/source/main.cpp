@@ -23,6 +23,10 @@ relou& okokoko()
 
 int main()
 {
+    // bungeegum::event<int>& evvv1 = bungeegum::make_event<int>();
+    // bungeegum::event<int>& evvv2 = bungeegum::make_event<int>(evvv1); // not implemented
+    // bungeegum::event<int>& evvv3 = bungeegum::make_event<int>(std::move(evvv1));
+
     std::cout << reinterpret_cast<std::uintptr_t>(&(okokoko())) << std::endl;
     bungeegum::widgets::container c1, c2;
 

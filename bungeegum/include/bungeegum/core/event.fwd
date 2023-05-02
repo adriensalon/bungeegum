@@ -16,31 +16,46 @@ namespace detail {
     template <typename... values_t>
     struct typed_event_data {
         typed_event_data();
+
+        // shallow copies everything but futures and shared_futures
         typed_event_data(const typed_event_data& other) = delete;
         typed_event_data& operator=(const typed_event_data& other) = delete;
+
+        // deep copies and moves everything
         typed_event_data(typed_event_data&& other);
         typed_event_data& operator=(typed_event_data&& other);
 
+        std::vector<std::function<void(values_t...)>> callbacks = {};
+        std::vector<std::future<future_typelist_t<values_t...>>> futures = {};
+        std::vector<std::shared_future<future_typelist_t<values_t...>>> shared_futures = {};
+
+        ///
+        ///
+        ///
         bool is_attached = true;
         entity_t detached_id = 0;
         std::function<void()> rattach_callback = nullptr;
-        std::vector<std::function<void(values_t...)>> callbacks;
-        std::vector<std::future<future_typelist_t<values_t...>>> futures;
-        std::vector<std::shared_future<future_typelist_t<values_t...>>> shared_futures;
     };
 
     struct untyped_event_data {
-        std::vector<std::type_index> kinds;
-        std::function<void()> tick = nullptr;
+        std::vector<std::type_index> kinds = {};
+        std::function<void()> ticker = nullptr;
     };
 
     struct events_registry {
         registry events = {};
+        std::unordered_map<void*, entity_t> possessed = {};
+        std::unordered_map<void*, std::reference_wrapper<untyped_event_data>> accessors = {};
+        std::vector<std::reference_wrapper<untyped_event_data>> tickeds = {};
+
+        ///
+        ///
+        ///
         std::unordered_map<entity_t, std::reference_wrapper<untyped_event_data>> detached_events = {};
         std::unordered_map<entity_t, std::reference_wrapper<untyped_event_data>> detached_events_to_widgets = {};
 
-        void tick();
-        void iterate(const std::function<void(untyped_event_data&)>& iterate_callback);
+        // void tick();
+        // void iterate(const std::function<void(untyped_event_data&)>& iterate_callback);
 
         template <typename... values_t>
         typed_event_data<values_t...>& create();

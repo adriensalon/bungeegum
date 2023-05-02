@@ -122,7 +122,9 @@ namespace detail {
     bool tick(const std::chrono::milliseconds& delta_time)
     {
         animations_context.tick(delta_time);
-        events_context.tick();
+        detail::events_context.events.iterate<detail::untyped_event_data>([](detail::untyped_event_data& _event_data) {
+            _event_data.ticker();
+        });
         context::execute_interact();
         context::execute_resolve(delta_time);
         return (has_userspace_thrown() || !widgets_context.drawables.empty());

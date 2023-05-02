@@ -7,22 +7,61 @@ namespace bungeegum {
 namespace detail {
 
     template <typename... values_t>
-    typed_event_data<values_t...>::typed_event_data() { }
-
-    template <typename... values_t>
-    typed_event_data<values_t...>::typed_event_data(typed_event_data&& other)
+    untyped_event_data& get_untyped_event(typed_event_data<values_t...>& typed_event)
     {
-        *this = std::move(other);
+        void* _void_typed_event = reinterpret_cast<void*>(&typed_event);
+        return events_context.accessors.at(_void_typed_event).get();
     }
 
     template <typename... values_t>
-    typed_event_data<values_t...>& typed_event_data<values_t...>::operator=(typed_event_data<values_t...>&& other)
+    void register_event(typed_event_data<values_t...>* event_data)
     {
-        is_attached = other.is_attached;
-        callbacks = std::move(other.callbacks);
-        futures = std::move(other.futures);
-        shared_futures = std::move(other.shared_futures);
-        return *this;
+        entity_t _entity = events.create_entity();
+        typed_event_data<values_t...>& event_data = events.create_component<typed_event_data<values_t...>>(_entity);
+        untyped_event_data& _event_data = events.create_component<untyped_event_data>(_entity);
+        _event_data.ticker = [&]() {
+            for (auto _future_it = _event.futures.begin(); _future_it != _event.futures.end();) {
+                if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    if constexpr (future_typelist<values_t...>::is_void()) {
+                        for (auto& _callback : _event.callbacks)
+                            _callback();
+                    } else {
+                        future_typelist_t<values_t...> _vals = _future_it->get();
+                        if constexpr (future_typelist<values_t...>::is_tuple()) {
+                            for (auto& _callback : _event.callbacks)
+                                _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
+                        } else {
+                            for (auto& _callback : _event.callbacks)
+                                _callback(std::forward<values_t>(_vals)...);
+                        }
+                    }
+                    _future_it = _event.futures.erase(_future_it);
+                } else
+                    _future_it++;
+            }
+            for (auto _shared_future_it = _event.shared_futures.begin(); _shared_future_it != _event.shared_futures.end();) {
+                if (_shared_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+
+                    if constexpr (future_typelist<values_t...>::is_void()) {
+                        for (auto& _callback : _event.callbacks)
+                            _callback();
+                    } else {
+                        future_typelist_t<values_t...> _vals = _shared_future_it->get();
+                        if constexpr (future_typelist<values_t...>::is_tuple()) {
+                            for (auto& _callback : _event.callbacks)
+                                _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
+                        } else {
+                            for (auto& _callback : _event.callbacks)
+                                _callback(std::forward<values_t>(_vals)...);
+                        }
+                    }
+                    _shared_future_it = _event.shared_futures.erase(_shared_future_it);
+                } else
+                    _shared_future_it++;
+            }
+        };
+        (_event_data.kinds.emplace_back(typeid(values_t)), ...);
+        return _event;
     }
 
     template <typename... values_t>
@@ -69,56 +108,49 @@ namespace detail {
         event.rattach_callback = []() {};
     }
 
-    template <typename... values_t>
-    typed_event_data<values_t...>& events_registry::create()
-    {
-        entity_t _entity = events.create_entity();
-        typed_event_data<values_t...>& _event = events.create_component<typed_event_data<values_t...>>(_entity);
-        untyped_event_data& _event_data = events.create_component<untyped_event_data>(_entity);
-        _event_data.tick = [&]() {
-            for (auto _future_it = _event.futures.begin(); _future_it != _event.futures.end();) {
-                if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    if constexpr (future_typelist<values_t...>::is_void()) {
-                        for (auto& _callback : _event.callbacks)
-                            _callback();
-                    } else {
-                        future_typelist_t<values_t...> _vals = _future_it->get();
-                        if constexpr (future_typelist<values_t...>::is_tuple()) {
-                            for (auto& _callback : _event.callbacks)
-                                _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
-                        } else {
-                            for (auto& _callback : _event.callbacks)
-                                _callback(std::forward<values_t>(_vals)...);
-                        }
-                    }
-                    _future_it = _event.futures.erase(_future_it);
-                } else
-                    _future_it++;
-            }
-            for (auto _shared_future_it = _event.shared_futures.begin(); _shared_future_it != _event.shared_futures.end();) {
-                if (_shared_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+    // template <typename... values_t>
+    // typed_event_data<values_t...>& events_registry::create()
 
-                    if constexpr (future_typelist<values_t...>::is_void()) {
-                        for (auto& _callback : _event.callbacks)
-                            _callback();
-                    } else {
-                        future_typelist_t<values_t...> _vals = _shared_future_it->get();
-                        if constexpr (future_typelist<values_t...>::is_tuple()) {
-                            for (auto& _callback : _event.callbacks)
-                                _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
-                        } else {
-                            for (auto& _callback : _event.callbacks)
-                                _callback(std::forward<values_t>(_vals)...);
-                        }
-                    }
-                    _shared_future_it = _event.shared_futures.erase(_shared_future_it);
-                } else
-                    _shared_future_it++;
-            }
-        };
-        (_event_data.kinds.emplace_back(typeid(values_t)), ...);
-        return _event;
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+
+    template <typename... values_t>
+    typed_event_data<values_t...>::typed_event_data()
+    {
     }
+
+    // copy !
+
+    template <typename... values_t>
+    typed_event_data<values_t...>::typed_event_data(typed_event_data&& other)
+    {
+        *this = std::move(other);
+    }
+
+    template <typename... values_t>
+    typed_event_data<values_t...>& typed_event_data<values_t...>::operator=(typed_event_data<values_t...>&& other)
+    {
+        is_attached = other.is_attached;
+        callbacks = std::move(other.callbacks);
+        futures = std::move(other.futures);
+        shared_futures = std::move(other.shared_futures);
+        return *this;
+    }
+
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
 
     template <typename... values_t>
     void events_registry::destroy(const typed_event_data<values_t...>& event)
@@ -152,73 +184,18 @@ namespace detail {
 }
 
 template <typename... values_t>
-event(std::function<void(values_t...)>) -> event<values_t...>;
-
-template <typename... values_t>
-event<values_t...>::event()
-    : _data(detail::events_context.create<values_t...>())
-{
-}
-
-template <typename... values_t>
-event<values_t...>::event(const on_trigger_callback& trigger_callback)
-    : _data(detail::events_context.create<values_t...>())
-{
-    _data.callbacks.push_back(trigger_callback);
-}
-
-template <typename... values_t>
-event<values_t...>::event(const event& other)
-{
-    *this = other;
-}
-
-template <typename... values_t>
-event<values_t...>& event<values_t...>::operator=(const event& other)
-{
-    _data = other._data;
-    return *this;
-}
-
-template <typename... values_t>
-event<values_t...>::event(event&& other)
-{
-    *this = std::move(other);
-}
-
-template <typename... values_t>
-event<values_t...>& event<values_t...>::operator=(event<values_t...>&& other)
-{
-    _data = std::move(other._data);
-    return *this;
-}
-
-template <typename... values_t>
-event<values_t...>::~event()
-{
-    if (_data.is_attached)
-        detail::events_context.destroy(_data);
-}
-
-template <typename... values_t>
 event<values_t...>& event<values_t...>::merge(const event<values_t...>& other)
 {
     detail::merge<values_t...>(_data, other._data);
     return *this;
 }
 
-template <typename... values_t>
-event<values_t...>& event<values_t...>::operator+=(const event<values_t...>& other)
-{
-    return merge(other);
-}
-
-template <typename... values_t>
-event<values_t...>& event<values_t...>::attach()
-{
-    detail::attach(_data);
-    return *this;
-}
+// template <typename... values_t>
+// event<values_t...>& event<values_t...>::attach()
+// {
+//     detail::attach(_data);
+//     return *this;
+// }
 
 // template <typename... values_t>
 // template <typename widget_t>
@@ -228,12 +205,12 @@ event<values_t...>& event<values_t...>::attach()
 //     return *this;
 // }
 
-template <typename... values_t>
-event<values_t...>& event<values_t...>::detach()
-{
-    detail::events_context.detach(_data);
-    return *this;
-}
+// template <typename... values_t>
+// event<values_t...>& event<values_t...>::detach()
+// {
+//     detail::events_context.detach(_data);
+//     return *this;
+// }
 
 template <typename... values_t>
 event<values_t...>& event<values_t...>::on_trigger(const on_trigger_callback& trigger_callback)
@@ -243,33 +220,74 @@ event<values_t...>& event<values_t...>::on_trigger(const on_trigger_callback& tr
 }
 
 template <typename... values_t>
-const event<values_t...>& event<values_t...>::trigger(values_t&&... values) const
+event<values_t...>& event<values_t...>::trigger(values_t&&... values) const
 {
     detail::trigger(_data, std::forward<values_t>(values)...);
     return *this;
 }
 
 template <typename... values_t>
-void event<values_t...>::trigger(std::future<future_values>&& future_value)
+event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& future_value)
 {
     detail::trigger(_data, std::move(future_value));
+    return *this;
 }
 
 template <typename... values_t>
-void event<values_t...>::trigger(const std::shared_future<future_values>& shared_future_value)
+event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_values>& shared_future_value)
 {
     detail::trigger(_data, shared_future_value);
+    return *this;
 }
 
 template <typename... values_t>
-std::vector<std::function<void(const values_t&...)>>& event<values_t...>::trigger_callbacks()
+std::vector<std::function<void(const values_t&...)>>& event<values_t...>::callbacks()
 {
     return _data.callbacks;
 }
 
-// template <typename... values_t>
-// const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::trigger_callbacks() const
-// {
-//     return _data.callbacks;
-// }
+template <typename... values_t>
+const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::callbacks() const
+{
+    return _data.callbacks;
+}
+
+template <typename... values_t>
+event<values_t...>& make_event()
+{
+    detail::entity_t _entity = detail::events_context.events.create_entity();
+    detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
+    event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity);
+    if (detail::events_context.accessors.find(&_event) == detail::events_context.accessors.end())
+        detail::events_context.possessed.emplace(reinterpret_cast<void*>(&_event), _entity);
+
+    std::cout << "creating event... " << reinterpret_cast<std::uintptr_t>(&_event) << std::endl;
+    return _event;
+}
+
+template <typename... values_t>
+event<values_t...>& make_event(const event<values_t...>& other)
+{
+    detail::entity_t _entity = detail::events_context.events.create_entity();
+    detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
+    event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity, other);
+    if (detail::events_context.accessors.find(&_event) == detail::events_context.accessors.end())
+        detail::events_context.possessed.emplace(reinterpret_cast<void*>(&_event), _entity);
+
+    std::cout << "creating event... " << reinterpret_cast<std::uintptr_t>(&_event) << std::endl;
+    return _event;
+}
+
+template <typename... values_t>
+event<values_t...>& make_event(event<values_t...>&& other)
+{
+    detail::entity_t _entity = detail::events_context.events.create_entity();
+    detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
+    event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity, std::move(other));
+    if (detail::events_context.accessors.find(&_event) == detail::events_context.accessors.end())
+        detail::events_context.possessed.emplace(reinterpret_cast<void*>(&_event), _entity);
+
+    std::cout << "creating event... " << reinterpret_cast<std::uintptr_t>(&_event) << std::endl;
+    return _event;
+}
 }
