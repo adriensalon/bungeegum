@@ -72,8 +72,8 @@ namespace detail {
         template <typename... values_t>
         void iterate(const std::function<void(typed_event_data<values_t...>&)>& iterate_callback);
 
-        template <typename... values_t>
-        void detach(typed_event_data<values_t...>& event);
+        // template <typename... values_t>
+        // void detach(typed_event_data<values_t...>& event);
     };
 
     inline events_registry events_context;
@@ -90,7 +90,9 @@ namespace detail {
     template <typename... values_t>
     void trigger(typed_event_data<values_t...>& event, const std::shared_future<future_typelist_t<values_t...>>& shared_future_value);
 
-    template <typename... values_t>
-    void attach(typed_event_data<values_t...>& event);
+    // template <typename... values_t>
+    // void attach(typed_event_data<values_t...>& event);
+
+    // traverse!!!!!
 }
 }

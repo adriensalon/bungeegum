@@ -14,12 +14,9 @@ namespace detail {
     }
 
     template <typename... values_t>
-    void register_event(typed_event_data<values_t...>* event_data)
+    void register_event_ticker(typed_event_data<values_t...>& typed_event)
     {
-        entity_t _entity = events.create_entity();
-        typed_event_data<values_t...>& event_data = events.create_component<typed_event_data<values_t...>>(_entity);
-        untyped_event_data& _event_data = events.create_component<untyped_event_data>(_entity);
-        _event_data.ticker = [&]() {
+        typed_event.ticker = [&]() {
             for (auto _future_it = _event.futures.begin(); _future_it != _event.futures.end();) {
                 if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                     if constexpr (future_typelist<values_t...>::is_void()) {
@@ -62,6 +59,33 @@ namespace detail {
         };
         (_event_data.kinds.emplace_back(typeid(values_t)), ...);
         return _event;
+    }
+
+    template <typename... values_t>
+    void register_event(typed_event_data<values_t...>& typed_event)
+    {
+        void* _void_widget = reinterpret_cast<void*>(widget);
+        detail::entity_t _entity;
+        if (detail::widgets_context.possessed.find(_void_widget) != detail::widgets_context.possessed.end()) {
+            _entity = detail::widgets_context.possessed.at(_void_widget);
+            detail::widgets_context.possessed.erase(_void_widget);
+            _REGISTER_WIDGET_IMPL(get);
+            return;
+        } else {
+            auto _existing_entity = detail::widgets_context.widgets.try_get_entity(*widget);
+            if (_existing_entity != std::nullopt) {
+                _entity = _existing_entity.value();
+                _REGISTER_WIDGET_IMPL(get);
+                return;
+            } else
+                _entity = detail::widgets_context.widgets.create_entity();
+        }
+        detail::widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, *widget);
+
+        //
+        //
+        //
+        register_event_ticker(typed_event);
     }
 
     template <typename... values_t>
