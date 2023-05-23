@@ -35,12 +35,6 @@ void adopt(widget_t* widget, children_widgets_t&... children_widgets);
 /// @param ...children_widgets
 template <typename widget_t, typename... children_widgets_t>
 void abandon(widget_t* widget, children_widgets_t&... children_widgets);
-
-/// @brief
-/// @tparam widget_t
-/// @param iterate_function
-template <typename widget_t>
-void iterate(const std::function<void(widget_t&)>& iterate_function);
 }
 
 #include <bungeegum/core/widget.inl>

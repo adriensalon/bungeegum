@@ -1,6 +1,6 @@
 #include <ImGui.h>
 
-#include <bungeegum/advanced/draw.hpp>
+#include <bungeegum/context/draw.hpp>
 
 namespace bungeegum {
 namespace detail {

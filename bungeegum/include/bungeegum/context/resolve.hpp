@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/advanced/resolve.fwd>
+#include <bungeegum/context/resolve.fwd>
 
 namespace bungeegum {
 
@@ -140,4 +140,4 @@ void must_resolve(widget_t* widget);
 
 }
 
-#include <bungeegum/advanced/resolve.inl>
+#include <bungeegum/context/resolve.inl>

@@ -1,4 +1,4 @@
-#include <bungeegum/advanced/interact.hpp>
+#include <bungeegum/context/interact.hpp>
 
 namespace bungeegum {
 namespace detail {

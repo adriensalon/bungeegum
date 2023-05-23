@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/advanced/draw.fwd>
+#include <bungeegum/context/draw.fwd>
 
 namespace bungeegum {
 
@@ -121,4 +121,4 @@ void must_draw(widget_t* widget);
 
 }
 
-#include <bungeegum/advanced/draw.inl>
+#include <bungeegum/context/draw.inl>

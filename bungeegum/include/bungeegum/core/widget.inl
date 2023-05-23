@@ -45,6 +45,11 @@ namespace detail {
 #undef _REGISTER_WIDGET_IMPL
     }
 
+    template <typename widget_t>
+    void unregister_widget(widget_t* widget)
+    {
+    }
+
     template <typename widget_t, typename child_widget_t>
     void adopt_widget(widget_t* widget, child_widget_t& child_widget)
     {
@@ -57,6 +62,11 @@ namespace detail {
         detail::untyped_widget_data& _child_data = get_untyped_widget(child_widget);
         _child_data.parent = _data;
         _data.children.emplace_back(_child_data);
+    }
+
+    template <typename widget_t, typename child_widget_t>
+    void abandon_widget(widget_t* widget, child_widget_t& child_widget)
+    {
     }
 }
 
@@ -95,13 +105,5 @@ void adopt(widget_t* widget, children_widgets_t&... children_widgets)
 template <typename widget_t, typename... children_widgets_t>
 void abandon(widget_t* widget, children_widgets_t&... children_widgets)
 {
-}
-
-template <typename widget_t>
-void iterate(const std::function<void(widget_t&)>& iterate_function)
-{
-    detail::widgets_context.widgets.iterate<std::reference_wrapper<widget_t>>([&iterate_function](std::reference_wrapper<widget_t>& widget) {
-        iterate_function(widget.get());
-    });
 }
 }

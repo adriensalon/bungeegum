@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/advanced/interact.fwd>
+#include <bungeegum/context/interact.fwd>
 
 namespace bungeegum {
 
@@ -143,4 +143,4 @@ template <typename widget_t>
 void on_interact(widget_t* widget, const std::function<void(interact_command&)>& interact_callback);
 }
 
-#include <bungeegum/advanced/interact.inl>
+#include <bungeegum/context/interact.inl>

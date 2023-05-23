@@ -1,6 +1,6 @@
 #include <imgui.h>
 
-#include <bungeegum/advanced/resolve.hpp>
+#include <bungeegum/context/resolve.hpp>
 
 namespace bungeegum {
 

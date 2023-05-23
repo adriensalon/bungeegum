@@ -3,8 +3,8 @@
 
 #include <SDL.h>
 
+#include <bungeegum/context/context.fwd>
 #include <bungeegum/core/animation.hpp>
-#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.fwd>
 #include <bungeegum/core/overlay.fwd>
@@ -15,21 +15,21 @@ namespace detail {
 
     void context::execute_interact()
     {
-#define traverse_interact_impl(interaction_name)                                                                    \
-    for (const interaction_name##_interaction_data& _interaction : interaction_name##_interactions) {               \
-        traverse_untyped_widgets(widgets_context.root.value(), [&_interaction](untyped_widget_data& _widget_data) { \
-            if (_widget_data.interactor_command.has_value()) {                                                      \
-                _widget_data.interactor_command.value()._data.is_blocked = false;                                   \
-                _widget_data.interactor_command.value()._data.command_data = _interaction;                          \
-                protect_userspace([&_widget_data]() {                                                               \
-                    _widget_data.interactor(_widget_data.interactor_command.value());                               \
-                });                                                                                                 \
-                bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                         \
-                return _retval;                                                                                     \
-            }                                                                                                       \
-            return true;                                                                                            \
-        });                                                                                                         \
-    }                                                                                                               \
+#define traverse_interact_impl(interaction_name)                                                                            \
+    for (const interaction_name##_interaction_data& _interaction : interaction_name##_interactions) {                       \
+        widgets_context.traverse_untyped(widgets_context.root.value(), [&_interaction](untyped_widget_data& _widget_data) { \
+            if (_widget_data.interactor_command.has_value()) {                                                              \
+                _widget_data.interactor_command.value()._data.is_blocked = false;                                           \
+                _widget_data.interactor_command.value()._data.command_data = _interaction;                                  \
+                protect_userspace([&_widget_data]() {                                                                       \
+                    _widget_data.interactor(_widget_data.interactor_command.value());                                       \
+                });                                                                                                         \
+                bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                                 \
+                return _retval;                                                                                             \
+            }                                                                                                               \
+            return true;                                                                                                    \
+        });                                                                                                                 \
+    }                                                                                                                       \
     interaction_name##_interactions.clear();
 
         traverse_interact_impl(window_resized);
@@ -124,6 +124,7 @@ namespace detail {
         animations_context.tick(delta_time);
         detail::events_context.events.iterate<detail::untyped_event_data>([](detail::untyped_event_data& _event_data) {
             _event_data.ticker();
+            // std::cout << "ticker is nullptr : " << std::to_string(_event_data.ticker == nullptr) << std::endl;
         });
         context::execute_interact();
         context::execute_resolve(delta_time);

@@ -23,7 +23,28 @@ relou& okokoko()
 
 int main()
 {
-    // bungeegum::event<int>& evvv1 = bungeegum::make_event<int>();
+    {
+
+        bungeegum::event<int>& evvv1 = bungeegum::make_event<int>();
+        evvv1.trigger(std::async([]() {
+            return 44;
+        }));
+        bungeegum::event<int> evvv2;
+        evvv2.trigger(std::async([]() {
+            return 44;
+        }));
+        evvv1.merge(evvv2);
+        evvv1.merge(std::move(evvv2));
+        bungeegum::unmake_event(evvv1);
+    }
+    {
+        bungeegum::event<int> evvv2;
+        evvv2.trigger(std::async([]() {
+            return 44;
+        }));
+        static int kl;
+        kl++;
+    }
     // bungeegum::event<int>& evvv2 = bungeegum::make_event<int>(evvv1); // not implemented
     // bungeegum::event<int>& evvv3 = bungeegum::make_event<int>(std::move(evvv1));
 
@@ -33,9 +54,9 @@ int main()
     auto& c3 = bungeegum::make<bungeegum::widgets::container>();
     auto& c4 = bungeegum::make<bungeegum::widgets::container>();
 
-    bungeegum::iterate<bungeegum::widgets::container>([](bungeegum::widgets::container& cont) {
-        std::cout << "container ! \n";
-    });
+    // bungeegum::iterate<bungeegum::widgets::container>([](bungeegum::widgets::container& cont) {
+    //     std::cout << "container ! \n";
+    // });
 
     bungeegum::launch(c3.ok().child(
         c4.ok().child(c2).ok()));

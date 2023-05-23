@@ -4,9 +4,9 @@
 #include <optional>
 #include <typeindex>
 
-#include <bungeegum/advanced/draw.hpp>
-#include <bungeegum/advanced/interact.hpp>
-#include <bungeegum/advanced/resolve.hpp>
+#include <bungeegum/context/draw.hpp>
+#include <bungeegum/context/interact.hpp>
+#include <bungeegum/context/resolve.hpp>
 #include <bungeegum/glue/detection.fwd>
 #include <bungeegum/glue/registry.fwd>
 
@@ -32,13 +32,10 @@ namespace detail {
         std::optional<std::reference_wrapper<untyped_widget_data>> root = std::nullopt;
         std::vector<std::reference_wrapper<untyped_widget_data>> resolvables = {};
         std::vector<std::reference_wrapper<untyped_widget_data>> drawables = {};
+
+        void traverse_untyped(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback);
     };
 
     inline widgets_registry widgets_context;
-
-    template <typename widget_t>
-    untyped_widget_data& get_untyped_widget(widget_t& widget);
-
-    void traverse_untyped_widgets(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback);
 }
 }

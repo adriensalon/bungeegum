@@ -24,7 +24,8 @@ namespace detail {
                 _animation_data.eval_point = _animation_data.eval_curve.eval(_frac);
                 float _t = _animation_data.eval_point.y;
                 value_t _lerped = lerp<value_t>(std::forward<value_t>(*(_animation.min_value)), std::forward<value_t>(*(_animation.max_value)), _t);
-                trigger<value_t>(_animation.event, std::forward<value_t>(_lerped));
+                for (auto& _callback : _animation.event.callbacks)
+                    _callback(std::forward<value_t>(_lerped));
             }
         };
         _animation_data.kind = std::make_unique<std::type_index>(typeid(value_t));
@@ -156,8 +157,8 @@ animation<value_t>& animation<value_t>::operator=(animation<value_t>&& other)
 template <typename value_t>
 animation<value_t>::~animation()
 {
-    if (_data.event.is_attached)
-        detail::animations_context.destroy(_data);
+    // if (_data.event.is_attached)
+    detail::animations_context.destroy(_data);
 }
 
 template <typename value_t>

@@ -3,15 +3,6 @@ project(bungeegum)
 option(BUNGEEGUM_ENABLE_OVERLAY "Enables an overlay diplaying errors etc" ON)
 
 set(bungeegum_source
-	"source/advanced/draw.cpp"
-	"source/advanced/interact.cpp"
-	"source/advanced/resolve.cpp"
-
-	"source/core/animation.cpp"
-	"source/core/context.cpp"
-	"source/core/event.cpp"
-	"source/core/exceptions.cpp"
-	"source/core/widget.cpp"
 
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"
@@ -19,6 +10,16 @@ set(bungeegum_source
 	"source/glue/imguarded.cpp"
 	"source/glue/registry.cpp"
 	"source/glue/time.cpp"
+
+	"source/context/context.cpp"
+	"source/context/draw.cpp"
+	"source/context/interact.cpp"
+	"source/context/resolve.cpp"
+
+	"source/core/animation.cpp"
+	"source/core/event.cpp"
+	"source/core/exceptions.cpp"
+	"source/core/widget.cpp"
 
 	"source/overlay/compressed/fa4.cpp"
 	"source/overlay/compressed/inter_extrabold.cpp"
