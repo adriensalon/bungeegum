@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <bungeegum/glue/raw.fwd>
 #include <bungeegum/glue/registry.fwd>
 #include <bungeegum/glue/typelist.fwd>
 
@@ -19,7 +20,7 @@ namespace detail {
 
     template <typename... values_t>
     struct typed_event_data {
-        void* raw_event = nullptr;
+        std::uintptr_t raw_event = 0u;
         std::vector<std::function<void(values_t...)>> callbacks = {};
         std::vector<std::future<future_typelist_t<values_t...>>> futures = {};
         std::vector<std::shared_future<future_typelist_t<values_t...>>> shared_futures = {};
@@ -39,8 +40,8 @@ namespace detail {
 
     struct events_registry {
         registry events = {};
-        std::unordered_map<void*, entity_t> possessed = {};
-        std::unordered_map<void*, std::reference_wrapper<untyped_event_data>> registered = {};
+        std::unordered_map<std::uintptr_t, entity_t> possessed = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_event_data>> registered = {};
 
         template <typename... values_t>
         typed_event_data<values_t...>& get_typed(event<values_t...>& event_object);
