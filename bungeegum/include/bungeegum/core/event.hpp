@@ -12,13 +12,15 @@ namespace bungeegum {
 template <typename... values_t>
 struct event {
 
-    /// @brief
+    /// @brief Callback objects
     using on_trigger_callback = std::function<void(const values_t&...)>;
 
-    /// @brief
+    /// @brief Future values resolve to void for event<>, to value_t for event<value_t> and to
+    /// std::tuple<values_t...> for event<values_t...> so that it fits as a template parameter
+    /// for std::future and std::shared_future
     using future_values = detail::future_typelist_t<values_t...>;
 
-    /// @brief
+    /// @brief Merge another event
     /// @details
     event& merge(const event& other);
 
@@ -50,14 +52,6 @@ struct event {
 
     /// @brief
     const std::vector<on_trigger_callback>& callbacks() const;
-
-    /// @brief This is required because of how entt works : a chain of constructor, move
-    /// constructor, destructor of an object that is in an unspecified but safe state, see
-    /// https://github.com/skypjack/entt/issues/488. Idk precisely how but this seems to imply
-    /// that this pointer has not the same void* value in destructor and regular member functions
-    /// @details An alternative would be entt meta destructors (invoked before dtors), see
-    /// https://skypjack.github.io/entt/md_docs_md_meta.html
-    virtual ~event();
 
 private:
     detail::typed_event_data<values_t...> _data;

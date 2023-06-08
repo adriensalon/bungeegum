@@ -23,6 +23,7 @@ relou& okokoko()
 
 int main()
 {
+
     {
 
         bungeegum::event<int>& evvv1 = bungeegum::make_event<int>();
@@ -30,11 +31,13 @@ int main()
             return 44;
         }));
         bungeegum::event<int> evvv2;
+        bungeegum::event<int> evvv3(evvv2);
+        bungeegum::event<int> evvv4;
         evvv2.trigger(std::async([]() {
             return 44;
         }));
-        evvv1.merge(evvv2);
-        evvv1.merge(std::move(evvv2));
+        evvv4.merge(evvv3);
+        // evvv1.merge(std::move(evvv2));
         bungeegum::unmake_event(evvv1);
     }
     {

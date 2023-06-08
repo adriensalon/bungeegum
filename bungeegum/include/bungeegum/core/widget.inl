@@ -5,11 +5,27 @@
 namespace bungeegum {
 namespace detail {
 
+    // free
+
     template <typename widget_t>
     untyped_widget_data& get_untyped_widget(widget_t& widget)
     {
         void* _void_widget = reinterpret_cast<void*>(&widget);
         return widgets_context.accessors.at(_void_widget).get();
+    }
+
+    template <typename widget_t>
+    bool is_widget_registered(widget_t* widget)
+    {
+        void* _void_widget = reinterpret_cast<void*>(widget);
+        return widgets_context.accessors.find(_void_widget) != widgets_context.accessors.end();
+    }
+
+    template <typename widget_t>
+    bool is_widget_possessed(widget_t* widget)
+    {
+        void* _void_widget = reinterpret_cast<void*>(widget);
+        return widgets_context.possessed.find(_void_widget) != widgets_context.possessed.end();
     }
 
     template <typename widget_t>
@@ -27,7 +43,7 @@ namespace detail {
         detail::entity_t _entity;
         if (detail::widgets_context.possessed.find(_void_widget) != detail::widgets_context.possessed.end()) {
             _entity = detail::widgets_context.possessed.at(_void_widget);
-            detail::widgets_context.possessed.erase(_void_widget);
+            // detail::widgets_context.possessed.erase(_void_widget);
             _REGISTER_WIDGET_IMPL(get);
             return;
         } else {
@@ -70,14 +86,16 @@ namespace detail {
     }
 }
 
+// free
+
 template <typename widget_t, typename... widget_args_t>
 widget_t& make(widget_args_t&&... widget_args)
 {
     detail::entity_t _entity = detail::widgets_context.widgets.create_entity();
     detail::widgets_context.widgets.create_component<detail::untyped_widget_data>(_entity);
     widget_t& _widget = detail::widgets_context.widgets.create_component<widget_t>(_entity, std::forward<widget_args_t>(widget_args)...);
-    if (detail::widgets_context.accessors.find(&_widget) == detail::widgets_context.accessors.end())
-        detail::widgets_context.possessed.emplace(reinterpret_cast<void*>(&_widget), _entity);
+    // if (detail::widgets_context.accessors.find(&_widget) == detail::widgets_context.accessors.end())
+    detail::widgets_context.possessed.emplace(reinterpret_cast<void*>(&_widget), _entity);
 
     std::cout << "creating widget... " << reinterpret_cast<std::uintptr_t>(&_widget) << std::endl;
     return _widget;

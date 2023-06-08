@@ -1,0 +1,15 @@
+#pragma once
+
+#include <functional>
+
+namespace bungeegum {
+namespace detail {
+
+    template <typename value_t>
+    constexpr std::uintptr_t raw_cast(value_t* value)
+    {
+        return static_cast<std::uintptr_t>(reinterpret_cast<void*>(value));
+    }
+
+}
+}
