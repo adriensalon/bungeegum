@@ -88,9 +88,31 @@ struct animation {
 
 private:
     detail::typed_animation_data<value_t>& _data; // GO VALUE
+    friend struct detail::animations_registry;
 };
 
-// make animation
+/// @brief
+/// @tparam value_t
+template <typename value_t>
+[[nodiscard]] animation<value_t>& make_animation();
+
+/// @brief
+/// @tparam value_t
+/// @param other_animation
+template <typename value_t>
+[[nodiscard]] animation<value_t>& make_animation(const animation<value_t>& other_animation);
+
+/// @brief
+/// @tparam value_t
+/// @param other_animation
+template <typename value_t>
+[[nodiscard]] animation<value_t>& make_animation(animation<value_t>&& other_animation);
+
+/// @brief
+/// @tparam value_t
+/// @param made_animation
+template <typename value_t>
+void unmake_animation(animation<value_t>& made_animation);
 }
 
 #include <bungeegum/core/animation.inl>

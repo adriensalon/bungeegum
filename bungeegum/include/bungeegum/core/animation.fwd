@@ -1,29 +1,37 @@
 #pragma once
 
 #include <chrono>
-#include <functional>
-#include <optional>
-#include <typeindex>
-#include <vector>
 
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/glue/curve.hpp>
 #include <bungeegum/glue/lerp.fwd>
 
 namespace bungeegum {
+
+template <typename value_t>
+struct animation;
+
 namespace detail {
 
     template <typename value_t>
     struct typed_animation_data {
+        std::uintptr_t raw_animation = 0u;
         std::unique_ptr<value_t> min_value = nullptr;
         std::unique_ptr<value_t> max_value = nullptr;
         typed_event_data<value_t> event;
         float playing_cursor_seconds = 0.f;
         float duration_seconds = 0.f;
+
+        typed_animation_data() = default;
+        typed_animation_data(const typed_animation_data& other) = default;
+        typed_animation_data& operator=(const typed_animation_data& other) = default;
+        typed_animation_data(typed_animation_data&& other) = default;
+        typed_animation_data& operator=(typed_animation_data&& other) = default;
+        ~typed_animation_data();
     };
 
     struct untyped_animation_data {
-        std::unique_ptr<std::type_index> kind;
+        std::unique_ptr<std::type_index> kind = nullptr;
         std::function<void(const std::chrono::milliseconds&)> tick = nullptr;
         bool is_playing = false;
         curve eval_curve { 0.f, 1.f, std::vector<float2> {}, false };
@@ -31,7 +39,14 @@ namespace detail {
     };
 
     struct animations_registry {
-        registry animations;
+        registry animations = {};
+        std::unordered_map<std::uintptr_t, entity_t> possessed = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_animation_data>> registered = {};
+
+        //
+        //
+        //
+        //
 
         void tick(const std::chrono::milliseconds& delta_time);
         void iterate(const std::function<void(untyped_animation_data&)>& iterate_callback);
@@ -39,8 +54,8 @@ namespace detail {
         template <typename value_t>
         typed_animation_data<value_t>& create(events_registry& events);
 
-        template <typename value_t>
-        void destroy(const typed_animation_data<value_t>& animation);
+        // template <typename value_t>
+        // void destroy(const typed_animation_data<value_t>& animation);
 
         template <typename value_t>
         void start(typed_animation_data<value_t>& animation);
@@ -63,11 +78,11 @@ namespace detail {
         template <typename value_t, typename duration_unit_t = std::chrono::seconds>
         void set_animation_duration(typed_animation_data<value_t>& animation, const unsigned int count);
 
-        template <typename value_t>
-        void attach_animation(typed_animation_data<value_t>& animation);
+        // template <typename value_t>
+        // void attach_animation(typed_animation_data<value_t>& animation);
 
-        template <typename value_t>
-        void detach_animation(typed_animation_data<value_t>& animation);
+        // template <typename value_t>
+        // void detach_animation(typed_animation_data<value_t>& animation);
 
         template <typename value_t>
         untyped_animation_data& get(typed_animation_data<value_t>& widget);

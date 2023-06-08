@@ -5,6 +5,19 @@
 namespace bungeegum {
 namespace detail {
 
+    // typed_animation_data
+
+    template <typename value_t>
+    typed_animation_data<value_t>::~typed_animation_data()
+    {
+        // if (is_animation_possessed(raw_animation))
+        //     animations_context.possessed.erase(raw_animation);
+        // if (is_animation_registered(raw_animation))
+        //     animations_context.registered.erase(raw_animation);
+    }
+
+    // animations_registry
+
     template <typename value_t>
     typed_animation_data<value_t>& animations_registry::create(events_registry& events)
     {
@@ -32,10 +45,10 @@ namespace detail {
         return _animation;
     }
 
-    template <typename value_t>
-    void animations_registry::destroy(const typed_animation_data<value_t>& animation)
-    {
-    }
+    // template <typename value_t>
+    // void animations_registry::destroy(const typed_animation_data<value_t>& animation)
+    // {
+    // }
 
     template <typename value_t>
     void animations_registry::start(typed_animation_data<value_t>& animation)
@@ -85,15 +98,15 @@ namespace detail {
         animation.duration_seconds = 0.001f * std::chrono::duration_cast<std::chrono::milliseconds>(duration_unit_t(count)).count();
     }
 
-    template <typename value_t>
-    void animations_registry::attach_animation(typed_animation_data<value_t>& animation)
-    {
-    }
+    // template <typename value_t>
+    // void animations_registry::attach_animation(typed_animation_data<value_t>& animation)
+    // {
+    // }
 
-    template <typename value_t>
-    void animations_registry::detach_animation(typed_animation_data<value_t>& animation)
-    {
-    }
+    // template <typename value_t>
+    // void animations_registry::detach_animation(typed_animation_data<value_t>& animation)
+    // {
+    // }
 
     template <typename value_t>
     untyped_animation_data& animations_registry::get(typed_animation_data<value_t>& animation)
@@ -158,7 +171,7 @@ template <typename value_t>
 animation<value_t>::~animation()
 {
     // if (_data.event.is_attached)
-    detail::animations_context.destroy(_data);
+    // detail::animations_context.destroy(_data);
 }
 
 template <typename value_t>
@@ -245,4 +258,24 @@ animation<value_t>& animation<value_t>::duration(const unsigned int count)
 //     detail::animations_context.detach_animation(_data);
 //     return *this;
 // }
+
+template <typename value_t>
+animation<value_t>& make_animation()
+{
+}
+
+template <typename value_t>
+animation<value_t>& make_animation(const animation<value_t>& other_animation)
+{
+}
+
+template <typename value_t>
+animation<value_t>& make_animation(animation<value_t>&& other_animation)
+{
+}
+
+template <typename value_t>
+void unmake_animation(animation<value_t>& made_animation)
+{
+}
 }

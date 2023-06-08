@@ -271,9 +271,9 @@ event<values_t...>& make_event(event<values_t...>&& other_event)
 }
 
 template <typename... values_t>
-void unmake_event(event<values_t...>& event_object)
+void unmake_event(event<values_t...>& made_event)
 {
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::raw_access_mode::stored>(event_object);
+    std::uintptr_t _raw_event = detail::get_raw_event<detail::raw_access_mode::stored>(made_event);
     detail::entity_t _entity = detail::events_context.possessed.at(_raw_event);
     detail::events_context.events.destroy_entity(_entity);
 }

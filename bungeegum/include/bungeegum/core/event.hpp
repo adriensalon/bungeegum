@@ -79,7 +79,7 @@ template <typename... values_t>
 /// @tparam ...values_t
 /// @param event
 template <typename... values_t>
-void unmake_event(event<values_t...>& event);
+void unmake_event(event<values_t...>& made_event);
 }
 
 #include <bungeegum/core/event.inl>
