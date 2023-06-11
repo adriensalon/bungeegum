@@ -16,8 +16,6 @@ set(bungeegum_source
 	"source/context/interact.cpp"
 	"source/context/resolve.cpp"
 
-	"source/core/animation.cpp"
-	"source/core/event.cpp"
 	"source/core/exceptions.cpp"
 	"source/core/widget.cpp"
 

@@ -1,10 +1,6 @@
 #pragma once
 
-#include <iostream>
 #include <optional>
-
-
-#include <imgui.h>
 
 #include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/widget.hpp>
@@ -51,13 +47,13 @@ namespace detail {
         try {
             try_callback();
         } catch (library_bad_implementation_exception& _exception) {
-            std::cout << "BAD IMPL 2 \n";
+            // std::cout << "BAD IMPL 2 \n";
             // bad implementation exception (traced)
             for (auto& _trace : _exception.tracing)
                 console_log(_trace.primary.function, console_color::green);
         } catch (const std::exception& _exception) {
-            std::cout << "UNKNOWN 2\n";
-            std::cout << _exception.what() << std::endl;
+            // std::cout << "UNKNOWN 2\n";
+            // std::cout << _exception.what() << std::endl;
             (void)_exception;
             // bad implementation exception (non traced)
         }
@@ -96,21 +92,6 @@ namespace detail {
     {
         return userspace_thrown_exception;
     }
-
-    // void display_userspace_gui()
-    // {
-    //     ImGui::StyleColorsLight();
-    //     if (ImGui::Begin("Exception caught")) {
-    //         ImGui::Text(userspace_thrown_exception.value().what());
-    //         for (auto& _trace : userspace_thrown_exception.value().tracing) {
-
-    //             ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
-    //             // ImGui
-    //         }
-    //         ImGui::End();
-    //     }
-    //     ImGui::ShowDemoWindow();
-    // }
 }
 
 /// @brief
