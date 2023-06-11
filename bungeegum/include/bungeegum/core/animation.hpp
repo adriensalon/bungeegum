@@ -14,7 +14,9 @@ enum struct animation_mode {
     random
 };
 
-/// @brief
+/// @brief Animation objects use curves to update variables and can be passed around the user
+/// code with events or typed callbacks. Animations will be fired each frame when started.
+/// @details lifetime
 /// @tparam value_t
 template <typename value_t>
 struct animation {
@@ -39,20 +41,20 @@ struct animation {
     /// @param must_resolve
     animation& on_tick(value_t& value, const bool must_draw = false, const bool must_resolve = false);
 
-    /// @brief
+    /// @brief Starts the animation
     animation& start();
 
-    /// @brief
+    /// @brief Stops the animation
     animation& stop();
 
-    /// @brief
+    /// @brief Resets the animation
     animation& reset();
 
-    /// @brief
+    /// @brief Sets the animation shape from a curve
     /// @param curved_shape
     animation& shape(const curve& curved_shape);
 
-    /// @brief
+    /// @brief Sets the minimal value
     /// @param min_value
     animation& min(value_t&& min_value);
 
@@ -60,7 +62,7 @@ struct animation {
     /// @param min_value
     animation& max(value_t&& min_value);
 
-    /// @brief
+    /// @brief Sets the length
     /// @tparam duration_unit_t
     /// @param count
     template <typename duration_unit_t = std::chrono::seconds>

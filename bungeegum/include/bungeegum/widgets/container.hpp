@@ -17,19 +17,19 @@ namespace widgets {
             : _image_child(&(make<image>()))
         {
             curve mycurve(0.f, 1.f, { float2 { 0.6f, 0.88f } });
-            myanim
-                .max(100.f)
-                .min(20.f)
-                .duration(3)
-                .shape(mycurve)
-                .on_tick([this](const float& _value) {
-                    _tick_value = _value;
-                    std::mutex _mut;
-                    _mut.lock();
-                    must_draw(this);
-                    _mut.unlock();
-                })
-                .start();
+            auto& myanim = make_animation<float>()
+                               .max(100.f)
+                               .min(20.f)
+                               .duration(3)
+                               .shape(mycurve)
+                               .on_tick([this](const float& _value) {
+                                   _tick_value = _value;
+                                   std::mutex _mut;
+                                   _mut.lock();
+                                   must_draw(this);
+                                   _mut.unlock();
+                               })
+                               .start();
             adopt(this, _image_child);
         }
 
@@ -104,7 +104,7 @@ namespace widgets {
 
     private:
         float _tick_value = 20.f;
-        animation<float> myanim;
+        // animation<float> myanim;
     };
 }
 }

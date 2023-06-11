@@ -35,9 +35,10 @@ namespace detail {
     struct untyped_animation_data {
         std::unique_ptr<std::type_index> kind = nullptr;
         std::function<void(const std::chrono::milliseconds&)> ticker = nullptr;
+        // ifdef protected
+        std::vector<float> overlay_samples = {};
+        std::array<float, 2> overlay_position = { 0.f, 0.f };
         //
-        std::array<float, 100> overlay_samples { 0.f };
-        std::array<float, 2> overlay_position { 0.f };
     };
 
     struct animations_registry {
@@ -47,26 +48,6 @@ namespace detail {
 
         template <typename value_t>
         typed_animation_data<value_t>& get_typed(animation<value_t>& animation_object);
-
-        //
-        //
-        //
-        //
-
-        // void tick(const std::chrono::milliseconds& delta_time);
-        // void iterate(const std::function<void(untyped_animation_data&)>& iterate_callback);
-
-        // template <typename value_t>
-        // typed_animation_data<value_t>& create(events_registry& events);
-
-        // template <typename value_t>
-        // untyped_animation_data& get(typed_animation_data<value_t>& widget);
-
-        // template <typename value_t>
-        // typed_animation_data<value_t>& get(untyped_animation_data& data);
-
-        // template <typename value_t>
-        // void iterate(const std::function<void(typed_animation_data<value_t>&)>& iterate_callback);
     };
 
     inline animations_registry animations_context;

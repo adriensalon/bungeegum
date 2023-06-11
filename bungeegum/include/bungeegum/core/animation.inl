@@ -77,7 +77,10 @@ namespace detail {
                 }
                 float _frac = typed_animation.playing_cursor_seconds / typed_animation.duration_seconds;
                 float2 _curve_eval = typed_animation.eval_curve.eval(_frac);
+                // ifdef protected
                 untyped_animation.overlay_position = { _curve_eval.x, _curve_eval.y };
+                untyped_animation.overlay_samples = typed_animation.eval_curve.strided_samples(100);
+                //
                 float _t = _curve_eval.y;
                 value_t _lerped = lerp<value_t>(std::forward<value_t>(*(typed_animation.min_value)), std::forward<value_t>(*(typed_animation.max_value)), _t);
                 for (auto& _callback : typed_animation.event.callbacks)
@@ -201,20 +204,41 @@ animation<value_t>& animation<value_t>::duration(const unsigned int count)
 template <typename value_t>
 animation<value_t>& make_animation()
 {
+    detail::entity_t _entity = detail::animations_context.animations.create_entity();
+    detail::animations_context.animations.create_component<detail::untyped_animation_data>(_entity);
+    animation<value_t>& _animation = detail::animations_context.animations.template create_component<animation<value_t>>(_entity);
+    std::uintptr_t _raw_animation = detail::get_raw_animation<detail::animation_raw_access_mode::animation_recast>(_animation);
+    detail::animations_context.possessed.emplace(_raw_animation, _entity);
+    return _animation;
 }
 
 template <typename value_t>
 animation<value_t>& make_animation(const animation<value_t>& other_animation)
 {
+    detail::entity_t _entity = detail::animations_context.animations.create_entity();
+    detail::animations_context.animations.create_component<detail::untyped_animation_data>(_entity);
+    animation<value_t>& _animation = detail::animations_context.animations.template create_component<animation<value_t>>(_entity, other_animation);
+    std::uintptr_t _raw_animation = detail::get_raw_animation<detail::animation_raw_access_mode::animation_recast>(_animation);
+    detail::animations_context.possessed.emplace(_raw_animation, _entity);
+    return _animation;
 }
 
 template <typename value_t>
 animation<value_t>& make_animation(animation<value_t>&& other_animation)
 {
+    detail::entity_t _entity = detail::animations_context.animations.create_entity();
+    detail::animations_context.animations.create_component<detail::untyped_animation_data>(_entity);
+    animation<value_t>& _animation = detail::animations_context.animations.create_component<animation<value_t>>(_entity, std::move(other_animation));
+    std::uintptr_t _raw_animation = detail::get_raw_animation<detail::animation_raw_access_mode::animation_recast>(_animation);
+    detail::animations_context.possessed.emplace(_raw_animation, _entity);
+    return _animation;
 }
 
 template <typename value_t>
 void unmake_animation(animation<value_t>& made_animation)
 {
+    std::uintptr_t _raw_animation = detail::get_raw_animation<detail::animation_raw_access_mode::animation_stored>(made_animation);
+    detail::entity_t _entity = detail::animations_context.possessed.at(_raw_animation);
+    detail::animations_context.animations.destroy_entity(_entity);
 }
 }
