@@ -27,10 +27,26 @@ void unmake(widget_t& widget);
 /// @param widget
 /// @param ...children_widgets
 template <typename widget_t, typename... children_widgets_t>
+void adopt(widget_t& widget, children_widgets_t&... children_widgets);
+
+/// @brief
+/// @tparam widget_t
+/// @tparam ...children_widgets_t
+/// @param widget
+/// @param ...children_widgets
+template <typename widget_t, typename... children_widgets_t>
 void adopt(widget_t* widget, children_widgets_t&... children_widgets);
 
 /// @brief Unregisters a parenting relationship
 /// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.
+/// @param widget
+/// @param ...children_widgets
+template <typename widget_t, typename... children_widgets_t>
+void abandon(widget_t& widget, children_widgets_t&... children_widgets);
+
+/// @brief
+/// @tparam widget_t
+/// @tparam ...children_widgets_t
 /// @param widget
 /// @param ...children_widgets
 template <typename widget_t, typename... children_widgets_t>

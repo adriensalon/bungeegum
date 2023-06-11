@@ -111,7 +111,20 @@ private:
 /// @param widget
 /// @param draw_callback
 template <typename widget_t>
+void on_draw(widget_t& widget, const std::function<void(draw_command&)>& draw_callback);
+
+/// @brief
+/// @tparam widget_t
+/// @param widget
+/// @param draw_callback
+template <typename widget_t>
 void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback);
+
+/// @brief
+/// @tparam widget_t
+/// @param widget
+template <typename widget_t>
+void must_draw(widget_t& widget);
 
 /// @brief
 /// @tparam widget_t

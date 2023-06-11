@@ -8,6 +8,7 @@
 #include <bungeegum/context/interact.hpp>
 #include <bungeegum/context/resolve.hpp>
 #include <bungeegum/glue/detection.fwd>
+#include <bungeegum/glue/raw.fwd>
 #include <bungeegum/glue/registry.fwd>
 
 namespace bungeegum {
@@ -27,8 +28,8 @@ namespace detail {
 
     struct widgets_registry {
         registry widgets = {};
-        std::unordered_map<void*, entity_t> possessed = {};
-        std::unordered_map<void*, std::reference_wrapper<untyped_widget_data>> accessors = {};
+        std::unordered_map<std::uintptr_t, entity_t> possessed = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_widget_data>> registered = {};
         std::optional<std::reference_wrapper<untyped_widget_data>> root = std::nullopt;
         std::vector<std::reference_wrapper<untyped_widget_data>> resolvables = {};
         std::vector<std::reference_wrapper<untyped_widget_data>> drawables = {};

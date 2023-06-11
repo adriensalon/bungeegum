@@ -130,7 +130,20 @@ private:
 /// @param widget
 /// @param resolve_callback
 template <typename widget_t>
+void on_resolve(widget_t& widget, const std::function<void(resolve_command&)>& resolve_callback);
+
+/// @brief
+/// @tparam widget_t
+/// @param widget
+/// @param resolve_callback
+template <typename widget_t>
 void on_resolve(widget_t* widget, const std::function<void(resolve_command&)>& resolve_callback);
+
+/// @brief
+/// @tparam widget_t
+/// @param widget
+template <typename widget_t>
+void must_resolve(widget_t& widget);
 
 /// @brief
 /// @tparam widget_t
