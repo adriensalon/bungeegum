@@ -13,11 +13,16 @@ namespace detail {
         return raw_cast(widget);
     }
 
+    inline untyped_widget_data& get_untyped_widget(const std::uintptr_t raw_widget)
+    {
+        return widgets_context.registered.at(raw_widget).get();
+    }
+
     template <typename widget_t>
     untyped_widget_data& get_untyped_widget(widget_t& widget)
     {
         std::uintptr_t _raw_widget = get_raw_widget(widget);
-        return widgets_context.registered.at(_raw_widget).get();
+        return get_untyped_widget(_raw_widget);
     }
 
     inline bool is_widget_registered(const std::uintptr_t raw_widget)
@@ -44,13 +49,6 @@ namespace detail {
         return is_widget_possessed(_raw_widget);
     }
 
-    //
-    //
-    //
-    //
-    //
-    //
-
     template <typename widget_t>
     void assign_widget(widget_t& widget, untyped_widget_data& untyped_widget, const std::uintptr_t raw_widget)
     {
@@ -62,57 +60,27 @@ namespace detail {
     }
 
     template <typename widget_t>
-    void register_widget(widget_t& widget)
+    void register_widget(widget_t& widget, const std::uintptr_t raw_widget)
     {
-        // #define _REGISTER_WIDGET_IMPL(operation)                                                                                                \
-//     detail::untyped_widget_data& _data = detail::widgets_context.widgets.##operation##_component<detail::untyped_widget_data>(_entity); \
-//     _data.kind = std::make_unique<std::type_index>(typeid(widget_t));                                                                   \
-//     detail::widgets_context.accessors.insert_or_assign(_void_widget, std::ref(_data));                                                  \
-//     detect_on_interact(widget);                                                                                                         \
-//     detect_on_resolve(widget);                                                                                                          \
-//     detect_on_draw(widget);
-
-        //         void* _void_widget = reinterpret_cast<void*>(widget);
-        //         detail::entity_t _entity;
-        //         if (detail::is_widget_possessed(widget)) {
-        //             _entity = detail::widgets_context.possessed.at(_void_widget);
-        //             // detail::widgets_context.possessed.erase(_void_widget);
-        //             _REGISTER_WIDGET_IMPL(get);
-        //             return;
-        //         } else {
-        //             auto _existing_entity = detail::widgets_context.widgets.try_get_entity(*widget);
-        //             if (_existing_entity != std::nullopt) {
-        //                 _entity = _existing_entity.value();
-        //                 _REGISTER_WIDGET_IMPL(get);
-        //                 return;
-        //             } else
-        //                 _entity = detail::widgets_context.widgets.create_entity();
-        //         }
-        //         detail::widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, *widget);
-        //         _REGISTER_WIDGET_IMPL(create);
-
-        // #undef _REGISTER_WIDGET_IMPL
-
         entity_t _entity;
-        std::uintptr_t _raw_widget = get_raw_widget(widget);
-        if (is_widget_possessed(_raw_widget)) {
-            _entity = widgets_context.possessed.at(_raw_widget);
+        if (is_widget_possessed(raw_widget)) {
+            _entity = widgets_context.possessed.at(raw_widget);
             untyped_widget_data& _untyped_widget = widgets_context.widgets.get_component<untyped_widget_data>(_entity);
-            assign_widget(widget, _untyped_widget, _raw_widget);
+            assign_widget(widget, _untyped_widget, raw_widget);
             return;
         } else {
             std::optional<entity_t> _existing_entity = widgets_context.widgets.try_get_entity(widget);
             if (_existing_entity != std::nullopt) {
                 _entity = _existing_entity.value();
                 untyped_widget_data& _untyped_widget = widgets_context.widgets.get_component<untyped_widget_data>(_entity);
-                assign_widget(widget, _untyped_widget, _raw_widget);
+                assign_widget(widget, _untyped_widget, raw_widget);
                 return;
             }
         }
         _entity = widgets_context.widgets.create_entity();
         widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, widget);
         untyped_widget_data& _untyped_widget = widgets_context.widgets.create_component<untyped_widget_data>(_entity);
-        assign_widget(widget, _untyped_widget, _raw_widget);
+        assign_widget(widget, _untyped_widget, raw_widget);
     }
 
     template <typename widget_t>
@@ -123,17 +91,14 @@ namespace detail {
     template <typename widget_t, typename child_widget_t>
     void adopt_widget(widget_t& widget, child_widget_t& child_widget)
     {
-        if (!detail::is_widget_registered(widget))
-            detail::register_widget(widget);
-        if (!detail::is_widget_registered(child_widget))
-            detail::register_widget(child_widget);
-        // if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(widget)) == detail::widgets_context.accessors.end())
-        //     register_widget(widget);
-        // if (detail::widgets_context.accessors.find(reinterpret_cast<void*>(&child_widget)) == detail::widgets_context.accessors.end())
-        //     register_widget(&child_widget);
-        std::cout << "adopt ! \n";
-        detail::untyped_widget_data& _data = get_untyped_widget(widget);
-        detail::untyped_widget_data& _child_data = get_untyped_widget(child_widget);
+        std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(widget);
+        std::uintptr_t _raw_child_widget = detail::get_raw_widget<child_widget_t>(child_widget);
+        if (!detail::is_widget_registered(_raw_widget))
+            detail::register_widget(widget, _raw_widget);
+        if (!detail::is_widget_registered(_raw_child_widget))
+            detail::register_widget(child_widget, _raw_child_widget);
+        detail::untyped_widget_data& _data = get_untyped_widget(_raw_widget);
+        detail::untyped_widget_data& _child_data = get_untyped_widget(_raw_child_widget);
         _child_data.parent = _data;
         _data.children.emplace_back(_child_data);
     }
@@ -141,6 +106,7 @@ namespace detail {
     template <typename widget_t, typename child_widget_t>
     void abandon_widget(widget_t* widget, child_widget_t& child_widget)
     {
+        // TODO
     }
 }
 
@@ -162,14 +128,18 @@ widget_t& make(widget_args_t&&... widget_args)
 template <typename widget_t>
 void unmake(widget_t& widget)
 {
-    void* _void_widget = reinterpret_cast<void*>(&widget);
-    detail::entity_t _entity;
-    if (detail::widgets_context.accessors.find(_void_widget) == detail::widgets_context.accessors.end())
-        detail::throw_error<detail::error_type::bad_implementation>("widget not found in accessors");
-    _entity = detail::widgets_context.possessed.at(_void_widget);
-    detail::widgets_context.widgets.destroy_entity(_entity);
-    detail::widgets_context.possessed.erase(_void_widget);
-    detail::widgets_context.accessors.erase(_void_widget);
+    // ?
+    // ?
+    // ?
+    // ?
+    // void* _void_widget = reinterpret_cast<void*>(&widget);
+    // detail::entity_t _entity;
+    // if (detail::widgets_context.accessors.find(_void_widget) == detail::widgets_context.accessors.end())
+    //     detail::throw_error<detail::error_type::bad_implementation>("widget not found in accessors");
+    // _entity = detail::widgets_context.possessed.at(_void_widget);
+    // detail::widgets_context.widgets.destroy_entity(_entity);
+    // detail::widgets_context.possessed.erase(_void_widget);
+    // detail::widgets_context.accessors.erase(_void_widget);
 }
 
 template <typename widget_t, typename... children_widgets_t>
