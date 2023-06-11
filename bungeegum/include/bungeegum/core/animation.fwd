@@ -19,8 +19,10 @@ namespace detail {
         std::unique_ptr<value_t> min_value = nullptr;
         std::unique_ptr<value_t> max_value = nullptr;
         typed_event_data<value_t> event;
-        float playing_cursor_seconds = 0.f;
+        curve eval_curve { 0.f, 1.f, std::vector<float2> {}, false };
         float duration_seconds = 0.f;
+        bool is_playing = false;
+        float playing_cursor_seconds = 0.f;
 
         typed_animation_data() = default;
         typed_animation_data(const typed_animation_data& other) = default;
@@ -32,10 +34,10 @@ namespace detail {
 
     struct untyped_animation_data {
         std::unique_ptr<std::type_index> kind = nullptr;
-        std::function<void(const std::chrono::milliseconds&)> tick = nullptr;
-        bool is_playing = false;
-        curve eval_curve { 0.f, 1.f, std::vector<float2> {}, false };
-        float2 eval_point { 0.f, 0.f };
+        std::function<void(const std::chrono::milliseconds&)> ticker = nullptr;
+        //
+        std::array<float, 100> overlay_samples { 0.f };
+        std::array<float, 2> overlay_position { 0.f };
     };
 
     struct animations_registry {
@@ -43,55 +45,28 @@ namespace detail {
         std::unordered_map<std::uintptr_t, entity_t> possessed = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_animation_data>> registered = {};
 
-        //
-        //
-        //
-        //
-
-        void tick(const std::chrono::milliseconds& delta_time);
-        void iterate(const std::function<void(untyped_animation_data&)>& iterate_callback);
-
         template <typename value_t>
-        typed_animation_data<value_t>& create(events_registry& events);
+        typed_animation_data<value_t>& get_typed(animation<value_t>& animation_object);
+
+        //
+        //
+        //
+        //
+
+        // void tick(const std::chrono::milliseconds& delta_time);
+        // void iterate(const std::function<void(untyped_animation_data&)>& iterate_callback);
 
         // template <typename value_t>
-        // void destroy(const typed_animation_data<value_t>& animation);
-
-        template <typename value_t>
-        void start(typed_animation_data<value_t>& animation);
-
-        template <typename value_t>
-        void stop(typed_animation_data<value_t>& animation);
-
-        template <typename value_t>
-        void reset(typed_animation_data<value_t>& animation);
-
-        template <typename value_t>
-        void shape(typed_animation_data<value_t>& animation, const curve& animation_curve);
-
-        template <typename value_t>
-        void set_animation_min(typed_animation_data<value_t>& animation, value_t&& min_value);
-
-        template <typename value_t>
-        void set_animation_max(typed_animation_data<value_t>& animation, value_t&& max_value);
-
-        template <typename value_t, typename duration_unit_t = std::chrono::seconds>
-        void set_animation_duration(typed_animation_data<value_t>& animation, const unsigned int count);
+        // typed_animation_data<value_t>& create(events_registry& events);
 
         // template <typename value_t>
-        // void attach_animation(typed_animation_data<value_t>& animation);
+        // untyped_animation_data& get(typed_animation_data<value_t>& widget);
 
         // template <typename value_t>
-        // void detach_animation(typed_animation_data<value_t>& animation);
+        // typed_animation_data<value_t>& get(untyped_animation_data& data);
 
-        template <typename value_t>
-        untyped_animation_data& get(typed_animation_data<value_t>& widget);
-
-        template <typename value_t>
-        typed_animation_data<value_t>& get(untyped_animation_data& data);
-
-        template <typename value_t>
-        void iterate(const std::function<void(typed_animation_data<value_t>&)>& iterate_callback);
+        // template <typename value_t>
+        // void iterate(const std::function<void(typed_animation_data<value_t>&)>& iterate_callback);
     };
 
     inline animations_registry animations_context;

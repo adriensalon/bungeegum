@@ -13,34 +13,23 @@ namespace widgets {
 
         image* _image_child = nullptr;
 
-        // template <typename child_widget_t>
         container()
             : _image_child(&(make<image>()))
         {
-            // register_widget(this);
-            // build(this, child_widget);
-            // // testanim.assign(this, _tick_value);
-            // curve mycurve(0.f, 1.f, { float2 { 0.6f, 0.88f } });
-            // animation<float> myanim(mycurve, 0.5f, 1.5f);
-            // myanim.max(100.f).min(20.f).duration(9).shape(mycurve);
-            // myanim.on_tick([this](const float& _value) {
-            //     _tick_value = _value;
-            //     must_draw(this);
-            // });
-            // myanim.start().detach();
             curve mycurve(0.f, 1.f, { float2 { 0.6f, 0.88f } });
-            myanim = std::make_unique<animation<float>>(mycurve, 0.5f, 1.5f);
-            myanim->max(100.f).min(20.f).duration(3).shape(mycurve);
-            myanim->on_tick([this](const float& _value) {
-                _tick_value = _value;
-                // std::cout << "playin " << reinterpret_cast<uintptr_t>(this) << std::endl;
-                std::mutex _mut;
-                _mut.lock();
-                must_draw(this);
-                _mut.unlock();
-            });
-
-            myanim->start(); //.detach(*this);
+            myanim
+                .max(100.f)
+                .min(20.f)
+                .duration(3)
+                .shape(mycurve)
+                .on_tick([this](const float& _value) {
+                    _tick_value = _value;
+                    std::mutex _mut;
+                    _mut.lock();
+                    must_draw(this);
+                    _mut.unlock();
+                })
+                .start();
             adopt(this, _image_child);
         }
 
@@ -115,7 +104,7 @@ namespace widgets {
 
     private:
         float _tick_value = 20.f;
-        std::unique_ptr<animation<float>> myanim;
+        animation<float> myanim;
     };
 }
 }

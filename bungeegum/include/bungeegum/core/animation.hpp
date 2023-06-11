@@ -26,26 +26,6 @@ struct animation {
     using on_tick_callback = std::function<void(const value_t&)>;
 
     /// @brief
-    /// @tparam duration_unit_t
-    /// @param curved_shape
-    /// @param min_value
-    /// @param max_value
-    /// @param duration_count
-    /// @param mode
-    template <typename duration_unit_t = std::chrono::seconds>
-    animation(
-        const curve& curved_shape,
-        lerpable_value&& min_value,
-        lerpable_value&& max_value,
-        const unsigned int duration_count = 1,
-        const animation_mode mode = animation_mode::forward);
-    animation(const animation& other);
-    animation& operator=(const animation& other);
-    animation(animation&& other);
-    animation& operator=(animation&& other);
-    ~animation();
-
-    /// @brief
     /// @param value_changed_event
     animation& on_value_changed(const event<value_t>& value_changed_event);
 
@@ -87,7 +67,7 @@ struct animation {
     animation& duration(const unsigned int count);
 
 private:
-    detail::typed_animation_data<value_t>& _data; // GO VALUE
+    detail::typed_animation_data<value_t> _data;
     friend struct detail::animations_registry;
 };
 

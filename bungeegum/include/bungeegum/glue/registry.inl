@@ -8,6 +8,7 @@ namespace detail {
     template <typename component_t>
     entity_t registry::get_entity(component_t& component)
     {
+        // maintain an std::unordered_set ?
         return entt::to_entity(_registry, component);
     }
 

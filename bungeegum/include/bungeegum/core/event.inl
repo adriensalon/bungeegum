@@ -39,38 +39,38 @@ namespace detail {
 
     // free
 
-    enum raw_access_mode {
-        recast,
-        stored
+    enum event_raw_access_mode {
+        event_recast,
+        event_stored
     };
 
-    template <raw_access_mode access_mode_t, typename... values_t>
+    template <event_raw_access_mode access_mode_t, typename... values_t>
     std::uintptr_t get_raw_event(event<values_t...>& event_object)
     {
-        if constexpr (access_mode_t == raw_access_mode::recast)
+        if constexpr (access_mode_t == event_raw_access_mode::event_recast)
             return raw_cast(event_object);
-        else if constexpr (access_mode_t == raw_access_mode::stored)
+        else if constexpr (access_mode_t == event_raw_access_mode::event_stored)
             return events_context.get_typed<values_t...>(event_object).raw_event;
     }
 
-    inline bool is_event_registered(std::uintptr_t raw_event)
+    inline bool is_event_registered(const std::uintptr_t raw_event)
     {
         return events_context.registered.find(raw_event) != events_context.registered.end();
     }
 
-    template <raw_access_mode access_mode_t, typename... values_t>
+    template <event_raw_access_mode access_mode_t, typename... values_t>
     bool is_event_registered(event<values_t...>& event_object)
     {
         std::uintptr_t _raw_event = get_raw_event<access_mode_t, values_t...>(event_object);
         return is_event_registered(_raw_event);
     }
 
-    inline bool is_event_possessed(std::uintptr_t raw_event)
+    inline bool is_event_possessed(const std::uintptr_t raw_event)
     {
         return events_context.possessed.find(raw_event) != events_context.possessed.end();
     }
 
-    template <raw_access_mode access_mode_t, typename... values_t>
+    template <event_raw_access_mode access_mode_t, typename... values_t>
     bool is_event_possessed(event<values_t...>& event_object)
     {
         std::uintptr_t _raw_event = get_raw_event<access_mode_t, values_t...>(event_object);
@@ -138,10 +138,10 @@ namespace detail {
     }
 
     template <typename... values_t>
-    void register_event(event<values_t...>& event_object, std::uintptr_t raw_event)
+    void register_event(event<values_t...>& event_object, const std::uintptr_t raw_event)
     {
         entity_t _entity;
-        if (is_event_possessed<detail::raw_access_mode::recast>(event_object)) {
+        if (is_event_possessed(raw_event)) {
             _entity = events_context.possessed.at(raw_event);
             untyped_event_data& _untyped_event = events_context.events.get_component<untyped_event_data>(_entity);
             assign_event(event_object, _untyped_event, raw_event);
@@ -206,7 +206,7 @@ event<values_t...>& event<values_t...>::trigger(values_t&&... values) const
 template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& future_value)
 {
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::raw_access_mode::recast>(*this);
+    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(*this);
     if (!detail::is_event_registered(_raw_event))
         detail::register_event(*this, _raw_event);
     _data.futures.push_back(std::move(future_value));
@@ -216,7 +216,7 @@ event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& fut
 template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_values>& shared_future_value)
 {
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::raw_access_mode::recast>(*this);
+    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(*this);
     if (!detail::is_event_registered(_raw_event))
         detail::register_event(*this, _raw_event);
     _data.shared_futures.push_back(shared_future_value);
@@ -243,7 +243,7 @@ event<values_t...>& make_event()
     detail::entity_t _entity = detail::events_context.events.create_entity();
     detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
     event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity);
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::raw_access_mode::recast>(_event);
+    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
     detail::events_context.possessed.emplace(_raw_event, _entity);
     return _event;
 }
@@ -254,7 +254,7 @@ event<values_t...>& make_event(const event<values_t...>& other_event)
     detail::entity_t _entity = detail::events_context.events.create_entity();
     detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
     event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity, other_event);
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::raw_access_mode::recast>(_event);
+    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
     detail::events_context.possessed.emplace(_raw_event, _entity);
     return _event;
 }
@@ -265,7 +265,7 @@ event<values_t...>& make_event(event<values_t...>&& other_event)
     detail::entity_t _entity = detail::events_context.events.create_entity();
     detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
     event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity, std::move(other_event));
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::raw_access_mode::recast>(_event);
+    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
     detail::events_context.possessed.emplace(_raw_event, _entity);
     return _event;
 }
@@ -273,7 +273,7 @@ event<values_t...>& make_event(event<values_t...>&& other_event)
 template <typename... values_t>
 void unmake_event(event<values_t...>& made_event)
 {
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::raw_access_mode::stored>(made_event);
+    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_stored>(made_event);
     detail::entity_t _entity = detail::events_context.possessed.at(_raw_event);
     detail::events_context.events.destroy_entity(_entity);
 }

@@ -14,7 +14,7 @@ namespace detail {
     template <typename value_t>
     constexpr std::uintptr_t raw_cast(value_t& value)
     {
-        return reinterpret_cast<std::uintptr_t>(static_cast<void*>(&value));
+        return reinterpret_cast<std::uintptr_t>(static_cast<void*>(std::addressof(value)));
     }
 
     template <typename value_t>
