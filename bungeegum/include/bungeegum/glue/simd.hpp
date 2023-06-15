@@ -33,4 +33,18 @@ constexpr inline float3 infinity<float3> = { infinity<float>, infinity<float>, i
 
 template <>
 constexpr inline float4 infinity<float4> = { infinity<float>, infinity<float>, infinity<float>, infinity<float> };
+
+template <typename value_t>
+constexpr inline bool is_finite(const value_t value) { return (value != infinity<value_t>); }
+
+template <>
+constexpr inline bool is_finite<float2>(const float2 value) { return ((value.x != infinity<float>)&&(value.y != infinity<float>)); }
+
+template <>
+constexpr inline bool is_finite<float3>(const float3 value) { return ((value.x != infinity<float>)&&(value.y != infinity<float>)&&(value.z != infinity<float>)); }
+
+// todo is_finite
+
+template <typename value_t>
+constexpr inline bool is_infinite(const value_t value) { return (value == infinity<value_t>); }
 }

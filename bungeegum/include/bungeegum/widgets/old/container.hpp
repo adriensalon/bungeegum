@@ -11,9 +11,33 @@ namespace widgets {
 
     struct container {
 
+        // alignment
+
+        template <typename child_widget_t>
+        container& child(child_widget_t& child_widget)
+        {
+            adopt(this, child_widget);
+            return *this;
+        }
+
+        // clip behavior
+
+        container& color(const float4 background_color);
+
+        // decoration ?
+        // foreground decoration ?
+
+        // private ???
+        void interact(interact_command& command);
+        void resolve(resolve_command& command);
+        void draw(draw_command& command);
+    };
+
+    struct old_container {
+
         // image _image_child;
 
-        container()
+        old_container()
         {
             curve mycurve(0.f, 1.f, { float2 { 0.6f, 0.88f } });
             auto& myanim = make_animation<float>()
@@ -32,7 +56,7 @@ namespace widgets {
             // adopt(this, _image_child);
         }
 
-        container& ok()
+        old_container& ok()
         {
             // adopt(this, _image_child);
             // std::uintptr_t _raw_widget = detail::get_raw_widget<container>(*this);
@@ -41,7 +65,7 @@ namespace widgets {
         }
 
         template <typename child_widget_t>
-        container& child(child_widget_t& child_widget)
+        old_container& child(child_widget_t& child_widget)
         {
             adopt(this, child_widget);
             // build(this, child_widget);

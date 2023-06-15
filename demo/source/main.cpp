@@ -52,8 +52,8 @@ int main()
     // bungeegum::event<int>& evvv3 = bungeegum::make_event<int>(std::move(evvv1));
 
     // std::cout << reinterpret_cast<std::uintptr_t>(&(okokoko())) << std::endl;
-    bungeegum::widgets::container c1, c2;
-    bungeegum::widgets::image i1;
+    // bungeegum::widgets::container c1, c2;
+    // bungeegum::widgets::image i1;
 
     // auto& c3 = bungeegum::make<bungeegum::widgets::container>(); //.ok().ok();
     // auto& c4 = bungeegum::make<bungeegum::widgets::container>();
@@ -62,7 +62,7 @@ int main()
     //     std::cout << "container ! \n";
     // });
 
-    bungeegum::launch(c1.child(c2).child(i1));
+    // bungeegum::launch(c1.child(c2).child(i1));
 
     return 0;
 }

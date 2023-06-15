@@ -16,10 +16,6 @@
 #include <bungeegum/backend/embedded.hpp>
 #include <bungeegum/backend/standalone.hpp>
 
-#include <bungeegum/widgets/align.hpp>
-#include <bungeegum/widgets/center.hpp>
-#include <bungeegum/widgets/column.hpp>
-#include <bungeegum/widgets/container.hpp>
-#include <bungeegum/widgets/image.hpp>
-#include <bungeegum/widgets/list_view.hpp>
-#include <bungeegum/widgets/row.hpp>
+#include <bungeegum/widgets/Align.hpp>
+#include <bungeegum/widgets/Offset.hpp>
+#include <bungeegum/widgets/Size.hpp>

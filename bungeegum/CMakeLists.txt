@@ -27,7 +27,12 @@ set(bungeegum_source
 	"source/overlay/overlay.cpp"
 	"source/overlay/profiler.cpp"
 	"source/overlay/report.cpp"
-	"source/overlay/wireframe.cpp")
+	"source/overlay/wireframe.cpp"
+
+	"source/widgets/Align.cpp"
+	"source/widgets/Offset.cpp"
+	"source/widgets/Size.cpp"
+)
 
 if(BUNGEEGUM_BUILD_LAUNCHER)
 	set(bungeegum_source ${bungeegum_source}
