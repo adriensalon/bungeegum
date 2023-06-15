@@ -11,10 +11,9 @@ namespace widgets {
 
     struct container {
 
-        image* _image_child = nullptr;
+        // image _image_child;
 
         container()
-            : _image_child(&(make<image>()))
         {
             curve mycurve(0.f, 1.f, { float2 { 0.6f, 0.88f } });
             auto& myanim = make_animation<float>()
@@ -30,12 +29,14 @@ namespace widgets {
                                    _mut.unlock();
                                })
                                .start();
-            adopt(this, _image_child);
+            // adopt(this, _image_child);
         }
 
         container& ok()
         {
-            // register_widget(this);
+            // adopt(this, _image_child);
+            // std::uintptr_t _raw_widget = detail::get_raw_widget<container>(*this);
+            // detail::register_widget(*this, _raw_widget);
             return *this;
         }
 

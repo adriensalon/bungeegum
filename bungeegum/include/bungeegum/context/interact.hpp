@@ -103,7 +103,7 @@ private:
 /// @details
 struct interact_command {
 
-    /// @brief
+    /// @brief Stops propagation IG
     void block();
 
     /// @brief
