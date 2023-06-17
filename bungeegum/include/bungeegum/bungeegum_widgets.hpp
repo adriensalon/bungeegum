@@ -5,3 +5,5 @@
 #include <bungeegum/widgets/misc/Size.hpp>
 
 #include <bungeegum/widgets/Align.hpp>
+#include <bungeegum/widgets/Container.hpp>
+#include <bungeegum/widgets/Title.hpp>

@@ -8,6 +8,15 @@
 #include <bungeegum/glue/window.fwd>
 
 namespace bungeegum {
+namespace detail {
+
+    inline static bool is_desired_app_color_changed = false;
+    inline static float4 desired_app_color = { 1.f, 1.f, 1.f, 1.f };
+    inline static bool is_desired_app_title_changed = false;
+    inline static std::string desired_app_title = "Bungeegum App";
+
+    void update_desired_data(window& current_window);
+}
 
 template <typename widget_t>
 void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
@@ -26,6 +35,8 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
             detail::process_input(_event);
         });
         _window.on_update([&_window, &_renderer, &_stopwatch]() {
+            detail::update_desired_data(_window);
+
             std::chrono::microseconds _max_fps_period_microseconds = std::chrono::microseconds(static_cast<unsigned int>(std::floorf(1000000.f / 60.f /* MAX FPS !!!*/)));
             std::chrono::microseconds _delta_time = _stopwatch.lap_at_least(_max_fps_period_microseconds);
             std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);

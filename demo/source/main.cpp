@@ -75,19 +75,24 @@ int main()
     Offset offlerp = bungeegum::lerp(off, off2, 1.f);
     Offset zerooff = bungeegum::zero<Offset>;
 
-    Align _align, _align2;
+    Title _title;
+    Align _align;
+    Container _container;
 
-    Color col = Color::fromRGBO(255, 122, 100, 1.f);
-    std::cout << col.alpha() << ", " << col.red() << ", " << col.green() << ", " << col.blue() << std::endl;
+    // Color col = Color::fromRGBO(255, 122, 100, 1.f);
+    // std::cout << col.alpha() << ", " << col.red() << ", " << col.green() << ", " << col.blue() << std::endl;
 
-    bungeegum::launch(_align
-                          .child(_align2
+    bungeegum::launch(_title
+                          .title("my title !!!")
+                          .child(_align
+                                     .child(_container
+                                                .color(Color::fromRGBO(255, 122, 121, 1.f)))
                                      .alignment(Alignment::center())
                                      .heightFactor(0.5f)
-                                     .widthFactor(0.5f))
-                          .alignment(Alignment::center())
-                          .heightFactor(0.5f)
-                          .widthFactor(0.5f));
+                                     .widthFactor(0.5f)),
+        [&]() {
+            bungeegum::must_draw(_container);
+        });
 
     return 0;
 }

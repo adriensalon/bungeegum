@@ -2,7 +2,19 @@
 
 #include <functional>
 
+#include <bungeegum/glue/simd.hpp>
+
 namespace bungeegum {
+
+/// @brief
+struct bungeegum_app {
+
+    /// @brief
+    static void color(const float4 rgba);
+
+    /// @brief
+    static void title(const std::string& description);
+};
 
 /// @brief Starts an infinite loop
 /// @tparam widget_t

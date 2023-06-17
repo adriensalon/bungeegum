@@ -4,6 +4,8 @@ option(BUNGEEGUM_ENABLE_OVERLAY "Enables an overlay diplaying errors etc" ON)
 
 set(bungeegum_source
 
+	"source/backend/standalone.cpp"
+
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"
 	"source/glue/curve.cpp"
@@ -36,6 +38,8 @@ set(bungeegum_source
 	"source/widgets/misc/Size.cpp"
 
 	"source/widgets/Align.cpp"
+	"source/widgets/Container.cpp"
+	"source/widgets/Title.cpp"
 )
 
 if(BUNGEEGUM_BUILD_LAUNCHER)
