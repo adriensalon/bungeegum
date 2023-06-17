@@ -11,15 +11,19 @@ namespace widgets {
     /// Immitates https://api.flutter.dev/flutter/widgets/Container-class.html
     struct Container {
 
-        /// @brief The widget below this widget in the tree.
-        /// @tparam child_widget_t
-        /// @param value
+        /// @brief The child contained by the container.
         template <typename child_widget_t>
-        Center& child(child_widget_t& value)
+        Container& child(child_widget_t& value)
         {
             adopt(this, value);
             return *this;
         }
+
+        /// @brief The color to paint behind the child.
+        /// @details This property should be preferred when the background is a simple color. For
+        /// other cases, such as gradients or images, use the decoration property. If the
+        /// decoration is used, this property will not.
+        Container& color(const float3 value);
 
         /// @brief Sets its height to the child's height multiplied by this factor.
         /// @param value

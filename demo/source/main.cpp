@@ -1,6 +1,8 @@
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum/bungeegum_widgets.hpp>
 
+#include <sstream>
+
 struct A {
 
     A()
@@ -74,6 +76,9 @@ int main()
     Offset zerooff = bungeegum::zero<Offset>;
 
     Align _align, _align2;
+
+    Color col = Color::fromRGBO(255, 122, 100, 1.f);
+    std::cout << col.alpha() << ", " << col.red() << ", " << col.green() << ", " << col.blue() << std::endl;
 
     bungeegum::launch(_align
                           .child(_align2

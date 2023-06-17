@@ -4,14 +4,23 @@
 
 #include <glm/glm.hpp>
 
+#define simd_precision glm::packed_highp
+
 namespace bungeegum {
 
 using float1 = float;
-using float2 = glm::vec2;
-using float3 = glm::vec3;
-using float4 = glm::vec4;
-using float3x3 = glm::mat3;
-using float4x4 = glm::mat4;
+using float2 = glm::vec<2, float, simd_precision>;
+using float3 = glm::vec<3, float, simd_precision>;
+using float4 = glm::vec<4, float, simd_precision>;
+using float3x3 = glm::mat<3, 3, glm::f32, simd_precision>;
+using float4x4 = glm::mat<4, 4, glm::f32, simd_precision>;
+
+using uint1 = unsigned int;
+using uint2 = glm::vec<2, unsigned int, simd_precision>;
+using uint3 = glm::vec<3, unsigned int, simd_precision>;
+using uint4 = glm::vec<4, unsigned int, simd_precision>;
+using uint3x3 = glm::mat<3, 3, unsigned int, simd_precision>;
+using uint4x4 = glm::mat<4, 4, unsigned int, simd_precision>;
 
 // zero
 
