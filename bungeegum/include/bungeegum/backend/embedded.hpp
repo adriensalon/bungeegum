@@ -8,17 +8,17 @@ namespace bungeegum {
 struct bungeegum_functor {
 
     /// @brief
-    void operator()();
+    inline void operator()();
 
     /// @brief
     /// @param size
     /// @param fullscreen
-    void notify_window_resized(const float2 size, const bool fullscreen);
+    inline void notify_window_resized(const float2 size, const bool fullscreen);
 
     /// @brief
     /// @param absolute_position
     /// @param relative_position
-    void notify_mouse_moved(const float2 absolute_position, const float2 relative_position);
+    inline void notify_mouse_moved(const float2 absolute_position, const float2 relative_position);
 
 private:
     detail::bungeegum_functor_data _data;

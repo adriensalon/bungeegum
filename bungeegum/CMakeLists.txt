@@ -29,9 +29,12 @@ set(bungeegum_source
 	"source/overlay/report.cpp"
 	"source/overlay/wireframe.cpp"
 
+	"source/widgets/misc/Alignment.cpp"
+	"source/widgets/misc/Offset.cpp"
+	"source/widgets/misc/Rect.cpp"
+	"source/widgets/misc/Size.cpp"
+
 	"source/widgets/Align.cpp"
-	"source/widgets/Offset.cpp"
-	"source/widgets/Size.cpp"
 )
 
 if(BUNGEEGUM_BUILD_LAUNCHER)

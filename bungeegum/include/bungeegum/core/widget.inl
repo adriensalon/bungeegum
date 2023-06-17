@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bungeegum/core/access.fwd>
 #include <bungeegum/core/exceptions.fwd>
 
 namespace bungeegum {
@@ -54,9 +55,9 @@ namespace detail {
     {
         untyped_widget.kind = std::make_unique<std::type_index>(typeid(widget_t));
         widgets_context.registered.insert_or_assign(raw_widget, std::ref(untyped_widget));
-        detect_on_interact(widget);
-        detect_on_resolve(widget);
-        detect_on_draw(widget);
+        bungeegum::access::detect_on_interact(widget);
+        bungeegum::access::detect_on_resolve(widget);
+        bungeegum::access::detect_on_draw(widget);
     }
 
     template <typename widget_t>
@@ -109,11 +110,11 @@ namespace detail {
 template <typename widget_t, typename... widget_args_t>
 widget_t& make(widget_args_t&&... widget_args)
 {
-    std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(_widget);
     detail::entity_t _entity = detail::widgets_context.widgets.create_entity();
     detail::widgets_context.widgets.create_component<detail::untyped_widget_data>(_entity);
-    detail::widgets_context.possessed.emplace(_raw_widget, _entity);
     widget_t& _widget = detail::widgets_context.widgets.create_component<widget_t>(_entity, std::forward<widget_args_t>(widget_args)...);
+    std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(_widget);
+    detail::widgets_context.possessed.emplace(_raw_widget, _entity);
 
     std::cout << "creating widget... " << reinterpret_cast<std::uintptr_t>(&_widget) << std::endl;
     return _widget;

@@ -7,7 +7,6 @@
 #include <bungeegum/context/draw.hpp>
 #include <bungeegum/context/interact.hpp>
 #include <bungeegum/context/resolve.hpp>
-#include <bungeegum/glue/detection.fwd>
 #include <bungeegum/glue/raw.fwd>
 #include <bungeegum/glue/registry.fwd>
 
@@ -24,6 +23,10 @@ namespace detail {
         std::optional<interact_command> interactor_command = std::nullopt;
         std::optional<resolve_command> resolver_command = std::nullopt;
         std::optional<draw_command> drawer_command = std::nullopt;
+    };
+
+    struct adopted_widget_data {
+        untyped_widget_data& untyped_widget;
     };
 
     struct widgets_registry {

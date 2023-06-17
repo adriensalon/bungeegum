@@ -15,7 +15,3 @@
 
 #include <bungeegum/backend/embedded.hpp>
 #include <bungeegum/backend/standalone.hpp>
-
-#include <bungeegum/widgets/Align.hpp>
-#include <bungeegum/widgets/Offset.hpp>
-#include <bungeegum/widgets/Size.hpp>

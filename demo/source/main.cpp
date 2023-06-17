@@ -1,4 +1,5 @@
 #include <bungeegum/bungeegum.hpp>
+#include <bungeegum/bungeegum_widgets.hpp>
 
 struct A {
 
@@ -62,7 +63,26 @@ int main()
     //     std::cout << "container ! \n";
     // });
 
-    // bungeegum::launch(c1.child(c2).child(i1));
+    using namespace bungeegum::widgets;
+
+    Size sz1(0.f, 0.f);
+    Offset off(1.f, 1.f);
+    Offset off2(1.f, 1.f);
+    // float kkk = off.direction();
+
+    Offset offlerp = bungeegum::lerp(off, off2, 1.f);
+    Offset zerooff = bungeegum::zero<Offset>;
+
+    Align _align, _align2;
+
+    bungeegum::launch(_align
+                          .child(_align2
+                                     .alignment(Alignment::center())
+                                     .heightFactor(0.5f)
+                                     .widthFactor(0.5f))
+                          .alignment(Alignment::center())
+                          .heightFactor(0.5f)
+                          .widthFactor(0.5f));
 
     return 0;
 }

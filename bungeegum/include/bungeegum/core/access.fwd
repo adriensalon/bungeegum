@@ -1,0 +1,72 @@
+#pragma once
+
+#include <bungeegum/context/draw.hpp>
+#include <bungeegum/context/interact.hpp>
+#include <bungeegum/context/resolve.hpp>
+#include <bungeegum/glue/detection.fwd>
+
+namespace bungeegum {
+
+struct access {
+
+    // draw
+
+    template <typename widget_t>
+    using draw_function = decltype(std::declval<widget_t>().draw(std::declval<draw_command&>()));
+
+    template <typename widget_t>
+    constexpr static bool has_draw_function = detail::is_detected_exact_v<void, draw_function, widget_t>;
+
+    template <typename widget_t>
+    constexpr static void detect_on_draw(widget_t& widget)
+    {
+        if constexpr (has_draw_function<widget_t>) {
+            detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+            _widget_data.drawer_command = draw_command();
+            _widget_data.drawer = [&widget](draw_command& command) {
+                widget.draw(command);
+            };
+        }
+    }
+
+    // interact
+
+    template <typename widget_t>
+    using interact_function = decltype(std::declval<widget_t>().interact(std::declval<interact_command&>()));
+
+    template <typename widget_t>
+    constexpr static bool has_interact_function = detail::is_detected_exact_v<void, interact_function, widget_t>;
+
+    template <typename widget_t>
+    constexpr static void detect_on_interact(widget_t& widget)
+    {
+        if constexpr (has_interact_function<widget_t>) {
+            detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+            _widget_data.interactor_command = interact_command();
+            _widget_data.interactor = [&widget](interact_command& command) {
+                widget.interact(command);
+            };
+        }
+    }
+
+    // resolve
+
+    template <typename widget_t>
+    using resolve_function = decltype(std::declval<widget_t>().resolve(std::declval<resolve_command&>()));
+
+    template <typename widget_t>
+    constexpr static bool has_resolve_function = detail::is_detected_exact_v<void, resolve_function, widget_t>;
+
+    template <typename widget_t>
+    constexpr static void detect_on_resolve(widget_t& widget)
+    {
+        if constexpr (has_resolve_function<widget_t>) {
+            detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+            _widget_data.resolver_command = resolve_command();
+            _widget_data.resolver = [&widget](resolve_command& command) {
+                widget.resolve(command);
+            };
+        }
+    }
+};
+}
