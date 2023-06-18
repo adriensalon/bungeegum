@@ -9,10 +9,10 @@ struct adopted_widget;
 struct resolve_command {
 
     /// @brief
-    [[nodiscard]] float2 min_size();
+    [[nodiscard]] float2 min_size() const;
 
     /// @brief
-    [[nodiscard]] float2 max_size();
+    [[nodiscard]] float2 max_size() const;
 
     /// @brief
     /// @param size
@@ -23,19 +23,31 @@ struct resolve_command {
     /// @param child_widget
     /// @param constraint
     template <typename child_widget_t>
-    float2 resolve_child(const child_widget_t& child_widget, const float2 min_size, const float2 max_size);
+    float2 resolve_child(const child_widget_t& child_widget, const float2 min_size, const float2 max_size)
+    {
+        // todo
+        (void)child_widget;
+        (void)min_size;
+        (void)max_size;
+        return zero<float2>;
+    }
 
     /// @brief
     /// @param child_widget
     /// @param constraint
-    float2 resolve_child(const adopted_widget& child_widget, const float2 min_size, const float2 max_size);
+    float2 resolve_child(const adopted_widget& child_widget, const float2 min_size, const float2 max_size) const;
 
     /// @brief Thenafter
     /// @tparam child_widget_t
     /// @param child_widget
     /// @param position
     template <typename child_widget_t>
-    void position_child(child_widget_t& child_widget, const float2 position);
+    void position_child(child_widget_t& child_widget, const float2 position)
+    {
+        // todo
+        (void)child_widget;
+        (void)position;
+    }
 
     /// @brief
     /// @param child_widget

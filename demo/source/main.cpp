@@ -78,20 +78,25 @@ int main()
     Title _title;
     Align _align;
     Container _container;
+    ColoredBox _coloredBox;
 
     // Color col = Color::fromRGBO(255, 122, 100, 1.f);
     // std::cout << col.alpha() << ", " << col.red() << ", " << col.green() << ", " << col.blue() << std::endl;
 
     bungeegum::launch(_title
                           .title("my title !!!")
-                          .child(_align
-                                     .child(_container
-                                                .color(Color::fromRGBO(255, 122, 121, 1.f)))
-                                     .alignment(Alignment::center())
-                                     .heightFactor(0.5f)
-                                     .widthFactor(0.5f)),
+                          .child(_coloredBox
+                                     .color(Color::fromRGBO(255, 122, 121, 1.f)))
+        //   .child(_align
+        //              .child(_container
+        //                         .color(Color::fromRGBO(255, 122, 121, 1.f)))
+        //              .alignment(Alignment::center())
+        //              .heightFactor(0.5f)
+        //              .widthFactor(0.5f))
+        ,
         [&]() {
-            bungeegum::must_draw(_container);
+            bungeegum::must_resolve(_coloredBox);
+            bungeegum::must_draw(_coloredBox);
         });
 
     return 0;

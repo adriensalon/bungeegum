@@ -17,7 +17,7 @@ namespace detail {
     struct resolve_command_data {
         resolve_constraint_data constraint; // given by parent
         float2 resolved_size; // set by widget after children
-        float2 resolved_position; // given by parent
+        float2 resolved_position; // given by parent ? NONEED??
     };
 
 }

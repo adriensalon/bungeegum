@@ -1,8 +1,47 @@
 #include <imgui.h>
 
 #include <bungeegum/context/resolve.hpp>
+#include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
+
+float2 resolve_command::min_size() const
+{
+    return _data.constraint.min_size;
+}
+
+float2 resolve_command::max_size() const
+{
+    return _data.constraint.max_size;
+}
+
+void resolve_command::resize(const float2 size)
+{
+    _data.resolved_size = size;
+}
+
+float2 resolve_command::resolve_child(const adopted_widget& child_widget, const float2 min_size, const float2 max_size) const
+{
+    detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
+    resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
+    draw_command& _child_draw_command = _child_untyped_widget.drawer_command.value();
+    _child_resolve_command._data.constraint.min_size = min_size;
+    _child_resolve_command._data.constraint.max_size = max_size;
+    detail::protect_userspace([&_child_untyped_widget, &_child_resolve_command]() {
+        _child_untyped_widget.resolver(_child_resolve_command);
+    });
+    float2 _resolved_size = _child_resolve_command._data.resolved_size;
+    _child_draw_command._data.resolved_size = _resolved_size;
+    return _resolved_size;
+}
+
+void resolve_command::position_child(const adopted_widget& child_widget, const float2 position)
+{
+    // todo
+    (void)child_widget;
+    (void)position;
+}
 
 // resolve_constraint::resolve_constraint(const float2 min_size, const float2 max_size)
 // {

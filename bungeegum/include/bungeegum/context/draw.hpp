@@ -9,7 +9,10 @@ namespace bungeegum {
 struct draw_command {
 
     /// @brief
-    [[nodiscard]] float2 available_size() const;
+    [[nodiscard]] float2 resolved_position() const;
+
+    /// @brief
+    [[nodiscard]] float2 resolved_size() const;
 
     /// @brief
     /// @param first_point
@@ -104,6 +107,7 @@ struct draw_command {
 private:
     detail::draw_command_data _data;
     friend struct detail::context;
+    friend struct resolve_command;
 };
 
 /// @brief

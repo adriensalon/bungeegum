@@ -11,6 +11,9 @@
 #include <bungeegum/glue/registry.fwd>
 
 namespace bungeegum {
+
+struct adopted_widget;
+
 namespace detail {
 
     struct untyped_widget_data {
@@ -26,7 +29,7 @@ namespace detail {
     };
 
     struct adopted_widget_data {
-        untyped_widget_data& untyped_widget;
+        std::optional<std::reference_wrapper<untyped_widget_data>> untyped_widget = std::nullopt;
     };
 
     struct widgets_registry {
@@ -36,6 +39,8 @@ namespace detail {
         std::optional<std::reference_wrapper<untyped_widget_data>> root = std::nullopt;
         std::vector<std::reference_wrapper<untyped_widget_data>> resolvables = {};
         std::vector<std::reference_wrapper<untyped_widget_data>> drawables = {};
+
+        adopted_widget create_adopted(untyped_widget_data& untyped_widget);
 
         void traverse_untyped(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback);
     };

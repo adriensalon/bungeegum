@@ -47,6 +47,16 @@ namespace detail {
 //     return *this;
 // }
 
+float2 draw_command::resolved_position() const
+{
+    return _data.resolved_position;
+}
+
+float2 draw_command::resolved_size() const
+{
+    return _data.resolved_size;
+}
+
 void draw_command::draw_line(
     const float2 first_point, const float2 second_point,
     const float4 color,
@@ -71,6 +81,19 @@ void draw_command::draw_rect(
     ImU32 _color = ImGui::GetColorU32({ color.x, color.y, color.z, color.w });
     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
         _drawlist->AddRect(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All, thickness);
+    });
+}
+
+void draw_command::draw_rect_filled(
+    const float2 min_point, const float2 max_point,
+    const float4 color,
+    const float rounding)
+{
+    ImVec2 _min_point { min_point.x, min_point.y };
+    ImVec2 _max_point { max_point.x, max_point.y };
+    ImU32 _color = ImGui::GetColorU32({ color.x, color.y, color.z, color.w });
+    _data.commands.emplace_back([=](ImDrawList* _drawlist) {
+        _drawlist->AddRectFilled(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All);
     });
 }
 }

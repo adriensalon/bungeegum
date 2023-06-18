@@ -84,7 +84,7 @@ namespace detail {
     }
 
     template <typename widget_t, typename child_widget_t>
-    void adopt_widget(widget_t& widget, child_widget_t& child_widget)
+    adopted_widget adopt_widget(widget_t& widget, child_widget_t& child_widget)
     {
         std::uintptr_t _raw_widget = get_raw_widget<widget_t>(widget);
         std::uintptr_t _raw_child_widget = get_raw_widget<child_widget_t>(child_widget);
@@ -96,6 +96,7 @@ namespace detail {
         untyped_widget_data& _child_data = get_untyped_widget(_raw_child_widget);
         _child_data.parent = _data;
         _data.children.emplace_back(_child_data);
+        return widgets_context.create_adopted(_child_data);
     }
 
     template <typename widget_t, typename child_widget_t>
@@ -137,16 +138,16 @@ void unmake(widget_t& widget)
     // detail::widgets_context.accessors.erase(_void_widget);
 }
 
-template <typename widget_t, typename... children_widgets_t>
-void adopt(widget_t& widget, children_widgets_t&... children_widgets)
+template <typename widget_t, typename child_widget_t>
+adopted_widget adopt(widget_t& widget, child_widget_t& child_widget)
 {
-    (detail::adopt_widget(widget, children_widgets), ...);
+    return detail::adopt_widget(widget, child_widget);
 }
 
-template <typename widget_t, typename... children_widgets_t>
-void adopt(widget_t* widget, children_widgets_t&... children_widgets)
+template <typename widget_t, typename child_widget_t>
+adopted_widget adopt(widget_t* widget, child_widget_t& child_widget)
 {
-    (detail::adopt_widget(*widget, children_widgets), ...);
+    return adopt<widget_t, child_widget_t>(*widget, child_widget);
 }
 
 template <typename widget_t, typename... children_widgets_t>

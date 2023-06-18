@@ -20,28 +20,33 @@ template <typename widget_t, typename... widget_args_t>
 template <typename widget_t>
 void unmake(widget_t& widget);
 
-/// @brief
+/// @brief Opaque untyped
 struct adopted_widget {
 private:
+    friend struct interact_command;
+    friend struct resolve_command;
+    friend struct draw_command;
+    friend struct detail::widgets_registry;
     detail::adopted_widget_data _data;
 };
 
-/// @brief Registers widgets as children of another widget.
+/// @brief Registers a widget as a child of another widget.
 /// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.
-/// @tparam ...children_widgets_t Custom types for the children widgets. Must be at least copy or
-/// move constructible.
+/// @tparam child_widget_t Custom type for the child widget. Must be at least copy or move
+/// constructible.
 /// @param widget
-/// @param ...children_widgets
-template <typename widget_t, typename... children_widgets_t>
-adopted_widget adopt(widget_t& widget, children_widgets_t&... children_widgets);
+/// @param child_widget
+/// @return
+template <typename widget_t, typename child_widget_t>
+adopted_widget adopt(widget_t& widget, child_widget_t& child_widget);
 
 /// @brief
 /// @tparam widget_t
 /// @tparam ...children_widgets_t
 /// @param widget
 /// @param ...children_widgets
-template <typename widget_t, typename... children_widgets_t>
-void adopt(widget_t* widget, children_widgets_t&... children_widgets);
+template <typename widget_t, typename child_widget_t>
+adopted_widget adopt(widget_t* widget, child_widget_t& child_widget);
 
 /// @brief Unregisters a parenting relationship
 /// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.

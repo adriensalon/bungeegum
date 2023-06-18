@@ -38,6 +38,7 @@ set(bungeegum_source
 	"source/widgets/misc/Size.cpp"
 
 	"source/widgets/Align.cpp"
+	"source/widgets/ColoredBox.cpp"
 	"source/widgets/Container.cpp"
 	"source/widgets/Title.cpp"
 )

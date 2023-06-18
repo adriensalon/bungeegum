@@ -8,12 +8,16 @@
 struct ImDrawList;
 
 namespace bungeegum {
+
+struct resolve_command;
+
 namespace detail {
 
     struct context;
 
     struct draw_command_data {
-        float2 available_size = zero<float2>;
+        float2 resolved_position = zero<float2>;
+        float2 resolved_size = zero<float2>;
         std::vector<std::function<void(ImDrawList*)>> commands = {};
 
         void draw(ImDrawList* imgui_drawlist);

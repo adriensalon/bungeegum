@@ -5,6 +5,13 @@
 namespace bungeegum {
 namespace detail {
 
+    adopted_widget widgets_registry::create_adopted(untyped_widget_data& untyped_widget)
+    {
+        adopted_widget _adopted;
+        _adopted._data.untyped_widget = untyped_widget;
+        return _adopted;
+    }
+
     void widgets_registry::traverse_untyped(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback)
     {
         std::function<void(untyped_widget_data&)> _iterate = [&](untyped_widget_data& _widget_data) {
