@@ -112,6 +112,13 @@ void window::set_title(const std::string& title)
     }
 }
 
+uint2 window::get_size() const
+{
+    int _w, _h;
+    SDL_GetWindowSize(get_window(_sdl_window), &_w, &_h);
+    return float2 { static_cast<uint1>(_w), static_cast<uint1>(_h) };
+}
+
 void window::set_size(const float2 size)
 {
     if constexpr (is_platform_emscripten_v) {

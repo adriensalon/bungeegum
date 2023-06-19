@@ -148,5 +148,9 @@ namespace detail {
         get(_diligent_renderer).imgui_renderer->ProcessEvent(_event_ptr);
     }
 
+    void renderer::resize(const uint2 size)
+    {
+        get(_diligent_renderer).swap_chain->Resize(static_cast<int>(size.x), static_cast<int>(size.y));
+    }
 }
 }

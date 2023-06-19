@@ -1,0 +1,10 @@
+#pragma once
+
+#include <bungeegum/glue/simd.hpp>
+
+namespace bungeegum {
+namespace detail {
+
+    inline uint2 viewport_size = zero<float2>;
+}
+}

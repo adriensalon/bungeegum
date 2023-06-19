@@ -25,6 +25,24 @@ namespace bungeegum {
 //     }
 // }
 
+template <typename child_widget_t>
+float2 resolve_command::resolve_child(const child_widget_t& child_widget, const float2 min_size, const float2 max_size)
+{
+    // todo
+    (void)child_widget;
+    (void)min_size;
+    (void)max_size;
+    return zero<float2>;
+}
+
+template <typename child_widget_t>
+void resolve_command::position_child(child_widget_t& child_widget, const float2 position)
+{
+    // todo
+    (void)child_widget;
+    (void)position;
+}
+
 template <typename widget_t>
 void on_resolve(widget_t& widget, const std::function<void(resolve_command&)>& resolve_callback)
 {

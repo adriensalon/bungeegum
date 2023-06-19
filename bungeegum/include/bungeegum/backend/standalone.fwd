@@ -1,0 +1,6 @@
+#pragma once
+
+#include <functional>
+
+#include <bungeegum/backend/common.fwd>
+#include <bungeegum/glue/simd.hpp>

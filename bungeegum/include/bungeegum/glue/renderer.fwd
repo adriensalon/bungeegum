@@ -30,6 +30,7 @@ namespace detail {
         void present();
         void rebuild_fonts();
         void process_input(const std::any& input);
+        void resize(const uint2 size);
 
     private:
         std::any _diligent_renderer = nullptr;

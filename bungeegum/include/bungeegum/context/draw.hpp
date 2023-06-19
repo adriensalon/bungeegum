@@ -125,14 +125,19 @@ template <typename widget_t>
 void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback);
 
 /// @brief
+void must_draw();
+
+/// @brief
 /// @tparam widget_t
-/// @param widget
+/// @param widget must have declared a void draw(const draw_command&) or added one
+/// dynamically with the on_draw() function.
 template <typename widget_t>
 void must_draw(widget_t& widget);
 
 /// @brief
 /// @tparam widget_t
-/// @param widget
+/// @param widget must have declared a void draw(const draw_command&) or added one
+/// dynamically with the on_draw() function.
 template <typename widget_t>
 void must_draw(widget_t* widget);
 

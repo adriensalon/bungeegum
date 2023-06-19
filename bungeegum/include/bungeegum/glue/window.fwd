@@ -24,6 +24,7 @@ namespace detail {
         [[nodiscard]] void* get_native_window() const;
         [[nodiscard]] SDL_Window* get_sdl_window() const;
         void set_title(const std::string& title);
+        uint2 get_size() const;
         void set_size(const float2 size);
         void set_fullscreen(const bool enabled);
         void on_input(const std::function<void(const std::any&)>& event_callback);

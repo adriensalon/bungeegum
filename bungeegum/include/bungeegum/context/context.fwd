@@ -21,7 +21,7 @@ namespace detail {
 
         static void execute_interact();
 
-        static void execute_resolve(const std::chrono::milliseconds& delta_time);
+        static void execute_resolve();
 
         static void execute_draw(ImDrawList* imgui_drawlist, const bool heads_start);
     };

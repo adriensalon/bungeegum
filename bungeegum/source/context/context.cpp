@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 
+#include <bungeegum/backend/common.fwd>
 #include <bungeegum/context/context.fwd>
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/event.hpp>
@@ -41,9 +42,8 @@ namespace detail {
 #undef traverse_interact_impl
     }
 
-    void context::execute_resolve(const std::chrono::milliseconds& delta_time)
+    void context::execute_resolve()
     {
-        (void)delta_time;
         bool _resolve_done = false;
         while (!_resolve_done) {
             std::for_each(
@@ -52,11 +52,38 @@ namespace detail {
                 widgets_context.resolvables.end(),
                 [](auto&& _data_reference) {
                     untyped_widget_data& _widget_data = _data_reference.get();
-                    if (_widget_data.resolver_command.has_value()) {
-                        protect_userspace([&_widget_data]() {
-                            _widget_data.resolver(_widget_data.resolver_command.value());
-                        });
+                    resolve_command& _resolve_command = _widget_data.resolver_command.value();
+                    draw_command& _draw_command = _widget_data.drawer_command.value();
+
+                    if (_widget_data == widgets_context.root.value().get()) {
+                        _resolve_command._data.constraint.min_size = detail::viewport_size;
+                        _resolve_command._data.constraint.max_size = detail::viewport_size;
+                    } else {
+                        untyped_widget_data* _parent_widget_data_ptr = &_widget_data.parent.value().get();
+                        bool _root_is_parent = false;
+                        while (!_parent_widget_data_ptr->resolver_command.has_value()) {
+                            if (*_parent_widget_data_ptr == widgets_context.root.value().get()) {
+                                _resolve_command._data.constraint.min_size = detail::viewport_size;
+                                _resolve_command._data.constraint.max_size = detail::viewport_size;
+                                std::cout << "viewport size = " << detail::viewport_size.x << ", " << detail::viewport_size.y << std::endl;
+                                _root_is_parent = true;
+                                break;
+                            }
+                            _parent_widget_data_ptr = &_parent_widget_data_ptr->parent.value().get();
+                        }
+                        if (!_root_is_parent) {
+                            resolve_command& _parent_resolve_command = _parent_widget_data_ptr->resolver_command.value();
+                            _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
+                            _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
+                        }
                     }
+
+                    protect_userspace([&_widget_data]() {
+                        _widget_data.resolver(_widget_data.resolver_command.value());
+                    });
+
+                    float2 _resolved_size = _resolve_command._data.resolved_size;
+                    _draw_command._data.resolved_size = _resolved_size;
                 });
             widgets_context.resolvables.erase(widgets_context.resolvables.begin(), widgets_context.resolvables.end());
             _resolve_done = widgets_context.resolvables.empty();
@@ -75,14 +102,17 @@ namespace detail {
                     widgets_context.drawables.begin(),
                     widgets_context.drawables.end(),
                     [imgui_drawlist](auto&& _data_reference) {
-                        untyped_widget_data& _widget_data = _data_reference.get();
-                        if (_widget_data.drawer_command.has_value()) {
-                            _widget_data.drawer_command.value()._data.commands.clear();
-                            protect_userspace([&_widget_data]() {
-                                _widget_data.drawer(_widget_data.drawer_command.value());
-                            });
-                            _widget_data.drawer_command.value()._data.draw(imgui_drawlist);
-                        }
+                        untyped_widget_data& _drawable_widget_data = _data_reference.get();
+                        widgets_context.traverse_untyped(_drawable_widget_data, [imgui_drawlist](untyped_widget_data& _widget_data) {
+                            if (_widget_data.drawer_command.has_value()) {
+                                _widget_data.drawer_command.value()._data.commands.clear();
+                                protect_userspace([&_widget_data]() {
+                                    _widget_data.drawer(_widget_data.drawer_command.value());
+                                });
+                                _widget_data.drawer_command.value()._data.draw(imgui_drawlist);
+                            }
+                            return true;
+                        });
                     });
                 widgets_context.drawables.erase(widgets_context.drawables.begin(), widgets_context.drawables.end());
                 _draw_done = widgets_context.drawables.empty();
@@ -121,7 +151,6 @@ namespace detail {
 
     bool tick(const std::chrono::milliseconds& delta_time)
     {
-        // animations_context.tick(delta_time);
         detail::animations_context.animations.template iterate<detail::untyped_animation_data>([delta_time](detail::untyped_animation_data& _animation_data) {
             _animation_data.ticker(delta_time);
         });
@@ -129,8 +158,9 @@ namespace detail {
             _event_data.ticker();
         });
         context::execute_interact();
-        context::execute_resolve(delta_time);
+        context::execute_resolve();
         return (has_userspace_thrown() || !widgets_context.drawables.empty());
+        // return true;
     }
 
     void draw(const bool heads_start)

@@ -22,6 +22,8 @@ namespace widgets {
 
         /// @brief A one-line description of this app for use in the window manager.
         Title& title(const std::string& value);
+
+        int jj = 99;
     };
 
 }

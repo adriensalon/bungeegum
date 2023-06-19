@@ -17,6 +17,7 @@ struct adopted_widget;
 namespace detail {
 
     struct untyped_widget_data {
+        std::uintptr_t raw_widget = 0u;
         std::unique_ptr<std::type_index> kind = nullptr;
         std::optional<std::reference_wrapper<untyped_widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<untyped_widget_data>> children = {};
@@ -26,6 +27,11 @@ namespace detail {
         std::optional<interact_command> interactor_command = std::nullopt;
         std::optional<resolve_command> resolver_command = std::nullopt;
         std::optional<draw_command> drawer_command = std::nullopt;
+
+        inline bool operator==(const untyped_widget_data& other)
+        {
+            return raw_widget == other.raw_widget;
+        }
     };
 
     struct adopted_widget_data {

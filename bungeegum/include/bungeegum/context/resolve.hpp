@@ -23,14 +23,7 @@ struct resolve_command {
     /// @param child_widget
     /// @param constraint
     template <typename child_widget_t>
-    float2 resolve_child(const child_widget_t& child_widget, const float2 min_size, const float2 max_size)
-    {
-        // todo
-        (void)child_widget;
-        (void)min_size;
-        (void)max_size;
-        return zero<float2>;
-    }
+    float2 resolve_child(const child_widget_t& child_widget, const float2 min_size, const float2 max_size);
 
     /// @brief
     /// @param child_widget
@@ -42,12 +35,7 @@ struct resolve_command {
     /// @param child_widget
     /// @param position
     template <typename child_widget_t>
-    void position_child(child_widget_t& child_widget, const float2 position)
-    {
-        // todo
-        (void)child_widget;
-        (void)position;
-    }
+    void position_child(child_widget_t& child_widget, const float2 position);
 
     /// @brief
     /// @param child_widget
@@ -74,14 +62,19 @@ template <typename widget_t>
 void on_resolve(widget_t* widget, const std::function<void(resolve_command&)>& resolve_callback);
 
 /// @brief
+void must_resolve();
+
+/// @brief
 /// @tparam widget_t
-/// @param widget
+/// @param widget must have declared a void resolve(const resolve_command&) or added one
+/// dynamically with the on_resolve() function.
 template <typename widget_t>
 void must_resolve(widget_t& widget);
 
 /// @brief
 /// @tparam widget_t
-/// @param widget
+/// @param widget must have declared a void resolve(const resolve_command&) or added one
+/// dynamically with the on_resolve() function.
 template <typename widget_t>
 void must_resolve(widget_t* widget);
 

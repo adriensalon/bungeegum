@@ -31,4 +31,8 @@ void bungeegum_app::title(const std::string& description)
     detail::desired_app_title = description;
 }
 
+float2 bungeegum_app::viewport()
+{
+    return detail::viewport_size;
+}
 }

@@ -53,6 +53,7 @@ namespace detail {
     template <typename widget_t>
     void assign_widget(widget_t& widget, untyped_widget_data& untyped_widget, const std::uintptr_t raw_widget)
     {
+        untyped_widget.raw_widget = raw_widget;
         untyped_widget.kind = std::make_unique<std::type_index>(typeid(widget_t));
         widgets_context.registered.insert_or_assign(raw_widget, std::ref(untyped_widget));
         bungeegum::access::detect_on_interact(widget);

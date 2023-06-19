@@ -1,8 +1,6 @@
 #pragma once
 
-#include <functional>
-
-#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/backend/standalone.fwd>
 
 namespace bungeegum {
 
@@ -14,6 +12,9 @@ struct bungeegum_app {
 
     /// @brief
     static void title(const std::string& description);
+
+    /// @brief
+    static float2 viewport();
 };
 
 /// @brief Starts an infinite loop
