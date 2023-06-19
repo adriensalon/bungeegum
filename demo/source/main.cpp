@@ -101,8 +101,9 @@ int main()
         //              .widthFactor(0.5f))
         ,
         [&]() {
-            // bungeegum::must_resolve(_coloredBox);
-            // bungeegum::must_draw(_coloredBox);
+            bungeegum::must_resolve();
+            bungeegum::must_draw();
+            // rendre officiel j'imagine
         });
 
     return 0;
