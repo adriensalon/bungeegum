@@ -16,7 +16,7 @@ namespace widgets {
             command.position_child(_child, zero<float2>);
             command.resize(_childSize);
         } else
-            command.resize(command.max_size());
+            command.resize(command.min_size());
     }
 
     void ColoredBox::draw(draw_command& command)

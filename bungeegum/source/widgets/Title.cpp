@@ -15,5 +15,14 @@ namespace widgets {
         return *this;
     }
 
+    void Title::resolve(resolve_command& command)
+    {
+        if (_child.has_value()) {
+            float2 _childSize = command.resolve_child(_child, command.min_size(), command.max_size());
+            command.position_child(_child, zero<float2>);
+            command.resize(_childSize);
+        } else
+            command.resize(command.min_size());
+    }
 }
 }

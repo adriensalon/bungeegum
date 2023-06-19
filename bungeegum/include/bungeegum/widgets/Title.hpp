@@ -13,7 +13,7 @@ namespace widgets {
         template <typename child_widget_t>
         Title& child(child_widget_t& value)
         {
-            adopt(this, value);
+            _child = adopt(this, value);
             return *this;
         }
 
@@ -23,7 +23,11 @@ namespace widgets {
         /// @brief A one-line description of this app for use in the window manager.
         Title& title(const std::string& value);
 
-        int jj = 99;
+    private:
+        friend struct access;
+        void resolve(resolve_command& command);
+
+        std::optional<adopted_widget> _child = std::nullopt;
     };
 
 }
