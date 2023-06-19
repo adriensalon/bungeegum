@@ -33,6 +33,8 @@ set(bungeegum_source
 
 	"source/widgets/misc/Alignment.cpp"
 	"source/widgets/misc/Color.cpp"
+	"source/widgets/misc/EdgeInsets.cpp"
+	"source/widgets/misc/EdgeInsetsDirectional.cpp"
 	"source/widgets/misc/Offset.cpp"
 	"source/widgets/misc/Rect.cpp"
 	"source/widgets/misc/Size.cpp"
@@ -40,6 +42,7 @@ set(bungeegum_source
 	"source/widgets/Align.cpp"
 	"source/widgets/ColoredBox.cpp"
 	"source/widgets/Container.cpp"
+	"source/widgets/Padding.cpp"
 	"source/widgets/Title.cpp"
 )
 

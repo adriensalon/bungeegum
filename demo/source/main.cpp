@@ -90,9 +90,10 @@ int main()
     //                                  .color(0xFF6699FF))
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
-                          .child(_coloredBox
-                                     //  .color(Color::fromRGBO(255, 122, 121, 1.f)))
-                                     .color(0xFF6699FF))
+                          .child(bungeegum::make<Padding>()
+                                     .child(bungeegum::make<ColoredBox>()
+                                                //  .color(Color::fromRGBO(255, 122, 121, 1.f)))
+                                                .color(0xFF6699FF)))
         //   .child(_align
         //              .child(_container
         //                         .color(Color::fromRGBO(255, 122, 121, 1.f)))

@@ -3,7 +3,9 @@
 #include <bungeegum/context/draw.hpp>
 #include <bungeegum/context/interact.hpp>
 #include <bungeegum/context/resolve.hpp>
+#include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/detection.fwd>
+#include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
 
@@ -60,11 +62,26 @@ struct access {
     template <typename widget_t>
     constexpr static void detect_on_resolve(widget_t& widget)
     {
+        detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+        _widget_data.resolver_command = resolve_command();
         if constexpr (has_resolve_function<widget_t>) {
-            detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
-            _widget_data.resolver_command = resolve_command();
             _widget_data.resolver = [&widget](resolve_command& command) {
                 widget.resolve(command);
+            };
+        } else {
+            _widget_data.resolver = [&widget, &_widget_data](resolve_command& command) {
+                if (_widget_data.children.empty()) {
+                    command.resize(command.max_size());
+                } else {
+                    float2 _max_size = zero<float2>;
+                    for (detail::untyped_widget_data& _child_widget_data : _widget_data.children) {
+                        adopted_widget _child = detail::widgets_context.create_adopted(_child_widget_data);
+                        float2 _child_size = command.resolve_child(_child, command.min_size(), command.max_size());
+                        _max_size = glm::max(_max_size, _child_size);
+                        command.position_child(_child, zero<float2>);
+                    }
+                    command.resize(_max_size);
+                }
             };
         }
     }
