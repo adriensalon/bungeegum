@@ -2,12 +2,10 @@
 
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum/widgets/misc/Alignment.hpp>
-#include <bungeegum/widgets/misc/AlignmentDirectional.hpp>
 #include <bungeegum/widgets/misc/BoxConstraints.hpp>
 #include <bungeegum/widgets/misc/BoxDecoration.hpp>
 #include <bungeegum/widgets/misc/Color.hpp>
 #include <bungeegum/widgets/misc/EdgeInsets.hpp>
-#include <bungeegum/widgets/misc/EdgeInsetsDirectional.hpp>
 #include <bungeegum/widgets/misc/ShapeDecoration.hpp>
 
 namespace bungeegum {
@@ -33,16 +31,13 @@ namespace widgets {
         /// @brief Align the child within the container.
         Container& alignment(const Alignment& value);
 
-        /// @brief Align the child within the container.
-        Container& alignment(const AlignmentDirectional& value);
-
         /// @brief The child contained by the container.
         template <typename child_widget_t>
         Container& child(child_widget_t& value)
         {
             adopt(this, value);
             return *this;
-    }
+        }
 
         /// @brief The color to paint behind the child.
         /// @details This property should be preferred when the background is a simple color. For
@@ -71,16 +66,9 @@ namespace widgets {
         /// @brief Empty space to surround the decoration and child.
         Container& margin(const EdgeInsets& value);
 
-        /// @brief Empty space to surround the decoration and child.
-        Container& margin(const EdgeInsetsDirectional& value);
-
         /// @brief Empty space to inscribe inside the decoration. The child, if any, is placed
         /// inside this padding.
         Container& padding(const EdgeInsets& value);
-
-        /// @brief Empty space to inscribe inside the decoration. The child, if any, is placed
-        /// inside this padding.
-        Container& padding(const EdgeInsetsDirectional& value);
 
         /// @brief The transformation matrix to apply before painting the container.
         Container& transform(const float4x4 value);
@@ -88,10 +76,6 @@ namespace widgets {
         /// @brief The alignment of the origin, relative to the size of the container, if
         /// transform is specified.
         Container& transformAlignment(const Alignment& value);
-
-        /// @brief The alignment of the origin, relative to the size of the container, if
-        /// transform is specified.
-        Container& transformAlignment(const AlignmentDirectional& value);
 
         /// @brief
         Container& width(const float1 value);
@@ -106,12 +90,12 @@ namespace widgets {
         std::optional<BoxConstraints> _constraints = std::nullopt;
         std::optional<float2> _size = std::nullopt;
         std::optional<float4x4> _transform = std::nullopt;
-        std::optional<std::variant<Alignment, AlignmentDirectional>> _alignment = std::nullopt;
-        std::optional<std::variant<Alignment, AlignmentDirectional>> _transformAlignment = std::nullopt;
+        std::optional<Alignment> _alignment = std::nullopt;
+        std::optional<Alignment> _transformAlignment = std::nullopt;
         std::optional<std::variant<BoxDecoration, ShapeDecoration>> _decoration = std::nullopt;
         std::optional<std::variant<BoxDecoration, ShapeDecoration>> _foregroundDecoration = std::nullopt;
-        std::optional<std::variant<EdgeInsets, EdgeInsetsDirectional>> _margin = std::nullopt;
-        std::optional<std::variant<EdgeInsets, EdgeInsetsDirectional>> _padding = std::nullopt;
+        std::optional<EdgeInsets> _margin = std::nullopt;
+        std::optional<EdgeInsets> _padding = std::nullopt;
     };
 }
 }

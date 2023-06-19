@@ -2,8 +2,10 @@
 #include <bungeegum/widgets/misc/BoxConstraints.hpp>
 #include <bungeegum/widgets/misc/BoxDecoration.hpp>
 #include <bungeegum/widgets/misc/Color.hpp>
+#include <bungeegum/widgets/misc/EdgeInsets.hpp>
 #include <bungeegum/widgets/misc/Offset.hpp>
 #include <bungeegum/widgets/misc/Rect.hpp>
+#include <bungeegum/widgets/misc/ShapeDecoration.hpp>
 #include <bungeegum/widgets/misc/Size.hpp>
 
 #include <bungeegum/widgets/Align.hpp>

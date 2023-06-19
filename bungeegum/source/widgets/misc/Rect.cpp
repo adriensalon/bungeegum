@@ -9,7 +9,7 @@ namespace widgets {
     {
         float1 _left = offset.dx();
         float1 _top = offset.dy();
-        _LTRB = { _left, _top, _left + size.width(), _top + size.height() };
+        _value = { _left, _top, _left + size.width(), _top + size.height() };
     }
 
     Rect Rect::fromCenter(const Offset& center, const float1 width, const float1 height)
@@ -32,7 +32,7 @@ namespace widgets {
     Rect Rect::fromLTRB(const float1 left, const float1 top, const float1 right, const float1 bottom)
     {
         Rect _rect;
-        _rect._LTRB = { left, top, right, bottom };
+        _rect._value = { left, top, right, bottom };
         return _rect;
     }
 

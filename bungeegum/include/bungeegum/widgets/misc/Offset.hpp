@@ -93,7 +93,7 @@ namespace widgets {
         Offset& operator=(Offset&& other) = default;
 
     private:
-        float2 _value = { 0.f, 0.f };
+        float2 _value = zero<float2>;
     };
 }
 

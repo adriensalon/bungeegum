@@ -116,7 +116,7 @@ namespace widgets {
         Color& operator=(Color&& other) = default;
 
     private:
-        uint32_t _value = 0x00000000;
+        uint32_t _value = zero<uint32_t>;
     };
 }
 

@@ -9,12 +9,6 @@ namespace widgets {
         return *this;
     }
 
-    Container& Container::alignment(const AlignmentDirectional& value)
-    {
-        _alignment = value;
-        return *this;
-    }
-
     Container& Container::color(const Color value)
     {
         _color = value;
@@ -65,19 +59,7 @@ namespace widgets {
         return *this;
     }
 
-    Container& Container::margin(const EdgeInsetsDirectional& value)
-    {
-        _margin = value;
-        return *this;
-    }
-
     Container& Container::padding(const EdgeInsets& value)
-    {
-        _padding = value;
-        return *this;
-    }
-
-    Container& Container::padding(const EdgeInsetsDirectional& value)
     {
         _padding = value;
         return *this;
@@ -90,12 +72,6 @@ namespace widgets {
     }
 
     Container& Container::transformAlignment(const Alignment& value)
-    {
-        _transformAlignment = value;
-        return *this;
-    }
-
-    Container& Container::transformAlignment(const AlignmentDirectional& value)
     {
         _transformAlignment = value;
         return *this;

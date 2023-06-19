@@ -120,7 +120,7 @@ namespace widgets {
         Rect& operator=(Rect&& other) = default;
 
     private:
-        float4 _LTRB = { 0.f, 0.f, 0.f, 0.f };
+        float4 _value = zero<float4>; // LTRB
     };
 }
 

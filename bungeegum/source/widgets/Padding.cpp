@@ -3,13 +3,7 @@
 namespace bungeegum {
 namespace widgets {
 
-    Padding& Padding::padding(const EdgeInsets& value)
-    {
-        _edgeInsets = value;
-        return *this;
-    }
-
-    Padding& Padding::padding(const EdgeInsetsDirectional& value)
+    Padding& Padding::padding(const EdgeInsets value)
     {
         _edgeInsets = value;
         return *this;
@@ -17,12 +11,15 @@ namespace widgets {
 
     void Padding::resolve(resolve_command& command)
     {
-        // TODO :::::===))))
-
         if (_child.has_value()) {
-            float2 _childSize = command.resolve_child(_child.value(), command.min_size(), command.max_size());
-            command.position_child(_child.value(), zero<float2>);
-            command.resize(_childSize);
+            float2 _padding = { _edgeInsets.horizontal(), _edgeInsets.vertical() };
+            Offset _topLeft = _edgeInsets.topLeft();
+            float2 _paddedPosition = { _topLeft.dx(), _topLeft.dy() };
+            float2 _paddedMinSize = command.min_size() - _padding;
+            float2 _paddedMaxSize = command.max_size() - _padding;
+            float2 _childSize = command.resolve_child(_child.value(), _paddedMinSize, _paddedMaxSize);
+            command.position_child(_child.value(), _paddedPosition);
+            command.resize(_childSize + _padding);
         } else
             command.resize(command.max_size());
     }
