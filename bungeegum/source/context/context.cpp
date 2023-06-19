@@ -53,7 +53,6 @@ namespace detail {
                 [](auto&& _data_reference) {
                     untyped_widget_data& _widget_data = _data_reference.get();
                     resolve_command& _resolve_command = _widget_data.resolver_command.value();
-                    draw_command& _draw_command = _widget_data.drawer_command.value();
 
                     if (_widget_data == widgets_context.root.value().get()) {
                         _resolve_command._data.constraint.min_size = detail::viewport_size;
@@ -83,7 +82,10 @@ namespace detail {
                     });
 
                     float2 _resolved_size = _resolve_command._data.resolved_size;
-                    _draw_command._data.resolved_size = _resolved_size;
+                    if (_widget_data.drawer_command.has_value()) {
+                        draw_command& _draw_command = _widget_data.drawer_command.value();
+                        _draw_command._data.resolved_size = _resolved_size;
+                    }
                 });
             widgets_context.resolvables.erase(widgets_context.resolvables.begin(), widgets_context.resolvables.end());
             _resolve_done = widgets_context.resolvables.empty();
@@ -126,12 +128,14 @@ namespace detail {
         const SDL_Event* _event_ptr = &_event;
         if ((_event_ptr->type == SDL_WINDOWEVENT) && (_event_ptr->window.event == SDL_WINDOWEVENT_RESIZED)) {
             window_resized_interaction_data _interaction_data;
-            _interaction_data.new_size = float2 { 0.f, 0.f };
-            _interaction_data.is_fullscreen = false;
+            _interaction_data.new_size = detail::viewport_size;
+            _interaction_data.is_fullscreen = false; // TODO
             context::window_resized_interactions.emplace_back(_interaction_data);
             // int _w, _h;
             // SDL_GetWindowSize(get(_diligent_renderer).sdl_window, &_w, &_h);
             // get(_diligent_renderer).swap_chain->Resize(_w, _h);
+            must_resolve();
+            must_draw();
         } else if (_event_ptr->type == SDL_MOUSEMOTION) {
             mouse_moved_interaction_data _interaction_data;
             _interaction_data.absolute_position = float2 { _event_ptr->motion.x, _event_ptr->motion.y };

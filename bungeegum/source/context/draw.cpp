@@ -1,6 +1,7 @@
 #include <ImGui.h>
 
 #include <bungeegum/context/draw.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -95,5 +96,11 @@ void draw_command::draw_rect_filled(
     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
         _drawlist->AddRectFilled(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All);
     });
+}
+
+void must_draw()
+{
+    detail::untyped_widget_data& _data = detail::widgets_context.root.value().get();
+    detail::widgets_context.drawables.emplace_back(_data);
 }
 }

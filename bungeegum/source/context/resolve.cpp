@@ -192,4 +192,9 @@ void resolve_command::position_child(const adopted_widget& child_widget, const f
 //     return constrain({ 0.f, 0.f });
 // }
 
+void must_resolve()
+{
+    detail::untyped_widget_data& _data = detail::widgets_context.root.value().get();
+    detail::widgets_context.resolvables.emplace_back(_data);
+}
 }

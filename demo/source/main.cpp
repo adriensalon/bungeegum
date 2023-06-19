@@ -83,6 +83,11 @@ int main()
     // Color col = Color::fromRGBO(255, 122, 100, 1.f);
     // std::cout << col.alpha() << ", " << col.red() << ", " << col.green() << ", " << col.blue() << std::endl;
 
+    // bungeegum::launch(bungeegum::make<Title>()
+    //                       .title("my title !!!")
+    //                       .child(_coloredBox
+    //                                  //  .color(Color::fromRGBO(255, 122, 121, 1.f)))
+    //                                  .color(0xFF6699FF))
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
                           .child(_coloredBox
@@ -96,8 +101,8 @@ int main()
         //              .widthFactor(0.5f))
         ,
         [&]() {
-            bungeegum::must_resolve(_coloredBox);
-            bungeegum::must_draw(_coloredBox);
+            // bungeegum::must_resolve(_coloredBox);
+            // bungeegum::must_draw(_coloredBox);
         });
 
     return 0;

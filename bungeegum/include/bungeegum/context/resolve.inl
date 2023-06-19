@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bungeegum/core/exceptions.hpp>
-// #include <bungeegum/core/widget.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 // namespace detail {
@@ -26,7 +26,7 @@ namespace bungeegum {
 // }
 
 template <typename child_widget_t>
-float2 resolve_command::resolve_child(const child_widget_t& child_widget, const float2 min_size, const float2 max_size)
+float2 resolve_command::resolve_child(const typename typed_widget<child_widget_t>::value& child_widget, const float2 min_size, const float2 max_size)
 {
     // todo
     (void)child_widget;
@@ -36,7 +36,7 @@ float2 resolve_command::resolve_child(const child_widget_t& child_widget, const 
 }
 
 template <typename child_widget_t>
-void resolve_command::position_child(child_widget_t& child_widget, const float2 position)
+void resolve_command::position_child(typename typed_widget<child_widget_t>::value& child_widget, const float2 position)
 {
     // todo
     (void)child_widget;

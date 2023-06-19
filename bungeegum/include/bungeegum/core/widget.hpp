@@ -4,6 +4,22 @@
 
 namespace bungeegum {
 
+/// @brief Opaque untyped
+struct adopted_widget {
+private:
+    friend struct interact_command;
+    friend struct resolve_command;
+    friend struct draw_command;
+    friend struct detail::widgets_registry;
+    detail::adopted_widget_data _data;
+};
+
+/// @brief Transparent typed
+template <typename widget_t>
+struct typed_widget {
+    using value = std::enable_if_t<!std::is_same_v<widget_t, adopted_widget>>;
+};
+
 /// @brief Creates a new widget managed by bungeegum and returns a reference to it. This reference
 /// will be valid until it is destroyed by the user.
 /// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.
@@ -19,16 +35,6 @@ template <typename widget_t, typename... widget_args_t>
 /// @param widget
 template <typename widget_t>
 void unmake(widget_t& widget);
-
-/// @brief Opaque untyped
-struct adopted_widget {
-private:
-    friend struct interact_command;
-    friend struct resolve_command;
-    friend struct draw_command;
-    friend struct detail::widgets_registry;
-    detail::adopted_widget_data _data;
-};
 
 /// @brief Registers a widget as a child of another widget.
 /// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.

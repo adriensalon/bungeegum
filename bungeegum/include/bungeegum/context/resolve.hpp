@@ -4,8 +4,6 @@
 
 namespace bungeegum {
 
-struct adopted_widget;
-
 struct resolve_command {
 
     /// @brief
@@ -23,7 +21,7 @@ struct resolve_command {
     /// @param child_widget
     /// @param constraint
     template <typename child_widget_t>
-    float2 resolve_child(const child_widget_t& child_widget, const float2 min_size, const float2 max_size);
+    float2 resolve_child(const typename typed_widget<child_widget_t>::value& child_widget, const float2 min_size, const float2 max_size);
 
     /// @brief
     /// @param child_widget
@@ -35,7 +33,7 @@ struct resolve_command {
     /// @param child_widget
     /// @param position
     template <typename child_widget_t>
-    void position_child(child_widget_t& child_widget, const float2 position);
+    void position_child(typename typed_widget<child_widget_t>::value& child_widget, const float2 position);
 
     /// @brief
     /// @param child_widget
