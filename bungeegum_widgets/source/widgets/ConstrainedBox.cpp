@@ -11,14 +11,15 @@ namespace widgets {
 
     void ConstrainedBox::resolve(resolve_command& command)
     {
+        BoxConstraints _parentConstraints(command.min_size(), command.max_size());
+        Size _constrainedMinSize = _parentConstraints.constrain(_constraints.smallest());
         if (_child.has_value()) {
-            float2 _childSize = command.resolve_child(
-                _child.value(),
-                _constraints.constrain(command.min_size()),
-                _constraints.constrain(command.max_size()));
+            Size _constrainedMaxSize = _parentConstraints.constrain(_constraints.biggest());
+            float2 _childSize = command.resolve_child(_child.value(), _constrainedMinSize, _constrainedMaxSize);
+            command.position_child(_child.value(), zero<float2>);
             command.resize(_childSize);
         } else {
-            command.resize(_constraints.smallest());
+            command.resize(_constrainedMinSize);
         }
     }
 

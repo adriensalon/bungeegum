@@ -19,6 +19,7 @@ set(bungeegum_widgets_source
 	"source/widgets/Container.cpp"
 	"source/widgets/Flex.cpp"
 	"source/widgets/Padding.cpp"
+	"source/widgets/SizedBox.cpp"
 	"source/widgets/Title.cpp"
 )
 

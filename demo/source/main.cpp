@@ -7,12 +7,14 @@ int main()
 
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
-                          .child(bungeegum::make<ConstrainedBox>()
-                                     .constraints(BoxConstraints::tight(Size(500.f, 500.f)))
+                          .child(bungeegum::make<SizedBox>()
+                                     //  .constraints(BoxConstraints::tight(Size(500.f, 500.f)))
+                                     .height(500.f)
+                                     .width(500.f)
                                      .child(bungeegum::make<Padding>()
                                                 .padding(EdgeInsets::fromLTRB(5.f, 10.f, 15.f, 5.f))
                                                 .child(bungeegum::make<ColoredBox>()
-                                                           .color(0xFF669900))))
+                                                           .color(0xFF6699FF))))
 
         //   )
         ,
