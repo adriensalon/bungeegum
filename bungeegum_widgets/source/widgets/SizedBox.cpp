@@ -4,8 +4,33 @@
 namespace bungeegum {
 namespace widgets {
 
+    SizedBox& SizedBox::expand()
+    {
+        _size = infinity<float2>;
+        return *this;
+    }
+
     SizedBox& SizedBox::height(const float1 value)
     {
+        _size.y = value;
+        return *this;
+    }
+
+    SizedBox& SizedBox::shrink()
+    {
+        _size = zero<float2>;
+        return *this;
+    }
+
+    SizedBox& SizedBox::size(const Size value)
+    {
+        _size = value;
+        return *this;
+    }
+
+    SizedBox& SizedBox::square(const float1 value)
+    {
+        _size.x = value;
         _size.y = value;
         return *this;
     }

@@ -35,7 +35,9 @@ namespace widgets {
         template <typename child_widget_t>
         Container& child(child_widget_t& value)
         {
-            adopt(this, value);
+            if (_child.has_value())
+                abandon(this, _child.value());
+            _adoptedChild = adopt(this, value);
             return *this;
         }
 

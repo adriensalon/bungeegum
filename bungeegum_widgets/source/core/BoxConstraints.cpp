@@ -61,13 +61,15 @@ namespace widgets {
     // {
     // }
 
-    // bool BoxConstraints::hasBoundedHeight() const
-    // {
-    // }
+    bool BoxConstraints::hasBoundedHeight() const
+    {
+        return (_maxSize.y != infinity<float1>);
+    }
 
-    // bool BoxConstraints::hasBoundedWidth() const
-    // {
-    // }
+    bool BoxConstraints::hasBoundedWidth() const
+    {
+        return (_maxSize.x != infinity<float1>);
+    }
 
     // bool BoxConstraints::hasInfiniteHeight() const
     // {

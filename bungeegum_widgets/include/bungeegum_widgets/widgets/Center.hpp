@@ -1,9 +1,6 @@
 #pragma once
 
-// https://api.flutter.dev/flutter/widgets/Align-class.html
-
 #include <bungeegum/bungeegum.hpp>
-#include <bungeegum_widgets/core/Alignment.hpp>
 
 namespace bungeegum {
 namespace widgets {
@@ -23,7 +20,9 @@ namespace widgets {
         template <typename child_widget_t>
         Center& child(child_widget_t& value)
         {
-            adopt(this, value);
+            if (_child.has_value())
+                abandon(this, _child.value());
+            _child = adopt(this, value);
             return *this;
         }
 
@@ -38,9 +37,9 @@ namespace widgets {
     private:
         friend struct access;
         void resolve(resolve_command& command);
-        Alignment _alignment = Alignment::center();
-        float1 _heightFactor = 1.f;
-        float1 _widthFactor = 1.f;
+
+        std::optional<adopted_widget> _child = std::nullopt;
+        float2 _sizeFactor = { 1.f, 1.f };
     };
 
 }

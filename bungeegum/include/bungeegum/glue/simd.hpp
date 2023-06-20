@@ -29,6 +29,13 @@ using uint4 = glm::vec<4, unsigned int, simd_precision>;
 using uint3x3 = glm::mat<3, 3, unsigned int, simd_precision>;
 using uint4x4 = glm::mat<4, 4, unsigned int, simd_precision>;
 
+using bool1 = bool;
+using bool2 = glm::vec<2, bool, simd_precision>;
+using bool3 = glm::vec<3, bool, simd_precision>;
+using bool4 = glm::vec<4, bool, simd_precision>;
+using bool3x3 = glm::mat<3, 3, bool, simd_precision>;
+using bool4x4 = glm::mat<4, 4, bool, simd_precision>;
+
 // zero
 
 template <typename value_t>

@@ -14,7 +14,7 @@ namespace widgets {
         ConstrainedBox& child(child_widget_t& value)
         {
             if (_child.has_value())
-                abandon(this, _child);
+                abandon(this, _child.value());
             _child = adopt(this, value);
             return *this;
         }

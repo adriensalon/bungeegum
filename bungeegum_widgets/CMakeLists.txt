@@ -14,6 +14,7 @@ set(bungeegum_widgets_source
 	"source/core/Size.cpp"
 
 	"source/widgets/Align.cpp"
+	"source/widgets/Center.cpp"
 	"source/widgets/ColoredBox.cpp"
 	"source/widgets/ConstrainedBox.cpp"
 	"source/widgets/Container.cpp"

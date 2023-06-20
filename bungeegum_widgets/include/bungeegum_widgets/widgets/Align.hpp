@@ -1,7 +1,5 @@
 #pragma once
 
-// https://api.flutter.dev/flutter/widgets/Align-class.html
-
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum_widgets/core/Alignment.hpp>
 
@@ -13,11 +11,10 @@ namespace widgets {
     /// a tight constraint that is bigger than the child's natural size, with an alignment of
     /// Alignment::bottomRight()
     /// @details This widget will be as big as possible if its dimensions are constrained and
-    /// widthFactor and heightFactor are null. If a dimension is unconstrained and the
-    /// corresponding size factor is null then the widget will match its child's size in that
-    /// dimension. If a size factor is non-null then the corresponding dimension of this widget will
-    /// be the product of the child's dimension and the size factor. For example if widthFactor is
-    /// 2.0 then the width of this widget will always be twice its child's width.
+    /// widthFactor and heightFactor are 1.f or unmodified. If a dimension is unconstrained the
+    /// corresponding dimension of this widget will be the product of the child's dimension and
+    /// the size factor. For example if widthFactor is 2.f then the width of this widget will
+    /// always be twice its child's width.
     struct Align {
 
         /// @brief How to align the child.
@@ -30,7 +27,9 @@ namespace widgets {
         template <typename child_widget_t>
         Align& child(child_widget_t& value)
         {
-            adopt(this, value);
+            if (_child.has_value())
+                abandon(this, _child.value());
+            _child = adopt(this, value);
             return *this;
         }
 
@@ -45,9 +44,10 @@ namespace widgets {
     private:
         friend struct access;
         void resolve(resolve_command& command);
+
+        std::optional<adopted_widget> _child = std::nullopt;
         Alignment _alignment = Alignment::center();
-        float1 _heightFactor = 1.f;
-        float1 _widthFactor = 1.f;
+        float2 _sizeFactor = { 1.f, 1.f };
     };
 
 }

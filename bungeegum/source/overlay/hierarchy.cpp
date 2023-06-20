@@ -25,6 +25,11 @@ namespace detail {
             return str.size() >= prefix.size() && 0 == str.compare(0, prefix.size(), prefix);
         }
 
+        std::string size_to_string(const float2 size)
+        {
+            return (std::to_string(size.x) + ", " + std::to_string(size.y));
+        }
+
         const std::string& clean_typename(const char* raw_typename)
         {
             static std::unordered_map<const char*, std::string> _typenames;
@@ -63,10 +68,14 @@ namespace detail {
                 font_guard _fg0(extrabold_font);
                 if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags)) {
                     _fg0.release();
-                    if (_widget_data.resolver)
-                        ImGui::Text("has advanced resolve");
-                    if (_widget_data.drawer)
-                        ImGui::Text("has advanced draw");
+                    // if (_widget_data.resolver)
+                    //     ImGui::Text("has advanced resolve");
+                    // if (_widget_data.drawer)
+                    //     ImGui::Text("has advanced draw");
+                    ImGui::Text("Constraints");
+                    ImGui::Text(("min_size = " + size_to_string(_widget_data.resolver_command.value().min_size())).c_str());
+                    ImGui::Text(("max_size = " + size_to_string(_widget_data.resolver_command.value().max_size())).c_str());
+
                     // ImGui::Text((std::to_string(_widget_data.command.value()._commands.size()) + " advanced draw commands)").c_str());
                     // if (!_widget_data.detached_events_removers.empty())
                     //     ImGui::Text((std::to_string(_widget_data.detached_events_removers.size()) + " detached events").c_str());

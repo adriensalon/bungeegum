@@ -161,6 +161,12 @@ namespace detail {
         detail::events_context.events.template iterate<detail::untyped_event_data>([](detail::untyped_event_data& _event_data) {
             _event_data.ticker();
         });
+
+        // debug only !
+        must_resolve();
+        must_draw();
+        // debug only !
+
         context::execute_interact();
         context::execute_resolve();
         return (has_userspace_thrown() || !widgets_context.drawables.empty());
