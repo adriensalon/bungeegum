@@ -15,6 +15,13 @@ using float4 = glm::vec<4, float, simd_precision>;
 using float3x3 = glm::mat<3, 3, glm::f32, simd_precision>;
 using float4x4 = glm::mat<4, 4, glm::f32, simd_precision>;
 
+using int1 = int;
+using int2 = glm::vec<2, int, simd_precision>;
+using int3 = glm::vec<3, int, simd_precision>;
+using int4 = glm::vec<4, int, simd_precision>;
+using int3x3 = glm::mat<3, 3, int, simd_precision>;
+using int4x4 = glm::mat<4, 4, int, simd_precision>;
+
 using uint1 = unsigned int;
 using uint2 = glm::vec<2, unsigned int, simd_precision>;
 using uint3 = glm::vec<3, unsigned int, simd_precision>;

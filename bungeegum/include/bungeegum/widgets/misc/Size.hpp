@@ -61,6 +61,8 @@ namespace widgets {
         bool operator>(const Size& other);
         bool operator>=(const Size& other);
 
+        operator float2() const;
+
         Size() = default;
         Size(const Size& other) = default;
         Size& operator=(const Size& other) = default;

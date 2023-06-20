@@ -32,6 +32,7 @@ set(bungeegum_source
 	"source/overlay/wireframe.cpp"
 
 	"source/widgets/misc/Alignment.cpp"
+	"source/widgets/misc/BoxConstraints.cpp"
 	"source/widgets/misc/Color.cpp"
 	"source/widgets/misc/EdgeInsets.cpp"
 	"source/widgets/misc/Offset.cpp"
@@ -40,7 +41,9 @@ set(bungeegum_source
 
 	"source/widgets/Align.cpp"
 	"source/widgets/ColoredBox.cpp"
+	"source/widgets/ConstrainedBox.cpp"
 	"source/widgets/Container.cpp"
+	"source/widgets/Flex.cpp"
 	"source/widgets/Padding.cpp"
 	"source/widgets/Title.cpp"
 )

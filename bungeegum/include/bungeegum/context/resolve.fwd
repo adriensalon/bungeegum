@@ -1,8 +1,10 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <type_traits>
 
+#include <bungeegum/glue/raw.fwd>
 #include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
@@ -19,6 +21,7 @@ namespace detail {
     struct resolve_constraint_data {
         float2 min_size = zero<float2>;
         float2 max_size = infinity<float2>;
+        float1 flex_value = 0.f;
     };
 
     struct resolve_command_data {

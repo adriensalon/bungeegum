@@ -10,6 +10,8 @@
 
 #include <bungeegum/widgets/Align.hpp>
 #include <bungeegum/widgets/ColoredBox.hpp>
+#include <bungeegum/widgets/ConstrainedBox.hpp>
 #include <bungeegum/widgets/Container.hpp>
+#include <bungeegum/widgets/Flex.hpp>
 #include <bungeegum/widgets/Padding.hpp>
 #include <bungeegum/widgets/Title.hpp>

@@ -241,5 +241,9 @@ namespace widgets {
             && (_value.y >= other.height()));
     }
 
+    Size::operator float2() const
+    {
+        return _value;
+    }
 }
 }

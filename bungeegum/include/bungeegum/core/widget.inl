@@ -160,6 +160,6 @@ void abandon(widget_t& widget, children_widgets_t&... children_widgets)
 template <typename widget_t, typename... children_widgets_t>
 void abandon(widget_t* widget, children_widgets_t&... children_widgets)
 {
-    abandon<widget_t, children_widgets_t...>(widget, children_widgets...);
+    abandon<widget_t, children_widgets_t...>(*widget, children_widgets...);
 }
 }

@@ -25,6 +25,14 @@ namespace bungeegum {
 //     }
 // }
 
+template <typename value_t>
+std::optional<value_t>& resolve_command::properties(const std::string& name)
+{
+    static std::unordered_map<std::uintptr_t, std::unordered_map<std::string, std::optional<value_t>>> _properties = {};
+    std::uintptr_t _raw_command = detail::raw_cast<resolve_command>(this);
+    return _properties[_raw_command][name];
+}
+
 template <typename child_widget_t>
 float2 resolve_command::resolve_child(const typename typed_widget<child_widget_t>::value& child_widget, const float2 min_size, const float2 max_size)
 {
