@@ -21,13 +21,13 @@ namespace detail {
     struct resolve_constraint_data {
         float2 min_size = zero<float2>;
         float2 max_size = infinity<float2>;
-        float1 flex_value = 0.f;
     };
 
     struct resolve_command_data {
         resolve_constraint_data constraint; // given by parent
-        float2 resolved_size; // set by widget after children
-        // float2 resolved_position; // given by parent ? NONEED??
+        float2 resolved_size = zero<float2>; // set by widget after children
+        float2 resolved_position = zero<float2>; // given by parent ? NONEED??
+        float2 accumulated_position = zero<float2>; // set when drawing
     };
 
 }

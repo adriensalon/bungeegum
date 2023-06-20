@@ -13,6 +13,7 @@ namespace widgets {
 
     struct Offset;
 
+    /// @brief A point within a rectangle.
     struct Alignment {
 
         // Constructors
@@ -60,6 +61,8 @@ namespace widgets {
         // bool operator>(const Size& other);
         // bool operator>=(const Size& other);
 
+        operator float2() const;
+
         Alignment() = default;
         Alignment(const Alignment& other) = default;
         Alignment& operator=(const Alignment& other) = default;
@@ -67,7 +70,7 @@ namespace widgets {
         Alignment& operator=(Alignment&& other) = default;
 
     private:
-        float2 _value = { 0.f, 0.f };
+        float2 _value = zero<float2>;
     };
 
 }

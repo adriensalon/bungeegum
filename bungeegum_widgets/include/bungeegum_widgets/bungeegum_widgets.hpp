@@ -9,6 +9,7 @@
 #include <bungeegum_widgets/core/Size.hpp>
 
 #include <bungeegum_widgets/widgets/Align.hpp>
+#include <bungeegum_widgets/widgets/Center.hpp>
 #include <bungeegum_widgets/widgets/ColoredBox.hpp>
 #include <bungeegum_widgets/widgets/ConstrainedBox.hpp>
 #include <bungeegum_widgets/widgets/Container.hpp>

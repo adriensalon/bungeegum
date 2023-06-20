@@ -8,12 +8,12 @@ int main()
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
                           .child(
-                              bungeegum::make<Align>()
-                                  .alignment(Alignment::center())
+                              bungeegum::make<Center>()
+                                  //   .alignment(Alignment::center())
                                   .child(bungeegum::make<SizedBox>()
                                              //  .constraints(BoxConstraints::tight(Size(500.f, 500.f)))
-                                             .height(500.f)
-                                             .width(500.f)
+                                             .height(100.f)
+                                             .width(100.f)
                                              //  .expand()
                                              .child(bungeegum::make<Padding>()
                                                         .padding(EdgeInsets::fromLTRB(5.f, 10.f, 15.f, 5.f))
@@ -23,8 +23,8 @@ int main()
         //   )
         ,
         [&]() {
-            bungeegum::must_resolve();
-            bungeegum::must_draw();
+            // bungeegum::must_resolve();
+            // bungeegum::must_draw();
             // rendre officiel j'imagine
         });
 

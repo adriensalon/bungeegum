@@ -42,20 +42,22 @@ float2 resolve_command::resolve_child(const adopted_widget& child_widget, const 
     });
 
     float2 _resolved_size = _child_resolve_command._data.resolved_size;
-    if (_child_untyped_widget.drawer_command.has_value()) {
-        draw_command& _child_draw_command = _child_untyped_widget.drawer_command.value();
-        _child_draw_command._data.resolved_size = _resolved_size;
-    }
+    // if (_child_untyped_widget.drawer_command.has_value()) {
+    //     draw_command& _child_draw_command = _child_untyped_widget.drawer_command.value();
+    //     _child_draw_command._data.resolved_size = _resolved_size;
+    // }
     return _resolved_size;
 }
 
 void resolve_command::position_child(const adopted_widget& child_widget, const float2 position)
 {
     detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
-    if (_child_untyped_widget.drawer_command.has_value()) {
-        draw_command& _child_draw_command = _child_untyped_widget.drawer_command.value();
-        _child_draw_command._data.resolved_position = position;
-    }
+    resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
+    _child_resolve_command._data.resolved_position = position;
+    // if (_child_untyped_widget.drawer_command.has_value()) {
+    //     draw_command& _child_draw_command = _child_untyped_widget.drawer_command.value();
+    //     _child_draw_command._data.resolved_position = _resolvedPosition;
+    // }
 }
 
 // resolve_constraint::resolve_constraint(const float2 min_size, const float2 max_size)

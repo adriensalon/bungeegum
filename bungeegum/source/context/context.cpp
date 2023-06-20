@@ -75,17 +75,18 @@ namespace detail {
                             _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
                             _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
                         }
+                        // _resolve_command._data.resolved_position = _parent_widget_data_ptr->resolver_command.value()._data.resolved_position;
                     }
 
                     protect_userspace([&_widget_data]() {
                         _widget_data.resolver(_widget_data.resolver_command.value());
                     });
 
-                    float2 _resolved_size = _resolve_command._data.resolved_size;
-                    if (_widget_data.drawer_command.has_value()) {
-                        draw_command& _draw_command = _widget_data.drawer_command.value();
-                        _draw_command._data.resolved_size = _resolved_size;
-                    }
+                    // float2 _resolved_size = _resolve_command._data.resolved_size;
+                    // if (_widget_data.drawer_command.has_value()) {
+                    //     draw_command& _draw_command = _widget_data.drawer_command.value();
+                    //     _draw_command._data.resolved_size = _resolved_size;
+                    // }
                 });
             widgets_context.resolvables.erase(widgets_context.resolvables.begin(), widgets_context.resolvables.end());
             _resolve_done = widgets_context.resolvables.empty();
@@ -106,12 +107,24 @@ namespace detail {
                     [imgui_drawlist](auto&& _data_reference) {
                         untyped_widget_data& _drawable_widget_data = _data_reference.get();
                         widgets_context.traverse_untyped(_drawable_widget_data, [imgui_drawlist](untyped_widget_data& _widget_data) {
+                            // accumulate position anyway
+                            resolve_command& _widget_resolver_command = _widget_data.resolver_command.value();
+                            if (_widget_data.parent.has_value()) {
+                                resolve_command& _parent_resolver_command = _widget_data.parent.value().get().resolver_command.value();
+                                _widget_resolver_command._data.accumulated_position = _widget_resolver_command._data.resolved_position + _parent_resolver_command._data.accumulated_position;
+                            }
+
+                            // draw
                             if (_widget_data.drawer_command.has_value()) {
-                                _widget_data.drawer_command.value()._data.commands.clear();
-                                protect_userspace([&_widget_data]() {
-                                    _widget_data.drawer(_widget_data.drawer_command.value());
+
+                                draw_command& _widget_drawer_command = _widget_data.drawer_command.value();
+                                _widget_drawer_command._data.resolved_size = _widget_resolver_command._data.resolved_size;
+                                _widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
+                                _widget_drawer_command._data.commands.clear();
+                                protect_userspace([&_widget_data, &_widget_drawer_command]() {
+                                    _widget_data.drawer(_widget_drawer_command);
                                 });
-                                _widget_data.drawer_command.value()._data.draw(imgui_drawlist);
+                                _widget_drawer_command._data.draw(imgui_drawlist);
                             }
                             return true;
                         });
@@ -134,8 +147,8 @@ namespace detail {
             // int _w, _h;
             // SDL_GetWindowSize(get(_diligent_renderer).sdl_window, &_w, &_h);
             // get(_diligent_renderer).swap_chain->Resize(_w, _h);
-            must_resolve();
-            must_draw();
+            // must_resolve();
+            // must_draw();
         } else if (_event_ptr->type == SDL_MOUSEMOTION) {
             mouse_moved_interaction_data _interaction_data;
             _interaction_data.absolute_position = float2 { _event_ptr->motion.x, _event_ptr->motion.y };

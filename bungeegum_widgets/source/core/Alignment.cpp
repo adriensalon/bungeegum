@@ -48,5 +48,9 @@ namespace widgets {
         return Alignment(1.f, -1.f);
     }
 
+    Alignment::operator float2() const
+    {
+        return _value;
+    }
 }
 }

@@ -12,11 +12,16 @@ namespace widgets {
             const float2 childSize,
             const float2 centerSize)
         {
-            (void)command;
-            (void)childWidget;
-            (void)childSize;
-            (void)centerSize;
-            // TODO
+            float2 _positionForChild = {
+                0.5f * childSize.x,
+                0.5f * childSize.y
+            };
+            float2 _positionForAlign = {
+                0.5f * centerSize.x,
+                0.5f * centerSize.y
+            };
+            float2 _positionDelta = _positionForAlign - _positionForChild;
+            command.position_child(childWidget, _positionDelta);
         }
 
     }

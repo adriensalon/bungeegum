@@ -13,12 +13,19 @@ namespace widgets {
             const float2 alignSize,
             const Alignment alignment)
         {
-            (void)command;
-            (void)childWidget;
-            (void)childSize;
-            (void)alignSize;
-            (void)alignment;
-            // TODO
+            float2 _alignment = static_cast<float2>(alignment);
+            float2 _clampedAlignment = { glm::clamp(_alignment.x, -1.f, 1.f), glm::clamp(_alignment.y, -1.f, 1.f) };
+            float2 _normalizedAlignment = 0.5f * (_clampedAlignment + float2 { 1.f });
+            float2 _positionForChild = {
+                _normalizedAlignment.x * childSize.x,
+                _normalizedAlignment.y * childSize.y
+            };
+            float2 _positionForAlign = {
+                _normalizedAlignment.x * alignSize.x,
+                _normalizedAlignment.y * alignSize.y
+            };
+            float2 _positionDelta = _positionForAlign - _positionForChild;
+            command.position_child(childWidget, _positionDelta);
         }
 
     }
