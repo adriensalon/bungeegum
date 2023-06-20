@@ -1,5 +1,7 @@
 project(bungeegum)
 
+option(BUNGEEGUM_ENABLE_EMBEDDED "Embedded" ON)
+option(BUNGEEGUM_ENABLE_STANDALONE "Build SDL + Diligent Engine launcher" ON)
 option(BUNGEEGUM_ENABLE_OVERLAY "Enables an overlay diplaying errors etc" ON)
 
 set(bungeegum_source
@@ -30,25 +32,9 @@ set(bungeegum_source
 	"source/overlay/profiler.cpp"
 	"source/overlay/report.cpp"
 	"source/overlay/wireframe.cpp"
-
-	"source/widgets/misc/Alignment.cpp"
-	"source/widgets/misc/BoxConstraints.cpp"
-	"source/widgets/misc/Color.cpp"
-	"source/widgets/misc/EdgeInsets.cpp"
-	"source/widgets/misc/Offset.cpp"
-	"source/widgets/misc/Rect.cpp"
-	"source/widgets/misc/Size.cpp"
-
-	"source/widgets/Align.cpp"
-	"source/widgets/ColoredBox.cpp"
-	"source/widgets/ConstrainedBox.cpp"
-	"source/widgets/Container.cpp"
-	"source/widgets/Flex.cpp"
-	"source/widgets/Padding.cpp"
-	"source/widgets/Title.cpp"
 )
 
-if(BUNGEEGUM_BUILD_LAUNCHER)
+if(BUNGEEGUM_ENABLE_STANDALONE)
 	set(bungeegum_source ${bungeegum_source}
 		"source/glue/renderer.cpp"
 		"source/glue/window.cpp")
@@ -77,7 +63,7 @@ target_link_libraries(bungeegum implot)
 target_link_libraries(bungeegum tinysplinecxx)
 target_link_libraries(bungeegum EnTT)
 
-if(BUNGEEGUM_BUILD_LAUNCHER)
+if(BUNGEEGUM_ENABLE_STANDALONE)
 	target_link_libraries(bungeegum SDL2-static)
 	target_link_libraries(bungeegum Diligent-Common)
 	target_link_libraries(bungeegum Diligent-Primitives)

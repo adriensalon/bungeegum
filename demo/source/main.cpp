@@ -1,5 +1,5 @@
 #include <bungeegum/bungeegum.hpp>
-#include <bungeegum/bungeegum_widgets.hpp>
+#include <bungeegum_widgets/bungeegum_widgets.hpp>
 
 int main()
 {

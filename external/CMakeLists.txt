@@ -1,12 +1,3 @@
-#       _        _   _                 _ 
-#      | |      | | (_)               (_)
-#   ___| |_ __ _| |_ _  ___ __ _ _   _ _ 
-#  / __| __/ _` | __| |/ __/ _` | | | | |
-#  \__ \ || (_| | |_| | (_| (_| | |_| | |
-#  |___/\__\__,_|\__|_|\___\__, |\__,_|_|
-#                           __/ |        
-#                          |___/         
-
 add_subdirectory("glm")
 add_subdirectory("imgui")
 add_subdirectory("implot")
@@ -19,7 +10,7 @@ set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 add_subdirectory("googletest")
 
-if(BUNGEEGUM_BUILD_LAUNCHER)
+if(BUNGEEGUM_ENABLE_STANDALONE)
 	add_subdirectory("sdl")
 
 	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Android")
@@ -47,8 +38,6 @@ if(BUNGEEGUM_BUILD_LAUNCHER)
 	set(DILIGENT_NO_ARCHIVER ON CACHE BOOL "" FORCE) # implement later
 	add_subdirectory("diligent")
 
-
 	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
 	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
 endif()
-

@@ -35,13 +35,13 @@ We can either own the widgets or let _bungeegum_ own them and get references. Wi
 
 ```C++
 // we own the widget
-container my_container_widget;
+Container my_container_widget;
 
 // bungeegum owns the widget and we get a reference
-container& my_container_widget_ref = bungeegum::make<container>();
+Container& my_container_widget_ref = bungeegum::make<Container>();
 
-auto& my_widget_tree = bungeegum::make<center>()
-    .child(bungeegum::make<row>()			
+auto& my_widget_tree = bungeegum::make<Center>()
+    .child(bungeegum::make<Row>()			
         .height(200.f)
         .children(my_container_widget
             .width(120.f)
@@ -90,13 +90,13 @@ struct my_widget_class {
 
 	my_widget_class()
 	{		
-		bungeegum::adopt(this, bungeegum::make<center>()
-			.child(bungeegum::make<row>()		
+		bungeegum::adopt(this, bungeegum::make<Center>()
+			.child(bungeegum::make<Row>()		
 				.height(200.f)
 				.children(_my_container_widget
 						.width(120.f)
 						.color({ 0.2f, 0.2f, 0.2f, 1.f }),
-					bungeegum::make<container>()
+					bungeegum::make<Container>()
 						.width(140.f)
 						.color({ 0.3f, 0.3f, 0.3f, 1.f })
 				)
