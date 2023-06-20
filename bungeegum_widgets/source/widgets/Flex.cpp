@@ -1,4 +1,4 @@
-#include <bungeegum_widgets/misc/FlexFit.hpp>
+#include <bungeegum_widgets/core/FlexFit.hpp>
 #include <bungeegum_widgets/widgets/Flex.hpp>
 
 

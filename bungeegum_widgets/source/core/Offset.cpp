@@ -1,4 +1,4 @@
-#include <bungeegum_widgets/misc/Offset.hpp>
+#include <bungeegum_widgets/core/Offset.hpp>
 
 namespace bungeegum {
 namespace widgets {

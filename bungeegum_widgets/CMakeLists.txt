@@ -1,14 +1,17 @@
 project(bungeegum_widgets)
 
+option(BUNGEEGUM_ENABLE_CUPERTINO "Cupertino design" ON)
+option(BUNGEEGUM_ENABLE_MATERIAL "Material design" ON)
+
 set(bungeegum_widgets_source
 
-	"source/misc/Alignment.cpp"
-	"source/misc/BoxConstraints.cpp"
-	"source/misc/Color.cpp"
-	"source/misc/EdgeInsets.cpp"
-	"source/misc/Offset.cpp"
-	"source/misc/Rect.cpp"
-	"source/misc/Size.cpp"
+	"source/core/Alignment.cpp"
+	"source/core/BoxConstraints.cpp"
+	"source/core/Color.cpp"
+	"source/core/EdgeInsets.cpp"
+	"source/core/Offset.cpp"
+	"source/core/Rect.cpp"
+	"source/core/Size.cpp"
 
 	"source/widgets/Align.cpp"
 	"source/widgets/ColoredBox.cpp"

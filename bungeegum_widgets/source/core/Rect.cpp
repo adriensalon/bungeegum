@@ -1,6 +1,6 @@
-#include <bungeegum_widgets/misc/Offset.hpp>
-#include <bungeegum_widgets/misc/Rect.hpp>
-#include <bungeegum_widgets/misc/Size.hpp>
+#include <bungeegum_widgets/core/Offset.hpp>
+#include <bungeegum_widgets/core/Rect.hpp>
+#include <bungeegum_widgets/core/Size.hpp>
 
 namespace bungeegum {
 namespace widgets {

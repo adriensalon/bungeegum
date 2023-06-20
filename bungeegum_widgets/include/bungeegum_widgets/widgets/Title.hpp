@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bungeegum/bungeegum.hpp>
-#include <bungeegum_widgets/misc/Color.hpp>
+#include <bungeegum_widgets/core/Color.hpp>
 
 namespace bungeegum {
 namespace widgets {

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <bungeegum/bungeegum.hpp>
-#include <bungeegum_widgets/misc/Axis.hpp>
-#include <bungeegum_widgets/misc/CrossAxisAlignment.hpp>
-#include <bungeegum_widgets/misc/MainAxisAlignment.hpp>
-#include <bungeegum_widgets/misc/MainAxisSize.hpp>
-#include <bungeegum_widgets/misc/VerticalDirection.hpp>
+#include <bungeegum_widgets/core/Axis.hpp>
+#include <bungeegum_widgets/core/CrossAxisAlignment.hpp>
+#include <bungeegum_widgets/core/MainAxisAlignment.hpp>
+#include <bungeegum_widgets/core/MainAxisSize.hpp>
+#include <bungeegum_widgets/core/VerticalDirection.hpp>
 
 namespace bungeegum {
 namespace widgets {

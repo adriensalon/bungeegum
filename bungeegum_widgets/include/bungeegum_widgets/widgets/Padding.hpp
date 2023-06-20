@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bungeegum/bungeegum.hpp>
-#include <bungeegum_widgets/misc/EdgeInsets.hpp>
+#include <bungeegum_widgets/core/EdgeInsets.hpp>
 
 namespace bungeegum {
 namespace widgets {

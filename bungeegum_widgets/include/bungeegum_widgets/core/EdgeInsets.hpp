@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bungeegum/bungeegum.hpp>
-#include <bungeegum_widgets/misc/Offset.hpp>
-#include <bungeegum_widgets/misc/Size.hpp>
+#include <bungeegum_widgets/core/Offset.hpp>
+#include <bungeegum_widgets/core/Size.hpp>
 
 namespace bungeegum {
 namespace widgets {

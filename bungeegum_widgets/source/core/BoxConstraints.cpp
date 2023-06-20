@@ -1,4 +1,4 @@
-#include <bungeegum_widgets/misc/BoxConstraints.hpp>
+#include <bungeegum_widgets/core/BoxConstraints.hpp>
 
 namespace bungeegum {
 namespace widgets {

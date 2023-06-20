@@ -1,4 +1,4 @@
-#include <bungeegum_widgets/misc/Alignment.hpp>
+#include <bungeegum_widgets/core/Alignment.hpp>
 
 namespace bungeegum {
 namespace widgets {

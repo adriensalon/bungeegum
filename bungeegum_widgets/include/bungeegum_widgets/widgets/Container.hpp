@@ -1,12 +1,12 @@
 #pragma once
 
 #include <bungeegum/bungeegum.hpp>
-#include <bungeegum_widgets/misc/Alignment.hpp>
-#include <bungeegum_widgets/misc/BoxConstraints.hpp>
-#include <bungeegum_widgets/misc/BoxDecoration.hpp>
-#include <bungeegum_widgets/misc/Color.hpp>
-#include <bungeegum_widgets/misc/EdgeInsets.hpp>
-#include <bungeegum_widgets/misc/ShapeDecoration.hpp>
+#include <bungeegum_widgets/core/Alignment.hpp>
+#include <bungeegum_widgets/core/BoxConstraints.hpp>
+#include <bungeegum_widgets/core/BoxDecoration.hpp>
+#include <bungeegum_widgets/core/Color.hpp>
+#include <bungeegum_widgets/core/EdgeInsets.hpp>
+#include <bungeegum_widgets/core/ShapeDecoration.hpp>
 
 namespace bungeegum {
 namespace widgets {
