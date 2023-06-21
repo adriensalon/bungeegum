@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bungeegum/bungeegum.hpp>
+#include <bungeegum_widgets/core/Future.hpp>
 
 namespace bungeegum {
 namespace widgets {

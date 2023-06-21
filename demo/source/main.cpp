@@ -27,6 +27,17 @@ struct delegateTest {
 
 int main()
 {
+    // Future<int> _fok(std::async([]() {
+    //     return 555;
+    // }));
+    // _fok.then<float>([](int pres) {
+    //         return static_cast<float>(pres) + 22.f;
+    //     })
+    //     .then<float>([](float res) {
+    //         std::cout << res << std::endl;
+    //         return 0.f;
+    //     });
+
     // FutureBuilder<Color> _fb;
     // _fb.initialData(55.f);
     // _fb.builder<Padding>([](const float ff) -> auto& {
