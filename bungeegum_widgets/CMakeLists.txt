@@ -18,6 +18,7 @@ set(bungeegum_widgets_source
 	"source/widgets/ColoredBox.cpp"
 	"source/widgets/ConstrainedBox.cpp"
 	"source/widgets/Container.cpp"
+	"source/widgets/CustomSingleChildLayout.cpp"
 	"source/widgets/Flex.cpp"
 	"source/widgets/Padding.cpp"
 	"source/widgets/SizedBox.cpp"

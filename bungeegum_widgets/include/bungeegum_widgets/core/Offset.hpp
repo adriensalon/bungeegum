@@ -86,6 +86,8 @@ namespace widgets {
         bool operator>(const Offset& other);
         bool operator>=(const Offset& other);
 
+        operator float2() const;
+
         Offset() = default;
         Offset(const Offset& other) = default;
         Offset& operator=(const Offset& other) = default;

@@ -136,5 +136,10 @@ namespace widgets {
         return ((_value.x >= other.dx())
             && (_value.y >= other.dy()));
     }
+
+    Offset::operator float2() const
+    {
+        return _value;
+    }
 }
 }
