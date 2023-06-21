@@ -27,8 +27,18 @@ struct delegateTest {
 
 int main()
 {
-
-    SingleChildLayoutDelegate<delegateTest> ii;
+    // FutureBuilder<Color> _fb;
+    // _fb.initialData(55.f);
+    // _fb.builder<Padding>([](const float ff) -> auto& {
+    //     return bungeegum::make<Padding>()
+    //         .padding(EdgeInsets::fromLTRB(5.f, 10.f, 15.f, 5.f))
+    //         .child(bungeegum::make<ColoredBox>()
+    //                    .color(0xFF6699FF));
+    // });
+    // _fb.builder<Padding>(bbb);
+    // _fb.future(std::async([]() {
+    //     return 42.f;
+    // }));
 
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
@@ -45,10 +55,20 @@ int main()
                                              //  .height(100.f)
                                              //  .width(100.f)
                                              //  .expand()
-                                             .child(bungeegum::make<Padding>()
-                                                        .padding(EdgeInsets::fromLTRB(5.f, 10.f, 15.f, 5.f))
-                                                        .child(bungeegum::make<ColoredBox>()
-                                                                   .color(0xFF6699FF)))))
+                                             .child(bungeegum::make<FutureBuilder<Color>>()
+                                                        .initialData(Color(0xFF6699FF))
+                                                        .future(std::async([]() {
+                                                            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                                                            return Color(0xFF6611FF);
+                                                        }))
+                                                        .builder<Padding>([](const Color& color) -> auto& {
+                                                            return bungeegum::make<Padding>()
+                                                                .padding(EdgeInsets::fromLTRB(5.f, 10.f, 15.f, 5.f))
+                                                                .child(bungeegum::make<ColoredBox>()
+                                                                           .color(color));
+                                                        }))
+
+                                          ))
 
         //   )
         ,
