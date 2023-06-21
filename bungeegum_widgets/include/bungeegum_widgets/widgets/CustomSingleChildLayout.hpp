@@ -21,43 +21,24 @@ namespace widgets {
         }
 
         /// @brief The delegate that controls the layout of the child.
-        template <typename delegate_t>
-        CustomSingleChildLayout& delegate(const SingleChildLayoutDelegate<delegate_t>& value)
+        template <typename delegate_t, typename... delegate_args_t>
+        CustomSingleChildLayout& delegate(delegate_args_t&&... args)
         {
             using _delegateType_t = SingleChildLayoutDelegate<delegate_t>;
-            _delegate.untyped = std::make_any<_delegateType_t>(value);
-            _delegate.getConstraintsForChild = [&_delegate](const BoxConstraints constraints) {
-                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t>(_delegate.untyped);
+            _delegate.untyped = std::make_any<_delegateType_t>(std::forward<delegate_args_t>(args)...);
+            _delegate.getConstraintsForChild = [this](const BoxConstraints constraints) {
+                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t&>(_delegate.untyped);
                 return _typedDelegate.getConstraintsForChild(constraints);
             };
-            _delegate.getPositionForChild = [&_delegate](const Size size, const Size childSize) {
-                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t>(_delegate.untyped);
+            _delegate.getPositionForChild = [this](const Size size, const Size childSize) {
+                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t&>(_delegate.untyped);
                 return _typedDelegate.getPositionForChild(size, childSize);
             };
-            _delegate.getSize = [&_delegate](const BoxConstraints constraints) {
-                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t>(_delegate.untyped);
+            _delegate.getSize = [this](const BoxConstraints constraints) {
+                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t&>(_delegate.untyped);
                 return _typedDelegate.getSize(constraints);
             };
-        }
-
-        /// @brief The delegate that controls the layout of the child.
-        template <typename delegate_t>
-        CustomSingleChildLayout& delegate(SingleChildLayoutDelegate<delegate_t>&& value)
-        {
-            using _delegateType_t = SingleChildLayoutDelegate<delegate_t>;
-            _delegate.untyped = std::make_any<_delegateType_t>(value);
-            _delegate.getConstraintsForChild = [&_delegate](const BoxConstraints constraints) {
-                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t>(_delegate.untyped);
-                return _typedDelegate.getConstraintsForChild(constraints);
-            };
-            _delegate.getPositionForChild = [&_delegate](const Size size, const Size childSize) {
-                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t>(_delegate.untyped);
-                return _typedDelegate.getPositionForChild(size, childSize);
-            };
-            _delegate.getSize = [&_delegate](const BoxConstraints constraints) {
-                _delegateType_t& _typedDelegate = std::any_cast<_delegateType_t>(_delegate.untyped);
-                return _typedDelegate.getSize(constraints);
-            };
+            return *this;
         }
 
     private:

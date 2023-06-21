@@ -7,18 +7,21 @@ struct delegateTest {
 
     BoxConstraints getConstraintsForChild(const BoxConstraints constraints)
     {
+        Size _wantedSize(200.f, 200.f);
+        Size _constrainedSize = constraints.constrain(_wantedSize);
+        return BoxConstraints(_constrainedSize, _constrainedSize);
     }
 
     Offset getPositionForChild(const Size size, const Size childSize)
     {
+        return Offset(0.f, 0.f);
     }
 
     Size getSize(const BoxConstraints constraints)
     {
-    }
-
-    bool shouldRelayout(const delegateTest& oldDelegate)
-    {
+        Size _wantedSize(200.f, 200.f);
+        Size _constrainedSize = constraints.constrain(_wantedSize);
+        return _constrainedSize;
     }
 };
 
@@ -35,10 +38,12 @@ int main()
 
                                   //   .heightFactor(2.f) // LOL NE MARCHE PAS
                                   //   .widthFactor(2.f) // LOL NE MARCHE PAS
-                                  .child(bungeegum::make<SizedBox>()
+                                  .child(bungeegum::make<CustomSingleChildLayout>()
+                                             .delegate<delegateTest>()
+
                                              //  .constraints(BoxConstraints::tight(Size(500.f, 500.f)))
-                                             .height(100.f)
-                                             .width(100.f)
+                                             //  .height(100.f)
+                                             //  .width(100.f)
                                              //  .expand()
                                              .child(bungeegum::make<Padding>()
                                                         .padding(EdgeInsets::fromLTRB(5.f, 10.f, 15.f, 5.f))

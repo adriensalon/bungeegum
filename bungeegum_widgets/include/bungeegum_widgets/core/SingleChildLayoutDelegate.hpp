@@ -45,14 +45,14 @@ namespace widgets {
             return _delegate.getConstraintsForChild(constraints);
         }
 
-        Offset getPositionForChild(const BoxConstraints constraints)
+        Offset getPositionForChild(const Size size, const Size childSize)
         {
-            return _delegate.getPositionForChild(constraints);
+            return _delegate.getPositionForChild(size, childSize);
         }
 
-        Size getSize(const Size size, const Size childSize)
+        Size getSize(const BoxConstraints constraints)
         {
-            return _delegate.getSize(size, childSize);
+            return _delegate.getSize(constraints);
         }
 
         SingleChildLayoutDelegate(const SingleChildLayoutDelegate& other) = default;
