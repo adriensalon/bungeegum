@@ -27,7 +27,7 @@ namespace widgets {
         friend struct access;
         void resolve(resolve_command& command);
 
-        std::optional<adopted_widget> _child = std::nullopt;
+        std::optional<runtime_widget> _child = std::nullopt;
     };
 
 }

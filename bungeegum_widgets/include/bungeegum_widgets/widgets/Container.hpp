@@ -88,7 +88,7 @@ namespace widgets {
         void draw(draw_command& command);
 
         Color _color = { 0xFF000000 };
-        std::optional<adopted_widget> _adoptedChild = std::nullopt;
+        std::optional<runtime_widget> _adoptedChild = std::nullopt;
         std::optional<BoxConstraints> _constraints = std::nullopt;
         std::optional<float2> _size = std::nullopt;
         std::optional<float4x4> _transform = std::nullopt;

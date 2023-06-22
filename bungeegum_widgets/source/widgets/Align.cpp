@@ -8,7 +8,7 @@ namespace widgets {
 
         void _alignChildWidget(
             resolve_command& command,
-            adopted_widget& childWidget,
+            runtime_widget& childWidget,
             const float2 childSize,
             const float2 alignSize,
             const Alignment alignment)

@@ -76,7 +76,7 @@ namespace widgets {
             _childData.flexFactor = _childCommand.properties<float1>("flexFactor");
             _childData.flexFit = _childCommand.properties<FlexFit>("flexFit");
             if (!_childData.flexFactor.has_value()) {
-                adopted_widget& _child = _children[_k];
+                runtime_widget& _child = _children[_k];
                 _childData.resolvedSize = command.resolve_child(_child, _minSizeNoFlex, _maxSizeNoFlex);
                 if (_direction == Axis::horizontal) {
                     _mainAxisResolvedNoFlex += _childData.resolvedSize.x;
@@ -128,7 +128,7 @@ namespace widgets {
         for (int1 _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             if (_childData.flexFactor.has_value()) {
-                adopted_widget& _child = _children[_k];
+                runtime_widget& _child = _children[_k];
 
                 float2 _minSizeFlexChild = command.min_size();
                 float2 _maxSizeFlexChild = command.max_size();

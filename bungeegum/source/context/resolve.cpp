@@ -21,14 +21,14 @@ void resolve_command::resize(const float2 size)
     _data.resolved_size = size;
 }
 
-resolve_command& resolve_command::child_command(const adopted_widget& child_widget) const
+resolve_command& resolve_command::child_command(const runtime_widget& child_widget) const
 {
     detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
     resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
     return _child_resolve_command;
 }
 
-float2 resolve_command::resolve_child(const adopted_widget& child_widget, const float2 min_size, const float2 max_size) const
+float2 resolve_command::resolve_child(const runtime_widget& child_widget, const float2 min_size, const float2 max_size) const
 {
     detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
     if (!_child_untyped_widget.resolver_command.has_value())
@@ -49,7 +49,7 @@ float2 resolve_command::resolve_child(const adopted_widget& child_widget, const 
     return _resolved_size;
 }
 
-void resolve_command::position_child(const adopted_widget& child_widget, const float2 position)
+void resolve_command::position_child(const runtime_widget& child_widget, const float2 position)
 {
     detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
     resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();

@@ -5,8 +5,22 @@
 namespace bungeegum {
 
 /// @brief Opaque untyped
-struct adopted_widget {
+struct runtime_widget {
+
+    // register if needed
+    template <typename widget_t>
+    runtime_widget(widget_t* widget)
+    {
+    }
+
+    // register if needed
+    template <typename widget_t>
+    runtime_widget(widget_t& widget)
+    {
+    }
+
 private:
+    inline runtime_widget() { }
     friend struct interact_command;
     friend struct resolve_command;
     friend struct draw_command;
@@ -14,10 +28,16 @@ private:
     detail::adopted_widget_data _data;
 };
 
-/// @brief Transparent typed
-template <typename widget_t>
-struct typed_widget {
-    using value = std::enable_if_t<!std::is_same_v<widget_t, adopted_widget>>;
+template <typename property_t>
+struct runtime_property {
+
+    runtime_property(const runtime_widget& widget, const std::string& name, const property_t& property)
+    {
+    }
+
+    runtime_property(const runtime_widget& widget, const std::string& name, property_t&& property)
+    {
+    }
 };
 
 /// @brief Creates a new widget managed by bungeegum and returns a reference to it. This reference
@@ -44,7 +64,7 @@ void unmake(widget_t& widget);
 /// @param child_widget
 /// @return
 template <typename widget_t, typename child_widget_t>
-adopted_widget adopt(widget_t& widget, child_widget_t& child_widget);
+runtime_widget adopt(widget_t& widget, child_widget_t& child_widget);
 
 /// @brief
 /// @tparam widget_t
@@ -52,7 +72,7 @@ adopted_widget adopt(widget_t& widget, child_widget_t& child_widget);
 /// @param widget
 /// @param ...children_widgets
 template <typename widget_t, typename child_widget_t>
-adopted_widget adopt(widget_t* widget, child_widget_t& child_widget);
+runtime_widget adopt(widget_t* widget, child_widget_t& child_widget);
 
 /// @brief Unregisters a parenting relationship
 /// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.
@@ -68,6 +88,37 @@ void abandon(widget_t& widget, children_widgets_t&... children_widgets);
 /// @param ...children_widgets
 template <typename widget_t, typename... children_widgets_t>
 void abandon(widget_t* widget, children_widgets_t&... children_widgets);
+
+// register if needed
+template <typename widget_t>
+std::vector<runtime_widget> children(const typed_widget_t<widget_t>* widget);
+
+// register if needed
+template <typename widget_t>
+std::vector<runtime_widget> children(const typed_widget_t<widget_t>& widget);
+
+std::vector<runtime_widget> children(const runtime_widget& widget);
+
+// register if needed
+template <typename widget_t>
+std::optional<runtime_widget> parent(const typed_widget_t<widget_t>* widget);
+
+// register if needed
+template <typename widget_t>
+std::optional<runtime_widget> parent(const typed_widget_t<widget_t> widget);
+
+std::optional<runtime_widget> parent(const runtime_widget& widget);
+
+// register if needed
+template <typename widget_t, typename property_t>
+std::optional<property_t&> property(const typed_widget_t<widget_t>* widget, const std::string& name);
+
+// register if needed
+template <typename widget_t, typename property_t>
+std::optional<property_t&> property(const typed_widget_t<widget_t>& widget, const std::string& name);
+
+template <typename property_t>
+std::optional<property_t&> property(const runtime_widget& widget, const std::string& name);
 }
 
 #include <bungeegum/core/widget.inl>

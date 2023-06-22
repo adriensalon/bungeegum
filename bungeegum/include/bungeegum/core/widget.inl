@@ -85,7 +85,7 @@ namespace detail {
     }
 
     template <typename widget_t, typename child_widget_t>
-    adopted_widget adopt_widget(widget_t& widget, child_widget_t& child_widget)
+    runtime_widget adopt_widget(widget_t& widget, child_widget_t& child_widget)
     {
         std::uintptr_t _raw_widget = get_raw_widget<widget_t>(widget);
         std::uintptr_t _raw_child_widget = get_raw_widget<child_widget_t>(child_widget);
@@ -140,13 +140,13 @@ void unmake(widget_t& widget)
 }
 
 template <typename widget_t, typename child_widget_t>
-adopted_widget adopt(widget_t& widget, child_widget_t& child_widget)
+runtime_widget adopt(widget_t& widget, child_widget_t& child_widget)
 {
     return detail::adopt_widget(widget, child_widget);
 }
 
 template <typename widget_t, typename child_widget_t>
-adopted_widget adopt(widget_t* widget, child_widget_t& child_widget)
+runtime_widget adopt(widget_t* widget, child_widget_t& child_widget)
 {
     return adopt<widget_t, child_widget_t>(*widget, child_widget);
 }

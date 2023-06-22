@@ -5,6 +5,11 @@ using namespace bungeegum::widgets;
 
 struct delegateTest {
 
+    delegateTest()
+    {
+        bungeegum::runtime_property<float> _rp2(this, "okok", 45.f);
+    }
+
     BoxConstraints getConstraintsForChild(const BoxConstraints constraints)
     {
         Size _wantedSize(200.f, 200.f);
@@ -50,6 +55,9 @@ int main()
     // _fb.future(std::async([]() {
     //     return 42.f;
     // }));
+
+    bungeegum::runtime_property<float> _rp1(bungeegum::runtime_widget(bungeegum::make<Title>()), "okok", 45);
+    bungeegum::runtime_property<float> _rp2(bungeegum::make<Title>(), "okok", 45);
 
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")

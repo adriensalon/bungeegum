@@ -29,7 +29,7 @@ namespace widgets {
         void draw(draw_command& command);
 
         Color _color = { 0xFF000000 };
-        std::optional<adopted_widget> _child = std::nullopt;
+        std::optional<runtime_widget> _child = std::nullopt;
     };
 }
 }

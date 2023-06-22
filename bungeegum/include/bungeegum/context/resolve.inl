@@ -34,7 +34,7 @@ std::optional<value_t>& resolve_command::properties(const std::string& name)
 }
 
 template <typename child_widget_t>
-float2 resolve_command::resolve_child(const typename typed_widget<child_widget_t>::value& child_widget, const float2 min_size, const float2 max_size)
+float2 resolve_command::resolve_child(const typed_widget_t<child_widget_t>& child_widget, const float2 min_size, const float2 max_size)
 {
     // todo
     (void)child_widget;
@@ -44,7 +44,7 @@ float2 resolve_command::resolve_child(const typename typed_widget<child_widget_t
 }
 
 template <typename child_widget_t>
-void resolve_command::position_child(typename typed_widget<child_widget_t>::value& child_widget, const float2 position)
+void resolve_command::position_child(typed_widget_t<child_widget_t>& child_widget, const float2 position)
 {
     // todo
     (void)child_widget;

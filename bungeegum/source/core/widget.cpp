@@ -5,9 +5,9 @@
 namespace bungeegum {
 namespace detail {
 
-    adopted_widget widgets_registry::create_adopted(untyped_widget_data& untyped_widget)
+    runtime_widget widgets_registry::create_adopted(untyped_widget_data& untyped_widget)
     {
-        adopted_widget _adopted;
+        runtime_widget _adopted;
         _adopted._data.untyped_widget = untyped_widget;
         return _adopted;
     }

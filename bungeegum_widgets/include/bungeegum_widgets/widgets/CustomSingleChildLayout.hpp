@@ -52,7 +52,7 @@ namespace widgets {
             std::function<Size(const BoxConstraints constraints)> getSize = nullptr;
         };
 
-        std::optional<adopted_widget> _child = std::nullopt;
+        std::optional<runtime_widget> _child = std::nullopt;
         untypedDelegate _delegate = {};
     };
 
