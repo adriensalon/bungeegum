@@ -13,7 +13,10 @@ namespace widgets {
         template <typename child_widget_t>
         Title& child(child_widget_t& value)
         {
-            _child = adopt(this, value);
+            if (_child.has_value())
+                abandon(this, _child.value());
+            _child = runtime_widget(value);
+            adopt(this, _child.value());
             return *this;
         }
 

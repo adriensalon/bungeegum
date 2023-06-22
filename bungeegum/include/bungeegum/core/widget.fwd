@@ -20,6 +20,7 @@ namespace detail {
     struct untyped_widget_data {
         std::uintptr_t raw_widget = 0u;
         std::unique_ptr<std::type_index> kind = nullptr;
+        std::string kindlol = "";
         std::optional<std::reference_wrapper<untyped_widget_data>> parent = std::nullopt;
         std::vector<std::reference_wrapper<untyped_widget_data>> children = {};
         std::function<void(interact_command&)> interactor = nullptr;

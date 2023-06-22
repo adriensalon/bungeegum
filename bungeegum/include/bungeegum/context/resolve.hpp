@@ -19,26 +19,12 @@ struct resolve_command {
     resolve_command& child_command(const runtime_widget& child_widget) const;
 
     template <typename value_t>
-    std::optional<value_t>& properties(const std::string& name);
-
-    /// @brief Then
-    /// @tparam child_widget_t
-    /// @param child_widget
-    /// @param constraint
-    template <typename child_widget_t>
-    float2 resolve_child(const typed_widget_t<child_widget_t>& child_widget, const float2 min_size, const float2 max_size);
+    std::optional<value_t>& properties(const std::string& name); // nn
 
     /// @brief
     /// @param child_widget
     /// @param constraint
     float2 resolve_child(const runtime_widget& child_widget, const float2 min_size, const float2 max_size) const;
-
-    /// @brief Thenafter
-    /// @tparam child_widget_t
-    /// @param child_widget
-    /// @param position
-    template <typename child_widget_t>
-    void position_child(typed_widget_t<child_widget_t>& child_widget, const float2 position);
 
     /// @brief
     /// @param child_widget

@@ -7,17 +7,11 @@ namespace bungeegum {
 /// @brief Opaque untyped
 struct runtime_widget {
 
-    // register if needed
     template <typename widget_t>
-    runtime_widget(widget_t* widget)
-    {
-    }
+    runtime_widget(widget_t* widget);
 
-    // register if needed
     template <typename widget_t>
-    runtime_widget(widget_t& widget)
-    {
-    }
+    runtime_widget(widget_t& widget);
 
 private:
     inline runtime_widget() { }
@@ -26,6 +20,7 @@ private:
     friend struct draw_command;
     friend struct detail::widgets_registry;
     detail::adopted_widget_data _data;
+    friend void adopt(const runtime_widget& widget, const runtime_widget& child_widget);
 };
 
 template <typename property_t>
@@ -63,16 +58,24 @@ void unmake(widget_t& widget);
 /// @param widget
 /// @param child_widget
 /// @return
-template <typename widget_t, typename child_widget_t>
-runtime_widget adopt(widget_t& widget, child_widget_t& child_widget);
+// template <typename widget_t, typename child_widget_t>
+// runtime_widget adopt(widget_t& widget, child_widget_t& child_widget);
 
 /// @brief
 /// @tparam widget_t
 /// @tparam ...children_widgets_t
 /// @param widget
 /// @param ...children_widgets
-template <typename widget_t, typename child_widget_t>
-runtime_widget adopt(widget_t* widget, child_widget_t& child_widget);
+// template <typename widget_t, typename child_widget_t>
+// runtime_widget adopt(widget_t* widget, child_widget_t& child_widget);
+
+inline void adopt(const runtime_widget& widget, const runtime_widget& child_widget)
+{
+    detail::untyped_widget_data& _widget_data = widget._data.untyped_widget.value().get();
+    detail::untyped_widget_data& _child_widget_data = child_widget._data.untyped_widget.value().get();
+    _child_widget_data.parent = _widget_data;
+    _widget_data.children.emplace_back(_child_widget_data);
+}
 
 /// @brief Unregisters a parenting relationship
 /// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.

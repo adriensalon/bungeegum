@@ -16,7 +16,8 @@ namespace widgets {
             _builderFunction = [this, value](const futureValue_t& futureValue) {
                 if (_childWidget.has_value())
                     abandon(this, _childWidget.value());
-                _childWidget = adopt(this, value(futureValue));
+                _childWidget = runtime_widget(value(futureValue));
+                adopt(this, _childWidget.value());
                 must_resolve(this);
             };
             _event.on_trigger([this, value](const futureValue_t& futureValue) {

@@ -180,7 +180,7 @@ namespace detail {
         must_draw();
         // debug only !
 
-        context::execute_interact();
+        // context::execute_interact();
         context::execute_resolve();
         return (has_userspace_thrown() || !widgets_context.drawables.empty());
         // return true;

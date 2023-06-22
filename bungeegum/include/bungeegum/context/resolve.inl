@@ -33,24 +33,6 @@ std::optional<value_t>& resolve_command::properties(const std::string& name)
     return _properties[_raw_command][name];
 }
 
-template <typename child_widget_t>
-float2 resolve_command::resolve_child(const typed_widget_t<child_widget_t>& child_widget, const float2 min_size, const float2 max_size)
-{
-    // todo
-    (void)child_widget;
-    (void)min_size;
-    (void)max_size;
-    return zero<float2>;
-}
-
-template <typename child_widget_t>
-void resolve_command::position_child(typed_widget_t<child_widget_t>& child_widget, const float2 position)
-{
-    // todo
-    (void)child_widget;
-    (void)position;
-}
-
 template <typename widget_t>
 void on_resolve(widget_t& widget, const std::function<void(resolve_command&)>& resolve_callback)
 {

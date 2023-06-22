@@ -55,6 +55,7 @@ namespace detail {
     {
         untyped_widget.raw_widget = raw_widget;
         untyped_widget.kind = std::make_unique<std::type_index>(typeid(widget_t));
+        untyped_widget.kindlol = std::string(untyped_widget.kind->name());
         widgets_context.registered.insert_or_assign(raw_widget, std::ref(untyped_widget));
         bungeegum::access::detect_on_interact(widget);
         bungeegum::access::detect_on_resolve(widget);
@@ -107,6 +108,26 @@ namespace detail {
     }
 }
 
+// runtime_widget
+
+template <typename widget_t>
+runtime_widget::runtime_widget(widget_t* widget)
+{
+    std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(*widget);
+    if (!detail::is_widget_registered(_raw_widget))
+        detail::register_widget(*widget, _raw_widget);
+    _data.untyped_widget = detail::get_untyped_widget(_raw_widget);
+}
+
+template <typename widget_t>
+runtime_widget::runtime_widget(widget_t& widget)
+{
+    std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(widget);
+    if (!detail::is_widget_registered(_raw_widget))
+        detail::register_widget(widget, _raw_widget);
+    _data.untyped_widget = detail::get_untyped_widget(_raw_widget);
+}
+
 // free
 
 template <typename widget_t, typename... widget_args_t>
@@ -139,17 +160,17 @@ void unmake(widget_t& widget)
     // detail::widgets_context.accessors.erase(_void_widget);
 }
 
-template <typename widget_t, typename child_widget_t>
-runtime_widget adopt(widget_t& widget, child_widget_t& child_widget)
-{
-    return detail::adopt_widget(widget, child_widget);
-}
+// template <typename widget_t, typename child_widget_t>
+// runtime_widget adopt(widget_t& widget, child_widget_t& child_widget)
+// {
+//     return detail::adopt_widget(widget, child_widget);
+// }
 
-template <typename widget_t, typename child_widget_t>
-runtime_widget adopt(widget_t* widget, child_widget_t& child_widget)
-{
-    return adopt<widget_t, child_widget_t>(*widget, child_widget);
-}
+// template <typename widget_t, typename child_widget_t>
+// runtime_widget adopt(widget_t* widget, child_widget_t& child_widget)
+// {
+//     return adopt<widget_t, child_widget_t>(*widget, child_widget);
+// }
 
 template <typename widget_t, typename... children_widgets_t>
 void abandon(widget_t& widget, children_widgets_t&... children_widgets)

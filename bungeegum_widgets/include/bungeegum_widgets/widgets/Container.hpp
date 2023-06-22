@@ -37,7 +37,8 @@ namespace widgets {
         {
             if (_child.has_value())
                 abandon(this, _child.value());
-            _adoptedChild = adopt(this, value);
+            _child = runtime_widget(value);
+            adopt(this, _child.value());
             return *this;
         }
 
