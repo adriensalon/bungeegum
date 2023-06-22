@@ -1,4 +1,5 @@
 #include <cctype>
+#include <regex>
 #include <string>
 #include <unordered_map>
 
@@ -35,17 +36,8 @@ namespace detail {
             static std::unordered_map<const char*, std::string> _typenames;
             if (_typenames.find(raw_typename) == _typenames.end()) {
                 std::string _typename(raw_typename);
-                if (starts_with(_typename, "class "))
-                    _typename = _typename.substr(5, _typename.length() - 5);
-                if (starts_with(_typename, "struct "))
-                    _typename = _typename.substr(6, _typename.length() - 6);
-                size_t _last_colon_pos = _typename.find_last_of(':');
-                if (_last_colon_pos != std::string::npos)
-                    _typename = _typename.substr(_last_colon_pos + 1, _typename.length() - _last_colon_pos - 1);
-                // size_t _last_underscore_pos = _typename.find_last_not_of('_');
-                if (ends_with(_typename, "_widget"))
-                    _typename = _typename.substr(0, _typename.length() - 7);
-                _typename[0] = static_cast<char>(std::toupper(_typename[0]));
+                std::regex _to_remove("struct bungeegum::widgets::");
+                _typename = std::regex_replace(_typename, _to_remove, "");
                 _typenames.emplace(raw_typename, _typename);
             }
             return _typenames[raw_typename];
