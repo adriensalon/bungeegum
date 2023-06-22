@@ -17,9 +17,11 @@
 #include <bungeegum_widgets/widgets/CustomSingleChildLayout.hpp>
 #include <bungeegum_widgets/widgets/Flex.hpp>
 #include <bungeegum_widgets/widgets/FutureBuilder.hpp>
+#include <bungeegum_widgets/widgets/LimitedBox.hpp>
 #include <bungeegum_widgets/widgets/Padding.hpp>
 #include <bungeegum_widgets/widgets/SizedBox.hpp>
 #include <bungeegum_widgets/widgets/Title.hpp>
+
 
 // material
 // cupertino TODO

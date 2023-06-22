@@ -20,6 +20,8 @@ set(bungeegum_widgets_source
 	"source/widgets/Container.cpp"
 	"source/widgets/CustomSingleChildLayout.cpp"
 	"source/widgets/Flex.cpp"
+	"source/widgets/LimitedBox.cpp"
+	"source/widgets/MouseRegion.cpp"
 	"source/widgets/Padding.cpp"
 	"source/widgets/SizedBox.cpp"
 	"source/widgets/Title.cpp"

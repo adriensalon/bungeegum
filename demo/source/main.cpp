@@ -69,12 +69,12 @@ int main()
                                              .child(bungeegum::make<FutureBuilder<Color>>()
                                                         .initialData(Color(0xFF6699FF))
                                                         .future(std::async([]() {
-                                                            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                                                            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
                                                             return Color(0xFF6611FF);
                                                         }))
                                                         .builder<Padding>([](const Color& color) -> auto& {
                                                             return bungeegum::make<Padding>()
-                                                                .padding(EdgeInsets::fromLTRB(5.f, 10.f, 15.f, 5.f))
+                                                                .padding(EdgeInsets::fromLTRB(color.green(), 10.f, 15.f, 5.f))
                                                                 .child(bungeegum::make<ColoredBox>()
                                                                            .color(color));
                                                         }))
