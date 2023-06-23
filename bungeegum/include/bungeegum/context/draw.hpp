@@ -110,37 +110,41 @@ private:
     friend struct resolve_command;
 };
 
-/// @brief
-/// @tparam widget_t
-/// @param widget
-/// @param draw_callback
-template <typename widget_t>
-void on_draw(widget_t& widget, const std::function<void(draw_command&)>& draw_callback);
+// /// @brief
+// /// @tparam widget_t
+// /// @param widget
+// /// @param draw_callback
+// template <typename widget_t>
+// void on_draw(widget_t& widget, const std::function<void(draw_command&)>& draw_callback);
 
-/// @brief
-/// @tparam widget_t
-/// @param widget
-/// @param draw_callback
-template <typename widget_t>
-void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback);
+// /// @brief
+// /// @tparam widget_t
+// /// @param widget
+// /// @param draw_callback
+// template <typename widget_t>
+// void on_draw(widget_t* widget, const std::function<void(draw_command&)>& draw_callback);
+
+void on_draw(const runtime_widget& widget, const std::function<void(draw_command&)>& draw_callback);
 
 /// @brief
 void must_draw();
 
 /// @brief
-/// @tparam widget_t
-/// @param widget must have declared a void draw(const draw_command&) or added one
-/// dynamically with the on_draw() function.
-template <typename widget_t>
-void must_draw(widget_t& widget);
+void must_draw(const runtime_widget& widget);
 
-/// @brief
-/// @tparam widget_t
-/// @param widget must have declared a void draw(const draw_command&) or added one
-/// dynamically with the on_draw() function.
-template <typename widget_t>
-void must_draw(widget_t* widget);
+// /// @brief
+// /// @tparam widget_t
+// /// @param widget must have declared a void draw(const draw_command&) or added one
+// /// dynamically with the on_draw() function.
+// template <typename widget_t>
+// void must_draw(widget_t& widget);
 
+// /// @brief
+// /// @tparam widget_t
+// /// @param widget must have declared a void draw(const draw_command&) or added one
+// /// dynamically with the on_draw() function.
+// template <typename widget_t>
+// void must_draw(widget_t* widget);
 }
 
 #include <bungeegum/context/draw.inl>

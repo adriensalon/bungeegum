@@ -9,6 +9,8 @@ struct ImDrawList;
 
 namespace bungeegum {
 
+struct runtime_widget;
+
 struct resolve_command;
 
 namespace detail {

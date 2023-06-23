@@ -14,15 +14,13 @@ struct runtime_widget {
     runtime_widget(widget_t& widget);
 
 private:
-    inline runtime_widget() { }
-    friend struct interact_command;
     friend struct resolve_command;
-    friend struct draw_command;
     friend struct detail::widgets_registry;
     detail::adopted_widget_data _data;
     friend void adopt(const runtime_widget& widget, const runtime_widget& child_widget);
     friend void abandon(const runtime_widget& widget, const runtime_widget& child_widget);
     friend resolve_command& get_resolve_command(const runtime_widget& widget);
+    friend void must_resolve(const runtime_widget& widget);
 };
 
 /// @brief Creates a new widget managed by bungeegum and returns a reference to it. This reference

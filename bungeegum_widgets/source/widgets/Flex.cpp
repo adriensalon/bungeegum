@@ -73,8 +73,9 @@ namespace widgets {
         for (int1 _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             resolve_command& _childCommand = get_resolve_command(_children[_k]);
-            _childData.flexFactor = _childCommand.properties<float1>("flexFactor");
-            _childData.flexFit = _childCommand.properties<FlexFit>("flexFit");
+            (void)_childCommand;
+            // _childData.flexFactor = _childCommand.properties<float1>("flexFactor");
+            // _childData.flexFit = _childCommand.properties<FlexFit>("flexFit");
             if (!_childData.flexFactor.has_value()) {
                 runtime_widget& _child = _children[_k];
                 _childData.resolvedSize = command.resolve_child(_child, _minSizeNoFlex, _maxSizeNoFlex);

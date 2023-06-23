@@ -31,9 +31,10 @@ void resolve_command::resize(const float2 size)
 float2 resolve_command::resolve_child(const runtime_widget& child_widget, const float2 min_size, const float2 max_size) const
 {
     detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
-    if (!_child_untyped_widget.resolver_command.has_value())
-        return min_size;
-    resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
+    // if (!_child_untyped_widget.resolver_command.has_value())
+    //     return min_size;
+    // resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
+    resolve_command& _child_resolve_command = get_resolve_command(child_widget);
     _child_resolve_command._data.constraint.min_size = min_size;
     _child_resolve_command._data.constraint.max_size = max_size;
 
@@ -51,8 +52,9 @@ float2 resolve_command::resolve_child(const runtime_widget& child_widget, const 
 
 void resolve_command::position_child(const runtime_widget& child_widget, const float2 position)
 {
-    detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
-    resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
+    // detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
+    // resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
+    resolve_command& _child_resolve_command = get_resolve_command(child_widget);
     _child_resolve_command._data.resolved_position = position;
     // if (_child_untyped_widget.drawer_command.has_value()) {
     //     draw_command& _child_draw_command = _child_untyped_widget.drawer_command.value();
@@ -205,5 +207,14 @@ void must_resolve()
 {
     detail::untyped_widget_data& _data = detail::widgets_context.root.value().get();
     detail::widgets_context.resolvables.emplace_back(_data);
+}
+
+void must_resolve(const runtime_widget& widget)
+{
+    // std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(widget);
+    // if (!detail::is_widget_registered(_raw_widget))
+    //     detail::register_widget(widget, _raw_widget);
+    // detail::untyped_widget_data& _data = detail::get_untyped_widget(widget);
+    detail::widgets_context.resolvables.emplace_back(widget._data.untyped_widget.value().get());
 }
 }

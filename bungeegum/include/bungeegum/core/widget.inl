@@ -55,7 +55,7 @@ namespace detail {
     {
         untyped_widget.raw_widget = raw_widget;
         untyped_widget.kind = std::make_unique<std::type_index>(typeid(widget_t));
-        untyped_widget.kindlol = std::string(untyped_widget.kind->name());
+        untyped_widget.kind_debug = std::string(untyped_widget.kind->name());
         widgets_context.registered.insert_or_assign(raw_widget, std::ref(untyped_widget));
         bungeegum::access::detect_on_interact(widget);
         bungeegum::access::detect_on_resolve(widget);

@@ -25,22 +25,22 @@ namespace bungeegum {
 // }
 // }
 
-template <typename widget_t>
-void on_interact(widget_t& widget, const std::function<void(interact_command&)>& interact_callback)
-{
-    if (!interact_callback)
-        detail::throw_error<error_type::bad_usage>("interact callback is nullptr");
-    detail::untyped_widget_data& _widget_data = detail::widgets_context.get(widget);
-    if (!_widget_data.interactor_command.has_value())
-        _widget_data.interactor_command = interact_command();
-    _widget_data.widget_interactor = [](interact_command& command) {
-        interact_callback(command);
-    };
-}
+// template <typename widget_t>
+// void on_interact(widget_t& widget, const std::function<void(interact_command&)>& interact_callback)
+// {
+//     if (!interact_callback)
+//         detail::throw_error<error_type::bad_usage>("interact callback is nullptr");
+//     detail::untyped_widget_data& _widget_data = detail::widgets_context.get(widget);
+//     if (!_widget_data.interactor_command.has_value())
+//         _widget_data.interactor_command = interact_command();
+//     _widget_data.widget_interactor = [](interact_command& command) {
+//         interact_callback(command);
+//     };
+// }
 
-template <typename widget_t>
-void on_interact(widget_t* widget, const std::function<void(interact_command&)>& interact_callback)
-{
-    on_interact<widget_t>(widget, interact_callback);
-}
+// template <typename widget_t>
+// void on_interact(widget_t* widget, const std::function<void(interact_command&)>& interact_callback)
+// {
+//     on_interact<widget_t>(widget, interact_callback);
+// }
 }

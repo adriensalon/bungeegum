@@ -9,6 +9,9 @@
 #include <bungeegum/glue/window.fwd>
 
 namespace bungeegum {
+
+struct runtime_widget;
+
 namespace detail {
 
     struct context;

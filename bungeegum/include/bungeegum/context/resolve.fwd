@@ -9,6 +9,9 @@
 #include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
+
+struct runtime_widget;
+
 namespace detail {
 
     struct context;
@@ -19,10 +22,10 @@ namespace detail {
     };
 
     struct resolve_command_data {
-        resolve_constraint_data constraint; // given by parent
-        float2 resolved_size = zero<float2>; // set by widget after children
-        float2 resolved_position = zero<float2>; // given by parent ? NONEED??
-        float2 accumulated_position = zero<float2>; // set when drawing
+        resolve_constraint_data constraint;
+        float2 resolved_size = zero<float2>;
+        float2 resolved_position = zero<float2>;
+        float2 accumulated_position = zero<float2>;
     };
 
 }

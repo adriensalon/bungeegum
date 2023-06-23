@@ -16,11 +16,6 @@ struct resolve_command {
     /// @param size
     void resize(const float2 size);
 
-    // resolve_command& child_command(const runtime_widget& child_widget) const;
-
-    template <typename value_t>
-    std::optional<value_t>& properties(const std::string& name); // nn
-
     /// @brief
     /// @param child_widget
     /// @param constraint
@@ -36,36 +31,40 @@ private:
     friend struct detail::context;
 };
 
-/// @brief
-/// @tparam widget_t
-/// @param widget
-/// @param resolve_callback
-template <typename widget_t>
-void on_resolve(typed_widget_t<widget_t>& widget, const std::function<void(resolve_command&)>& resolve_callback);
+// /// @brief
+// /// @tparam widget_t
+// /// @param widget
+// /// @param resolve_callback
+// template <typename widget_t>
+// void on_resolve(typed_widget_t<widget_t>& widget, const std::function<void(resolve_command&)>& resolve_callback);
 
-/// @brief
-/// @tparam widget_t
-/// @param widget
-/// @param resolve_callback
-template <typename widget_t>
-void on_resolve(typed_widget_t<widget_t>* widget, const std::function<void(resolve_command&)>& resolve_callback);
+// /// @brief
+// /// @tparam widget_t
+// /// @param widget
+// /// @param resolve_callback
+// template <typename widget_t>
+// void on_resolve(typed_widget_t<widget_t>* widget, const std::function<void(resolve_command&)>& resolve_callback);
+
+void on_resolve(const runtime_widget& widget, const std::function<void(resolve_command&)>& resolve_callback);
 
 /// @brief
 void must_resolve();
 
-/// @brief
-/// @tparam widget_t
-/// @param widget must have declared a void resolve(const resolve_command&) or added one
-/// dynamically with the on_resolve() function.
-template <typename widget_t>
-void must_resolve(typed_widget_t<widget_t>& widget);
+// /// @brief
+// /// @tparam widget_t
+// /// @param widget must have declared a void resolve(const resolve_command&) or added one
+// /// dynamically with the on_resolve() function.
+// template <typename widget_t>
+// void must_resolve(typed_widget_t<widget_t>& widget);
 
-/// @brief
-/// @tparam widget_t
-/// @param widget must have declared a void resolve(const resolve_command&) or added one
-/// dynamically with the on_resolve() function.
-template <typename widget_t>
-void must_resolve(typed_widget_t<widget_t>* widget);
+// /// @brief
+// /// @tparam widget_t
+// /// @param widget must have declared a void resolve(const resolve_command&) or added one
+// /// dynamically with the on_resolve() function.
+// template <typename widget_t>
+// void must_resolve(typed_widget_t<widget_t>* widget);
+
+void must_resolve(const runtime_widget& widget);
 }
 
 #include <bungeegum/context/resolve.inl>
