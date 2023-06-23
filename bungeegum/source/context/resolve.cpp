@@ -21,12 +21,12 @@ void resolve_command::resize(const float2 size)
     _data.resolved_size = size;
 }
 
-resolve_command& resolve_command::child_command(const runtime_widget& child_widget) const
-{
-    detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
-    resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
-    return _child_resolve_command;
-}
+// resolve_command& resolve_command::child_command(const runtime_widget& child_widget) const
+// {
+//     detail::untyped_widget_data& _child_untyped_widget = child_widget._data.untyped_widget.value().get();
+//     resolve_command& _child_resolve_command = _child_untyped_widget.resolver_command.value();
+//     return _child_resolve_command;
+// }
 
 float2 resolve_command::resolve_child(const runtime_widget& child_widget, const float2 min_size, const float2 max_size) const
 {

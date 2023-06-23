@@ -16,7 +16,7 @@ struct resolve_command {
     /// @param size
     void resize(const float2 size);
 
-    resolve_command& child_command(const runtime_widget& child_widget) const;
+    // resolve_command& child_command(const runtime_widget& child_widget) const;
 
     template <typename value_t>
     std::optional<value_t>& properties(const std::string& name); // nn

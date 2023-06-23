@@ -21,18 +21,8 @@ private:
     friend struct detail::widgets_registry;
     detail::adopted_widget_data _data;
     friend void adopt(const runtime_widget& widget, const runtime_widget& child_widget);
-};
-
-template <typename property_t>
-struct runtime_property {
-
-    runtime_property(const runtime_widget& widget, const std::string& name, const property_t& property)
-    {
-    }
-
-    runtime_property(const runtime_widget& widget, const std::string& name, property_t&& property)
-    {
-    }
+    friend void abandon(const runtime_widget& widget, const runtime_widget& child_widget);
+    friend resolve_command& get_resolve_command(const runtime_widget& widget);
 };
 
 /// @brief Creates a new widget managed by bungeegum and returns a reference to it. This reference
@@ -46,28 +36,7 @@ template <typename widget_t, typename... widget_args_t>
 
 /// @brief Destroys a widget created with the make function. References to it will no longer
 /// be valid.
-/// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.
-/// @param widget
-template <typename widget_t>
-void unmake(widget_t& widget);
-
-/// @brief Registers a widget as a child of another widget.
-/// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.
-/// @tparam child_widget_t Custom type for the child widget. Must be at least copy or move
-/// constructible.
-/// @param widget
-/// @param child_widget
-/// @return
-// template <typename widget_t, typename child_widget_t>
-// runtime_widget adopt(widget_t& widget, child_widget_t& child_widget);
-
-/// @brief
-/// @tparam widget_t
-/// @tparam ...children_widgets_t
-/// @param widget
-/// @param ...children_widgets
-// template <typename widget_t, typename child_widget_t>
-// runtime_widget adopt(widget_t* widget, child_widget_t& child_widget);
+void destroy(const runtime_widget& widget);
 
 inline void adopt(const runtime_widget& widget, const runtime_widget& child_widget)
 {
@@ -77,27 +46,75 @@ inline void adopt(const runtime_widget& widget, const runtime_widget& child_widg
     _widget_data.children.emplace_back(_child_widget_data);
 }
 
-/// @brief Unregisters a parenting relationship
-/// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.
-/// @param widget
-/// @param ...children_widgets
-template <typename widget_t, typename... children_widgets_t>
-void abandon(widget_t& widget, children_widgets_t&... children_widgets);
+inline void abandon(const runtime_widget& parent_widget, const runtime_widget& child_widget)
+{
+    detail::untyped_widget_data& _widget_data = parent_widget._data.untyped_widget.value().get();
+    detail::untyped_widget_data& _child_widget_data = child_widget._data.untyped_widget.value().get();
+    _child_widget_data.parent = std::nullopt;
+    (void)_widget_data;
+    // TODO HEIN
+    // _widget_data.children.erase(_child_widget_data);
+}
 
 /// @brief
-/// @tparam widget_t
-/// @tparam ...children_widgets_t
-/// @param widget
-/// @param ...children_widgets
-template <typename widget_t, typename... children_widgets_t>
-void abandon(widget_t* widget, children_widgets_t&... children_widgets);
+template <template <typename, typename> typename container_t, typename allocator_t = std::allocator<runtime_widget>>
+void get_children(const runtime_widget& widget, container_t<runtime_widget, allocator_t>& container)
+{
+}
 
-std::vector<runtime_widget> children(const runtime_widget& widget);
+bool has_parent(const runtime_widget& widget);
 
-std::optional<runtime_widget> parent(const runtime_widget& widget);
+runtime_widget get_parent(const runtime_widget& widget);
+
+inline resolve_command& get_resolve_command(const runtime_widget& widget)
+{
+    detail::untyped_widget_data& _widget_data = widget._data.untyped_widget.value().get();
+    return _widget_data.resolver_command.value();
+}
+
+bool has_interact_command(const runtime_widget& widget);
+
+interact_command& get_interact_command(const runtime_widget& widget);
+
+bool has_draw_command(const runtime_widget& widget);
+
+draw_command& get_draw_command(const runtime_widget& widget);
 
 template <typename property_t>
-std::optional<property_t&> property(const runtime_widget& widget, const std::string& name);
+property_t& make_property(const runtime_widget& widget, const std::string& name);
+
+template <typename property_t>
+bool has_property(const runtime_widget& widget, const std::string& name);
+
+template <typename property_t>
+property_t& get_property(const runtime_widget& widget, const std::string& name);
+
+template <typename property_t>
+property_t& get_or_make_property(const runtime_widget& widget, const std::string& name);
+
+template <typename property_t, template <typename, typename> typename container_t, typename allocator_t = std::allocator<runtime_widget>>
+void get_children_with_property(
+    const runtime_widget& widget,
+    const std::string& name,
+    container_t<runtime_widget, allocator_t>& container,
+    const bool recursive = false)
+{
+}
+
+template <typename property_t>
+bool has_parent_with_property(const runtime_widget& widget, const std::string& name,
+    const unsigned int depth = infinity<unsigned int>);
+
+template <typename property_t>
+runtime_widget get_parent_with_property(
+    const runtime_widget& widget,
+    const std::string& name,
+    const unsigned int depth = infinity<unsigned int>);
+
+template <typename property_t>
+void destroy_property(const runtime_widget& widget, const std::string& name);
+
+// traverse children ?
 }
 
 #include <bungeegum/core/widget.inl>

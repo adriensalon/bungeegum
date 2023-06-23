@@ -32,32 +32,9 @@ struct delegateTest {
 
 int main()
 {
-    // Future<int> _fok(std::async([]() {
-    //     return 555;
-    // }));
-    // _fok.then<float>([](int pres) {
-    //         return static_cast<float>(pres) + 22.f;
-    //     })
-    //     .then<float>([](float res) {
-    //         std::cout << res << std::endl;
-    //         return 0.f;
-    //     });
 
-    // FutureBuilder<Color> _fb;
-    // _fb.initialData(55.f);
-    // _fb.builder<Padding>([](const float ff) -> auto& {
-    //     return bungeegum::make<Padding>()
-    //         .padding(EdgeInsets::fromLTRB(5.f, 10.f, 15.f, 5.f))
-    //         .child(bungeegum::make<ColoredBox>()
-    //                    .color(0xFF6699FF));
-    // });
-    // _fb.builder<Padding>(bbb);
-    // _fb.future(std::async([]() {
-    //     return 42.f;
-    // }));
-
-    // bungeegum::runtime_property<float> _rp1(bungeegum::runtime_widget(bungeegum::make<Title>()), "okok", 45);
-    // bungeegum::runtime_property<float> _rp2(bungeegum::make<Title>(), "okok", 45);
+    std::list<bungeegum::runtime_widget> _children;
+    bungeegum::get_children_with_property<float>(bungeegum::make<Align>(), "okok", _children);
 
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
