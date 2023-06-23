@@ -74,17 +74,21 @@ int main()
                                              //  .height(100.f)
                                              //  .width(100.f)
                                              //  .expand()
-                                             .child(bungeegum::make<FutureBuilder<Color>>()
-                                                        .initialData(Color(0xFF6699FF))
+                                             .child(bungeegum::make<FutureBuilder<bool>>()
+                                                        .initialData(false)
                                                         .future(std::async([]() {
-                                                            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-                                                            return Color(0xFF6611FF);
+                                                            std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+                                                            return true;
                                                         }))
-                                                        .builder<Padding>([](const Color& color) -> auto& {
+                                                        .builder([](const bool value) -> bungeegum::runtime_widget {
+                                                            auto& _coloredBox = bungeegum::make<ColoredBox>();
+                                                            _coloredBox.color(value ? 0xFF6699FF : 0xFF6611FF);
+                                                            if (value) {
+                                                                return _coloredBox;
+                                                            }
                                                             return bungeegum::make<Padding>()
-                                                                .padding(EdgeInsets::fromLTRB(color.green(), 10.f, 15.f, 5.f))
-                                                                .child(bungeegum::make<ColoredBox>()
-                                                                           .color(color));
+                                                                .padding(EdgeInsets::fromLTRB(44.f, 10.f, 15.f, 5.f))
+                                                                .child(_coloredBox);
                                                         }))
 
                                           ))

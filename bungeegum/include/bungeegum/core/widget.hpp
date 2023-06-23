@@ -92,33 +92,9 @@ void abandon(widget_t& widget, children_widgets_t&... children_widgets);
 template <typename widget_t, typename... children_widgets_t>
 void abandon(widget_t* widget, children_widgets_t&... children_widgets);
 
-// register if needed
-template <typename widget_t>
-std::vector<runtime_widget> children(const typed_widget_t<widget_t>* widget);
-
-// register if needed
-template <typename widget_t>
-std::vector<runtime_widget> children(const typed_widget_t<widget_t>& widget);
-
 std::vector<runtime_widget> children(const runtime_widget& widget);
 
-// register if needed
-template <typename widget_t>
-std::optional<runtime_widget> parent(const typed_widget_t<widget_t>* widget);
-
-// register if needed
-template <typename widget_t>
-std::optional<runtime_widget> parent(const typed_widget_t<widget_t> widget);
-
 std::optional<runtime_widget> parent(const runtime_widget& widget);
-
-// register if needed
-template <typename widget_t, typename property_t>
-std::optional<property_t&> property(const typed_widget_t<widget_t>* widget, const std::string& name);
-
-// register if needed
-template <typename widget_t, typename property_t>
-std::optional<property_t&> property(const typed_widget_t<widget_t>& widget, const std::string& name);
 
 template <typename property_t>
 std::optional<property_t&> property(const runtime_widget& widget, const std::string& name);

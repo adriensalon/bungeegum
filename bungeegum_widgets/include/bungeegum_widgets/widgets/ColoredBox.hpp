@@ -2,6 +2,7 @@
 
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum_widgets/core/Color.hpp>
+#include <bungeegum_widgets/widgets/Align.hpp>
 
 namespace bungeegum {
 namespace widgets {

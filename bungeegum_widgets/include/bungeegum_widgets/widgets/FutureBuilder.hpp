@@ -9,14 +9,13 @@ namespace widgets {
     struct FutureBuilder {
 
         /// @brief The build strategy currently used.
-        template <typename builtWidget_t>
-        FutureBuilder& builder(const std::function<builtWidget_t&(const futureValue_t&)>& value)
+        FutureBuilder& builder(const std::function<runtime_widget(const futureValue_t&)>& value)
         {
             // reset tout si deja defini && deja invoke ?
             _builderFunction = [this, value](const futureValue_t& futureValue) {
                 if (_childWidget.has_value())
                     abandon(this, _childWidget.value());
-                _childWidget = runtime_widget(value(futureValue));
+                _childWidget = value(futureValue);
                 adopt(this, _childWidget.value());
                 must_resolve(this);
             };
