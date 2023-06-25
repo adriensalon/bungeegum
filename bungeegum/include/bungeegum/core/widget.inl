@@ -70,42 +70,42 @@ namespace detail {
             _entity = widgets_context.possessed.at(raw_widget);
             untyped_widget_data& _untyped_widget = widgets_context.widgets.get_component<untyped_widget_data>(_entity);
             assign_widget(widget, _untyped_widget, raw_widget);
-            std::cout << "assign 1 \n";
+            // std::cout << "assign 1 \n";
         } else {
             _entity = widgets_context.widgets.create_entity();
             widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, widget);
             untyped_widget_data& _untyped_widget = widgets_context.widgets.create_component<untyped_widget_data>(_entity);
             assign_widget(widget, _untyped_widget, raw_widget);
-            std::cout << "assign 2 \n";
+            // std::cout << "assign 2 \n";
         }
     }
 
-    template <typename widget_t>
-    void unregister_widget(widget_t& widget)
-    {
-    }
+    // template <typename widget_t>
+    // void unregister_widget(widget_t& widget)
+    // {
+    // }
 
-    template <typename widget_t, typename child_widget_t>
-    runtime_widget adopt_widget(widget_t& widget, child_widget_t& child_widget)
-    {
-        std::uintptr_t _raw_widget = get_raw_widget<widget_t>(widget);
-        std::uintptr_t _raw_child_widget = get_raw_widget<child_widget_t>(child_widget);
-        if (!is_widget_registered(_raw_widget))
-            register_widget(widget, _raw_widget);
-        if (!is_widget_registered(_raw_child_widget))
-            register_widget(child_widget, _raw_child_widget);
-        untyped_widget_data& _data = get_untyped_widget(_raw_widget);
-        untyped_widget_data& _child_data = get_untyped_widget(_raw_child_widget);
-        _child_data.parent = _data;
-        _data.children.emplace_back(_child_data);
-        return widgets_context.create_adopted(_child_data);
-    }
+    // template <typename widget_t, typename child_widget_t>
+    // runtime_widget adopt_widget(widget_t& widget, child_widget_t& child_widget)
+    // {
+    //     std::uintptr_t _raw_widget = get_raw_widget<widget_t>(widget);
+    //     std::uintptr_t _raw_child_widget = get_raw_widget<child_widget_t>(child_widget);
+    //     if (!is_widget_registered(_raw_widget))
+    //         register_widget(widget, _raw_widget);
+    //     if (!is_widget_registered(_raw_child_widget))
+    //         register_widget(child_widget, _raw_child_widget);
+    //     untyped_widget_data& _data = get_untyped_widget(_raw_widget);
+    //     untyped_widget_data& _child_data = get_untyped_widget(_raw_child_widget);
+    //     _child_data.parent = _data;
+    //     _data.children.emplace_back(_child_data);
+    //     return widgets_context.create_adopted(_child_data);
+    // }
 
-    template <typename widget_t, typename child_widget_t>
-    void abandon_widget(widget_t* widget, child_widget_t& child_widget)
-    {
-        // TODO
-    }
+    // template <typename widget_t, typename child_widget_t>
+    // void abandon_widget(widget_t* widget, child_widget_t& child_widget)
+    // {
+    //     // TODO
+    // }
 }
 
 // runtime_widget
@@ -143,46 +143,85 @@ widget_t& make(widget_args_t&&... widget_args)
     return _widget;
 }
 
-// template <typename widget_t>
-// void destroy(widget_t& widget)
-// {
-// ?
-// ?
-// ?
-// ?
-// void* _void_widget = reinterpret_cast<void*>(&widget);
-// detail::entity_t _entity;
-// if (detail::widgets_context.accessors.find(_void_widget) == detail::widgets_context.accessors.end())
-//     detail::throw_error<detail::error_type::bad_implementation>("widget not found in accessors");
-// _entity = detail::widgets_context.possessed.at(_void_widget);
-// detail::widgets_context.widgets.destroy_entity(_entity);
-// detail::widgets_context.possessed.erase(_void_widget);
-// detail::widgets_context.accessors.erase(_void_widget);
-// }
-
-// template <typename widget_t, typename child_widget_t>
-// runtime_widget adopt(widget_t& widget, child_widget_t& child_widget)
-// {
-//     return detail::adopt_widget(widget, child_widget);
-// }
-
-// template <typename widget_t, typename child_widget_t>
-// runtime_widget adopt(widget_t* widget, child_widget_t& child_widget)
-// {
-//     return adopt<widget_t, child_widget_t>(*widget, child_widget);
-// }
-
-template <typename widget_t, typename... children_widgets_t>
-void abandon(widget_t& widget, children_widgets_t&... children_widgets)
+template <template <typename, typename> typename container_t, typename allocator_t>
+void get_children(
+    const runtime_widget& widget,
+    container_t<runtime_widget, allocator_t>& container)
 {
-    // TODO
     (void)widget;
-    ((void)children_widgets, ...);
+    (void)container;
 }
 
-template <typename widget_t, typename... children_widgets_t>
-void abandon(widget_t* widget, children_widgets_t&... children_widgets)
+template <typename widget_t>
+bool has_type(const runtime_widget& widget)
 {
-    abandon<widget_t, children_widgets_t...>(*widget, children_widgets...);
+    (void)widget;
+    return false;
+}
+
+template <typename property_t>
+property_t& make_property(const runtime_widget& widget, const std::string& name)
+{
+    (void)widget;
+    (void)name;
+}
+
+template <typename property_t>
+bool has_property(const runtime_widget& widget, const std::string& name)
+{
+    (void)widget;
+    (void)name;
+}
+
+template <typename property_t>
+property_t& get_property(const runtime_widget& widget, const std::string& name)
+{
+    (void)widget;
+    (void)name;
+}
+
+template <typename property_t>
+property_t& get_or_make_property(const runtime_widget& widget, const std::string& name)
+{
+    (void)widget;
+    (void)name;
+}
+
+template <typename property_t, template <typename, typename> typename container_t, typename allocator_t>
+void get_children_with_property(
+    const runtime_widget& widget,
+    const std::string& name,
+    container_t<runtime_widget, allocator_t>& container,
+    const bool recursive)
+{
+    (void)widget;
+    (void)name;
+    (void)container;
+    (void)recursive;
+}
+
+template <typename property_t>
+bool has_parent_with_property(const runtime_widget& widget, const std::string& name,
+    const unsigned int depth)
+{
+    (void)depth;
+}
+
+template <typename property_t>
+runtime_widget get_parent_with_property(
+    const runtime_widget& widget,
+    const std::string& name,
+    const unsigned int depth)
+{
+    (void)widget;
+    (void)name;
+    (void)depth;
+}
+
+template <typename property_t>
+void destroy_property(const runtime_widget& widget, const std::string& name)
+{
+    (void)widget;
+    (void)name;
 }
 }

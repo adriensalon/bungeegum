@@ -1,6 +1,8 @@
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum_widgets/bungeegum_widgets.hpp>
 
+#include <iostream>
+
 using namespace bungeegum::widgets;
 
 struct delegateTest {
@@ -32,7 +34,6 @@ struct delegateTest {
 
 int main()
 {
-
     std::list<bungeegum::runtime_widget> _children;
     bungeegum::get_children_with_property<float>(bungeegum::make<Align>(), "okok", _children);
 

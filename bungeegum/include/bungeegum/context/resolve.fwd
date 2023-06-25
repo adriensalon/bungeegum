@@ -4,7 +4,6 @@
 #include <optional>
 #include <type_traits>
 
-#include <bungeegum/context/typed.fwd>
 #include <bungeegum/glue/raw.fwd>
 #include <bungeegum/glue/simd.hpp>
 

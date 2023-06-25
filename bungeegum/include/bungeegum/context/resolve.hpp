@@ -4,6 +4,7 @@
 
 namespace bungeegum {
 
+/// @brief
 struct resolve_command {
 
     /// @brief
@@ -31,40 +32,15 @@ private:
     friend struct detail::context;
 };
 
-// /// @brief
-// /// @tparam widget_t
-// /// @param widget
-// /// @param resolve_callback
-// template <typename widget_t>
-// void on_resolve(typed_widget_t<widget_t>& widget, const std::function<void(resolve_command&)>& resolve_callback);
-
-// /// @brief
-// /// @tparam widget_t
-// /// @param widget
-// /// @param resolve_callback
-// template <typename widget_t>
-// void on_resolve(typed_widget_t<widget_t>* widget, const std::function<void(resolve_command&)>& resolve_callback);
-
+/// @brief
+/// @param widget
+/// @param resolve_callback
 void on_resolve(const runtime_widget& widget, const std::function<void(resolve_command&)>& resolve_callback);
 
 /// @brief
 void must_resolve();
 
-// /// @brief
-// /// @tparam widget_t
-// /// @param widget must have declared a void resolve(const resolve_command&) or added one
-// /// dynamically with the on_resolve() function.
-// template <typename widget_t>
-// void must_resolve(typed_widget_t<widget_t>& widget);
-
-// /// @brief
-// /// @tparam widget_t
-// /// @param widget must have declared a void resolve(const resolve_command&) or added one
-// /// dynamically with the on_resolve() function.
-// template <typename widget_t>
-// void must_resolve(typed_widget_t<widget_t>* widget);
-
+/// @brief
+/// @param widget
 void must_resolve(const runtime_widget& widget);
 }
-
-#include <bungeegum/context/resolve.inl>

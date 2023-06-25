@@ -135,21 +135,9 @@ private:
     friend struct detail::context;
 };
 
+/// @brief 
+/// @param widget 
+/// @param interact_callback 
 void on_interact(const runtime_widget& widget, const std::function<void(interact_command&)>& interact_callback);
 
-// /// @brief
-// /// @tparam widget_t
-// /// @param widget
-// /// @param interact_callback
-// template <typename widget_t>
-// void on_interact(widget_t& widget, const std::function<void(interact_command&)>& interact_callback);
-
-// /// @brief
-// /// @tparam widget_t
-// /// @param widget
-// /// @param interact_callback
-// template <typename widget_t>
-// void on_interact(widget_t* widget, const std::function<void(interact_command&)>& interact_callback);
 }
-
-#include <bungeegum/context/interact.inl>

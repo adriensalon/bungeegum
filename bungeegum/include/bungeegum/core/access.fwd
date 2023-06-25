@@ -75,10 +75,10 @@ struct access {
                 } else {
                     float2 _max_size = zero<float2>;
                     for (detail::untyped_widget_data& _child_widget_data : _widget_data.children) {
-                        runtime_widget _child = detail::widgets_context.create_adopted(_child_widget_data);
-                        float2 _child_size = command.resolve_child(_child, command.min_size(), command.max_size());
+                        runtime_widget _child_widget = detail::widgets_context.get_runtime_widget(_child_widget_data);
+                        float2 _child_size = command.resolve_child(_child_widget, command.min_size(), command.max_size());
                         _max_size = glm::max(_max_size, _child_size);
-                        command.position_child(_child, zero<float2>);
+                        command.position_child(_child_widget, zero<float2>);
                     }
                     command.resize(_max_size);
                 }
