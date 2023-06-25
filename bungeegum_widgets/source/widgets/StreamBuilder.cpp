@@ -1,5 +1,3 @@
-#include <iosfwd>
-
 #include <bungeegum_widgets/widgets/StreamBuilder.hpp>
 
 namespace bungeegum {
@@ -7,9 +5,11 @@ namespace widgets {
 
     namespace detail {
 
-        StreamBuilderBuffer::StreamBuilderBuffer(std::ostream& sink, std::size_t buffer_size)
+        // StreamBuilderBuffer
+
+        StreamBuilderBuffer::StreamBuilderBuffer(std::ostream& sink, const uint1 buffer_size)
             : _sink(std::ref(sink))
-            , _buffer(buffer_size + 1)
+            , _buffer(static_cast<std::size_t>(buffer_size) + 1)
         {
             _sink.get().clear();
             char_type* _base = &_buffer.front();
@@ -31,7 +31,7 @@ namespace widgets {
         {
             if (_sink.get() && character != traits_type::eof()) {
                 if (!std::less_equal<char_type*>()(pptr(), epptr())) {
-                    throw_error("Error in StreamBuilder.cpp : event_buffer overflow error");
+                    throw_error("Error in StreamBuilder.cpp : StreamBuilderBuffer overflow");
                 }
                 *pptr() = static_cast<char_type>(character);
                 pbump(1);
@@ -42,11 +42,55 @@ namespace widgets {
             return traits_type::eof();
         }
 
-        StreamBuilderBuffer::int_type StreamBuilderBuffer::sync()
+        int1 StreamBuilderBuffer::sync()
+        {
+            return triggerAndFlush() ? 0 : -1;
+        }
+
+        // WideStreamBuilderBuffer
+
+        WideStreamBuilderBuffer::WideStreamBuilderBuffer(std::wostream& sink, const uint1 buffer_size)
+            : _sink(std::ref(sink))
+            , _buffer(static_cast<std::size_t>(buffer_size) + 1)
+        {
+            _sink.get().clear();
+            char_type* _base = &_buffer.front();
+            setp(_base, _base + _buffer.size() - 1);
+        }
+
+        bool1 WideStreamBuilderBuffer::triggerAndFlush()
+        {
+            std::ptrdiff_t _count = pptr() - pbase();
+            std::wstring _str(pbase(), _count);
+            if (flushCallback != nullptr) {
+                flushCallback(_str);
+            }
+            pbump(-static_cast<int_type>(_count));
+            return _sink.get().write(pbase(), _count).good();
+        }
+
+        WideStreamBuilderBuffer::int_type WideStreamBuilderBuffer::overflow(int_type character)
+        {
+            if (_sink.get() && character != traits_type::eof()) {
+                if (!std::less_equal<char_type*>()(pptr(), epptr())) {
+                    throw_error("Error in StreamBuilder.cpp : WideStreamBuilderBuffer overflow");
+                }
+                *pptr() = static_cast<char_type>(character);
+                pbump(1);
+                if (triggerAndFlush()) {
+                    return character;
+                }
+            }
+            return traits_type::eof();
+        }
+
+        int1 WideStreamBuilderBuffer::sync()
         {
             return triggerAndFlush() ? 0 : -1;
         }
     }
+
+    // StreamBuilder
 
     StreamBuilder& StreamBuilder::builder(const std::function<runtime_widget(const std::string&)>& value)
     {
@@ -66,16 +110,23 @@ namespace widgets {
     {
         _customBuffer = detail::StreamBuilderBuffer(stream, buffer_size);
         _customBuffer.value().flushCallback = [this](const std::string& buffer) {
-            _flushCallback.value()(buffer);
+            if (!_flushCallback) {
+                throw_error("Error in StreamBuilder.cpp : _flushCallback is nullptr");
+            }
+            _flushCallback(buffer);
         };
-        _formerStreambuf = stream.basic_ios<char>::rdbuf(&_customBuffer.value());
+        using _char_type = detail::StreamBuilderBuffer::char_type;
+        std::streambuf* _formerStreambuf = stream.basic_ios<_char_type>::rdbuf(&_customBuffer.value());
+        _restoreFormerBuffer = [this, &stream, _formerStreambuf]() {
+            stream.basic_ios<_char_type>::rdbuf(_formerStreambuf);
+        };
         return *this;
     }
 
     void StreamBuilder::processInitialData()
     {
-        if (!_initialDataBuildDone && _flushCallback.has_value() && _initialData.has_value()) {
-            _flushCallback.value()(_initialData.value());
+        if (!_initialDataBuildDone && _flushCallback && _initialData.has_value()) {
+            _flushCallback(_initialData.value());
             _initialDataBuildDone = true;
         }
     }
@@ -91,7 +142,70 @@ namespace widgets {
         }
     }
 
-    /// WIDE
+    StreamBuilder::~StreamBuilder()
+    {
+        if (_restoreFormerBuffer) {
+            _restoreFormerBuffer();
+        }
+    }
 
+    // WideStreamBuilder
+
+    WideStreamBuilder& WideStreamBuilder::builder(const std::function<runtime_widget(const std::wstring&)>& value)
+    {
+        _flushCallback = value;
+        processInitialData();
+        return *this;
+    }
+
+    WideStreamBuilder& WideStreamBuilder::initialData(const std::wstring& value)
+    {
+        _initialData = value;
+        processInitialData();
+        return *this;
+    }
+
+    WideStreamBuilder& WideStreamBuilder::stream(std::wostream& stream, const uint1 buffer_size)
+    {
+        _customBuffer = detail::WideStreamBuilderBuffer(stream, buffer_size);
+        _customBuffer.value().flushCallback = [this](const std::wstring& buffer) {
+            if (!_flushCallback) {
+                throw_error("Error in StreamBuilder.cpp : _flushCallback is nullptr");
+            }
+            _flushCallback(buffer);
+        };
+        using _char_type = detail::WideStreamBuilderBuffer::char_type;
+        std::wstreambuf* _formerStreambuf = stream.basic_ios<_char_type>::rdbuf(&_customBuffer.value());
+        _restoreFormerBuffer = [this, &stream, _formerStreambuf]() {
+            stream.basic_ios<_char_type>::rdbuf(_formerStreambuf);
+        };
+        return *this;
+    }
+
+    void WideStreamBuilder::processInitialData()
+    {
+        if (!_initialDataBuildDone && _flushCallback && _initialData.has_value()) {
+            _flushCallback(_initialData.value());
+            _initialDataBuildDone = true;
+        }
+    }
+
+    void WideStreamBuilder::resolve(resolve_command& command)
+    {
+        if (_childWidget.has_value()) {
+            float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
+            command.position_child(_childWidget.value(), zero<float2>);
+            command.resize(_childSize);
+        } else {
+            command.resize(command.max_size());
+        }
+    }
+
+    WideStreamBuilder::~WideStreamBuilder()
+    {
+        if (_restoreFormerBuffer) {
+            _restoreFormerBuffer();
+        }
+    }
 }
 }

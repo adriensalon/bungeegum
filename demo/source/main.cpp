@@ -46,7 +46,7 @@ int main()
     // };
     // _osstream << "Helloooooo4466" << std::endl;
 
-    std::ostringstream _osstream2;
+    std::wostringstream _osstream2;
 
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
@@ -76,10 +76,10 @@ int main()
                                                                     _osstream2 << "Helloooooo4466" << std::endl;
                                                                 });
                                                                 (void)fff;
-                                                                return bungeegum::make<StreamBuilder>()
-                                                                    .initialData("heyyy")
-                                                                    .builder([&_osstream2](const std::string& message) -> bungeegum::runtime_widget {
-                                                                        std::cout << message;
+                                                                return bungeegum::make<WideStreamBuilder>()
+                                                                    .initialData(L"heyyy")
+                                                                    .builder([&_osstream2](const std::wstring& message) -> bungeegum::runtime_widget {
+                                                                        std::wcout << message;
 
                                                                         return bungeegum::make<ColoredBox>().color(0xFF6611FF);
                                                                     })

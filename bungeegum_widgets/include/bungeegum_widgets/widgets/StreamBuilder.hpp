@@ -12,7 +12,7 @@ namespace widgets {
         struct StreamBuilderBuffer : public std::streambuf {
             std::function<void(const std::string&)> flushCallback = nullptr;
 
-            StreamBuilderBuffer(std::ostream& sink, std::size_t buffer_size);
+            StreamBuilderBuffer(std::ostream& sink, const uint1 buffer_size);
             StreamBuilderBuffer(const StreamBuilderBuffer& other) = default;
             StreamBuilderBuffer& operator=(const StreamBuilderBuffer& other) = default;
             StreamBuilderBuffer(StreamBuilderBuffer&& other) = default;
@@ -24,20 +24,47 @@ namespace widgets {
 
             bool1 triggerAndFlush();
             int_type overflow(int_type character) override;
-            int_type sync() override;
+            int1 sync() override;
+        };
+
+        struct WideStreamBuilderBuffer : public std::wstreambuf {
+            std::function<void(const std::wstring&)> flushCallback = nullptr;
+
+            WideStreamBuilderBuffer(std::wostream& sink, const uint1 buffer_size);
+            WideStreamBuilderBuffer(const WideStreamBuilderBuffer& other) = default;
+            WideStreamBuilderBuffer& operator=(const WideStreamBuilderBuffer& other) = default;
+            WideStreamBuilderBuffer(WideStreamBuilderBuffer&& other) = default;
+            WideStreamBuilderBuffer& operator=(WideStreamBuilderBuffer&& other) = default;
+
+        private:
+            std::reference_wrapper<std::wostream> _sink;
+            std::vector<char_type> _buffer = {};
+
+            bool1 triggerAndFlush();
+            int_type overflow(int_type character) override;
+            int1 sync() override;
         };
     }
 
+    /// @brief Widget that builds itself based on the latest overflow of a std::ostream.
+    /// @details
     struct StreamBuilder {
 
         /// @brief The build strategy currently used.
+        /// @details Initial data can be used to fire the build callback only once in the lifetime
+        /// of this StreamBuilder, the first time initialData() and builder() are defined.
         StreamBuilder& builder(const std::function<runtime_widget(const std::string&)>& value);
 
-        /// @brief The data that will be used to build until the stream has completed.
+        /// @brief The data that will be used to build until the stream has overflown once.
+        /// @details Initial data can be used to fire the build callback only once in the lifetime
+        /// of this StreamBuilder, the first time initialData() and builder() are defined.
         StreamBuilder& initialData(const std::string& value);
 
-        /// @brief The asynchronous computation to which this builder is currently connected.
-        StreamBuilder& stream(std::ostream& value, const uint1 buffer_size = 256u);
+        /// @brief The std::ostream to which this builder is currently connected.
+        /// @details The original streambuf will be restored when this StreamBuilder is destroyed.
+        StreamBuilder& stream(std::ostream& stream, const uint1 buffer_size = 256u);
+
+        virtual ~StreamBuilder();
 
     private:
         friend struct access;
@@ -46,32 +73,37 @@ namespace widgets {
 
         std::optional<runtime_widget> _childWidget = std::nullopt;
         std::optional<std::string> _initialData = std::nullopt;
-        std::optional<std::function<runtime_widget(const std::string&)>> _flushCallback = std::nullopt;
+        std::function<runtime_widget(const std::string&)> _flushCallback = nullptr;
         std::optional<detail::StreamBuilderBuffer> _customBuffer = std::nullopt;
-        std::streambuf* _formerStreambuf = nullptr;
+        std::function<void()> _restoreFormerBuffer = nullptr;
         bool1 _initialDataBuildDone = false;
     };
 
-    // struct WideStreamBuilder {
+    /// @brief Widget that builds itself based on the latest overflow of a std:w:ostream.
+    struct WideStreamBuilder {
 
-    //     /// @brief The build strategy currently used.
-    //     WideStreamBuilder& builder(const std::function<runtime_widget(const std::wstring&)>& value);
+        /// @brief The build strategy currently used.
+        WideStreamBuilder& builder(const std::function<runtime_widget(const std::wstring&)>& value);
 
-    //     /// @brief The data that will be used to build until the stream has completed.
-    //     WideStreamBuilder& initialData(const std::wstring& value);
+        /// @brief The data that will be used to build until the stream has overflown once.
+        WideStreamBuilder& initialData(const std::wstring& value);
 
-    //     /// @brief The asynchronous computation to which this builder is currently connected.
-    //     WideStreamBuilder& stream(std::wostream& value);
+        /// @brief The asynchronous computation to which this builder is currently connected.
+        WideStreamBuilder& stream(std::wostream& stream, const uint1 buffer_size = 256u);
 
-    // private:
-    //     friend struct access;
-    //     void resolve(resolve_command& command);
+        virtual ~WideStreamBuilder();
 
-    //     std::optional<runtime_widget> _childWidget = std::nullopt;
-    //     std::optional<std::function<void(const std::wstring&)>> _builderFunction = std::nullopt;
-    //     std::optional<std::wstring> _initialData = std::nullopt;
-    //     std::streambuf* _formerStreambuf = nullptr;
-    // };
+    private:
+        friend struct access;
+        void processInitialData();
+        void resolve(resolve_command& command);
 
+        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<std::wstring> _initialData = std::nullopt;
+        std::function<runtime_widget(const std::wstring&)> _flushCallback = nullptr;
+        std::optional<detail::WideStreamBuilderBuffer> _customBuffer = std::nullopt;
+        std::function<void()> _restoreFormerBuffer = nullptr;
+        bool1 _initialDataBuildDone = false;
+    };
 }
 }
