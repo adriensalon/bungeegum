@@ -2,6 +2,7 @@
 #include <bungeegum_widgets/bungeegum_widgets.hpp>
 
 #include <iostream>
+#include <sstream>
 
 using namespace bungeegum::widgets;
 
@@ -36,6 +37,11 @@ int main()
 {
     std::list<bungeegum::runtime_widget> _children;
     bungeegum::get_children_with_property<float>(bungeegum::make<Align>(), "okok", _children);
+
+    std::ostringstream _osstream;
+    bungeegum::widgets::detail::event_buffer _evb(_osstream);
+    _osstream.basic_ios<char>::rdbuf(&_evb);
+    _osstream << "Helloooooo" << std::endl;
 
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")

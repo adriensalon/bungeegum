@@ -24,6 +24,7 @@ set(bungeegum_widgets_source
 	"source/widgets/MouseRegion.cpp"
 	"source/widgets/Padding.cpp"
 	"source/widgets/SizedBox.cpp"
+	"source/widgets/StreamBuilder.cpp"
 	"source/widgets/Title.cpp"
 )
 

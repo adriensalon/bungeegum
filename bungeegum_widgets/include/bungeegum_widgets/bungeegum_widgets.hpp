@@ -20,6 +20,7 @@
 #include <bungeegum_widgets/widgets/LimitedBox.hpp>
 #include <bungeegum_widgets/widgets/Padding.hpp>
 #include <bungeegum_widgets/widgets/SizedBox.hpp>
+#include <bungeegum_widgets/widgets/StreamBuilder.hpp>
 #include <bungeegum_widgets/widgets/Title.hpp>
 
 
