@@ -70,8 +70,9 @@ namespace widgets {
                 float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
                 command.position_child(_childWidget.value(), zero<float2>);
                 command.resize(_childSize);
-            } else
+            } else {
                 command.resize(command.max_size());
+            }
         }
 
         std::optional<runtime_widget> _childWidget = std::nullopt;

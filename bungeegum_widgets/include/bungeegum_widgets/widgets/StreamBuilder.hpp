@@ -9,24 +9,23 @@ namespace widgets {
 
     namespace detail {
 
-        struct event_buffer : public std::streambuf {
+        struct StreamBuilderBuffer : public std::streambuf {
+            std::function<void(const std::string&)> flushCallback = nullptr;
 
-            event_buffer(std::ostream& sink, std::size_t buffer_size = 256);
-
-            event_buffer(const event_buffer& other) = default;
-            event_buffer& operator=(const event_buffer& other) = default;
-            event_buffer(event_buffer&& other) = default;
-            event_buffer& operator=(event_buffer&& other) = default;
+            StreamBuilderBuffer(std::ostream& sink, std::size_t buffer_size);
+            StreamBuilderBuffer(const StreamBuilderBuffer& other) = default;
+            StreamBuilderBuffer& operator=(const StreamBuilderBuffer& other) = default;
+            StreamBuilderBuffer(StreamBuilderBuffer&& other) = default;
+            StreamBuilderBuffer& operator=(StreamBuilderBuffer&& other) = default;
 
         private:
             std::reference_wrapper<std::ostream> _sink;
-            std::vector<char_type> _buffer;
+            std::vector<char_type> _buffer = {};
 
-            bool trigger_and_flush();
-            int_type overflow(int_type ch) override;
+            bool1 triggerAndFlush();
+            int_type overflow(int_type character) override;
             int_type sync() override;
         };
-
     }
 
     struct StreamBuilder {
@@ -38,22 +37,19 @@ namespace widgets {
         StreamBuilder& initialData(const std::string& value);
 
         /// @brief The asynchronous computation to which this builder is currently connected.
-        StreamBuilder& stream(std::ostream& value);
-
-        StreamBuilder(const StreamBuilder& other) = delete;
-        StreamBuilder& operator=(const StreamBuilder& other) = delete;
-        StreamBuilder(StreamBuilder&& other) = default;
-        StreamBuilder& operator=(StreamBuilder&& other) = default;
+        StreamBuilder& stream(std::ostream& value, const uint1 buffer_size = 256u);
 
     private:
         friend struct access;
+        void processInitialData();
         void resolve(resolve_command& command);
 
         std::optional<runtime_widget> _childWidget = std::nullopt;
-        std::optional<std::function<void(const std::string&)>> _builderFunction = std::nullopt;
         std::optional<std::string> _initialData = std::nullopt;
-        std::optional<detail::event_buffer> _customBuffer = std::nullopt;
+        std::optional<std::function<runtime_widget(const std::string&)>> _flushCallback = std::nullopt;
+        std::optional<detail::StreamBuilderBuffer> _customBuffer = std::nullopt;
         std::streambuf* _formerStreambuf = nullptr;
+        bool1 _initialDataBuildDone = false;
     };
 
     // struct WideStreamBuilder {

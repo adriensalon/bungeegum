@@ -38,10 +38,15 @@ int main()
     std::list<bungeegum::runtime_widget> _children;
     bungeegum::get_children_with_property<float>(bungeegum::make<Align>(), "okok", _children);
 
-    std::ostringstream _osstream;
-    bungeegum::widgets::detail::event_buffer _evb(_osstream);
-    _osstream.basic_ios<char>::rdbuf(&_evb);
-    _osstream << "Helloooooo" << std::endl;
+    // std::ostringstream _osstream;
+    // bungeegum::widgets::detail::StreamBuilderBuffer _evb(_osstream, 512u);
+    // _osstream.basic_ios<char>::rdbuf(&_evb);
+    // _evb.flushCallback = [](const std::string& str) {
+    //     std::cout << str;
+    // };
+    // _osstream << "Helloooooo4466" << std::endl;
+
+    std::ostringstream _osstream2;
 
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
@@ -64,15 +69,25 @@ int main()
                                                             std::this_thread::sleep_for(std::chrono::milliseconds(4000));
                                                             return true;
                                                         }))
-                                                        .builder([](const bool value) -> bungeegum::runtime_widget {
-                                                            auto& _coloredBox = bungeegum::make<ColoredBox>();
-                                                            _coloredBox.color(value ? 0xFF6699FF : 0xFF6611FF);
+                                                        .builder([&_osstream2](const bool value) -> bungeegum::runtime_widget {
                                                             if (value) {
-                                                                return _coloredBox;
+                                                                auto fff = std::async([&_osstream2]() {
+                                                                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                                                                    _osstream2 << "Helloooooo4466" << std::endl;
+                                                                });
+                                                                (void)fff;
+                                                                return bungeegum::make<StreamBuilder>()
+                                                                    .initialData("heyyy")
+                                                                    .builder([&_osstream2](const std::string& message) -> bungeegum::runtime_widget {
+                                                                        std::cout << message;
+
+                                                                        return bungeegum::make<ColoredBox>().color(0xFF6611FF);
+                                                                    })
+                                                                    .stream(_osstream2);
                                                             }
                                                             return bungeegum::make<Padding>()
                                                                 .padding(EdgeInsets::fromLTRB(44.f, 10.f, 15.f, 5.f))
-                                                                .child(_coloredBox);
+                                                                .child(bungeegum::make<ColoredBox>().color(0xFF6611FF));
                                                         }))
 
                                           ))
