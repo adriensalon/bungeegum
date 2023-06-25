@@ -27,6 +27,8 @@ Not easy to choose when you don't have much and want your GUI to stand out. Then
 
 _bungeegum_ requires a C++17 compiler. CMake is used to build the library, gtest targets can be enabled with the `BUNGEEGUM_BUILD_TEST` option. A doxygen documentation target can be enabled with the `BUNGEEGUM_BUILD_DOC` option. All the widgets that ship with _bungeegum_ are implemented inside the `bungeegum::widgets` namespace.
 
+See widgets [here](https://github.com/adriensalon/bungeegum/tree/master/bungeegum_widgets/README.md)
+
 ```C++
 using namespace bungeegum::widgets;
 ```
@@ -298,15 +300,6 @@ void draw(bungeegum::draw_command& command)
 
 ### Multithreading and optimization
 
-
-## Roadmap v0.0
-
-Implementing some Flutter widgets behavior with _bungeegum_ should be a good way to demonstrate and ensure that any widget can be implemented in few lines of code without involving any ugly trick.  
-
-- 📕 align  
-- 📕 container  
-- 📕 column  
-- 📕 row  
 
 ## External dependencies
 

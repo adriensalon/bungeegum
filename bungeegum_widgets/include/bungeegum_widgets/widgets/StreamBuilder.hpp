@@ -80,15 +80,22 @@ namespace widgets {
     };
 
     /// @brief Widget that builds itself based on the latest overflow of a std:w:ostream.
+    /// @details
     struct WideStreamBuilder {
 
         /// @brief The build strategy currently used.
+        /// @details Initial data can be used to fire the build callback only once in the lifetime
+        /// of this WideStreamBuilder, the first time initialData() and builder() are defined.
         WideStreamBuilder& builder(const std::function<runtime_widget(const std::wstring&)>& value);
 
         /// @brief The data that will be used to build until the stream has overflown once.
+        /// @details Initial data can be used to fire the build callback only once in the lifetime
+        /// of this WideStreamBuilder, the first time initialData() and builder() are defined.
         WideStreamBuilder& initialData(const std::wstring& value);
 
-        /// @brief The asynchronous computation to which this builder is currently connected.
+        /// @brief The std::wostream to which this builder is currently connected.
+        /// @details The original streambuf will be restored when this WideStreamBuilder is
+        /// destroyed.
         WideStreamBuilder& stream(std::wostream& stream, const uint1 buffer_size = 256u);
 
         virtual ~WideStreamBuilder();
