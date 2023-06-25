@@ -32,13 +32,13 @@ namespace widgets {
         Container& alignment(const Alignment& value);
 
         /// @brief The child contained by the container.
-        template <typename child_widget_t>
-        Container& child(child_widget_t& value)
+        template <typename childWidget_t>
+        Container& child(childWidget_t& value)
         {
-            if (_child.has_value())
-                abandon(this, _child.value());
-            _child = runtime_widget(value);
-            adopt(this, _child.value());
+            if (_childWidget.has_value())
+                abandon(this, _childWidget.value());
+            _childWidget = runtime_widget(value);
+            adopt(this, _childWidget.value());
             return *this;
         }
 

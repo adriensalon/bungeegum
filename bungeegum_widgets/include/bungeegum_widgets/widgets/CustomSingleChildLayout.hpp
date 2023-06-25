@@ -6,18 +6,20 @@
 namespace bungeegum {
 namespace widgets {
 
+    /// @brief A widget that defers the layout of its single child to a delegate.
+    /// @details The delegate can determine the layout constraints for the child and can decide
+    /// where to position the child. The delegate can also determine the size of the parent, but
+    /// the size of the parent cannot depend on the size of the child.
     struct CustomSingleChildLayout {
 
         /// @brief The widget below this widget in the tree.
-        /// @tparam child_widget_t
-        /// @param value
-        template <typename child_widget_t>
-        CustomSingleChildLayout& child(child_widget_t& value)
+        template <typename childWidget_t>
+        CustomSingleChildLayout& child(childWidget_t& value)
         {
-            if (_child.has_value())
-                abandon(this, _child.value());
-            _child = runtime_widget(value);
-            adopt(this, _child.value());
+            if (_childWidget.has_value())
+                abandon(this, _childWidget.value());
+            _childWidget = runtime_widget(value);
+            adopt(this, _childWidget.value());
             return *this;
         }
 
@@ -53,7 +55,7 @@ namespace widgets {
             std::function<Size(const BoxConstraints constraints)> getSize = nullptr;
         };
 
-        std::optional<runtime_widget> _child = std::nullopt;
+        std::optional<runtime_widget> _childWidget = std::nullopt;
         untypedDelegate _delegate = {};
     };
 

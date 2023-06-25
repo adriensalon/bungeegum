@@ -45,9 +45,9 @@ namespace widgets {
     {
         BoxConstraints _parentConstraints(command.min_size(), command.max_size());
         Size _constrainedSize = _parentConstraints.constrain(_size);
-        if (_child.has_value()) {
-            float2 _childSize = command.resolve_child(_child.value(), _constrainedSize, _constrainedSize);
-            command.position_child(_child.value(), zero<float2>);
+        if (_childWidget.has_value()) {
+            float2 _childSize = command.resolve_child(_childWidget.value(), _constrainedSize, _constrainedSize);
+            command.position_child(_childWidget.value(), zero<float2>);
             command.resize(_childSize);
         } else {
             command.resize(_constrainedSize);

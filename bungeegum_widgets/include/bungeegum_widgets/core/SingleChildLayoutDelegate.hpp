@@ -35,9 +35,9 @@ namespace widgets {
 
         SingleChildLayoutDelegate()
         {
-            static_assert(detail::hasGetConstraintsForChildFunction<delegate_t>, "Must have");
-            static_assert(detail::hasGetPositionForChildFunction<delegate_t>, "Must have");
-            static_assert(detail::hasGetSizeFunction<delegate_t>, "Must have");
+            static_assert(detail::hasGetConstraintsForChildFunction<delegate_t>, "Error in SingleChildLayoutDelegate.hpp : type delegate_t has no valid getConstraintsForChild method");
+            static_assert(detail::hasGetPositionForChildFunction<delegate_t>, "Error in SingleChildLayoutDelegate.hpp : type delegate_t has no valid getPositionForChildFunction method");
+            static_assert(detail::hasGetSizeFunction<delegate_t>, "Error in SingleChildLayoutDelegate.hpp : type delegate_t has no valid getSizeFunction method");
         }
 
         BoxConstraints getConstraintsForChild(const BoxConstraints constraints)

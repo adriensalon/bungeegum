@@ -10,13 +10,13 @@ namespace widgets {
     struct Title {
 
         /// @brief The widget below this widget in the tree.
-        template <typename child_widget_t>
-        Title& child(child_widget_t& value)
+        template <typename childWidget_t>
+        Title& child(childWidget_t& value)
         {
-            if (_child.has_value())
-                abandon(this, _child.value());
-            _child = runtime_widget(value);
-            adopt(this, _child.value());
+            if (_childWidget.has_value())
+                abandon(this, _childWidget.value());
+            _childWidget = runtime_widget(value);
+            adopt(this, _childWidget.value());
             return *this;
         }
 
@@ -30,7 +30,7 @@ namespace widgets {
         friend struct access;
         void resolve(resolve_command& command);
 
-        std::optional<runtime_widget> _child = std::nullopt;
+        std::optional<runtime_widget> _childWidget = std::nullopt;
     };
 
 }

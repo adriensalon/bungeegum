@@ -7,45 +7,6 @@
 namespace bungeegum {
 namespace widgets {
 
-    namespace detail {
-
-        struct StreamBuilderBuffer : public std::streambuf {
-            std::function<void(const std::string&)> flushCallback = nullptr;
-
-            StreamBuilderBuffer(std::ostream& sink, const uint1 buffer_size);
-            StreamBuilderBuffer(const StreamBuilderBuffer& other) = default;
-            StreamBuilderBuffer& operator=(const StreamBuilderBuffer& other) = default;
-            StreamBuilderBuffer(StreamBuilderBuffer&& other) = default;
-            StreamBuilderBuffer& operator=(StreamBuilderBuffer&& other) = default;
-
-        private:
-            std::reference_wrapper<std::ostream> _sink;
-            std::vector<char_type> _buffer = {};
-
-            bool1 triggerAndFlush();
-            int_type overflow(int_type character) override;
-            int1 sync() override;
-        };
-
-        struct WideStreamBuilderBuffer : public std::wstreambuf {
-            std::function<void(const std::wstring&)> flushCallback = nullptr;
-
-            WideStreamBuilderBuffer(std::wostream& sink, const uint1 buffer_size);
-            WideStreamBuilderBuffer(const WideStreamBuilderBuffer& other) = default;
-            WideStreamBuilderBuffer& operator=(const WideStreamBuilderBuffer& other) = default;
-            WideStreamBuilderBuffer(WideStreamBuilderBuffer&& other) = default;
-            WideStreamBuilderBuffer& operator=(WideStreamBuilderBuffer&& other) = default;
-
-        private:
-            std::reference_wrapper<std::wostream> _sink;
-            std::vector<char_type> _buffer = {};
-
-            bool1 triggerAndFlush();
-            int_type overflow(int_type character) override;
-            int1 sync() override;
-        };
-    }
-
     /// @brief Widget that builds itself based on the latest overflow of a std::ostream.
     /// @details
     struct StreamBuilder {
@@ -71,10 +32,28 @@ namespace widgets {
         void processInitialData();
         void resolve(resolve_command& command);
 
+        struct StreamBuilderBuffer : public std::streambuf {
+            std::function<void(const std::string&)> flushCallback = nullptr;
+
+            StreamBuilderBuffer(std::ostream& sink, const uint1 buffer_size);
+            StreamBuilderBuffer(const StreamBuilderBuffer& other) = default;
+            StreamBuilderBuffer& operator=(const StreamBuilderBuffer& other) = default;
+            StreamBuilderBuffer(StreamBuilderBuffer&& other) = default;
+            StreamBuilderBuffer& operator=(StreamBuilderBuffer&& other) = default;
+
+        private:
+            std::reference_wrapper<std::ostream> _sink;
+            std::vector<char_type> _buffer = {};
+
+            bool1 triggerAndFlush();
+            int_type overflow(int_type character) override;
+            int1 sync() override;
+        };
+
         std::optional<runtime_widget> _childWidget = std::nullopt;
         std::optional<std::string> _initialData = std::nullopt;
         std::function<runtime_widget(const std::string&)> _flushCallback = nullptr;
-        std::optional<detail::StreamBuilderBuffer> _customBuffer = std::nullopt;
+        std::optional<StreamBuilderBuffer> _customBuffer = std::nullopt;
         std::function<void()> _restoreFormerBuffer = nullptr;
         bool1 _initialDataBuildDone = false;
     };
@@ -105,10 +84,28 @@ namespace widgets {
         void processInitialData();
         void resolve(resolve_command& command);
 
+        struct WideStreamBuilderBuffer : public std::wstreambuf {
+            std::function<void(const std::wstring&)> flushCallback = nullptr;
+
+            WideStreamBuilderBuffer(std::wostream& sink, const uint1 buffer_size);
+            WideStreamBuilderBuffer(const WideStreamBuilderBuffer& other) = default;
+            WideStreamBuilderBuffer& operator=(const WideStreamBuilderBuffer& other) = default;
+            WideStreamBuilderBuffer(WideStreamBuilderBuffer&& other) = default;
+            WideStreamBuilderBuffer& operator=(WideStreamBuilderBuffer&& other) = default;
+
+        private:
+            std::reference_wrapper<std::wostream> _sink;
+            std::vector<char_type> _buffer = {};
+
+            bool1 triggerAndFlush();
+            int_type overflow(int_type character) override;
+            int1 sync() override;
+        };
+
         std::optional<runtime_widget> _childWidget = std::nullopt;
         std::optional<std::wstring> _initialData = std::nullopt;
         std::function<runtime_widget(const std::wstring&)> _flushCallback = nullptr;
-        std::optional<detail::WideStreamBuilderBuffer> _customBuffer = std::nullopt;
+        std::optional<WideStreamBuilderBuffer> _customBuffer = std::nullopt;
         std::function<void()> _restoreFormerBuffer = nullptr;
         bool1 _initialDataBuildDone = false;
     };

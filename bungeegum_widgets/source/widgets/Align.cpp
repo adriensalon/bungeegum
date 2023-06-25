@@ -58,14 +58,14 @@ namespace widgets {
         };
         if (_hasConstrainedSize.x && _hasConstrainedSize.y) {
             command.resize(_biggest);
-            if (_child.has_value()) {
-                float2 _childSize = command.resolve_child(_child.value(), zero<float2>, _biggest);
-                _alignChildWidget(command, _child.value(), _childSize, _biggest, _alignment);
+            if (_childWidget.has_value()) {
+                float2 _childSize = command.resolve_child(_childWidget.value(), zero<float2>, _biggest);
+                _alignChildWidget(command, _childWidget.value(), _childSize, _biggest, _alignment);
             }
-        } else if (!_child.has_value()) {
+        } else if (!_childWidget.has_value()) {
             throw_error("Error TODO");
         } else {
-            float2 _childSize = command.resolve_child(_child.value(), zero<float2>, _biggest);
+            float2 _childSize = command.resolve_child(_childWidget.value(), zero<float2>, _biggest);
             float2 _alignSize = zero<float2>;
             if (_hasConstrainedSize.x) {
                 _alignSize.x = _biggest.width();
@@ -78,7 +78,7 @@ namespace widgets {
                 _alignSize.y = _sizeFactor.y * _childSize.y;
             }
             command.resize(_alignSize);
-            _alignChildWidget(command, _child.value(), _childSize, _alignSize, _alignment);
+            _alignChildWidget(command, _childWidget.value(), _childSize, _alignSize, _alignment);
         }
     }
 

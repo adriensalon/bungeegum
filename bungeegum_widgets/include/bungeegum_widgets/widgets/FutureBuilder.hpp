@@ -5,10 +5,14 @@
 namespace bungeegum {
 namespace widgets {
 
+    /// @brief A widget that builds itself based on the result of a std::future or
+    /// std::shared_future.
     template <typename futureValue_t>
     struct FutureBuilder {
 
         /// @brief The build strategy currently used.
+        /// @details Initial data can be used to fire the build callback only once in the lifetime
+        /// of this FutureBuilder, the first time initialData() and builder() are defined.
         FutureBuilder& builder(const std::function<runtime_widget(const futureValue_t&)>& value)
         {
             // reset tout si deja defini && deja invoke ?
@@ -49,6 +53,8 @@ namespace widgets {
         }
 
         /// @brief The data that will be used to build until the future has completed.
+        /// @details Initial data can be used to fire the build callback only once in the lifetime
+        /// of this FutureBuilder, the first time initialData() and builder() are defined.
         FutureBuilder& initialData(const futureValue_t& value)
         {
             if (!_initialDataBuildDone) {

@@ -23,8 +23,6 @@ namespace widgets {
     /// The Flex widget does not allow its children to wrap across multiple horizontal or vertical
     /// runs. For a widget that allows its children to wrap, consider using the Wrap widget instead
     /// of Flex.
-    /// If you only have one child, then rather than using Flex, Row, or Column, consider using
-    /// Align or Center to position the child.
     struct Flex {
 
         template <typename... children_widgets_t>

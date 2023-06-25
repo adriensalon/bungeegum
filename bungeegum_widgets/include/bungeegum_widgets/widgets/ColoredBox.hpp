@@ -2,7 +2,6 @@
 
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum_widgets/core/Color.hpp>
-#include <bungeegum_widgets/widgets/Align.hpp>
 
 namespace bungeegum {
 namespace widgets {
@@ -12,13 +11,13 @@ namespace widgets {
     struct ColoredBox {
 
         /// @brief The widget below this widget in the tree.
-        template <typename child_widget_t>
-        ColoredBox& child(child_widget_t& value)
+        template <typename childWidget_t>
+        ColoredBox& child(childWidget_t& value)
         {
-            if (_child.has_value())
-                abandon(this, _child.value());
-            _child = runtime_widget(value);
-            adopt(this, _child.value());
+            if (_childWidget.has_value())
+                abandon(this, _childWidget.value());
+            _childWidget = runtime_widget(value);
+            adopt(this, _childWidget.value());
             return *this;
         }
 
@@ -31,7 +30,7 @@ namespace widgets {
         void draw(draw_command& command);
 
         Color _color = { 0xFF000000 };
-        std::optional<runtime_widget> _child = std::nullopt;
+        std::optional<runtime_widget> _childWidget = std::nullopt;
     };
 }
 }
