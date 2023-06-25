@@ -81,6 +81,139 @@ my_update_callback();
 ImGui::Render();
 ```
 
+## Limitations
+
+### Images, fonts, shaders, transform, stencil clipping and assets
+
+### Multithreading and optimization
+
+## Flutter widgets
+
+Lists all widgets specified here : https://docs.flutter.dev/ui/widgets/
+Few widgets can't be implemented as for now and don't appear in this list
+
+__Accessibility__
+- 📕 ExcludeSemantics  
+- 📕 MergeSemantics  
+- 📕 Semantics  
+
+__Animation and motion__
+- 📕 AnimatedAlign
+- 📕 AnimatededBuilder
+- 📕 AnimatedContainer
+- 📕 AnimatedCrossFade
+- 📕 AnimatedDefaultTextStyle
+- 📕 AnimatedList
+- 📕 AnimatedModalBarrier
+- 📕 AnimatedOpacity
+- 📕 AnimatedPositioned
+- 📕 AnimatedSize
+- 📕 AnimatedWidget
+- 📕 DecoratedBoxTransition
+- 📕 FadeTransition
+- 📕 Hero
+- 📕 PositionedTransition
+- 📕 RotationTransition
+- 📕 ScaleTransition
+- 📕 SizeTransition
+- 📕 SlideTransition
+
+__Assets, Images and Icons__
+- 📕 AssetBundle ?
+- 📕 Icon
+- 📕 Image
+- 📕 RawImage
+
+__Async__
+- 📗 FutureBuilder
+- 📗 StreamBuilder
+
+__Basics__
+- 📕 Container
+- 📕 MediaQuery
+- 📕 Placeholder
+
+__Input__
+- 📕 Form
+- 📕 FormField
+- 📕 RawKeyboardListener
+
+__Interaction model__
+- 📕 AbsorbPointer
+- 📕 Dismissible
+- 📕 DragTarget
+- 📕 Draggable
+- 📕 GestureDetector
+- 📕 IgnorePointer
+- 📕 InteractiveViewer
+- 📕 LongPressDraggable
+
+__Layout__ (Single child)
+- 📗 Align
+- 📕 AspectRatio
+- 📕 Baseline ?
+- 📗 Center
+- 📗 ConstrainedBox
+- 📗 CustomSingleChildLayout
+- 📕 Expanded
+- 📕 FittedBox
+- 📕 FractionnalySizedBox
+- 📕 IntrinsicHeight
+- 📕 IntrinsicWidth
+- 📗 LimitedBox
+- 📕 Offstage
+- 📕 OverflowBox
+- 📗 Padding
+- 📗 SizedBox
+- 📕 SizedOverflowBox
+
+__Layout__ (Multi child)
+- 📕 Column
+- 📕 CustomMultiChildLayout
+- 📕 Flow
+- 📕 GridView
+- 📕 IndexedStack
+- 📕 LayoutBuilder
+- 📕 ListBody
+- 📕 ListView
+- 📕 Row
+- 📕 Stack
+- 📕 Table
+- 📕 Wrap
+
+__Layout__ (Sliver)
+- 📕 CustomScrollView
+- 📕 SliverChildBuilderDelegate
+- 📕 SliverChildListDelegate
+- 📕 SliverFixedExtentList
+- 📕 SliverGrid
+- 📕 SliverList
+- 📕 SliverPadding
+- 📕 SliverPersistentHeader
+- 📕 SliverToBoxAdapter
+
+__Painting__
+- 📕 CustomPainter
+- 📕 DecoratedBox
+- 📕 FractionalTranslation
+- 📕 Opacity
+- 📕 RotatedBox
+- 📕 Transform
+
+__Scrolling__
+- 📕 CustomScrollView
+- 📕 DraggableScrollableSheet
+- 📕 NestedScrollView
+- 📕 NotificationListener
+- 📕 ScrollConfiguration
+- 📕 Scrollable
+- 📕 SingleChildScrollView
+
+__Text__
+- 📕 DefaultTextStyle
+- 📕 RichText
+- 📕 Text
+
 ## Implementing widgets
 
 No macro or inheritance is required to implement widget classes. The `bungeegum::adopt` function registers widgets as children of the current widget. It can be called at any time, but usually widgets call it within their `child` or `children` methods to mimic the syntax of Flutter. We can use it inside our constructor to implement a basic widget with composition.
@@ -294,11 +427,6 @@ void draw(bungeegum::draw_command& command)
 }
 ```
 
-## Limitations
-
-### Images, fonts, shaders and assets
-
-### Multithreading and optimization
 
 
 ## External dependencies
