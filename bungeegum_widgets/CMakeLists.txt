@@ -14,6 +14,7 @@ set(bungeegum_widgets_source
 	"source/core/Size.cpp"
 
 	"source/widgets/Align.cpp"
+	"source/widgets/AspectRatio.cpp"
 	"source/widgets/Center.cpp"
 	"source/widgets/ColoredBox.cpp"
 	"source/widgets/ConstrainedBox.cpp"
@@ -22,6 +23,7 @@ set(bungeegum_widgets_source
 	"source/widgets/Flex.cpp"
 	"source/widgets/LimitedBox.cpp"
 	"source/widgets/MouseRegion.cpp"
+	"source/widgets/OverflowBox.cpp"
 	"source/widgets/Padding.cpp"
 	"source/widgets/SizedBox.cpp"
 	"source/widgets/StreamBuilder.cpp"

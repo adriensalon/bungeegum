@@ -149,10 +149,10 @@ __Interaction model__
 - 📕 LongPressDraggable
 
 __Layout__ (Single child)
-- 📗 Align
+- 📙 Align
 - 📕 AspectRatio
 - 📕 Baseline ?
-- 📗 Center
+- 📙 Center
 - 📗 ConstrainedBox
 - 📗 CustomSingleChildLayout
 - 📕 Expanded
@@ -162,7 +162,7 @@ __Layout__ (Single child)
 - 📕 IntrinsicWidth
 - 📗 LimitedBox
 - 📕 Offstage
-- 📕 OverflowBox
+- 📙 OverflowBox
 - 📗 Padding
 - 📗 SizedBox
 - 📕 SizedOverflowBox

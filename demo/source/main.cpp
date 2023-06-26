@@ -71,7 +71,7 @@ int main()
                                                         }))
                                                         .builder([&_osstream2](const bool value) -> bungeegum::runtime_widget {
                                                             if (value) {
-                                                                auto fff = std::async([&_osstream2]() {
+                                                                static auto fff = std::async([&_osstream2]() {
                                                                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                                                                     _osstream2 << "Helloooooo4466" << std::endl;
                                                                 });
@@ -81,13 +81,30 @@ int main()
                                                                     .builder([&_osstream2](const std::wstring& message) -> bungeegum::runtime_widget {
                                                                         std::wcout << message;
 
-                                                                        return bungeegum::make<ColoredBox>().color(0xFF6611FF);
+                                                                        return bungeegum::make<OverflowBox>()
+                                                                            .maxHeight(40.f)
+                                                                            .minHeight(10.f)
+                                                                            .maxWidth(500.f)
+                                                                            .minWidth(500.f)
+                                                                            .child(
+                                                                                bungeegum::make<ColoredBox>()
+                                                                                    .color(0xFF8899FF));
                                                                     })
                                                                     .stream(_osstream2);
                                                             }
                                                             return bungeegum::make<Padding>()
                                                                 .padding(EdgeInsets::fromLTRB(44.f, 10.f, 15.f, 5.f))
-                                                                .child(bungeegum::make<ColoredBox>().color(0xFF6611FF));
+                                                                .child(
+                                                                    bungeegum::make<OverflowBox>()
+                                                                        .maxHeight(400.f)
+                                                                        .minHeight(100.f)
+                                                                        .maxWidth(50.f)
+                                                                        .minWidth(50.f)
+                                                                        .child(
+                                                                            bungeegum::make<ColoredBox>()
+                                                                                .color(0xFF6611FF))
+
+                                                                );
                                                         }))
 
                                           ))
