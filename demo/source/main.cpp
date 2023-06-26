@@ -33,6 +33,17 @@ struct delegateTest {
     }
 };
 
+template <typename id_t>
+struct multiDelegateTest {
+
+    Size getSize(const BoxConstraints constraints)
+    {
+        Size _wantedSize(200.f, 200.f);
+        Size _constrainedSize = constraints.constrain(_wantedSize);
+        return _constrainedSize;
+    }
+};
+
 /// TEST PR MultiChildLayoutDelegate OK !!!
 /// TEST PR MultiChildLayoutDelegate OK !!!
 /// TEST PR MultiChildLayoutDelegate OK !!!
@@ -63,6 +74,7 @@ constexpr inline bool hasMyMethodFunction = bungeegum::detail::is_detected_exact
 
 int main()
 {
+    MultiChildLayoutDelegate<multiDelegateTest, int> _dellll;
     /// TEST PR MultiChildLayoutDelegate OK !!!
     /// TEST PR MultiChildLayoutDelegate OK !!!
     /// TEST PR MultiChildLayoutDelegate OK !!!

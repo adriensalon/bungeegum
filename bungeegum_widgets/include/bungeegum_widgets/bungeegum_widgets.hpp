@@ -3,6 +3,7 @@
 #include <bungeegum_widgets/core/BoxDecoration.hpp>
 #include <bungeegum_widgets/core/Color.hpp>
 #include <bungeegum_widgets/core/EdgeInsets.hpp>
+#include <bungeegum_widgets/core/MultiChildLayoutDelegate.hpp>
 #include <bungeegum_widgets/core/Offset.hpp>
 #include <bungeegum_widgets/core/Rect.hpp>
 #include <bungeegum_widgets/core/ShapeDecoration.hpp>
