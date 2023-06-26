@@ -162,7 +162,7 @@ __Layout__ (Single child)
 - 📕 IntrinsicWidth
 - 📗 LimitedBox
 - 📕 Offstage
-- 📙 OverflowBox
+- 📗 OverflowBox
 - 📗 Padding
 - 📗 SizedBox
 - 📕 SizedOverflowBox

@@ -33,8 +33,49 @@ struct delegateTest {
     }
 };
 
+/// TEST PR MultiChildLayoutDelegate OK !!!
+/// TEST PR MultiChildLayoutDelegate OK !!!
+/// TEST PR MultiChildLayoutDelegate OK !!!
+
+template <typename value_t>
+struct myStruct {
+
+    void myMethod(value_t i)
+    {
+        std::cout << " okok" << std::endl;
+    }
+
+    value_t v;
+    int i;
+};
+
+template myStruct<int>;
+
+template <typename container_t, typename value_t>
+using myMethodFunction = decltype(std::declval<container_t>().myMethod(std::declval<value_t>()));
+
+template <template <typename> typename container_t, typename value_t>
+constexpr inline bool hasMyMethodFunction = bungeegum::detail::is_detected_exact_v<void, myMethodFunction, container_t<value_t>, value_t>;
+
+/// TEST PR MultiChildLayoutDelegate OK !!!
+/// TEST PR MultiChildLayoutDelegate OK !!!
+/// TEST PR MultiChildLayoutDelegate OK !!!
+
 int main()
 {
+    /// TEST PR MultiChildLayoutDelegate OK !!!
+    /// TEST PR MultiChildLayoutDelegate OK !!!
+    /// TEST PR MultiChildLayoutDelegate OK !!!
+    myStruct<int> kkkk;
+    kkkk.i = 55;
+
+    constexpr bool okokokokok = hasMyMethodFunction<myStruct, std::string>;
+    std::cout << okokokokok << std::endl;
+
+    /// TEST PR MultiChildLayoutDelegate OK !!!
+    /// TEST PR MultiChildLayoutDelegate OK !!!
+    /// TEST PR MultiChildLayoutDelegate OK !!!
+
     std::list<bungeegum::runtime_widget> _children;
     bungeegum::get_children_with_property<float>(bungeegum::make<Align>(), "okok", _children);
 
