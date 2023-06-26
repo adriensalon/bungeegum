@@ -66,9 +66,13 @@ void abandon(const runtime_widget& parent_widget, const runtime_widget& child_wi
     detail::untyped_widget_data& _widget_data = detail::widgets_context.get_widget_data(parent_widget);
     detail::untyped_widget_data& _child_widget_data = detail::widgets_context.get_widget_data(child_widget);
     _child_widget_data.parent = std::nullopt;
-    (void)_widget_data;
-    // TODO HEIN
-    // _widget_data.children.erase(_child_widget_data);
+    for (int1 _k = 0; _k < _widget_data.children.size(); _k++) {
+        detail::untyped_widget_data& _loop_child_widget_data = _widget_data.children[_k].get();
+        if (_loop_child_widget_data == _child_widget_data) {
+            _widget_data.children.erase(_widget_data.children.begin() + _k);
+            break;
+        }
+    }
 }
 
 bool has_parent(const runtime_widget& widget)

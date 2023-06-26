@@ -26,7 +26,11 @@ namespace widgets {
             if (!_flushCallback) {
                 throw_error("Error in StreamBuilder.cpp : _flushCallback is nullptr");
             }
-            _flushCallback(buffer);
+            if (_childWidget.has_value())
+                abandon(this, _childWidget.value());
+            _childWidget = _flushCallback(buffer);
+            adopt(this, _childWidget.value());
+            must_resolve(this);
         };
         using _char_type = StreamBuilderBuffer::char_type;
         std::streambuf* _formerStreambuf = stream.basic_ios<_char_type>::rdbuf(&_customBuffer.value());
@@ -127,7 +131,11 @@ namespace widgets {
             if (!_flushCallback) {
                 throw_error("Error in StreamBuilder.cpp : _flushCallback is nullptr");
             }
-            _flushCallback(buffer);
+            if (_childWidget.has_value())
+                abandon(this, _childWidget.value());
+            _childWidget = _flushCallback(buffer);
+            adopt(this, _childWidget.value());
+            must_resolve(this);
         };
         using _char_type = WideStreamBuilderBuffer::char_type;
         std::wstreambuf* _formerStreambuf = stream.basic_ios<_char_type>::rdbuf(&_customBuffer.value());
