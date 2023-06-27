@@ -65,6 +65,8 @@ namespace widgets {
         } else if (!_childWidget.has_value()) {
             throw_error("Error TODO");
         } else {
+            // je pense qu'il faut avoir le parent de la taille biggest
+            // et ajuster plutot la taille du child avec les if else
             float2 _childSize = command.resolve_child(_childWidget.value(), zero<float2>, _biggest);
             float2 _alignSize = zero<float2>;
             if (_hasConstrainedSize.x) {

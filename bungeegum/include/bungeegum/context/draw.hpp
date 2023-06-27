@@ -14,12 +14,21 @@ struct draw_command {
     /// @brief
     [[nodiscard]] float2 resolved_size() const;
 
+    /// @brief Sets the clipping rectangle for all the commands issued to this widget and all the
+    /// commands issued by its children.
+    /// @param first_point is the minimum point for this clipping rectangle
+    /// @param second_point is the maximum point for this clipping rectangle
+    /// @param intersect_with_current_clip_rect defines if we account for
+    void clip_rect(
+        const float2 first_point, const float2 second_point,
+        const bool1 intersect_with_current_clip_rect);
+
     /// @brief
     /// @param first_point
     /// @param second_point
     /// @param intersect_with_current_clip_rect
     /// @param clipped_callback
-    void clip_rect(
+    void clip_temporary_rect(
         const float2 first_point, const float2 second_point,
         const bool1 intersect_with_current_clip_rect,
         const std::function<void(draw_command&)>& clipped_callback);

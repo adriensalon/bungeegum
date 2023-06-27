@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <vector>
 
 #include <bungeegum/glue/simd.hpp>
@@ -21,6 +22,13 @@ namespace detail {
         float2 resolved_position = zero<float2>;
         float2 resolved_size = zero<float2>;
         std::vector<std::function<void(ImDrawList*)>> commands = {};
+
+        struct clip_data {
+            float2 first_point = zero<float2>;
+            float2 second_point = infinity<float2>;
+            bool1 intersect_with_existing = true;
+        };
+        std::optional<clip_data> clipping = std::nullopt;
 
         void draw(ImDrawList* imgui_drawlist);
         void draw();

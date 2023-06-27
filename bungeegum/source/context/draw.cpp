@@ -60,6 +60,17 @@ float2 draw_command::resolved_size() const
 
 void draw_command::clip_rect(
     const float2 first_point, const float2 second_point,
+    const bool1 intersect_with_current_clip_rect)
+{
+    _data.clipping = {
+        first_point,
+        second_point,
+        intersect_with_current_clip_rect
+    };
+}
+
+void draw_command::clip_temporary_rect(
+    const float2 first_point, const float2 second_point,
     const bool1 intersect_with_current_clip_rect,
     const std::function<void(draw_command&)>& clipped_callback)
 {

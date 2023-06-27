@@ -55,7 +55,7 @@ int main()
                               bungeegum::make<Align>()
                                   .alignment(Alignment::center())
 
-                                  //   .heightFactor(2.f) // LOL NE MARCHE PAS
+                                  .heightFactor(2.f) // LOL NE MARCHE PAS
                                   //   .widthFactor(2.f) // LOL NE MARCHE PAS
                                   .child(bungeegum::make<CustomSingleChildLayout>()
                                              .delegate<delegateTest>()
