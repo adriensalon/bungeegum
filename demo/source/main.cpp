@@ -8,11 +8,6 @@ using namespace bungeegum::widgets;
 
 struct delegateTest {
 
-    delegateTest()
-    {
-        // bungeegum::runtime_property<float> _rp2(this, "okok", 45.f);
-    }
-
     BoxConstraints getConstraintsForChild(const BoxConstraints constraints)
     {
         Size _wantedSize(200.f, 200.f);
@@ -33,7 +28,6 @@ struct delegateTest {
     }
 };
 
-template <typename id_t>
 struct multiDelegateTest {
 
     Size getSize(const BoxConstraints constraints)
@@ -42,62 +36,16 @@ struct multiDelegateTest {
         Size _constrainedSize = constraints.constrain(_wantedSize);
         return _constrainedSize;
     }
-};
 
-/// TEST PR MultiChildLayoutDelegate OK !!!
-/// TEST PR MultiChildLayoutDelegate OK !!!
-/// TEST PR MultiChildLayoutDelegate OK !!!
-
-template <typename value_t>
-struct myStruct {
-
-    void myMethod(value_t i)
+    void performLayout(const Size size, LayoutCommand<std::string>& command)
     {
-        std::cout << " okok" << std::endl;
+        (void)size;
+        (void)command;
     }
-
-    value_t v;
-    int i;
 };
-
-template myStruct<int>;
-
-template <typename container_t, typename value_t>
-using myMethodFunction = decltype(std::declval<container_t>().myMethod(std::declval<value_t>()));
-
-template <template <typename> typename container_t, typename value_t>
-constexpr inline bool hasMyMethodFunction = bungeegum::detail::is_detected_exact_v<void, myMethodFunction, container_t<value_t>, value_t>;
-
-/// TEST PR MultiChildLayoutDelegate OK !!!
-/// TEST PR MultiChildLayoutDelegate OK !!!
-/// TEST PR MultiChildLayoutDelegate OK !!!
 
 int main()
 {
-    MultiChildLayoutDelegate<multiDelegateTest, int> _dellll;
-    /// TEST PR MultiChildLayoutDelegate OK !!!
-    /// TEST PR MultiChildLayoutDelegate OK !!!
-    /// TEST PR MultiChildLayoutDelegate OK !!!
-    myStruct<int> kkkk;
-    kkkk.i = 55;
-
-    constexpr bool okokokokok = hasMyMethodFunction<myStruct, std::string>;
-    std::cout << okokokokok << std::endl;
-
-    /// TEST PR MultiChildLayoutDelegate OK !!!
-    /// TEST PR MultiChildLayoutDelegate OK !!!
-    /// TEST PR MultiChildLayoutDelegate OK !!!
-
-    std::list<bungeegum::runtime_widget> _children;
-    bungeegum::get_children_with_property<float>(bungeegum::make<Align>(), "okok", _children);
-
-    // std::ostringstream _osstream;
-    // bungeegum::widgets::detail::StreamBuilderBuffer _evb(_osstream, 512u);
-    // _osstream.basic_ios<char>::rdbuf(&_evb);
-    // _evb.flushCallback = [](const std::string& str) {
-    //     std::cout << str;
-    // };
-    // _osstream << "Helloooooo4466" << std::endl;
 
     std::wostringstream _osstream2;
 
@@ -155,7 +103,23 @@ int main()
                                                                         .minWidth(50.f)
                                                                         .child(
                                                                             bungeegum::make<ColoredBox>()
-                                                                                .color(0xFF6611FF))
+                                                                                .color(0xFF6611FF)
+                                                                                .child(bungeegum::make<CustomMultiChildLayout<std::string>>()
+                                                                                           .delegate<multiDelegateTest>()
+                                                                                           .children({
+                                                                                               bungeegum::make<LayoutId<std::string>>()
+                                                                                                   .id("1st")
+                                                                                                   .child(bungeegum::make<ColoredBox>()
+                                                                                                              .color(0xFF8899FF)),
+                                                                                               bungeegum::make<LayoutId<std::string>>()
+                                                                                                   .id("2nd")
+                                                                                                   .child(bungeegum::make<ColoredBox>()
+                                                                                                              .color(0xFF8899FF)),
+                                                                                               bungeegum::make<LayoutId<std::string>>()
+                                                                                                   .id("3rd")
+                                                                                                   .child(bungeegum::make<ColoredBox>()
+                                                                                                              .color(0xFF8899FF)),
+                                                                                           })))
 
                                                                 );
                                                         }))

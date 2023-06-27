@@ -15,9 +15,11 @@
 #include <bungeegum_widgets/widgets/ColoredBox.hpp>
 #include <bungeegum_widgets/widgets/ConstrainedBox.hpp>
 #include <bungeegum_widgets/widgets/Container.hpp>
+#include <bungeegum_widgets/widgets/CustomMultiChildLayout.hpp>
 #include <bungeegum_widgets/widgets/CustomSingleChildLayout.hpp>
 #include <bungeegum_widgets/widgets/Flex.hpp>
 #include <bungeegum_widgets/widgets/FutureBuilder.hpp>
+#include <bungeegum_widgets/widgets/LayoutId.hpp>
 #include <bungeegum_widgets/widgets/LimitedBox.hpp>
 #include <bungeegum_widgets/widgets/OverflowBox.hpp>
 #include <bungeegum_widgets/widgets/Padding.hpp>

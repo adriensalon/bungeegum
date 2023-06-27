@@ -169,7 +169,7 @@ __Layout__ (Single child)
 
 __Layout__ (Multi child)
 - 📕 Column
-- 📕 CustomMultiChildLayout
+- 📙 CustomMultiChildLayout
 - 📕 Flow
 - 📕 GridView
 - 📕 IndexedStack
