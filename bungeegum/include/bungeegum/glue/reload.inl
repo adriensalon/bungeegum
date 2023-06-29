@@ -3,6 +3,8 @@
 namespace bungeegum {
 namespace detail {
 
+    // unique_reference
+
     template <typename widget_t>
     unique_reference<widget_t>::unique_reference(unique_reference<widget_t>&& other)
     {
@@ -29,6 +31,18 @@ namespace detail {
         return *(_ref.GetMemory());
     }
 
+    template <typename widget_t>
+    unique_reference<widget_t>::unique_reference(hscpp::mem::UniqueRef<widget_t>&& ref)
+        : _ref(std::move(ref))
+    {
+    }
+
+    // free
+
+    template <typename widget_t>
+    unique_reference<widget_t> allocate()
+    {
+    }
 }
 }
 

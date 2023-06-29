@@ -13,6 +13,7 @@ set(bungeegum_source
 	"source/glue/curve.cpp"
 	"source/glue/imguarded.cpp"
 	"source/glue/registry.cpp"
+	"source/glue/reload.cpp"
 	"source/glue/time.cpp"
 
 	"source/context/context.cpp"

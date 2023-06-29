@@ -1,13 +1,36 @@
 #pragma once
 
+#include <hscpp/Hotswapper.h>
+#include <hscpp/mem/MemoryManager.h>
 #include <hscpp/mem/Ref.h>
+#include <hscpp/module/Tracker.h>
+
+#include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
 namespace detail {
 
+#define BUNGEEGUM_ENBALE_HOTRELOAD 1
+
+#if defined(BUNGEEGUM_ENBALE_HOTRELOAD)
+
+#define HOTRELOAD_CLASS(class, name) HSCPP_TRACK(class, name)
+#define HOTRELOAD_METHOD hscpp_virtual
+#define HOTRELOAD_FIELDS(...)                             \
+    template <typename archive_t, typename... args_t>     \
+    void _serialize(archive_t& archive, args_t&&... args) \
+    {                                                     \
+        (archive(args), ...);                             \
+    }                                                     \
+    template <typename archive_t>                         \
+    void serialize(archive_t& archive)                    \
+    {                                                     \
+        _serialize(archive, __VA_ARGS__);                 \
+    }
+
     template <typename widget_t>
     struct unique_reference {
-        unique_reference() = default;
+        unique_reference() = delete;
         unique_reference(const unique_reference& other) = delete;
         unique_reference& operator=(const unique_reference& other) = delete;
         unique_reference(unique_reference&& other);
@@ -18,8 +41,29 @@ namespace detail {
 
     private:
         hscpp::mem::UniqueRef<widget_t> _ref;
+        unique_reference(hscpp::mem::UniqueRef<widget_t>&& ref);
     };
 
+    struct reload_manager {
+
+        template <typename widget_t>
+        unique_reference<widget_t> allocate();
+
+        uint1 allocated_blocks_count();
+        void update();
+        // set source callbacks etc
+
+    private:
+        hscpp::Hotswapper _swapper;
+        unique_reference<hscpp::mem::MemoryManager> _manager;
+    };
+
+#else
+
+    template <typename widget_t>
+    using unique_reference = widget_t&;
+
+#endif
 }
 }
 

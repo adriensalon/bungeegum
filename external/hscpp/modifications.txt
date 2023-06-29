@@ -1,0 +1,7 @@
++ dans <hscpp/module/Tracker.hpp>
+Tracker() = default;
+Tracker(Tracker&& rhs) = default;
+Tracker& operator=(Tracker&& rhs) = default;
+
++ dans <hscpp/Platform.hpp>
+#define NOMINMAX

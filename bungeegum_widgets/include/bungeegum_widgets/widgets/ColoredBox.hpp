@@ -31,6 +31,10 @@ namespace widgets {
 
         Color _color = { 0xFF000000 };
         std::optional<runtime_widget> _childWidget = std::nullopt;
+
+        HOTRELOAD_CLASS(ColoredBox, "ok");
+
+        HOTRELOAD_FIELDS(_color, _childWidget)
     };
 }
 }
