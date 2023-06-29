@@ -31,7 +31,7 @@ struct access {
             };
 #else
             _widget_data.drawer = [entity](draw_command& command) {
-                widget_t& _widget = detail::widgets_context.widgets.get_component<detail::unique_reference<widget_t>>(entity).get();
+                widget_t& _widget = detail::widgets_context.widgets.get_component<detail::reloaded<widget_t>>(entity).get();
                 _widget.draw(command);
 #endif
         };
@@ -78,7 +78,7 @@ struct access {
             };
 #else
             _widget_data.resolver = [entity](resolve_command& command) {
-                widget_t& _widget = detail::widgets_context.widgets.get_component<detail::unique_reference<widget_t>>(entity).get();
+                widget_t& _widget = detail::widgets_context.widgets.get_component<detail::reloaded<widget_t>>(entity).get();
                 _widget.resolve(command);
             };
 #endif

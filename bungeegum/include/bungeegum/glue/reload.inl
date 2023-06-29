@@ -4,35 +4,35 @@
 namespace bungeegum {
 namespace detail {
 
-    // unique_reference
+    // reloaded
 
     template <typename widget_t>
-    unique_reference<widget_t>::unique_reference(unique_reference<widget_t>&& other)
+    reloaded<widget_t>::reloaded(reloaded<widget_t>&& other)
     {
         *this = std::move(other);
     }
 
     template <typename widget_t>
-    unique_reference<widget_t>& unique_reference<widget_t>::operator=(unique_reference<widget_t>&& other)
+    reloaded<widget_t>& reloaded<widget_t>::operator=(reloaded<widget_t>&& other)
     {
         _ref = std::move(other._ref);
         return *this;
     }
 
     template <typename widget_t>
-    widget_t& unique_reference<widget_t>::get()
+    widget_t& reloaded<widget_t>::get()
     {
         return *(_ref.operator->());
     }
 
     template <typename widget_t>
-    const widget_t& unique_reference<widget_t>::get() const
+    const widget_t& reloaded<widget_t>::get() const
     {
         return *(_ref.operator->());
     }
 
     template <typename widget_t>
-    unique_reference<widget_t>::unique_reference(hscpp::mem::UniqueRef<widget_t>&& ref)
+    reloaded<widget_t>::reloaded(hscpp::mem::UniqueRef<widget_t>&& ref)
         : _ref(std::move(ref))
     {
     }
@@ -40,7 +40,7 @@ namespace detail {
     // reload_manager
 
     template <typename widget_t>
-    unique_reference<widget_t> reload_manager::allocate()
+    reloaded<widget_t> reloader::allocate()
     {
         return _manager.get()->operator->()->Allocate<widget_t>();
     }

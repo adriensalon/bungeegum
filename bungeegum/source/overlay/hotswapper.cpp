@@ -16,7 +16,7 @@ namespace detail {
 
             // button ?
             if (ImGui::Button("Trigger hotswap")) {
-                detail::reloader->force_update();
+                detail::reload_manager->force_update();
             }
         }
         ImGui::End();

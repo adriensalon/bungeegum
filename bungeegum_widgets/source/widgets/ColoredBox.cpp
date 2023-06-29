@@ -11,7 +11,6 @@ namespace widgets {
 
     void ColoredBox::resolve(resolve_command& command)
     {
-        // (void)command;
         if (_childWidget.has_value()) {
             float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
             command.position_child(_childWidget.value(), zero<float2>);

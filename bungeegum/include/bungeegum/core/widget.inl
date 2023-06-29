@@ -146,9 +146,9 @@ widget_t& make(widget_args_t&&... widget_args)
 	widget_t& _widget = detail::widgets_context.widgets.create_component<widget_t>(_entity, std::forward<widget_args_t>(widget_args)...);
     std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(_widget);
 #else
-    detail::unique_reference<widget_t>& _widget_reference = detail::widgets_context.widgets.create_component<detail::unique_reference<widget_t>>(_entity);
+    detail::reloaded<widget_t>& _widget_reference = detail::widgets_context.widgets.create_component<detail::reloaded<widget_t>>(_entity);
     // copy or move from args
-    _widget_reference = detail::reloader->allocate<widget_t>();
+    _widget_reference = detail::reload_manager->allocate<widget_t>();
     std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(_widget_reference.get());
 #endif
 

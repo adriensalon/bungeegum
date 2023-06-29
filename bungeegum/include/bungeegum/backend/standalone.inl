@@ -30,20 +30,20 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
         //
         //
         // #if BUNGEEGUM_ENABLE_HOTRELOAD
-        if (!detail::reloader) {
-            detail::reloader = std::make_unique<detail::reload_manager>();
+        if (!detail::reload_manager) {
+            detail::reload_manager = std::make_unique<detail::reloader>();
         }
-        for (std::filesystem::path& _include_directory : detail::include_directories) {
-            detail::reloader->add_include_directory(_include_directory);
+        for (std::filesystem::path& _include_directory : detail::reload_include_directories) {
+            detail::reload_manager->add_include_directory(_include_directory);
         }
-        for (std::filesystem::path& _library : detail::libraries) {
-            detail::reloader->add_library(_library);
+        for (std::filesystem::path& _library : detail::reload_libraries) {
+            detail::reload_manager->add_library(_library);
         }
-        for (std::filesystem::path& _source_directory : detail::source_directories) {
-            detail::reloader->add_source_directory(_source_directory);
+        for (std::filesystem::path& _source_directory : detail::reload_source_directories) {
+            detail::reload_manager->add_source_directory(_source_directory);
         }
-        for (std::filesystem::path& _force_compiled_source_file : detail::force_compiled_source_files) {
-            detail::reloader->add_force_compiled_source_file(_force_compiled_source_file);
+        for (std::filesystem::path& _force_compiled_source_file : detail::reload_force_compiled_source_files) {
+            detail::reload_manager->add_force_compiled_source_file(_force_compiled_source_file);
         }
         // #endif
         //
@@ -74,7 +74,7 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
 
             //
             //
-            detail::reloader->update();
+            detail::reload_manager->update();
             //
             //
         });

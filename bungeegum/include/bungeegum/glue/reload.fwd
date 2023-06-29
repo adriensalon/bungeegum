@@ -43,14 +43,17 @@ namespace detail {
     friend class cereal::access;
 
     template <typename widget_t>
-    struct unique_reference;
+    struct reloaded;
 
-    struct reload_manager {
-
-        reload_manager();
+    struct reloader {
+        reloader();
+        reloader(const reloader& other) = delete;
+        reloader& operator=(const reloader& other) = delete;
+        reloader(reloader&& other) = default;
+        reloader& operator=(reloader&& other) = default;
 
         template <typename widget_t>
-        unique_reference<widget_t> allocate();
+        reloaded<widget_t> allocate();
 
         uint1 allocated_blocks_count();
         void add_include_directory(const std::filesystem::path& directory);
@@ -66,26 +69,26 @@ namespace detail {
     };
 
     template <typename widget_t>
-    struct unique_reference {
-        unique_reference() = default;
-        unique_reference(const unique_reference& other) = delete;
-        unique_reference& operator=(const unique_reference& other) = delete;
-        unique_reference(unique_reference&& other);
-        unique_reference& operator=(unique_reference&& other);
+    struct reloaded {
+        reloaded() = default;
+        reloaded(const reloaded& other) = delete;
+        reloaded& operator=(const reloaded& other) = delete;
+        reloaded(reloaded&& other);
+        reloaded& operator=(reloaded&& other);
 
         widget_t& get();
         const widget_t& get() const;
 
     private:
         hscpp::mem::UniqueRef<widget_t> _ref;
-        unique_reference(hscpp::mem::UniqueRef<widget_t>&& ref);
-        friend struct reload_manager;
+        reloaded(hscpp::mem::UniqueRef<widget_t>&& ref);
+        friend struct reloader;
     };
 
 #else
 
     template <typename widget_t>
-    using unique_reference = widget_t&;
+    using reloaded = widget_t&;
 
 #endif
 }

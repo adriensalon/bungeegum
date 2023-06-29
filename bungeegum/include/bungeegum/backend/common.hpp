@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/glue/reload.fwd>
+#include <bungeegum/backend/common.fwd>
 
 namespace bungeegum {
 

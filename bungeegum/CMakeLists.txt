@@ -6,6 +6,7 @@ option(BUNGEEGUM_ENABLE_OVERLAY "Enables an overlay diplaying errors etc" ON)
 
 set(bungeegum_source
 
+	"source/backend/common.cpp"
 	"source/backend/standalone.cpp"
 
 	"source/glue/backtrace.cpp"
@@ -22,7 +23,6 @@ set(bungeegum_source
 	"source/context/resolve.cpp"
 
 	"source/core/exceptions.cpp"
-	"source/core/hotreload.cpp"
 	"source/core/widget.cpp"
 
 	"source/overlay/compressed/fa4.cpp"

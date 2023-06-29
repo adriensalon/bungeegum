@@ -11,10 +11,10 @@ namespace bungeegum {
 namespace detail {
 
     inline uint2 viewport_size = zero<float2>;
-    inline std::unique_ptr<reload_manager> reloader = nullptr;
-    inline std::list<std::filesystem::path> include_directories = {};
-    inline std::list<std::filesystem::path> libraries = {};
-    inline std::list<std::filesystem::path> source_directories = {};
-    inline std::list<std::filesystem::path> force_compiled_source_files = {};
+    inline std::unique_ptr<reloader> reload_manager = nullptr;
+    inline std::list<std::filesystem::path> reload_include_directories = {};
+    inline std::list<std::filesystem::path> reload_libraries = {};
+    inline std::list<std::filesystem::path> reload_source_directories = {};
+    inline std::list<std::filesystem::path> reload_force_compiled_source_files = {};
 }
 }
