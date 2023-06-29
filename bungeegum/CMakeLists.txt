@@ -62,6 +62,8 @@ target_link_libraries(bungeegum imgui)
 target_link_libraries(bungeegum implot)
 target_link_libraries(bungeegum tinysplinecxx)
 target_link_libraries(bungeegum EnTT)
+target_link_libraries(bungeegum hscpp)
+target_link_libraries(bungeegum hscpp-mem)
 
 if(BUNGEEGUM_ENABLE_STANDALONE)
 	target_link_libraries(bungeegum SDL2-static)

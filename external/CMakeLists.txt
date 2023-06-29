@@ -5,6 +5,11 @@ add_subdirectory("tinyspline")
 add_subdirectory("entt")
 add_subdirectory("backwardcpp")
 
+add_subdirectory("hscpp")
+set(HSCPP_EXAMPLES OFF)
+set(HSCPP_TEST OFF)
+set(HSCPP_BUILD_EXTENSION_MEM ON)
+
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)

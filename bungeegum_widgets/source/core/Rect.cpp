@@ -48,10 +48,10 @@ namespace widgets {
         float1 _bdx = b.dx();
         float1 _bdy = b.dy();
         return fromLTRB(
-            std::min(_adx, _bdx),
-            std::min(_ady, _bdy),
-            std::max(_adx, _bdx),
-            std::max(_ady, _bdy));
+            glm::min(_adx, _bdx),
+            glm::min(_ady, _bdy),
+            glm::max(_adx, _bdx),
+            glm::max(_ady, _bdy));
     }
 
     // float1 Rect::bottom() const

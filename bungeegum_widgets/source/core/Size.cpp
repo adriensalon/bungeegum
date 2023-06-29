@@ -73,12 +73,12 @@ namespace widgets {
 
     float1 Size::longestSide() const
     {
-        return std::max(std::abs(_value.x), std::abs(_value.y));
+        return glm::max(glm::abs(_value.x), glm::abs(_value.y));
     }
 
     float1 Size::shortestSide() const
     {
-        return std::min(std::abs(_value.x), std::abs(_value.y));
+        return glm::min(glm::abs(_value.x), glm::abs(_value.y));
     }
 
     float1 Size::width() const

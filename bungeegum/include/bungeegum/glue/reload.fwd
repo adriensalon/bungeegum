@@ -1,0 +1,26 @@
+#pragma once
+
+#include <hscpp/mem/Ref.h>
+
+namespace bungeegum {
+namespace detail {
+
+    template <typename widget_t>
+    struct unique_reference {
+        unique_reference() = default;
+        unique_reference(const unique_reference& other) = delete;
+        unique_reference& operator=(const unique_reference& other) = delete;
+        unique_reference(unique_reference&& other);
+        unique_reference& operator=(unique_reference&& other);
+
+        widget_t& get();
+        const widget_t& get() const;
+
+    private:
+        hscpp::mem::UniqueRef<widget_t> _ref;
+    };
+
+}
+}
+
+#include <bungeegum/glue/reload.inl>
