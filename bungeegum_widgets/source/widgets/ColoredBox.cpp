@@ -24,6 +24,7 @@ namespace widgets {
         float2 _min_point = command.resolved_position();
         float2 _max_point = _min_point + command.resolved_size();
         command.draw_rect_filled(_min_point, _max_point, _color);
+        test42<ColoredBox>(*this);
     }
 
 }

@@ -10,6 +10,22 @@ namespace widgets {
     /// top of that color.
     struct ColoredBox {
 
+        // ColoredBox()
+        // {
+        // }
+        // ColoredBox(ColoredBox&& other)
+        // {
+        //     *this = std::move(other);
+        // }
+        // ColoredBox& operator=(ColoredBox&& other)
+        // {
+        //     _color = std::move(other._color);
+        //     _childWidget = std::move(other._childWidget);
+        //     return *this;
+        // }
+
+        // HOTRELOAD_CLASS(ColoredBox, "ColoredBoxClass");
+
         /// @brief The widget below this widget in the tree.
         template <typename childWidget_t>
         ColoredBox& child(childWidget_t& value)
@@ -32,9 +48,10 @@ namespace widgets {
         Color _color = { 0xFF000000 };
         std::optional<runtime_widget> _childWidget = std::nullopt;
 
-        HOTRELOAD_CLASS(ColoredBox, "ok");
+        int ii = 43;
+        float ff = 3.33f;
 
-        HOTRELOAD_FIELDS(_color, _childWidget)
+        HOTRELOAD_FIELDS(ii, ff)
     };
 }
 }

@@ -59,6 +59,7 @@ endif()
 
 target_link_libraries(bungeegum glm)
 target_link_libraries(bungeegum backward)
+target_link_libraries(bungeegum cereal)
 target_link_libraries(bungeegum imgui)
 target_link_libraries(bungeegum implot)
 target_link_libraries(bungeegum tinysplinecxx)

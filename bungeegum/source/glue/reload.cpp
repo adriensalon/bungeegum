@@ -2,6 +2,7 @@
 #include <hscpp/Hotswapper.h>
 #include <hscpp/mem/MemoryManager.h>
 
+#include <bungeegum/glue/archive.fwd>
 #include <bungeegum/glue/reload.fwd>
 
 namespace bungeegum {

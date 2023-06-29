@@ -1,0 +1,12 @@
+#pragma once
+
+#include <cereal/access.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/cereal.hpp>
+
+template <typename T>
+void test42(T& widget)
+{
+    cereal::JSONOutputArchive archive(std::cout);
+    archive(widget);
+}

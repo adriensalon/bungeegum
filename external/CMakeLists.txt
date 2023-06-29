@@ -4,6 +4,7 @@ add_subdirectory("implot")
 add_subdirectory("tinyspline")
 add_subdirectory("entt")
 add_subdirectory("backwardcpp")
+add_subdirectory("cereal")
 
 add_subdirectory("hscpp")
 set(HSCPP_EXAMPLES OFF)

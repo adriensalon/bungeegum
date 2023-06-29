@@ -5,6 +5,7 @@
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
+#include <bungeegum/glue/archive.fwd>
 #include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
@@ -16,17 +17,13 @@ namespace detail {
 
 #define HOTRELOAD_CLASS(class, name) HSCPP_TRACK(class, name)
 #define HOTRELOAD_METHOD hscpp_virtual
-#define HOTRELOAD_FIELDS(...)                             \
-    template <typename archive_t, typename... args_t>     \
-    void _serialize(archive_t& archive, args_t&&... args) \
-    {                                                     \
-        (archive(args), ...);                             \
-    }                                                     \
-    template <typename archive_t>                         \
-    void serialize(archive_t& archive)                    \
-    {                                                     \
-        _serialize(archive, __VA_ARGS__);                 \
-    }
+#define HOTRELOAD_FIELDS(...)          \
+    template <typename archive_t>      \
+    void serialize(archive_t& archive) \
+    {                                  \
+        archive(__VA_ARGS__);          \
+    }                                  \
+    friend class cereal::access;
 
     template <typename widget_t>
     struct unique_reference {
