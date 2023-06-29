@@ -11,9 +11,17 @@
 namespace bungeegum {
 namespace detail {
 
+//
+//
 #define BUNGEEGUM_ENBALE_HOTRELOAD 1
+    //
+    //
 
-#if defined(BUNGEEGUM_ENBALE_HOTRELOAD)
+#if !defined(BUNGEEGUM_ENBALE_HOTRELOAD)
+#define BUNGEEGUM_ENBALE_HOTRELOAD 0
+#endif
+
+#if BUNGEEGUM_ENBALE_HOTRELOAD
 
 #define HOTRELOAD_CLASS(class, name) HSCPP_TRACK(class, name)
 #define HOTRELOAD_METHOD hscpp_virtual
@@ -39,20 +47,24 @@ namespace detail {
     private:
         hscpp::mem::UniqueRef<widget_t> _ref;
         unique_reference(hscpp::mem::UniqueRef<widget_t>&& ref);
+        friend struct reload_manager;
     };
 
     struct reload_manager {
+
+        reload_manager();
 
         template <typename widget_t>
         unique_reference<widget_t> allocate();
 
         uint1 allocated_blocks_count();
+        void add_include_directory(const std::filesystem::path& directory);
+        void add_source_directory(const std::filesystem::path& directory);
         void update();
-        // set source callbacks etc
 
     private:
-        hscpp::Hotswapper _swapper;
-        unique_reference<hscpp::mem::MemoryManager> _manager;
+        hscpp::Hotswapper _swapper = {};
+        unique_reference<hscpp::mem::MemoryManager> _manager = hscpp::mem::MemoryManager::Create();
     };
 
 #else

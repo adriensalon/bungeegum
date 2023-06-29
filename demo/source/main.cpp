@@ -49,6 +49,9 @@ int main()
 
     std::wostringstream _osstream2;
 
+    bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/include/");
+    bungeegum::hotreload_source_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/source/");
+
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
                           .child(

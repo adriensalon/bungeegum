@@ -1,10 +1,18 @@
 #pragma once
 
+#include <filesystem>
+#include <list>
+#include <optional>
+
+#include <bungeegum/glue/reload.fwd>
 #include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
 namespace detail {
 
     inline uint2 viewport_size = zero<float2>;
+    inline std::unique_ptr<reload_manager> reloader = nullptr;
+    inline std::list<std::filesystem::path> include_directories = {};
+    inline std::list<std::filesystem::path> source_directories = {};
 }
 }

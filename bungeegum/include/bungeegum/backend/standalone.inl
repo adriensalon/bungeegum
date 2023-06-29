@@ -27,6 +27,19 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
         detail::window _window;
         detail::viewport_size = _window.get_size();
         detail::renderer _renderer(_window);
+        //
+        //
+        // #if BUNGEEGUM_ENABLE_HOTRELOAD
+        detail::reloader = std::make_unique<detail::reload_manager>();
+        for (std::filesystem::path& _include_directory : detail::include_directories) {
+            detail::reloader->add_include_directory(_include_directory);
+        }
+        for (std::filesystem::path& _source_directory : detail::include_directories) {
+            detail::reloader->add_source_directory(_source_directory);
+        }
+        // #endif
+        //
+        //
         detail::setup_overlay();
         if (on_renderer_started)
             on_renderer_started();
@@ -50,6 +63,12 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
                 detail::draw(false);
                 _renderer.present();
             }
+
+            //
+            //
+            detail::reloader->update();
+            //
+            //
         });
         _renderer.set_clear_color({ 1.f, 1.f, 1.f, 1.f });
         _window.run_loop();

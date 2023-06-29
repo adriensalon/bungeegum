@@ -22,6 +22,7 @@ set(bungeegum_source
 	"source/context/resolve.cpp"
 
 	"source/core/exceptions.cpp"
+	"source/core/hotreload.cpp"
 	"source/core/widget.cpp"
 
 	"source/overlay/compressed/fa4.cpp"

@@ -8,27 +8,26 @@ namespace detail {
     template <typename widget_t>
     unique_reference<widget_t>::unique_reference(unique_reference<widget_t>&& other)
     {
-        _ref.MoveRef(std::move(other._ref));
+        *this = std::move(other);
     }
 
     template <typename widget_t>
     unique_reference<widget_t>& unique_reference<widget_t>::operator=(unique_reference<widget_t>&& other)
     {
-        _ref.Free();
-        _ref.MoveRef(std::move(other._ref));
+        _ref = std::move(other._ref);
         return *this;
     }
 
     template <typename widget_t>
     widget_t& unique_reference<widget_t>::get()
     {
-        return *(_ref.GetMemory());
+        return *(_ref.operator->());
     }
 
     template <typename widget_t>
     const widget_t& unique_reference<widget_t>::get() const
     {
-        return *(_ref.GetMemory());
+        return *(_ref.operator->());
     }
 
     template <typename widget_t>
@@ -37,11 +36,12 @@ namespace detail {
     {
     }
 
-    // free
+    // reload_manager
 
     template <typename widget_t>
-    unique_reference<widget_t> allocate()
+    unique_reference<widget_t> reload_manager::allocate()
     {
+        return _manager.get().template Allocate<widget_t>();
     }
 }
 }
