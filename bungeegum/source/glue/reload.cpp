@@ -45,6 +45,17 @@ namespace detail {
         _swapper->AddForceCompiledSourceFile(directory);
     }
 
+    void reloader::clear()
+    {
+        _swapper->ClearCompileOptions();
+        _swapper->ClearForceCompiledSourceFiles();
+        _swapper->ClearIncludeDirectories();
+        _swapper->ClearLibraries();
+        _swapper->ClearLibraryDirectories();
+        // etc
+        _swapper->ClearSourceDirectories();
+    }
+
     void reloader::update()
     {
         _swapper->Update();

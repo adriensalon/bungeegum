@@ -60,6 +60,7 @@ namespace detail {
         void add_library(const std::filesystem::path& file);
         void add_source_directory(const std::filesystem::path& directory);
         void add_force_compiled_source_file(const std::filesystem::path& file);
+        void clear();
         void force_update();
         void update();
 
