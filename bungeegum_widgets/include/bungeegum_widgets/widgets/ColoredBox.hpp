@@ -10,21 +10,12 @@ namespace widgets {
     /// top of that color.
     struct ColoredBox {
 
-        // ColoredBox()
-        // {
-        // }
-        // ColoredBox(ColoredBox&& other)
-        // {
-        //     *this = std::move(other);
-        // }
-        // ColoredBox& operator=(ColoredBox&& other)
-        // {
-        //     _color = std::move(other._color);
-        //     _childWidget = std::move(other._childWidget);
-        //     return *this;
-        // }
+        inline ColoredBox()
+        {
+            std::cout << "create ColorBox \n";
+        }
 
-        // HOTRELOAD_CLASS(ColoredBox, "ColoredBoxClass");
+        HOTRELOAD_CLASS(ColoredBox, "ColoredBoxClass");
 
         /// @brief The widget below this widget in the tree.
         template <typename childWidget_t>
@@ -43,7 +34,7 @@ namespace widgets {
     private:
         friend struct access;
         void resolve(resolve_command& command);
-        void draw(draw_command& command);
+        HOTRELOAD_METHOD void draw(draw_command& command);
 
         Color _color = { 0xFF000000 };
         std::optional<runtime_widget> _childWidget = std::nullopt;

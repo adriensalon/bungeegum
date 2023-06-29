@@ -29,6 +29,7 @@ set(bungeegum_source
 	"source/overlay/compressed/inter_extrabold.cpp"
 	"source/overlay/compressed/inter_regular.cpp"
 	"source/overlay/hierarchy.cpp"
+	"source/overlay/hotswapper.cpp"
 	"source/overlay/inspector.cpp"
 	"source/overlay/overlay.cpp"
 	"source/overlay/profiler.cpp"

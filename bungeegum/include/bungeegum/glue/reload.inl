@@ -1,4 +1,5 @@
 #pragma once
+#include <hscpp/mem/MemoryManager.h>
 
 namespace bungeegum {
 namespace detail {
@@ -41,7 +42,7 @@ namespace detail {
     template <typename widget_t>
     unique_reference<widget_t> reload_manager::allocate()
     {
-        return _manager.get().template Allocate<widget_t>();
+        return _manager.get()->operator->()->Allocate<widget_t>();
     }
 }
 }

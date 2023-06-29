@@ -49,30 +49,39 @@ int main()
 
     std::wostringstream _osstream2;
 
+    bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
+    bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
+    bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
+    bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
+    bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
+    bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum/include/");
+    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/bungeegum/Debug/bungeegum.lib");
+    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
+    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
+    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
+
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/include/");
     bungeegum::hotreload_source_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/source/");
+    bungeegum::hotreload_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/source/core/Color.cpp");
+    bungeegum::hotreload_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/source/widgets/ColoredBox.cpp");
 
     bungeegum::launch(bungeegum::make<Title>()
                           .title("my title !!!")
                           .child(
                               bungeegum::make<Align>()
                                   .alignment(Alignment::center())
-
                                   .heightFactor(2.f) // LOL NE MARCHE PAS
                                   //   .widthFactor(2.f) // LOL NE MARCHE PAS
-                                  .child(bungeegum::make<CustomSingleChildLayout>()
-                                             .delegate<delegateTest>()
+                                  .child(bungeegum::make<CustomSingleChildLayout>().delegate<delegateTest>()
 
                                              //  .constraints(BoxConstraints::tight(Size(500.f, 500.f)))
                                              //  .height(100.f)
                                              //  .width(100.f)
                                              //  .expand()
-                                             .child(bungeegum::make<FutureBuilder<bool>>()
-                                                        .initialData(false)
-                                                        .future(std::async([]() {
-                                                            std::this_thread::sleep_for(std::chrono::milliseconds(4000));
-                                                            return true;
-                                                        }))
+                                             .child(bungeegum::make<FutureBuilder<bool>>().initialData(false).future(std::async([]() {
+                                                                                                                 std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+                                                                                                                 return true;
+                                                                                                             }))
                                                         .builder([&_osstream2](const bool value) -> bungeegum::runtime_widget {
                                                             if (value) {
                                                                 static auto fff = std::async([&_osstream2]() {
@@ -107,22 +116,24 @@ int main()
                                                                         .child(
                                                                             bungeegum::make<ColoredBox>()
                                                                                 .color(0xFF6611FF)
-                                                                                .child(bungeegum::make<CustomMultiChildLayout<std::string>>()
-                                                                                           .delegate<multiDelegateTest>()
-                                                                                           .children({
-                                                                                               bungeegum::make<LayoutId<std::string>>()
-                                                                                                   .id("1st")
-                                                                                                   .child(bungeegum::make<ColoredBox>()
-                                                                                                              .color(0xFF8899FF)),
-                                                                                               bungeegum::make<LayoutId<std::string>>()
-                                                                                                   .id("2nd")
-                                                                                                   .child(bungeegum::make<ColoredBox>()
-                                                                                                              .color(0xFF8899FF)),
-                                                                                               bungeegum::make<LayoutId<std::string>>()
-                                                                                                   .id("3rd")
-                                                                                                   .child(bungeegum::make<ColoredBox>()
-                                                                                                              .color(0xFF8899FF)),
-                                                                                           })))
+                                                                            // .child(bungeegum::make<CustomMultiChildLayout<std::string>>()
+                                                                            //            .delegate<multiDelegateTest>()
+                                                                            //            .children({
+                                                                            //                bungeegum::make<LayoutId<std::string>>()
+                                                                            //                    .id("1st")
+                                                                            //                    .child(bungeegum::make<ColoredBox>()
+                                                                            //                               .color(0xFF8899FF)),
+                                                                            //                bungeegum::make<LayoutId<std::string>>()
+                                                                            //                    .id("2nd")
+                                                                            //                    .child(bungeegum::make<ColoredBox>()
+                                                                            //                               .color(0xFF8899FF)),
+                                                                            //                bungeegum::make<LayoutId<std::string>>()
+                                                                            //                    .id("3rd")
+                                                                            //                    .child(bungeegum::make<ColoredBox>()
+                                                                            //                               .color(0xFF8899FF)),
+                                                                            //            }))
+
+                                                                            )
 
                                                                 );
                                                         }))

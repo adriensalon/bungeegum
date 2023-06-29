@@ -30,12 +30,20 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
         //
         //
         // #if BUNGEEGUM_ENABLE_HOTRELOAD
-        detail::reloader = std::make_unique<detail::reload_manager>();
+        if (!detail::reloader) {
+            detail::reloader = std::make_unique<detail::reload_manager>();
+        }
         for (std::filesystem::path& _include_directory : detail::include_directories) {
             detail::reloader->add_include_directory(_include_directory);
         }
-        for (std::filesystem::path& _source_directory : detail::include_directories) {
+        for (std::filesystem::path& _library : detail::libraries) {
+            detail::reloader->add_library(_library);
+        }
+        for (std::filesystem::path& _source_directory : detail::source_directories) {
             detail::reloader->add_source_directory(_source_directory);
+        }
+        for (std::filesystem::path& _force_compiled_source_file : detail::force_compiled_source_files) {
+            detail::reloader->add_force_compiled_source_file(_force_compiled_source_file);
         }
         // #endif
         //

@@ -25,18 +25,19 @@ namespace detail {
     void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands);
 
     void setup_profiler_overlay();
-    
-	void setup_overlay_theme();
+
+    void setup_overlay_theme();
 
     void draw_hierarchy_overlay();
-    
-	void draw_inspector_overlay();
-    
-	void draw_profiler_overlay();
-    
-	void draw_report_overlay();
-    
-	void draw_wireframe_overlay();
 
+    void draw_inspector_overlay();
+
+    void draw_profiler_overlay();
+
+    void draw_report_overlay();
+
+    void draw_wireframe_overlay();
+
+    void draw_hotswapper_overlay();
 }
 }

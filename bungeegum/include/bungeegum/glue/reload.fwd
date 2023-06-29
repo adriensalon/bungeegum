@@ -1,21 +1,30 @@
 #pragma once
 
-#include <hscpp/Hotswapper.h>
-#include <hscpp/mem/MemoryManager.h>
+#include <filesystem>
+
+#define HSCPP_CXX_STANDARD 17
+
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
 #include <bungeegum/glue/archive.fwd>
 #include <bungeegum/glue/simd.hpp>
 
-namespace bungeegum {
-namespace detail {
-
 //
 //
 #define BUNGEEGUM_ENBALE_HOTRELOAD 1
-    //
-    //
+//
+//
+
+namespace hscpp {
+class Hotswapper;
+namespace mem {
+    class MemoryManager;
+}
+}
+
+namespace bungeegum {
+namespace detail {
 
 #if !defined(BUNGEEGUM_ENBALE_HOTRELOAD)
 #define BUNGEEGUM_ENBALE_HOTRELOAD 0
@@ -34,8 +43,31 @@ namespace detail {
     friend class cereal::access;
 
     template <typename widget_t>
+    struct unique_reference;
+
+    struct reload_manager {
+
+        reload_manager();
+
+        template <typename widget_t>
+        unique_reference<widget_t> allocate();
+
+        uint1 allocated_blocks_count();
+        void add_include_directory(const std::filesystem::path& directory);
+        void add_library(const std::filesystem::path& file);
+        void add_source_directory(const std::filesystem::path& directory);
+        void add_force_compiled_source_file(const std::filesystem::path& file);
+        void force_update();
+        void update();
+
+    private:
+        std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
+        std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
+    };
+
+    template <typename widget_t>
     struct unique_reference {
-        unique_reference() = delete;
+        unique_reference() = default;
         unique_reference(const unique_reference& other) = delete;
         unique_reference& operator=(const unique_reference& other) = delete;
         unique_reference(unique_reference&& other);
@@ -48,23 +80,6 @@ namespace detail {
         hscpp::mem::UniqueRef<widget_t> _ref;
         unique_reference(hscpp::mem::UniqueRef<widget_t>&& ref);
         friend struct reload_manager;
-    };
-
-    struct reload_manager {
-
-        reload_manager();
-
-        template <typename widget_t>
-        unique_reference<widget_t> allocate();
-
-        uint1 allocated_blocks_count();
-        void add_include_directory(const std::filesystem::path& directory);
-        void add_source_directory(const std::filesystem::path& directory);
-        void update();
-
-    private:
-        hscpp::Hotswapper _swapper = {};
-        unique_reference<hscpp::mem::MemoryManager> _manager = hscpp::mem::MemoryManager::Create();
     };
 
 #else

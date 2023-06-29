@@ -9,6 +9,8 @@ namespace widgets {
     /// @brief A widget that describes this app in the operating system.
     struct Title {
 
+        HOTRELOAD_CLASS(Title, "TitleClass");
+
         /// @brief The widget below this widget in the tree.
         template <typename childWidget_t>
         Title& child(childWidget_t& value)

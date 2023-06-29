@@ -56,5 +56,10 @@ namespace detail {
     };
 
     inline widgets_registry widgets_context;
+
+    inline widgets_registry& get_widgets_context()
+    {
+        // static if
+    }
 }
 }

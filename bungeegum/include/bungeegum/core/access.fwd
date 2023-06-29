@@ -20,15 +20,22 @@ struct access {
     constexpr static bool has_draw_function = detail::is_detected_exact_v<void, draw_function, widget_t>;
 
     template <typename widget_t>
-    constexpr static void detect_on_draw(widget_t& widget)
+    constexpr static void detect_on_draw(widget_t& widget, const detail::entity_t entity)
     {
         if constexpr (has_draw_function<widget_t>) {
             detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
             _widget_data.drawer_command = draw_command();
+#if 0
             _widget_data.drawer = [&widget](draw_command& command) {
                 widget.draw(command);
             };
-        }
+#else
+            _widget_data.drawer = [entity](draw_command& command) {
+                widget_t& _widget = detail::widgets_context.widgets.get_component<detail::unique_reference<widget_t>>(entity).get();
+                _widget.draw(command);
+#endif
+        };
+    }
     }
 
     // interact
@@ -60,14 +67,21 @@ struct access {
     constexpr static bool has_resolve_function = detail::is_detected_exact_v<void, resolve_function, widget_t>;
 
     template <typename widget_t>
-    constexpr static void detect_on_resolve(widget_t& widget)
+    constexpr static void detect_on_resolve(widget_t& widget, const detail::entity_t entity)
     {
         detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
         _widget_data.resolver_command = resolve_command();
         if constexpr (has_resolve_function<widget_t>) {
+#if 0
             _widget_data.resolver = [&widget](resolve_command& command) {
                 widget.resolve(command);
             };
+#else
+            _widget_data.resolver = [entity](resolve_command& command) {
+                widget_t& _widget = detail::widgets_context.widgets.get_component<detail::unique_reference<widget_t>>(entity).get();
+                _widget.resolve(command);
+            };
+#endif
         } else {
             _widget_data.resolver = [&widget, &_widget_data](resolve_command& command) {
                 if (_widget_data.children.empty()) {

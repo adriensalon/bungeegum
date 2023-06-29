@@ -90,7 +90,7 @@ void draw_command::draw_line(
 {
     ImVec2 _first_point { first_point.x, first_point.y };
     ImVec2 _second_point { second_point.x, second_point.y };
-    ImU32 _color = ImGui::GetColorU32({ color.x, color.y, color.z, color.w });
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });
     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
         _drawlist->AddLine(_first_point, _second_point, _color, thickness);
     });
@@ -104,7 +104,7 @@ void draw_command::draw_rect(
 {
     ImVec2 _min_point { min_point.x, min_point.y };
     ImVec2 _max_point { max_point.x, max_point.y };
-    ImU32 _color = ImGui::GetColorU32({ color.x, color.y, color.z, color.w });
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });
     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
         _drawlist->AddRect(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All, thickness);
     });
@@ -117,7 +117,7 @@ void draw_command::draw_rect_filled(
 {
     ImVec2 _min_point { min_point.x, min_point.y };
     ImVec2 _max_point { max_point.x, max_point.y };
-    ImU32 _color = ImGui::GetColorU32({ color.x, color.y, color.z, color.w });
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });
     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
         _drawlist->AddRectFilled(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All);
     });

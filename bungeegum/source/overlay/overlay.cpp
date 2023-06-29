@@ -27,6 +27,7 @@ namespace detail {
         static bool show_inspector = false;
         static bool show_profiler = false;
         static bool show_wireframe = false;
+        static bool show_hotswapper = false;
     }
 
     void setup_overlay()
@@ -136,6 +137,14 @@ namespace detail {
                     show_wireframe = !show_wireframe;
                 }
                 _fg3.release();
+                font_guard _fg4;
+                if (show_hotswapper)
+                    _fg4.set(extrabold_font);
+                if (ImGui::Button("hotswapper##__bungeegum_footer_wireframe_button__")) {
+                    show_hotswapper = !show_hotswapper;
+                }
+                _fg4.release();
+
                 ImGui::SameLine();
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (footer_height - ImGui::GetFrameHeight()) / 2.f);
                 std::string _metrics_text_1(std::to_string(vertices_count) + " vertices, " + std::to_string(indices_count) + " indices,");
@@ -147,7 +156,7 @@ namespace detail {
                 ImGui::Text(_metrics_text_1.c_str());
                 ImGui::SetCursorPosY(_cursor_pos_mem.y);
                 {
-                    font_guard _fg4(extrabold_font);
+                    font_guard _fg5(extrabold_font);
                     ImGui::Text(_metrics_text_2.c_str());
                 }
                 ImGui::EndMenuBar();
@@ -220,6 +229,8 @@ namespace detail {
             draw_inspector_overlay();
         if (show_profiler)
             draw_profiler_overlay();
+        if (show_hotswapper)
+            draw_hotswapper_overlay();
 
         draw_report_overlay();
 
