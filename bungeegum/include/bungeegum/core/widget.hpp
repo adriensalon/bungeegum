@@ -4,6 +4,29 @@
 
 namespace bungeegum {
 
+/// @brief
+/// @tparam widget_t
+template <typename widget_t>
+struct reference_widget {
+
+    /// @brief
+    widget_t& operator&();
+
+    /// @brief
+    const widget_t& operator&() const;
+
+    reference_widget() = delete;
+    reference_widget(const reference_widget& other) = delete;
+    reference_widget& operator=(const reference_widget& other) = delete;
+    reference_widget(reference_widget&& other) = default;
+    reference_widget& operator=(reference_widget&& other) = default;
+
+private:
+    friend struct detail::widgets_registry;
+    detail::reloaded<widget_t> _data;
+    reference_widget(detail::reloaded<widget_t>&&);
+};
+
 /// @brief Opaque untyped
 struct runtime_widget {
 

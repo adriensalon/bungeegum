@@ -80,33 +80,26 @@ namespace detail {
             // std::cout << "assign 2 \n";
         }
     }
+}
 
-    // template <typename widget_t>
-    // void unregister_widget(widget_t& widget)
-    // {
-    // }
+// reference_widget
 
-    // template <typename widget_t, typename child_widget_t>
-    // runtime_widget adopt_widget(widget_t& widget, child_widget_t& child_widget)
-    // {
-    //     std::uintptr_t _raw_widget = get_raw_widget<widget_t>(widget);
-    //     std::uintptr_t _raw_child_widget = get_raw_widget<child_widget_t>(child_widget);
-    //     if (!is_widget_registered(_raw_widget))
-    //         register_widget(widget, _raw_widget);
-    //     if (!is_widget_registered(_raw_child_widget))
-    //         register_widget(child_widget, _raw_child_widget);
-    //     untyped_widget_data& _data = get_untyped_widget(_raw_widget);
-    //     untyped_widget_data& _child_data = get_untyped_widget(_raw_child_widget);
-    //     _child_data.parent = _data;
-    //     _data.children.emplace_back(_child_data);
-    //     return widgets_context.create_adopted(_child_data);
-    // }
+template <typename widget_t>
+widget_t& reference_widget<widget_t>::operator&()
+{
+    return _data.get();
+}
 
-    // template <typename widget_t, typename child_widget_t>
-    // void abandon_widget(widget_t* widget, child_widget_t& child_widget)
-    // {
-    //     // TODO
-    // }
+template <typename widget_t>
+const widget_t& reference_widget<widget_t>::operator&() const
+{
+    return _data.get();
+}
+
+template <typename widget_t>
+reference_widget<widget_t>::reference_widget(detail::reloaded<widget_t>&& reloaded)
+    : _data(std::move(reloaded))
+{
 }
 
 // runtime_widget
