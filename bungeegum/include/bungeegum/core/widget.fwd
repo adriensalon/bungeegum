@@ -48,6 +48,9 @@ namespace detail {
         std::vector<std::reference_wrapper<untyped_widget_data>> resolvables = {};
         std::vector<std::reference_wrapper<untyped_widget_data>> drawables = {};
 
+        // template <typename widget_t>
+        // reference_widget<widget_t> get_reference_widget(detail::reloaded<widget_t>&& reloaded)
+
         runtime_widget get_runtime_widget(untyped_widget_data& widget_data);
 
         untyped_widget_data& get_widget_data(const runtime_widget& widget);

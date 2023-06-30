@@ -10,6 +10,12 @@ template <typename widget_t>
 struct reference_widget {
 
     /// @brief
+    widget_t& get();
+
+    /// @brief
+    const widget_t& get() const;
+
+    /// @brief
     widget_t& operator&();
 
     /// @brief
@@ -21,10 +27,11 @@ struct reference_widget {
     reference_widget(reference_widget&& other) = default;
     reference_widget& operator=(reference_widget&& other) = default;
 
+    reference_widget(detail::reloaded<widget_t>&& reloaded);
+
 private:
     friend struct detail::widgets_registry;
     detail::reloaded<widget_t> _data;
-    reference_widget(detail::reloaded<widget_t>&&);
 };
 
 /// @brief Opaque untyped
@@ -54,7 +61,7 @@ private:
 /// @param ...widget_args
 /// @return Returns a reference to the new widget
 template <typename widget_t, typename... widget_args_t>
-[[nodiscard]] widget_t& make(widget_args_t&&... widget_args);
+[[nodiscard]] reference_widget<widget_t>& make(widget_args_t&&... widget_args);
 
 /// @brief Destroys a widget created with the make function. References to it will no longer
 /// be valid.

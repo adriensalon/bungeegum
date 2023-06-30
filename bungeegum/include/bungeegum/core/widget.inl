@@ -85,6 +85,18 @@ namespace detail {
 // reference_widget
 
 template <typename widget_t>
+widget_t& reference_widget<widget_t>::get()
+{
+    return _data.get();
+}
+
+template <typename widget_t>
+const widget_t& reference_widget<widget_t>::get() const
+{
+    return _data.get();
+}
+
+template <typename widget_t>
 widget_t& reference_widget<widget_t>::operator&()
 {
     return _data.get();
@@ -130,7 +142,7 @@ runtime_widget::runtime_widget(widget_t& widget)
 // free
 
 template <typename widget_t, typename... widget_args_t>
-widget_t& make(widget_args_t&&... widget_args)
+reference_widget<widget_t>& make(widget_args_t&&... widget_args)
 {
     detail::entity_t _entity = detail::widgets_context.widgets.create_entity();
     detail::widgets_context.widgets.create_component<detail::untyped_widget_data>(_entity);
@@ -139,16 +151,18 @@ widget_t& make(widget_args_t&&... widget_args)
 	widget_t& _widget = detail::widgets_context.widgets.create_component<widget_t>(_entity, std::forward<widget_args_t>(widget_args)...);
     std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(_widget);
 #else
-    detail::reloaded<widget_t>& _widget_reference = detail::widgets_context.widgets.create_component<detail::reloaded<widget_t>>(_entity);
+    reference_widget<widget_t>& _widget_reference = detail::widgets_context.widgets.create_component<reference_widget<widget_t>>(
+        _entity,
+        detail::reload_manager->allocate<widget_t>());
     // copy or move from args
-    _widget_reference = detail::reload_manager->allocate<widget_t>();
-    std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(_widget_reference.get());
+    // _widget_reference = detail::reload_manager->allocate<widget_t>();
+    std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(&_widget_reference);
 #endif
 
     detail::widgets_context.possessed.emplace(_raw_widget, _entity);
 
     // std::cout << "creating widget... " << reinterpret_cast<std::uintptr_t>(&_widget_reference) << std::endl;
-    return _widget_reference.get();
+    return _widget_reference;
 }
 
 template <template <typename, typename> typename container_t, typename allocator_t>
