@@ -12,6 +12,7 @@ namespace detail {
     template <typename value_t>
     void input_archiver::load(value_t& value)
     {
+        // value._bungeegum_load(_archive);
         _archive(value);
     }
 
@@ -24,7 +25,8 @@ namespace detail {
     template <typename value_t>
     void output_archiver::save(value_t& value)
     {
-        _archive(value);
+        // _archive(value);
+        value.get()._bungeegum_save(_archive);
     }
 }
 }

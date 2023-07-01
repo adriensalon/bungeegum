@@ -4,6 +4,7 @@
 #include <bungeegum/context/interact.hpp>
 #include <bungeegum/context/resolve.hpp>
 #include <bungeegum/core/widget.hpp>
+#include <bungeegum/glue/archive.fwd>
 #include <bungeegum/glue/detection.fwd>
 #include <bungeegum/glue/simd.hpp>
 
@@ -97,6 +98,37 @@ struct access {
                     command.resize(_max_size);
                 }
             };
+        }
+    }
+
+    // SAVE + LOAD
+
+    template <typename widget_t>
+    using load_function = decltype(std::declval<widget_t>()._bungeegum_load(std::declval<cereal::JSONInputArchive&>()));
+
+    template <typename widget_t>
+    using save_function = decltype(std::declval<widget_t>()._bungeegum_save(std::declval<cereal::JSONOutputArchive&>()));
+
+    template <typename widget_t>
+    constexpr static bool has_save_function = detail::is_detected_exact_v<void, save_function, widget_t>;
+
+    template <typename widget_t>
+    constexpr static void detect_on_save(widget_t& widget, const detail::entity_t entity)
+    {
+        detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+        _widget_data.resolver_command = resolve_command();
+        if constexpr (has_save_function<widget_t>) {
+#if 0
+            // _widget_data.resolver = [&widget](resolve_command& command) {
+            //     widget.resolve(command);
+            // };
+
+#else
+            _widget_data.saver = [entity](detail::output_archiver& archiver) {
+                reference_widget<widget_t>& _ref_widget = detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+                archiver.save(_ref_widget);
+            };
+#endif
         }
     }
 };

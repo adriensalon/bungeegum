@@ -34,13 +34,30 @@ namespace detail {
 
 #define HOTRELOAD_CLASS(class, name) HSCPP_TRACK(class, name)
 #define HOTRELOAD_METHOD hscpp_virtual
-#define HOTRELOAD_FIELDS(...)          \
-    template <typename archive_t>      \
-    void serialize(archive_t& archive) \
-    {                                  \
-        archive(__VA_ARGS__);          \
-    }                                  \
-    friend class cereal::access;
+#define HOTRELOAD_FIELDS(...)                                              \
+    friend struct bungeegum::detail::input_archiver;                       \
+    friend struct bungeegum::detail::output_archiver;                      \
+    friend class cereal::access;                                           \
+    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive) \
+    {                                                                      \
+        archive(__VA_ARGS__);                                              \
+    }
+
+    // #define HOTRELOAD_FIELDS2(...)
+    //     friend class cereal::access;
+    // 	template <typename widget_t>
+    //     struct bungeegum_serializer {
+    //         template <typename archive_t>
+    //         void serialize(archive_t& archive)
+    //         {
+    //             archive(__VA_ARGS__);
+    //         }
+    //     };
+    //     bungeegum_serializer _serializer;
+    //     hscpp_virtual _bungeegum_save(cereal::JSONOutputArchive& archive)
+    //     {
+    //         archive(_serializer);
+    //     }
 
     template <typename widget_t>
     struct reloaded {

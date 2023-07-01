@@ -67,12 +67,13 @@ namespace detail {
                 archiver.load(_widget);
             };
         }
-        if constexpr (cereal::traits::detail::count_output_serializers<widget_t, cereal::JSONOutputArchive>::value == 1) {
-            untyped_widget.saver = [entity](output_archiver& archiver) {
-                widget_t& _widget = &detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
-                archiver.save(_widget);
-            };
-        }
+        // if constexpr (cereal::traits::detail::count_output_serializers<widget_t, cereal::JSONOutputArchive>::value == 1) {
+        //     untyped_widget.saver = [entity](output_archiver& archiver) {
+        //         widget_t& _widget = &detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+        //         archiver.save(_widget);
+        //     };
+        // }
+        bungeegum::access::detect_on_save(widget, entity);
     }
 
     template <typename widget_t>
