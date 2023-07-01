@@ -73,6 +73,17 @@ namespace detail {
             });
         }
 
+        inline void load_widgets(const std::filesystem::path& archive_path)
+        {
+            input_archiver _archiver(archive_path);
+            traverse_untyped(root.value().get(), [this, &_archiver](untyped_widget_data& _widget_data) {
+                if (_widget_data.loader) {
+                    _widget_data.loader(_archiver);
+                }
+                return true;
+            });
+        }
+
         // load_widgets
     };
 

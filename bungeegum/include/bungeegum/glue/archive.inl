@@ -12,8 +12,8 @@ namespace detail {
     template <typename value_t>
     void input_archiver::load(value_t& value)
     {
-        // value._bungeegum_load(_archive);
-        _archive(value);
+        wrapper<value_t> _wrapper(value);
+        _archive(_wrapper);
     }
 
     inline output_archiver::output_archiver(const std::filesystem::path& archive_path)
@@ -30,7 +30,13 @@ namespace detail {
         }
 
         template <typename archive_t>
-        void serialize(archive_t& archive)
+        void load(archive_t& archive)
+        {
+            _ref.get()._bungeegum_load(archive);
+        }
+
+        template <typename archive_t>
+        void save(archive_t& archive) const
         {
             _ref.get()._bungeegum_save(archive);
         }
@@ -42,10 +48,7 @@ namespace detail {
     void output_archiver::save(value_t& value)
     {
         wrapper<value_t> _wrapper(value);
-        // _archive(cereal::make_nvp("okokok", _wrapper));
         _archive(_wrapper);
-
-        // value.get()._bungeegum_save(_archive);
     }
 }
 }

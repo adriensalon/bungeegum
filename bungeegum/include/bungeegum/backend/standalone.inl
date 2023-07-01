@@ -78,7 +78,7 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
             if (_reload_result == detail::reload_result::started_compiling) {
                 detail::widgets_context.save_widgets("C:/Users/adri/desktop/ok.json");
             } else if (_reload_result == detail::reload_result::performed_swap) {
-                // load
+                detail::widgets_context.load_widgets("C:/Users/adri/desktop/ok.json");
             }
             //
             //

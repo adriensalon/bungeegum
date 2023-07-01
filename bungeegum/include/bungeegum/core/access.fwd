@@ -110,7 +110,30 @@ struct access {
     using save_function = decltype(std::declval<widget_t>()._bungeegum_save(std::declval<cereal::JSONOutputArchive&>()));
 
     template <typename widget_t>
+    constexpr static bool has_load_function = detail::is_detected_exact_v<void, load_function, widget_t>;
+
+    template <typename widget_t>
     constexpr static bool has_save_function = detail::is_detected_exact_v<void, save_function, widget_t>;
+
+    template <typename widget_t>
+    constexpr static void detect_on_load(widget_t& widget, const detail::entity_t entity)
+    {
+        detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+        _widget_data.resolver_command = resolve_command();
+        if constexpr (has_load_function<widget_t>) {
+#if 0
+            // _widget_data.resolver = [&widget](resolve_command& command) {
+            //     widget.resolve(command);
+            // };
+
+#else
+            _widget_data.loader = [entity](detail::input_archiver& archiver) {
+                reference_widget<widget_t>& _ref_widget = detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+                archiver.load(_ref_widget);
+            };
+#endif
+        }
+    }
 
     template <typename widget_t>
     constexpr static void detect_on_save(widget_t& widget, const detail::entity_t entity)
