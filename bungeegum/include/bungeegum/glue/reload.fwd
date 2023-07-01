@@ -71,9 +71,9 @@ namespace detail {
 
     template <typename widget_t>
     struct reloaded {
-        reloaded() = default;
-        reloaded(const reloaded& other) = delete;
-        reloaded& operator=(const reloaded& other) = delete;
+        reloaded() = delete;
+        reloaded(const reloaded& other);
+        reloaded& operator=(const reloaded& other);
         reloaded(reloaded&& other);
         reloaded& operator=(reloaded&& other);
 

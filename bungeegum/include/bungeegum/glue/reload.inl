@@ -7,6 +7,21 @@ namespace detail {
     // reloaded
 
     template <typename widget_t>
+    reloaded<widget_t>::reloaded(const reloaded<widget_t>& other)
+    {
+        _ref.m_Id = other._ref.m_Id;
+        _ref.m_pMemoryManager = other._ref.m_pMemoryManager;
+    }
+
+    template <typename widget_t>
+    reloaded<widget_t>& reloaded<widget_t>::operator=(const reloaded<widget_t>& other)
+    {
+        _ref.m_Id = other._ref.m_Id;
+        _ref.m_pMemoryManager = other._ref.m_pMemoryManager;
+        return *this;
+    }
+
+    template <typename widget_t>
     reloaded<widget_t>::reloaded(reloaded<widget_t>&& other)
     {
         *this = std::move(other);

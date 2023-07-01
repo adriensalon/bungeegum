@@ -48,11 +48,20 @@ struct Composed {
 
     HOTRELOAD_CLASS(Composed, "ComposedClass")
 
-    HOTRELOAD_METHOD Composed& okok()
+    HOTRELOAD_METHOD Composed& build()
     {
-        bungeegum::adopt(this, bungeegum::make<ColoredBox>().get().color(0xFF8899AA));
+        bungeegum::adopt(this, _box.get());
+        bungeegum::reference_widget<ColoredBox> _box3 = std::move(_box2);
+        _box2 = std::move(_box3);
+        bungeegum::adopt(_box.get(), _box2.get());
         return *this;
     }
+
+    // Composed()
+    // {
+    //     bungeegum::adopt(this, _box.get().color(0xFF8899AA));
+    //     bungeegum::adopt(_box, _box2.get().color(0xFF8899AA));
+    // }
 
     HOTRELOAD_METHOD void draw(bungeegum::draw_command& command)
     {
@@ -60,12 +69,16 @@ struct Composed {
         bungeegum::float2 _max_point = _min_point + bungeegum::float2 { 500.f, 500.f };
         command.draw_rect_filled(_min_point, _max_point, { 1.f, 0.5f, 0.5f, 1.f });
 
-        // _box.get().color(0xFF8899AA);
+        _box.get().color(0xFF8899FF);
+        _box2.get().color(0xFF8899AA);
 
         // std::cout << "color box  = " << 44.f << std::endl;
     }
 
-    // bungeegum::reference_widget<ColoredBox> _box = bungeegum::make<ColoredBox>();
+    // ColoredBox _box;
+    // ColoredBox _box2;
+    bungeegum::reference_widget<ColoredBox> _box = bungeegum::make<ColoredBox>(56);
+    bungeegum::reference_widget<ColoredBox> _box2 = bungeegum::make<ColoredBox>(44);
 };
 
 int main()
@@ -90,24 +103,22 @@ int main()
     bungeegum::hotreload_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/source/core/Color.cpp");
     bungeegum::hotreload_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/source/widgets/ColoredBox.cpp");
 
-    bungeegum::launch(bungeegum::make<Title>()
-                          .get()
+    bungeegum::launch(bungeegum::make_and_get<Title>()
+
                           .title("my title !!!")
-                          .child(bungeegum::make<Align>()
-                                     .get()
+                          .child(bungeegum::make_and_get<Align>()
+
                                      .alignment(Alignment::center())
                                      .heightFactor(2.f) // LOL NE MARCHE PAS
                                      //   .widthFactor(2.f) // LOL NE MARCHE PAS
-                                     .child(bungeegum::make<CustomSingleChildLayout>()
-                                                .get()
+                                     .child(bungeegum::make_and_get<CustomSingleChildLayout>()
                                                 .delegate<delegateTest>()
 
                                                 //  .constraints(BoxConstraints::tight(Size(500.f, 500.f)))
                                                 //  .height(100.f)
                                                 //  .width(100.f)
                                                 //  .expand()
-                                                .child(bungeegum::make<FutureBuilder<bool>>()
-                                                           .get()
+                                                .child(bungeegum::make_and_get<FutureBuilder<bool>>()
                                                            .initialData(false)
                                                            .future(std::async([]() {
                                                                std::this_thread::sleep_for(std::chrono::milliseconds(4000));
@@ -120,50 +131,46 @@ int main()
                                                                        _osstream2 << "Helloooooo4466" << std::endl;
                                                                    });
                                                                    (void)fff;
-                                                                   return bungeegum::make<WideStreamBuilder>()
-                                                                       .get()
+                                                                   return bungeegum::make_and_get<WideStreamBuilder>()
                                                                        .initialData(L"heyyy")
                                                                        .builder([&_osstream2](const std::wstring& message) -> bungeegum::runtime_widget {
                                                                            std::wcout << message;
 
-                                                                           return bungeegum::make<OverflowBox>()
-                                                                               .get()
+                                                                           return bungeegum::make_and_get<OverflowBox>()
                                                                                .maxHeight(40.f)
                                                                                .minHeight(10.f)
                                                                                .maxWidth(500.f)
                                                                                .minWidth(500.f)
-                                                                               .child(bungeegum::make<Composed>()
-                                                                                          .get()
-                                                                                          .okok());
+                                                                               .child(bungeegum::make_and_get<Composed>()
+                                                                                          .build()
+                                                                                   //   .okok()
+                                                                               );
                                                                        })
                                                                        .stream(_osstream2);
                                                                }
-                                                               return bungeegum::make<Padding>()
-                                                                   .get()
+                                                               return bungeegum::make_and_get<Padding>()
                                                                    .padding(EdgeInsets::fromLTRB(44.f, 10.f, 15.f, 5.f))
-                                                                   .child(bungeegum::make<OverflowBox>()
-                                                                              .get()
+                                                                   .child(bungeegum::make_and_get<OverflowBox>()
                                                                               .maxHeight(400.f)
                                                                               .minHeight(100.f)
                                                                               .maxWidth(50.f)
                                                                               .minWidth(50.f)
-                                                                              .child(bungeegum::make<ColoredBox>()
-                                                                                         .get()
+                                                                              .child(bungeegum::make_and_get<ColoredBox>()
                                                                                          .color(0xFF6611FF)
-                                                                                  // .child(bungeegum::make<CustomMultiChildLayout<std::string>>()
+                                                                                  // .child(bungeegum::make_and_get<CustomMultiChildLayout<std::string>>()
                                                                                   //            .delegate<multiDelegateTest>()
                                                                                   //            .children({
-                                                                                  //                bungeegum::make<LayoutId<std::string>>()
+                                                                                  //                bungeegum::make_and_get<LayoutId<std::string>>()
                                                                                   //                    .id("1st")
-                                                                                  //                    .child(bungeegum::make<ColoredBox>()
+                                                                                  //                    .child(bungeegum::make_and_get<ColoredBox>()
                                                                                   //                               .color(0xFF8899FF)),
-                                                                                  //                bungeegum::make<LayoutId<std::string>>()
+                                                                                  //                bungeegum::make_and_get<LayoutId<std::string>>()
                                                                                   //                    .id("2nd")
-                                                                                  //                    .child(bungeegum::make<ColoredBox>()
+                                                                                  //                    .child(bungeegum::make_and_get<ColoredBox>()
                                                                                   //                               .color(0xFF8899FF)),
-                                                                                  //                bungeegum::make<LayoutId<std::string>>()
+                                                                                  //                bungeegum::make_and_get<LayoutId<std::string>>()
                                                                                   //                    .id("3rd")
-                                                                                  //                    .child(bungeegum::make<ColoredBox>()
+                                                                                  //                    .child(bungeegum::make_and_get<ColoredBox>()
                                                                                   //                               .color(0xFF8899FF)),
                                                                                   //            }))
 

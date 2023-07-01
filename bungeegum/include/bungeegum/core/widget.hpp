@@ -22,8 +22,8 @@ struct reference_widget {
     const widget_t& operator&() const;
 
     reference_widget() = delete;
-    reference_widget(const reference_widget& other) = delete;
-    reference_widget& operator=(const reference_widget& other) = delete;
+    reference_widget(const reference_widget& other) = default;
+    reference_widget& operator=(const reference_widget& other) = default;
     reference_widget(reference_widget&& other) = default;
     reference_widget& operator=(reference_widget&& other) = default;
 
@@ -62,6 +62,12 @@ private:
 /// @return Returns a reference to the new widget
 template <typename widget_t, typename... widget_args_t>
 [[nodiscard]] reference_widget<widget_t>& make(widget_args_t&&... widget_args);
+
+template <typename widget_t, typename... widget_args_t>
+[[nodiscard]] widget_t& make_and_get(widget_args_t&&... widget_args)
+{
+    return make<widget_t>(std::forward<widget_args_t>()...).get();
+}
 
 /// @brief Destroys a widget created with the make function. References to it will no longer
 /// be valid.

@@ -12,7 +12,12 @@ namespace widgets {
 
         inline ColoredBox()
         {
-            std::cout << "create ColorBox \n";
+            std::cout << " create ColorBox \n";
+        }
+
+        inline ColoredBox(int ok)
+        {
+            std::cout << ok << " create ColorBox \n";
         }
 
         HOTRELOAD_CLASS(ColoredBox, "ColoredBoxClass");

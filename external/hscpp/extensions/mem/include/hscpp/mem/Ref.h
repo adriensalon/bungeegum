@@ -25,7 +25,7 @@ namespace hscpp { namespace mem {
             return GetMemory();
         }
 
-    protected:
+        // protected:
         uint64_t m_Id = IMemoryManager::INVALID_ID;
         IMemoryManager* m_pMemoryManager = nullptr;
 
@@ -110,7 +110,7 @@ namespace hscpp { namespace mem {
 
         ~UniqueRef()
         {
-            Free();
+            // Free();
         }
 
     private:

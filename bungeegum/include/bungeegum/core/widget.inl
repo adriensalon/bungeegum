@@ -71,13 +71,13 @@ namespace detail {
             _entity = widgets_context.possessed.at(raw_widget);
             untyped_widget_data& _untyped_widget = widgets_context.widgets.get_component<untyped_widget_data>(_entity);
             assign_widget(widget, _untyped_widget, raw_widget, _entity);
-            // std::cout << "assign 1 \n";
+            std::cout << "assign 1 \n";
         } else {
             _entity = widgets_context.widgets.create_entity();
             widgets_context.widgets.create_component<std::reference_wrapper<widget_t>>(_entity, widget);
             untyped_widget_data& _untyped_widget = widgets_context.widgets.create_component<untyped_widget_data>(_entity);
             assign_widget(widget, _untyped_widget, raw_widget, _entity);
-            // std::cout << "assign 2 \n";
+            std::cout << "assign 2 \n";
         }
     }
 }
@@ -155,7 +155,8 @@ reference_widget<widget_t>& make(widget_args_t&&... widget_args)
         _entity,
         detail::reload_manager->allocate<widget_t>());
     // copy or move from args
-    // _widget_reference = detail::reload_manager->allocate<widget_t>();
+    // _widget_reference.get() = std::move(widget_t(std::forward<widget_args_t>(widget_args)...));
+    // or move
     std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(&_widget_reference);
 #endif
 
