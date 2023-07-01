@@ -23,10 +23,28 @@ namespace detail {
     }
 
     template <typename value_t>
+    struct wrapper {
+        wrapper(value_t& value)
+            : _ref(value)
+        {
+        }
+
+        template <typename archive_t>
+        void serialize(archive_t& archive)
+        {
+            _ref.get()._bungeegum_save(archive);
+        }
+
+        value_t& _ref;
+    };
+
+    template <typename value_t>
     void output_archiver::save(value_t& value)
     {
-        // _archive(value);
-        value.get()._bungeegum_save(_archive);
+        wrapper<value_t> _wrapper(value);
+        _archive(_wrapper);
+
+        // value.get()._bungeegum_save(_archive);
     }
 }
 }

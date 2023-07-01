@@ -35,6 +35,8 @@ namespace detail {
 #define HOTRELOAD_CLASS(class, name) HSCPP_TRACK(class, name)
 #define HOTRELOAD_METHOD hscpp_virtual
 #define HOTRELOAD_FIELDS(...)                                              \
+    template <typename value_t>                                            \
+    friend struct bungeegum::detail::wrapper;                              \
     friend struct bungeegum::detail::input_archiver;                       \
     friend struct bungeegum::detail::output_archiver;                      \
     friend class cereal::access;                                           \
