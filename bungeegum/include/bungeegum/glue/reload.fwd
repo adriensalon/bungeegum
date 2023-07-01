@@ -8,6 +8,7 @@
 #include <hscpp/module/Tracker.h>
 
 #include <bungeegum/glue/archive.fwd>
+#include <bungeegum/glue/foreach.fwd>
 #include <bungeegum/glue/simd.hpp>
 
 //
@@ -34,15 +35,33 @@ namespace detail {
 
 #define HOTRELOAD_CLASS(class, name) HSCPP_TRACK(class, name)
 #define HOTRELOAD_METHOD hscpp_virtual
-#define HOTRELOAD_FIELDS(...)                                              \
-    template <typename value_t>                                            \
-    friend struct bungeegum::detail::wrapper;                              \
-    friend struct bungeegum::detail::input_archiver;                       \
-    friend struct bungeegum::detail::output_archiver;                      \
-    friend class cereal::access;                                           \
-    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive) \
-    {                                                                      \
-        archive(__VA_ARGS__);                                              \
+#define HOTRELOAD_FIELDS(...)                                                                                       \
+    template <typename value_t>                                                                                     \
+    friend struct bungeegum::detail::wrapper;                                                                       \
+    friend struct bungeegum::detail::input_archiver;                                                                \
+    friend struct bungeegum::detail::output_archiver;                                                               \
+    friend class cereal::access;                                                                                    \
+    template <typename... fields_t>                                                                                 \
+    void _bungeegum_save_fields(cereal::JSONOutputArchive& archive, const std::string& names, fields_t&&... fields) \
+    {                                                                                                               \
+        std::vector<std::string> _names;                                                                            \
+        std::stringstream _sstream(names);                                                                          \
+        while (_sstream.good()) {                                                                                   \
+            std::string _substr;                                                                                    \
+            std::getline(_sstream, _substr, ',');                                                                   \
+            _names.push_back(_substr);                                                                              \
+        }                                                                                                           \
+        std::tuple<fields_t&...> _tuple((fields)...);                                                               \
+        constexpr size_t _count = std::variant_size_v<std::variant<fields_t...>>;                                   \
+        bungeegum::detail::constexpr_for<0, _count, 1>([&](auto _index) {                                           \
+            using field_type_t = std::variant_alternative_t<_index, std::variant<fields_t...>>;                     \
+            field_type_t& _field = std::get<_index>(_tuple);                                                        \
+            archive(cereal::make_nvp(_names[_index].c_str(), _field));                                              \
+        });                                                                                                         \
+    }                                                                                                               \
+    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                          \
+    {                                                                                                               \
+        _bungeegum_save_fields(archive, { #__VA_ARGS__ }, __VA_ARGS__);                                             \
     }
 
     // #define HOTRELOAD_FIELDS2(...)

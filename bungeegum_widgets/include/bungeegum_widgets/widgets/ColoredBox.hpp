@@ -45,9 +45,9 @@ namespace widgets {
         std::optional<runtime_widget> _childWidget = std::nullopt;
 
         int ii = 43;
-        float ff = 3.33f;
+        float ff = 56.f;
 
-        HOTRELOAD_FIELDS(ii, ff)
+        HOTRELOAD_FIELDS(ii, ff, ff)
     };
 }
 }
