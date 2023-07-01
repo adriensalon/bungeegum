@@ -43,7 +43,29 @@ namespace detail {
     friend class cereal::access;
 
     template <typename widget_t>
-    struct reloaded;
+    struct reloaded {
+        reloaded() = delete;
+        reloaded(const reloaded& other);
+        reloaded& operator=(const reloaded& other);
+        reloaded(reloaded&& other);
+        reloaded& operator=(reloaded&& other);
+
+        widget_t& get();
+        const widget_t& get() const;
+
+    private:
+        hscpp::mem::UniqueRef<widget_t> _ref;
+        reloaded(hscpp::mem::UniqueRef<widget_t>&& ref);
+        friend struct reloader;
+    };
+
+    enum struct reload_result {
+        idle,
+        compiling,
+        started_compiling,
+        performed_swap,
+        failed_swap,
+    };
 
     struct reloader {
         reloader();
@@ -62,28 +84,11 @@ namespace detail {
         void add_force_compiled_source_file(const std::filesystem::path& file);
         void clear();
         void force_update();
-        void update();
+        reload_result update();
 
     private:
         std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
-    };
-
-    template <typename widget_t>
-    struct reloaded {
-        reloaded() = delete;
-        reloaded(const reloaded& other);
-        reloaded& operator=(const reloaded& other);
-        reloaded(reloaded&& other);
-        reloaded& operator=(reloaded&& other);
-
-        widget_t& get();
-        const widget_t& get() const;
-
-    private:
-        hscpp::mem::UniqueRef<widget_t> _ref;
-        reloaded(hscpp::mem::UniqueRef<widget_t>&& ref);
-        friend struct reloader;
     };
 
 #else

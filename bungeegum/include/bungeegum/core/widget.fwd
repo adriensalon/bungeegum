@@ -30,6 +30,11 @@ namespace detail {
         std::optional<resolve_command> resolver_command = std::nullopt;
         std::optional<draw_command> drawer_command = std::nullopt;
 
+        //
+        std::function<void(input_archiver&)> loader = nullptr;
+        std::function<void(output_archiver&)> saver = nullptr;
+        //
+
         inline bool operator==(const untyped_widget_data& other)
         {
             return raw_widget == other.raw_widget;
@@ -56,6 +61,19 @@ namespace detail {
         untyped_widget_data& get_widget_data(const runtime_widget& widget);
 
         void traverse_untyped(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback);
+
+        inline void save_widgets(const std::filesystem::path& archive_path)
+        {
+            output_archiver _archiver(archive_path);
+            traverse_untyped(root.value().get(), [this, &_archiver](untyped_widget_data& _widget_data) {
+                if (_widget_data.saver) {
+                    _widget_data.saver(_archiver);
+                }
+                return true;
+            });
+        }
+
+        // load_widgets
     };
 
     inline widgets_registry widgets_context;

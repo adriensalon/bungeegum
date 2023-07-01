@@ -56,9 +56,9 @@ namespace detail {
         _swapper->ClearSourceDirectories();
     }
 
-    void reloader::update()
+    reload_result reloader::update()
     {
-        _swapper->Update();
+        return (static_cast<reload_result>(_swapper->Update()));
     }
 
     void reloader::force_update()
