@@ -26,7 +26,7 @@ namespace widgets {
         command.draw_rect_filled(_min_point, _max_point, _color);
 
         ff += 0.0001f;
-        std::cout << "color box  = " << ff << std::endl;
+        // std::cout << "color box  = " << ff << std::endl;
     }
 
 }

@@ -59,7 +59,11 @@ namespace detail {
         bungeegum::detail::constexpr_for<0, _count, 1>([&](auto _index) {                                \
             using field_type_t = std::variant_alternative_t<_index, std::variant<fields_t...>>;          \
             field_type_t& _field = std::get<_index>(_tuple);                                             \
-            archive(cereal::make_nvp(_names[_index].c_str(), _field));                                   \
+            try {                                                                                        \
+                archive(cereal::make_nvp(_names[_index].c_str(), _field));                               \
+            } catch (...) {                                                                              \
+                std::cout << "error detected :) \n";                                                     \
+            }                                                                                            \
         });                                                                                              \
     }                                                                                                    \
     hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                \
