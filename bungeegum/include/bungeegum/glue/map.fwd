@@ -1,0 +1,45 @@
+#pragma once
+
+// todo : noexcept + error messages
+
+#include <cstddef>
+#include <type_traits>
+#include <unordered_map>
+#include <vector>
+
+#include <bungeegum/glue/backtrace.fwd>
+
+namespace bungeegum {
+namespace detail {
+
+    template <typename key_t, typename value_t>
+    struct indexed_map {
+        indexed_map() = default;
+        indexed_map(std::initializer_list<std::pair<key_t, value_t>> values);
+        indexed_map(const indexed_map& other) = default;
+        indexed_map& operator=(const indexed_map& other) = default;
+        indexed_map(indexed_map&& other) = default;
+        indexed_map& operator=(indexed_map&& other) = default;
+
+        [[nodiscard]] value_t& at(const key_t& key);
+        [[nodiscard]] const value_t& at(const key_t& key) const;
+        [[nodiscard]] std::vector<value_t>::template iterator begin();
+        [[nodiscard]] std::vector<value_t>::template const_iterator begin() const;
+        [[nodiscard]] bool contains(const key_t& key);
+        value_t& emplace(const key_t& key, const value_t& value);
+        void erase(const key_t& key);
+        [[nodiscard]] std::vector<value_t>::template iterator end();
+        [[nodiscard]] std::vector<value_t>::template const_iterator end() const;
+        [[nodiscard]] value_t& operator[](const key_t& key);
+        [[nodiscard]] const value_t& operator[](const key_t& key) const;
+
+        inline static std::size_t backtrace_size = 10u;
+
+    private:
+        std::vector<value_t> _values = {};
+        std::unordered_map<key_t, std::size_t> _indices = {};
+    };
+}
+}
+
+#include <bungeegum/glue/map.inl>

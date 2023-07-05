@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <exception>
 #include <filesystem>
 #include <string>
@@ -11,8 +12,8 @@ namespace detail {
     struct backtraced_source {
         std::filesystem::path file;
         std::string function;
-        unsigned int line;
-        unsigned int column;
+        std::size_t line;
+        std::size_t column;
     };
 
     struct backtraced_result {
@@ -22,7 +23,7 @@ namespace detail {
     };
 
     struct backtraced_exception : std::exception {
-        backtraced_exception(const std::string& what, const unsigned int tracing_size);
+        backtraced_exception(const std::string& what, const std::size_t tracing_size);
         backtraced_exception(const std::exception& existing);
         backtraced_exception(const backtraced_exception& other) = delete;
         backtraced_exception& operator=(const backtraced_exception& other) = delete;

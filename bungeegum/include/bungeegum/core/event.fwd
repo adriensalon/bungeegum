@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <bungeegum/glue/map.fwd>
 #include <bungeegum/glue/raw.fwd>
 #include <bungeegum/glue/registry.fwd>
 #include <bungeegum/glue/typelist.fwd>

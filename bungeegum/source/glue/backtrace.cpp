@@ -7,15 +7,15 @@ namespace detail {
 
     namespace {
 
-        void emplace_traces(std::vector<backtraced_result>& tracing, const unsigned int tracing_size)
+        void emplace_traces(std::vector<backtraced_result>& tracing, const std::size_t tracing_size)
         {
             backward::StackTrace _stack_trace;
             backward::TraceResolver _trace_resolver;
-            unsigned int _offset = 3U; // escape backwardcpp calls
+            std::size_t _offset = 3U; // escape backwardcpp calls
             _stack_trace.load_here(tracing_size + _offset);
             _trace_resolver.load_stacktrace(_stack_trace);
             tracing.resize(tracing_size);
-            for (unsigned int _i = 0; _i < tracing_size; _i++) {
+            for (std::size_t _i = 0; _i < tracing_size; _i++) {
                 backward::ResolvedTrace _trace = _trace_resolver.resolve(_stack_trace[_i + _offset]);
                 tracing[_i].address = _trace.addr;
                 tracing[_i].primary = backtraced_source { _trace.source.filename, _trace.source.function, _trace.source.line, _trace.source.col };
@@ -25,7 +25,7 @@ namespace detail {
         }
     }
 
-    backtraced_exception::backtraced_exception(const std::string& what, const unsigned int tracing_size)
+    backtraced_exception::backtraced_exception(const std::string& what, const std::size_t tracing_size)
     {
         _what = what;
         emplace_traces(tracing, tracing_size);

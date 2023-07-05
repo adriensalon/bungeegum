@@ -65,9 +65,9 @@ struct Composed {
 
     HOTRELOAD_METHOD void draw(bungeegum::draw_command& command)
     {
-        bungeegum::float2 _min_point = bungeegum::float2 { 500.f, 500.f };
-        bungeegum::float2 _max_point = _min_point + bungeegum::float2 { 500.f, 500.f };
-        command.draw_rect_filled(_min_point, _max_point, { 1.f, 0.5f, 0.5f, 1.f });
+        // bungeegum::float2 _min_point = bungeegum::float2 { 500.f, 500.f };
+        // bungeegum::float2 _max_point = _min_point + bungeegum::float2 { 500.f, 500.f };
+        // command.draw_rect_filled(_min_point, _max_point, { 1.f, 0.5f, 0.5f, 1.f });
 
         _box.get().color(0xFF8899FF);
         _box2.get().color(0xFF8899AA);
@@ -83,6 +83,19 @@ struct Composed {
 
 int main()
 {
+    bungeegum::detail::indexed_map<unsigned int, float> _map = {
+        { 20, 33.f },
+        { 21, 33.f },
+        { 19, 33.f }
+    };
+    _map.emplace(55, 666.f);
+    _map.emplace(44, 333.f);
+    _map.emplace(22, 111.f);
+    _map[22] += 11.f;
+    for (auto& m : _map) {
+        std::cout << m << std::endl;
+    }
+    _map.erase(55);
 
     std::wostringstream _osstream2;
 
