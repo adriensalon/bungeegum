@@ -15,7 +15,9 @@ namespace detail {
     value_t& indexed_map<key_t, value_t>::at(const key_t& key)
     {
         if (!contains(key)) {
-            throw backtraced_exception("Error message", backtrace_size);
+            throw backtraced_exception("No value can be accessed because the "
+                                       "provided key is not contained.",
+                backtrace_size);
         }
         std::size_t _index = _indices.at(key);
         return (_values[_index]);
@@ -25,7 +27,9 @@ namespace detail {
     const value_t& indexed_map<key_t, value_t>::at(const key_t& key) const
     {
         if (!contains(key)) {
-            throw backtraced_exception("Error message", backtrace_size);
+            throw backtraced_exception("No value can be accessed because the "
+                                       "provided key is not contained.",
+                backtrace_size);
         }
         std::size_t _index = _indices.at(key);
         return (_values[_index]);
@@ -53,7 +57,9 @@ namespace detail {
     value_t& indexed_map<key_t, value_t>::emplace(const key_t& key, const value_t& value)
     {
         if (contains(key)) {
-            throw backtraced_exception("Error message", backtrace_size);
+            throw backtraced_exception("No key-value pair can be emplaced because the "
+                                       "provided key is already contained.",
+                backtrace_size);
         }
         std::size_t _index = _values.size();
         _indices.emplace(key, _index);
@@ -64,7 +70,9 @@ namespace detail {
     void indexed_map<key_t, value_t>::erase(const key_t& key)
     {
         if (!contains(key)) {
-            throw backtraced_exception("Error message", backtrace_size);
+            throw backtraced_exception("No key-value pair can be erased because the "
+                                       "provided key is not contained.",
+                backtrace_size);
         }
         std::size_t _index = _indices.at(key);
         _values.erase(_values.begin() + _index);
@@ -86,7 +94,9 @@ namespace detail {
     template <typename key_t, typename value_t>
     value_t& indexed_map<key_t, value_t>::operator[](const key_t& key)
     {
-        static_assert(std::is_default_constructible_v<value_t>, "Error message");
+        static_assert(std::is_default_constructible_v<value_t>, "The type value_t must be default-constructible to use the "
+                                                                "operator[] method, because a default-constructed value must "
+                                                                "be created when the key is not contained.");
         if (!contains(key)) {
             emplace(key, value_t {});
         }
@@ -97,7 +107,9 @@ namespace detail {
     template <typename key_t, typename value_t>
     const value_t& indexed_map<key_t, value_t>::operator[](const key_t& key) const
     {
-        static_assert(std::is_default_constructible_v<value_t>, "Error message");
+        static_assert(std::is_default_constructible_v<value_t>, "The type value_t must be default-constructible to use the "
+                                                                "operator[] method, because a default-constructed value must "
+                                                                "be created when the key is not contained.");
         if (!contains(key)) {
             emplace(key, value_t {});
         }
