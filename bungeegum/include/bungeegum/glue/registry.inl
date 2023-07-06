@@ -5,41 +5,41 @@
 namespace bungeegum {
 namespace detail {
 
-    template <typename component_t>
-    entity_t registry::get_entity(component_t& component)
-    {
-        // maintain an std::unordered_set ?
-        return entt::to_entity(_registry, component);
-    }
+    // template <typename component_t>
+    // registry_entity registry::get_entity(component_t& component)
+    // {
+    //     // maintain an std::unordered_set ?
+    //     return entt::to_entity(_registry, component);
+    // }
 
-    template <typename component_t>
-    std::optional<entity_t> registry::try_get_entity(component_t& component)
-    {
-        // maintain an std::unordered_set ?
-        std::optional<entity_t> _retval = std::nullopt;
-        iterate_with_entities<component_t>([this, &component, &_retval](entity_t _entity, component_t& _component) {
-            if (&_component == &component)
-                _retval = _entity;
-        });
-        return _retval;
-    }
+    // template <typename component_t>
+    // std::optional<registry_entity> registry::try_get_entity(component_t& component)
+    // {
+    //     // maintain an std::unordered_set ?
+    //     std::optional<registry_entity> _retval = std::nullopt;
+    //     iterate_with_entities<component_t>([this, &component, &_retval](registry_entity _entity, component_t& _component) {
+    //         if (&_component == &component)
+    //             _retval = _entity;
+    //     });
+    //     return _retval;
+    // }
 
     // TODO has component
 
     template <typename component_t, typename... args_t>
-    decltype(auto) registry::create_component(const entity_t entity, args_t&&... args)
+    decltype(auto) registry::create_component(const registry_entity entity, args_t&&... args)
     {
         return _registry.template emplace<component_t>(entity, std::forward<args_t>(args)...);
     }
 
     template <typename component_t>
-    component_t& registry::get_component(const entity_t entity)
+    component_t& registry::get_component(const registry_entity entity)
     {
         return _registry.template get<component_t>(entity);
     }
 
     template <typename component_t>
-    const component_t& registry::get_component(const entity_t entity) const
+    const component_t& registry::get_component(const registry_entity entity) const
     {
         return _registry.template view<component_t>().template get<component_t>(entity);
     }
@@ -54,10 +54,10 @@ namespace detail {
     }
 
     template <typename... components_t>
-    void registry::iterate_with_entities(const std::function<void(entity_t, components_t&...)>& iterate_function)
+    void registry::iterate_with_entities(const std::function<void(registry_entity, components_t&...)>& iterate_function)
     {
         auto _view = _registry.template view<components_t...>();
-        _view.each([&](entity_t _entity, components_t&... _components) {
+        _view.each([&](registry_entity _entity, components_t&... _components) {
             iterate_function(_entity, _components...);
         });
     }

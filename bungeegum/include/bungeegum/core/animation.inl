@@ -102,14 +102,14 @@ namespace detail {
     template <typename value_t>
     void register_animation(animation<value_t>& animation_object, const std::uintptr_t raw_animation)
     {
-        entity_t _entity;
+        registry_entity _entity;
         if (is_animation_possessed(raw_animation)) {
             _entity = animations_context.possessed.at(raw_animation);
             untyped_animation_data& _untyped_animation = animations_context.animations.get_component<untyped_animation_data>(_entity);
             assign_animation(animation_object, _untyped_animation, raw_animation);
             return;
         } else {
-            std::optional<entity_t> _existing_entity = animations_context.animations.try_get_entity(animation_object);
+            std::optional<registry_entity> _existing_entity = animations_context.animations.try_get_entity(animation_object);
             if (_existing_entity != std::nullopt) {
                 _entity = _existing_entity.value();
                 untyped_animation_data& _untyped_animation = animations_context.animations.get_component<untyped_animation_data>(_entity);
@@ -204,7 +204,7 @@ animation<value_t>& animation<value_t>::duration(const unsigned int count)
 template <typename value_t>
 animation<value_t>& make_animation()
 {
-    detail::entity_t _entity = detail::animations_context.animations.create_entity();
+    detail::registry_entity _entity = detail::animations_context.animations.create_entity();
     detail::animations_context.animations.create_component<detail::untyped_animation_data>(_entity);
     animation<value_t>& _animation = detail::animations_context.animations.template create_component<animation<value_t>>(_entity);
     std::uintptr_t _raw_animation = detail::get_raw_animation<detail::animation_raw_access_mode::animation_recast>(_animation);
@@ -215,7 +215,7 @@ animation<value_t>& make_animation()
 template <typename value_t>
 animation<value_t>& make_animation(const animation<value_t>& other_animation)
 {
-    detail::entity_t _entity = detail::animations_context.animations.create_entity();
+    detail::registry_entity _entity = detail::animations_context.animations.create_entity();
     detail::animations_context.animations.create_component<detail::untyped_animation_data>(_entity);
     animation<value_t>& _animation = detail::animations_context.animations.template create_component<animation<value_t>>(_entity, other_animation);
     std::uintptr_t _raw_animation = detail::get_raw_animation<detail::animation_raw_access_mode::animation_recast>(_animation);
@@ -226,7 +226,7 @@ animation<value_t>& make_animation(const animation<value_t>& other_animation)
 template <typename value_t>
 animation<value_t>& make_animation(animation<value_t>&& other_animation)
 {
-    detail::entity_t _entity = detail::animations_context.animations.create_entity();
+    detail::registry_entity _entity = detail::animations_context.animations.create_entity();
     detail::animations_context.animations.create_component<detail::untyped_animation_data>(_entity);
     animation<value_t>& _animation = detail::animations_context.animations.create_component<animation<value_t>>(_entity, std::move(other_animation));
     std::uintptr_t _raw_animation = detail::get_raw_animation<detail::animation_raw_access_mode::animation_recast>(_animation);
@@ -238,7 +238,7 @@ template <typename value_t>
 void unmake_animation(animation<value_t>& made_animation)
 {
     std::uintptr_t _raw_animation = detail::get_raw_animation<detail::animation_raw_access_mode::animation_stored>(made_animation);
-    detail::entity_t _entity = detail::animations_context.possessed.at(_raw_animation);
+    detail::registry_entity _entity = detail::animations_context.possessed.at(_raw_animation);
     detail::animations_context.animations.destroy_entity(_entity);
 }
 }

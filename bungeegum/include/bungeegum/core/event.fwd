@@ -41,7 +41,7 @@ namespace detail {
 
     struct events_registry {
         registry events = {};
-        std::unordered_map<std::uintptr_t, entity_t> possessed = {};
+        std::unordered_map<std::uintptr_t, registry_entity> possessed = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_event_data>> registered = {};
 
         indexed_map<std::uintptr_t, std::reference_wrapper<untyped_event_data>> tickables = {};

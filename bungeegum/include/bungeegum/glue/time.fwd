@@ -1,41 +1,55 @@
 #pragma once
 
-#include <array>
 #include <chrono>
 #include <ctime>
-#include <functional>
-#include <iostream>
-#include <unordered_map>
-#include <vector>
 
 namespace bungeegum {
 namespace detail {
 
+    /// @brief Instances of this struct represent mutable time points that can be updated and
+    /// retrieved as a formatted string.
+    /// @details Instances of this struct can be copied (performing deep copy) and moved.
     struct timestamp {
         timestamp();
-        timestamp(const std::chrono::system_clock::time_point& time_point);
-        timestamp(const timestamp& other);
-        timestamp& operator=(const timestamp& other);
-        timestamp(timestamp&& other);
-        timestamp& operator=(timestamp&& other);
+        timestamp(const timestamp& other) = default;
+        timestamp& operator=(const timestamp& other) = default;
+        timestamp(timestamp&& other) = default;
+        timestamp& operator=(timestamp&& other) = default;
 
+        /// @brief Creates an instance from a std::chrono time point.
+        timestamp(const std::chrono::system_clock::time_point& time_point);
+
+        /// @brief Sets this instance to the current time point.
         void now();
-        std::string get(const std::string& format = "%H:%M:%S") const;
+
+        /// @brief Gets a formatted string of the last time point recorded on creation of this
+        /// instance or the last time now() has been called.
+        std::string formatted(const std::string& format = "%H:%M:%S") const;
 
     private:
         std::time_t _time;
     };
 
+    /// @brief Instances of this struct represent mutable timers that measure durations in a
+    /// stopwatch manner : we can only get a duration between now and the last time we retrieved
+    /// a duration.
+    /// @details Instances of this struct can be copied (performing deep copy) and moved.
     struct stopwatch {
         stopwatch();
-        stopwatch(const stopwatch& other);
-        stopwatch& operator=(const stopwatch& other);
-        stopwatch(stopwatch&& other);
-        stopwatch& operator=(stopwatch&& other);
+        stopwatch(const stopwatch& other) = default;
+        stopwatch& operator=(const stopwatch& other) = default;
+        stopwatch(stopwatch&& other) = default;
+        stopwatch& operator=(stopwatch&& other) = default;
 
+        /// @brief Gets the duration between now and the last time we retrieved a duration.
+        /// @tparam unit_t is the type from std::chrono to use as units.
         template <typename unit_t = std::chrono::milliseconds>
         unit_t lap();
 
+        /// @brief Gets the duration between now and the last time we retrieved a duration,
+        /// blocking the thread until a certain duration has passed since the last time we
+        /// retrieved a duration.
+        /// @tparam unit_t is the type from std::chrono to use as units.
         template <typename unit_t = std::chrono::milliseconds>
         unit_t lap_at_least(const unit_t at_least);
 

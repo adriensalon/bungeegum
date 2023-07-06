@@ -21,7 +21,7 @@ struct access {
     constexpr static bool has_draw_function = detail::is_detected_exact_v<void, draw_function, widget_t>;
 
     template <typename widget_t>
-    constexpr static void detect_on_draw(widget_t& widget, const detail::entity_t entity)
+    constexpr static void detect_on_draw(widget_t& widget, const detail::registry_entity entity)
     {
         if constexpr (has_draw_function<widget_t>) {
             detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
@@ -68,7 +68,7 @@ struct access {
     constexpr static bool has_resolve_function = detail::is_detected_exact_v<void, resolve_function, widget_t>;
 
     template <typename widget_t>
-    constexpr static void detect_on_resolve(widget_t& widget, const detail::entity_t entity)
+    constexpr static void detect_on_resolve(widget_t& widget, const detail::registry_entity entity)
     {
         detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
         _widget_data.resolver_command = resolve_command();
@@ -116,7 +116,7 @@ struct access {
     constexpr static bool has_save_function = detail::is_detected_exact_v<void, save_function, widget_t>;
 
     template <typename widget_t>
-    constexpr static void detect_on_load(widget_t& widget, const detail::entity_t entity)
+    constexpr static void detect_on_load(widget_t& widget, const detail::registry_entity entity)
     {
         detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
         _widget_data.resolver_command = resolve_command();
@@ -136,7 +136,7 @@ struct access {
     }
 
     template <typename widget_t>
-    constexpr static void detect_on_save(widget_t& widget, const detail::entity_t entity)
+    constexpr static void detect_on_save(widget_t& widget, const detail::registry_entity entity)
     {
         detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
         _widget_data.resolver_command = resolve_command();

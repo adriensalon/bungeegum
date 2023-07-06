@@ -52,7 +52,7 @@ namespace detail {
     }
 
     template <typename widget_t>
-    void assign_widget(widget_t& widget, untyped_widget_data& untyped_widget, const std::uintptr_t raw_widget, const entity_t entity)
+    void assign_widget(widget_t& widget, untyped_widget_data& untyped_widget, const std::uintptr_t raw_widget, const registry_entity entity)
     {
         untyped_widget.raw_widget = raw_widget;
         untyped_widget.kind = std::make_unique<std::type_index>(typeid(widget_t));
@@ -80,7 +80,7 @@ namespace detail {
     template <typename widget_t>
     void register_widget(widget_t& widget, const std::uintptr_t raw_widget)
     {
-        entity_t _entity;
+        registry_entity _entity;
         if (is_widget_possessed(raw_widget)) {
             _entity = widgets_context.possessed.at(raw_widget);
             untyped_widget_data& _untyped_widget = widgets_context.widgets.get_component<untyped_widget_data>(_entity);
@@ -158,7 +158,7 @@ runtime_widget::runtime_widget(widget_t& widget)
 template <typename widget_t, typename... widget_args_t>
 reference_widget<widget_t>& make(widget_args_t&&... widget_args)
 {
-    detail::entity_t _entity = detail::widgets_context.widgets.create_entity();
+    detail::registry_entity _entity = detail::widgets_context.widgets.create_entity();
     detail::widgets_context.widgets.create_component<detail::untyped_widget_data>(_entity);
 
 #if 0

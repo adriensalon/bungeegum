@@ -43,7 +43,7 @@ namespace detail {
 
     struct animations_registry {
         registry animations = {};
-        std::unordered_map<std::uintptr_t, entity_t> possessed = {};
+        std::unordered_map<std::uintptr_t, registry_entity> possessed = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_animation_data>> registered = {};
 
         template <typename value_t>

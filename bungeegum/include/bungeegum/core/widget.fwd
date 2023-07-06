@@ -47,7 +47,7 @@ namespace detail {
 
     struct widgets_registry {
         registry widgets = {};
-        std::unordered_map<std::uintptr_t, entity_t> possessed = {};
+        std::unordered_map<std::uintptr_t, registry_entity> possessed = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_widget_data>> registered = {};
         std::optional<std::reference_wrapper<untyped_widget_data>> root = std::nullopt;
         std::vector<std::reference_wrapper<untyped_widget_data>> resolvables = {};

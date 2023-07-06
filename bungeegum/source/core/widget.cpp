@@ -44,7 +44,7 @@ void destroy(const runtime_widget& widget)
     // ?
     // ?
     // void* _void_widget = reinterpret_cast<void*>(&widget);
-    // detail::entity_t _entity;
+    // detail::registry_entity _entity;
     // if (detail::widgets_context.accessors.find(_void_widget) == detail::widgets_context.accessors.end())
     //     detail::throw_error<detail::error_type::bad_implementation>("widget not found in accessors");
     // _entity = detail::widgets_context.possessed.at(_void_widget);

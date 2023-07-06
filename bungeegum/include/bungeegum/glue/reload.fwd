@@ -4,19 +4,12 @@
 #include <filesystem>
 
 #define HSCPP_CXX_STANDARD 17
-
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
 #include <bungeegum/glue/archive.fwd>
 #include <bungeegum/glue/foreach.fwd>
 #include <bungeegum/glue/simd.hpp>
-
-//
-//
-#define BUNGEEGUM_ENBALE_HOTRELOAD 1
-//
-//
 
 namespace hscpp {
 class Hotswapper;
@@ -28,11 +21,16 @@ namespace mem {
 namespace bungeegum {
 namespace detail {
 
-#if !defined(BUNGEEGUM_ENBALE_HOTRELOAD)
-#define BUNGEEGUM_ENBALE_HOTRELOAD 0
+#if !defined(BUNGEEGUM_ENABLE_HOTRELOAD)
+#define BUNGEEGUM_ENABLE_HOTRELOAD 1 // TODO SET FROM CMAKE AND THIS TO 0
 #endif
 
-#if BUNGEEGUM_ENBALE_HOTRELOAD
+#if !BUNGEEGUM_ENABLE_HOTRELOAD
+
+    template <typename widget_t>
+    using reloaded = std::reference_wrapper<widget_t>;
+
+#else
 
 #define HOTRELOAD_CLASS(class, name) HSCPP_TRACK(class, name)
 #define HOTRELOAD_METHOD hscpp_virtual
@@ -75,22 +73,6 @@ namespace detail {
     {                                                                                                    \
         _bungeegum_serialize_fields<cereal::JSONOutputArchive>(archive, { #__VA_ARGS__ }, __VA_ARGS__);  \
     }
-
-    // #define HOTRELOAD_FIELDS2(...)
-    //     friend class cereal::access;
-    // 	template <typename widget_t>
-    //     struct bungeegum_serializer {
-    //         template <typename archive_t>
-    //         void serialize(archive_t& archive)
-    //         {
-    //             archive(__VA_ARGS__);
-    //         }
-    //     };
-    //     bungeegum_serializer _serializer;
-    //     hscpp_virtual _bungeegum_save(cereal::JSONOutputArchive& archive)
-    //     {
-    //         archive(_serializer);
-    //     }
 
     template <typename widget_t>
     struct reloaded {
@@ -163,11 +145,6 @@ namespace detail {
         std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
     };
-
-#else
-
-    template <typename widget_t>
-    using reloaded = std::reference_wrapper<widget_t>;
 
 #endif
 }

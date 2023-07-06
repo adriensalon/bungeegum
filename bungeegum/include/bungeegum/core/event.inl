@@ -140,21 +140,22 @@ namespace detail {
     template <typename... values_t>
     void register_event(event<values_t...>& event_object, const std::uintptr_t raw_event)
     {
-        entity_t _entity;
+        registry_entity _entity;
         if (is_event_possessed(raw_event)) {
             _entity = events_context.possessed.at(raw_event);
             untyped_event_data& _untyped_event = events_context.events.get_component<untyped_event_data>(_entity);
             assign_event(event_object, _untyped_event, raw_event);
             return;
-        } else {
-            std::optional<entity_t> _existing_entity = events_context.events.try_get_entity(event_object);
-            if (_existing_entity != std::nullopt) {
-                _entity = _existing_entity.value();
-                untyped_event_data& _untyped_event = events_context.events.get_component<untyped_event_data>(_entity);
-                assign_event(event_object, _untyped_event, raw_event);
-                return;
-            }
         }
+        // else {
+        //     std::optional<registry_entity> _existing_entity = events_context.events.try_get_entity(event_object);
+        //     if (_existing_entity != std::nullopt) {
+        //         _entity = _existing_entity.value();
+        //         untyped_event_data& _untyped_event = events_context.events.get_component<untyped_event_data>(_entity);
+        //         assign_event(event_object, _untyped_event, raw_event);
+        //         return;
+        //     }
+        // }
         _entity = events_context.events.create_entity();
         events_context.events.create_component<std::reference_wrapper<event<values_t...>>>(_entity, event_object);
         untyped_event_data& _untyped_event = events_context.events.create_component<untyped_event_data>(_entity);
@@ -240,7 +241,7 @@ const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::
 template <typename... values_t>
 event<values_t...>& make_event()
 {
-    detail::entity_t _entity = detail::events_context.events.create_entity();
+    detail::registry_entity _entity = detail::events_context.events.create_entity();
     detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
     event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity);
     std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
@@ -251,7 +252,7 @@ event<values_t...>& make_event()
 template <typename... values_t>
 event<values_t...>& make_event(const event<values_t...>& other_event)
 {
-    detail::entity_t _entity = detail::events_context.events.create_entity();
+    detail::registry_entity _entity = detail::events_context.events.create_entity();
     detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
     event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity, other_event);
     std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
@@ -262,7 +263,7 @@ event<values_t...>& make_event(const event<values_t...>& other_event)
 template <typename... values_t>
 event<values_t...>& make_event(event<values_t...>&& other_event)
 {
-    detail::entity_t _entity = detail::events_context.events.create_entity();
+    detail::registry_entity _entity = detail::events_context.events.create_entity();
     detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
     event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity, std::move(other_event));
     std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
@@ -274,7 +275,7 @@ template <typename... values_t>
 void unmake_event(event<values_t...>& made_event)
 {
     std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_stored>(made_event);
-    detail::entity_t _entity = detail::events_context.possessed.at(_raw_event);
+    detail::registry_entity _entity = detail::events_context.possessed.at(_raw_event);
     detail::events_context.events.destroy_entity(_entity);
 }
 }
