@@ -76,7 +76,7 @@ namespace detail {
                     typed_animation.is_playing = false;
                 }
                 float _frac = typed_animation.playing_cursor_seconds / typed_animation.duration_seconds;
-                float2 _curve_eval = typed_animation.eval_curve.eval(_frac);
+                float2 _curve_eval = typed_animation.eval_curve.evaluate(_frac);
                 // ifdef protected
                 untyped_animation.overlay_position = { _curve_eval.x, _curve_eval.y };
                 untyped_animation.overlay_samples = typed_animation.eval_curve.strided_samples(100);
