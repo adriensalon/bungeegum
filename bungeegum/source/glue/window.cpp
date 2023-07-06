@@ -45,6 +45,7 @@ namespace detail {
                 }
                 native_window_data::is_sdl_main_ready = true;
             }
+            _data = std::make_shared<native_window_data>();
             SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
             _data->sdl_window = SDL_CreateWindow(
                 native_window_data::sdl_default_window_title.data(),
