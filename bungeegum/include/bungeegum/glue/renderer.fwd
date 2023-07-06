@@ -32,11 +32,13 @@ namespace detail {
 
         void present();
 
-        void process_input(const std::any& input);
+        void process_sdl_event_for_imgui(const SDL_Event* event);
+
+        void process_window_resized_event(const window_resized_event& event);
 
         void rebuild_fonts();
 
-        void resize(const uint2 size);
+        // void resize(const uint2 size);
 
         void set_clear_color(const float4 color);
 

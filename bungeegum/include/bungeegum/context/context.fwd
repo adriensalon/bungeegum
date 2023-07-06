@@ -13,11 +13,11 @@ namespace bungeegum {
 namespace detail {
 
     struct context {
-        inline static std::vector<window_resized_interaction_data> window_resized_interactions = {};
-        inline static std::vector<mouse_moved_interaction_data> mouse_moved_interactions = {};
-        inline static std::vector<mouse_down_interaction_data> mouse_down_interactions = {};
-        inline static std::vector<mouse_up_interaction_data> mouse_up_interactions = {};
-        inline static std::vector<mouse_pressed_interaction_data> mouse_pressed_interactions = {};
+        inline static std::vector<window_resized_event> window_resized_events = {};
+        inline static std::vector<mouse_moved_event> mouse_moved_events = {};
+        inline static std::vector<mouse_down_event> mouse_down_events = {};
+        inline static std::vector<mouse_up_event> mouse_up_events = {};
+        inline static std::vector<mouse_pressed_event> mouse_pressed_events = {};
 
         static void execute_interact();
 
@@ -25,8 +25,6 @@ namespace detail {
 
         static void execute_draw(ImDrawList* imgui_drawlist, const bool heads_start);
     };
-
-    void process_input(const std::any& input);
 
     bool tick(const std::chrono::milliseconds& delta_time);
 

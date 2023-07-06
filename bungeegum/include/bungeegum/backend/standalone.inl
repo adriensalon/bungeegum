@@ -52,10 +52,31 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
         if (on_renderer_started)
             on_renderer_started();
         _renderer.rebuild_fonts();
-        _window.on_event([&_renderer](const std::any& _event) {
-            _renderer.process_input(_event);
-            detail::process_input(_event);
+
+        //
+        // web events
+        _window.on_mouse_down([](const detail::mouse_down_event& event) {
+            detail::context::mouse_down_events.push_back(event);
         });
+        _window.on_mouse_moved([](const detail::mouse_moved_event& event) {
+            detail::context::mouse_moved_events.push_back(event);
+        });
+        _window.on_mouse_pressed([](const detail::mouse_pressed_event& event) {
+            detail::context::mouse_pressed_events.push_back(event);
+        });
+        _window.on_mouse_up([](const detail::mouse_up_event& event) {
+            detail::context::mouse_up_events.push_back(event);
+        });
+        _window.on_window_resized([&_renderer](const detail::window_resized_event& event) {
+            detail::context::window_resized_events.push_back(event);
+            _renderer.process_window_resized_event(event);
+        });
+        _window.on_sdl_event([&_renderer](const SDL_Event* event) { // TOUJOURS CA MAIS FAUT REMOVE IMGUI PR CLEAN
+            _renderer.process_sdl_event_for_imgui(event);
+        });
+        //
+        //
+
         _window.on_update([&_window, &_renderer, &_stopwatch]() {
             detail::update_desired_data(_window);
             detail::viewport_size = _window.get_size();

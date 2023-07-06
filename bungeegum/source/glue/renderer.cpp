@@ -136,25 +136,39 @@ namespace detail {
         _renderer.swap_chain->Present();
     }
 
-    void renderer::process_input(const std::any& input)
+    // void renderer::process_input(const std::any& input)
+    // {
+    //     diligent_renderer& _renderer = get(_diligent_renderer);
+    //     SDL_Event _event = std::any_cast<SDL_Event>(input);
+    //     if (_event.type == SDL_WINDOWEVENT) {
+    //         if (_event.window.event == SDL_WINDOWEVENT_RESIZED) {
+    //             int _width, _height;
+    //             SDL_GetWindowSize(_renderer.sdl_window, &_width, &_height);
+    //             _renderer.swap_chain->Resize(_width, _height);
+    //         }
+    //     }
+    //     const SDL_Event* _event_ptr = &_event;
+    // _renderer.imgui_renderer->ProcessEvent(_event_ptr);
+    // }
+
+    void renderer::process_sdl_event_for_imgui(const SDL_Event* event)
     {
         diligent_renderer& _renderer = get(_diligent_renderer);
-        SDL_Event _event = std::any_cast<SDL_Event>(input);
-        if (_event.type == SDL_WINDOWEVENT) {
-            if (_event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                int _width, _height;
-                SDL_GetWindowSize(_renderer.sdl_window, &_width, &_height);
-                _renderer.swap_chain->Resize(_width, _height);
-            }
-        }
-        const SDL_Event* _event_ptr = &_event;
-        _renderer.imgui_renderer->ProcessEvent(_event_ptr);
+        _renderer.imgui_renderer->ProcessEvent(event);
     }
 
-    void renderer::resize(const uint2 size)
+    void renderer::process_window_resized_event(const window_resized_event& event)
     {
         diligent_renderer& _renderer = get(_diligent_renderer);
-        _renderer.swap_chain->Resize(static_cast<int>(size.x), static_cast<int>(size.y));
+        _renderer.swap_chain->Resize(
+            static_cast<uint1>(event.new_size.x),
+            static_cast<uint1>(event.new_size.y));
     }
+
+    // void renderer::resize(const uint2 size)
+    // {
+    //     diligent_renderer& _renderer = get(_diligent_renderer);
+    //     _renderer.swap_chain->Resize(static_cast<int>(size.x), static_cast<int>(size.y));
+    // }
 }
 }

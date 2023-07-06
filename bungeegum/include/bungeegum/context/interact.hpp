@@ -29,7 +29,7 @@ struct window_resized_interaction {
     [[nodiscard]] float2 new_size() const;
 
 private:
-    detail::window_resized_interaction_data _data;
+    detail::window_resized_event _event;
     friend struct interact_command;
     friend struct detail::context;
 };
@@ -46,7 +46,7 @@ struct mouse_moved_interaction {
     [[nodiscard]] float2 relative_position() const;
 
 private:
-    detail::mouse_moved_interaction_data _data;
+    detail::mouse_moved_event _event;
     friend struct interact_command;
     friend struct detail::context;
 };
@@ -68,7 +68,7 @@ struct mouse_down_interaction {
     [[nodiscard]] mouse_button button() const;
 
 private:
-    detail::mouse_down_interaction_data _data;
+    detail::mouse_down_event _event;
     friend struct interact_command;
     friend struct detail::context;
 };
@@ -81,7 +81,7 @@ struct mouse_up_interaction {
     [[nodiscard]] mouse_button button() const;
 
 private:
-    detail::mouse_up_interaction_data _data;
+    detail::mouse_up_event _event;
     friend struct interact_command;
     friend struct detail::context;
 };
@@ -94,7 +94,7 @@ struct mouse_pressed_interaction {
     [[nodiscard]] mouse_button button() const;
 
 private:
-    detail::mouse_pressed_interaction_data _data;
+    detail::mouse_pressed_event _event;
     friend struct interact_command;
     friend struct detail::context;
 };
