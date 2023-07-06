@@ -1,5 +1,15 @@
 #pragma once
 
+#include <array>
+
+#include <imgui.h>
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+// imgui emscripten ?
+#else
+#include <imgui_impl_sdl.h>
+#endif
+#include <implot.h>
+
 // define those before including diligent headers
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #define PLATFORM_EMSCRIPTEN
@@ -25,150 +35,91 @@
 #include <ImGui/interface/ImGuiDiligentRenderer.hpp>
 #include <ImGui/interface/ImGuiImplDiligent.hpp>
 #include <ImGui/interface/ImGuiImplSDL.hpp>
-#include <SDL.h>
-#include <imgui.h>
-#include <imgui_impl_sdl.h>
-#include <implot.h>
 
 #include <bungeegum/glue/renderer.fwd>
+#include <bungeegum/glue/backtrace.fwd>
 
 namespace bungeegum {
 namespace detail {
 
-    namespace {
-
-        struct diligent_renderer {
-            diligent_renderer() = default;
-            diligent_renderer(const diligent_renderer& other)
-            {
-                *this = other;
-            }
-            diligent_renderer& operator=(const diligent_renderer& other)
-            {
-                render_device = other.render_device;
-                device_context = other.device_context;
-                swap_chain = other.swap_chain;
-                imgui_renderer = other.imgui_renderer;
-                sdl_window = other.sdl_window;
-                return *this;
-            }
-            diligent_renderer(diligent_renderer&& other)
-            {
-                *this = std::move(other);
-            }
-            diligent_renderer& operator=(diligent_renderer&& other)
-            {
-                render_device = std::move(other.render_device);
-                device_context = std::move(other.device_context);
-                swap_chain = std::move(other.swap_chain);
-                imgui_renderer = std::move(other.imgui_renderer);
-                sdl_window = std::move(other.sdl_window);
-                return *this;
-            }
-            Diligent::RefCntAutoPtr<Diligent::IRenderDevice> render_device = {};
-            Diligent::RefCntAutoPtr<Diligent::IDeviceContext> device_context = {};
-            Diligent::RefCntAutoPtr<Diligent::ISwapChain> swap_chain = {};
-            std::shared_ptr<Diligent::ImGuiImplSDL> imgui_renderer = nullptr;
-            SDL_Window* sdl_window = nullptr;
-        };
-
-        diligent_renderer& get(std::any& untyped)
-        {
-            return std::any_cast<diligent_renderer&>(untyped);
-        }
-    }
+    struct renderer::renderer_data {
+        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> render_device = {};
+        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> device_context = {};
+        Diligent::RefCntAutoPtr<Diligent::ISwapChain> swap_chain = {};
+        std::shared_ptr<Diligent::ImGuiImplSDL> imgui_renderer = nullptr;
+        SDL_Window* sdl_window = nullptr;
+    };
 
     renderer::renderer(const window& existing_window)
     {
-        _diligent_renderer = std::make_any<diligent_renderer>();
-        diligent_renderer& _renderer = get(_diligent_renderer);
-        _renderer.sdl_window = existing_window.get_sdl_window();
+        _data = std::make_shared<renderer_data>();
+        _data->sdl_window = existing_window.get_sdl_window();
         Diligent::SwapChainDesc _swap_chain_descriptor;
-        if constexpr (is_renderer_backend_directx) {
-            Diligent::IEngineFactoryD3D11* pFactoryD3D11 = Diligent::GetEngineFactoryD3D11();
-            Diligent::EngineD3D11CreateInfo _engine_create_info;
-            // _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
-            pFactoryD3D11->CreateDeviceAndContextsD3D11(_engine_create_info, &(_renderer.render_device), &(_renderer.device_context));
-            Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native_window());
-            pFactoryD3D11->CreateSwapChainD3D11(_renderer.render_device, _renderer.device_context, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, _win32_native_window, &(_renderer.swap_chain));
-        } else if constexpr (is_renderer_backend_vulkan) {
-        } else if constexpr (is_renderer_backend_opengl) {
-            Diligent::IEngineFactoryOpenGL* _factory_ptr = Diligent::GetEngineFactoryOpenGL();
-            Diligent::EngineGLCreateInfo _engine_create_info;
-            _engine_create_info.Window = { existing_window.get_native_window() };
-            // kidnap std::cout ? => go dans libconsole ?
-            _factory_ptr->CreateDeviceAndSwapChainGL(_engine_create_info, &(_renderer.render_device), &(_renderer.device_context), _swap_chain_descriptor, &(_renderer.swap_chain));
-        }
+#if PREFERRED_RENDERER_DIRECTX
+        Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
+        Diligent::EngineD3D11CreateInfo _engine_create_info;
+        // _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
+        _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &(_data->render_device), &(_data->device_context));
+        Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native_window());
+        _factory_ptr->CreateSwapChainD3D11(_data->render_device, _data->device_context, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, _win32_native_window, &(_data->swap_chain));
+#elif PREFERRED_RENDERER_VULKAN
+#elif PREFERRED_RENDERER_OPENGL
+        Diligent::IEngineFactoryOpenGL* _factory_ptr = Diligent::GetEngineFactoryOpenGL();
+        Diligent::EngineGLCreateInfo _engine_create_info;
+        _engine_create_info.Window = { existing_window.get_native_window() };
+        // kidnap std::cout ? => go dans libconsole ?
+        _factory_ptr->CreateDeviceAndSwapChainGL(_engine_create_info, &(_data->render_device), &(_data->device_context), _swap_chain_descriptor, &(_data->swap_chain));
+#endif
 
-        const auto& SCDesc = _renderer.swap_chain->GetDesc();
-        _renderer.imgui_renderer = std::make_shared<Diligent::ImGuiImplSDL>(existing_window.get_sdl_window(), _renderer.render_device, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat);
+        const auto& SCDesc = _data->swap_chain->GetDesc();
+        _data->imgui_renderer = std::make_shared<Diligent::ImGuiImplSDL>(existing_window.get_sdl_window(), _data->render_device, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat);
         ImPlot::CreateContext();
     }
 
     void renderer::rebuild_fonts()
     {
-        diligent_renderer& _renderer = get(_diligent_renderer);
-        _renderer.imgui_renderer->CreateDeviceObjects();
-    }
-
-    void renderer::set_clear_color(const float4 color)
-    {
-        _clear_color = color;
+        _data->imgui_renderer->CreateDeviceObjects();
     }
 
     void renderer::new_frame()
     {
-        diligent_renderer& _renderer = get(_diligent_renderer);
-        Diligent::ITextureView* _rtv_ptr = _renderer.swap_chain->GetCurrentBackBufferRTV();
-        Diligent::ITextureView* _dsv_ptr = _renderer.swap_chain->GetDepthBufferDSV();
-        _renderer.device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        // bizarre un peu la conversion
-        _renderer.device_context->ClearRenderTarget(_rtv_ptr, std::array<float, 4> { _clear_color.x, _clear_color.y, _clear_color.z, _clear_color.w }.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        _renderer.device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        const Diligent::SwapChainDesc& _swap_chain_desc = _renderer.swap_chain->GetDesc();
-        _renderer.imgui_renderer->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
+		if (_is_rendering) {
+			throw backtraced_exception("TODO", backtrace_size);
+		}
+        Diligent::ITextureView* _rtv_ptr = _data->swap_chain->GetCurrentBackBufferRTV();
+        Diligent::ITextureView* _dsv_ptr = _data->swap_chain->GetDepthBufferDSV();
+        _data->device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        const std::array<float, 4> _clear_color_array = { clear_color.x, clear_color.y, clear_color.z, clear_color.w };
+        _data->device_context->ClearRenderTarget(_rtv_ptr, _clear_color_array.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        _data->device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        const Diligent::SwapChainDesc& _swap_chain_desc = _data->swap_chain->GetDesc();
+        _data->imgui_renderer->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
+		_is_rendering = true;
     }
 
     void renderer::present()
     {
-        diligent_renderer& _renderer = get(_diligent_renderer);
-        _renderer.imgui_renderer->Render(_renderer.device_context);
-        _renderer.swap_chain->Present();
+		if (!_is_rendering) {
+			throw backtraced_exception("TODO", backtrace_size);
+		}
+        _data->imgui_renderer->Render(_data->device_context);
+        _data->swap_chain->Present();
+		_is_rendering = false;
     }
-
-    // void renderer::process_input(const std::any& input)
-    // {
-    //     diligent_renderer& _renderer = get(_diligent_renderer);
-    //     SDL_Event _event = std::any_cast<SDL_Event>(input);
-    //     if (_event.type == SDL_WINDOWEVENT) {
-    //         if (_event.window.event == SDL_WINDOWEVENT_RESIZED) {
-    //             int _width, _height;
-    //             SDL_GetWindowSize(_renderer.sdl_window, &_width, &_height);
-    //             _renderer.swap_chain->Resize(_width, _height);
-    //         }
-    //     }
-    //     const SDL_Event* _event_ptr = &_event;
-    // _renderer.imgui_renderer->ProcessEvent(_event_ptr);
-    // }
 
     void renderer::process_sdl_event_for_imgui(const SDL_Event* event)
     {
-        diligent_renderer& _renderer = get(_diligent_renderer);
-        _renderer.imgui_renderer->ProcessEvent(event);
+        _data->imgui_renderer->ProcessEvent(event);
     }
 
     void renderer::process_window_resized_event(const window_resized_event& event)
     {
-        diligent_renderer& _renderer = get(_diligent_renderer);
-        _renderer.swap_chain->Resize(
-            static_cast<uint1>(event.new_size.x),
-            static_cast<uint1>(event.new_size.y));
+        _data->swap_chain->Resize(static_cast<uint1>(event.new_size.x), static_cast<uint1>(event.new_size.y));
     }
 
-    // void renderer::resize(const uint2 size)
-    // {
-    //     diligent_renderer& _renderer = get(_diligent_renderer);
-    //     _renderer.swap_chain->Resize(static_cast<int>(size.x), static_cast<int>(size.y));
-    // }
+    void renderer::resize_swapchain(const uint2 size)
+    {
+        _data->swap_chain->Resize(size.x, size.y);
+    }
 }
 }

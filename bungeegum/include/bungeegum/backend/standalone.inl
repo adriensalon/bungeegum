@@ -104,7 +104,7 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
             //
             //
         });
-        _renderer.set_clear_color({ 1.f, 1.f, 1.f, 1.f });
+        _renderer.clear_color = { 1.f, 1.f, 1.f, 1.f };
         _window.run_loop();
     });
 }

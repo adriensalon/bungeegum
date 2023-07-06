@@ -44,6 +44,7 @@ namespace detail {
 
     window::window()
     {
+        _data = std::make_shared<window_data>();
         if constexpr (is_platform_emscripten_v) {
             static bool1 _is_already_created = false;
             if (_is_already_created) {
@@ -65,7 +66,6 @@ namespace detail {
                 }
                 window_data::is_sdl_main_ready = true;
             }
-            _data = std::make_shared<window_data>();
             SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
             _data->sdl_window = SDL_CreateWindow(
                 window_data::sdl_default_window_title.data(),
@@ -99,6 +99,7 @@ namespace detail {
         static_assert(!is_platform_emscripten_v, "An instance can only be created from an raw pointer to an OS window on "
                                                  "platforms where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
         (void)native_window;
+        _data = std::make_shared<window_data>();
 
         //
         //
@@ -112,6 +113,7 @@ namespace detail {
         static_assert(!is_platform_emscripten_v, "An instance can only be created from an SDL_Window on platforms "
                                                  "where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
         window_data::is_sdl_main_ready = true;
+        _data = std::make_shared<window_data>();
         _data->sdl_window = sdl_window;
     }
 

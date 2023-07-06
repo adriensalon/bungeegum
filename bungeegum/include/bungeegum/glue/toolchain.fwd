@@ -10,7 +10,7 @@
 #define TOOLCHAIN_ARCH_32 0
 #define TOOLCHAIN_ARCH_64 1
 #else
-#error BAD IMPLEMENTATION (unknown pointer size or missing size macros)
+#error Unknown pointer size or missing size macros. Please define INTPTR_MAX && (INT32_MAX || INT64_MAX).
 #endif
 
 // cpu detection
@@ -76,7 +76,7 @@
 #define TOOLCHAIN_PLATFORM_LINUX 0
 #define TOOLCHAIN_PLATFORM_ANDROID 0
 #else
-#error "BAD IMPLEMENTATION (unknown Apple platform)"
+#error "Undefined Apple platform. Please define TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE || TARGET_OS_MAC."
 #endif
 #elif defined(_WIN32)
 #include <winapifamily.h>
@@ -126,7 +126,7 @@
 #define TOOLCHAIN_COMPILER_GCC 0
 #endif
 
-// build variant
+// build variant detection
 #if defined(NDEBUG)
 #define TOOLCHAIN_BUILD_DEBUG 0
 #define TOOLCHAIN_BUILD_RELEASE 1
@@ -138,26 +138,55 @@
 namespace bungeegum {
 namespace detail {
 
+    /// @brief True if the current architecture is 32bits.
     constexpr bool is_arch_32_v = TOOLCHAIN_ARCH_32;
+
+    /// @brief True if the current architecture is 64bits.
     constexpr bool is_arch_64_v = TOOLCHAIN_ARCH_64;
 
+    /// @brief True if the current CPU architecture is x86.
     constexpr bool is_cpu_x86_v = TOOLCHAIN_CPU_X86;
+
+    /// @brief True if the current CPU architecture is ARM.
     constexpr bool is_cpu_arm_v = TOOLCHAIN_CPU_ARM;
+
+    /// @brief True if the current "CPU" architecture is WEBASM.
     constexpr bool is_cpu_webasm_v = TOOLCHAIN_CPU_WEBASM;
 
+    /// @brief True if the current platform is emscripten.
     constexpr bool is_platform_emscripten_v = TOOLCHAIN_PLATFORM_EMSCRIPTEN;
+
+    /// @brief True if the current platform is Win32.
     constexpr bool is_platform_win32_v = TOOLCHAIN_PLATFORM_WIN32;
+
+    /// @brief True if the current platform is Universal Windows Platform.
     constexpr bool is_platform_uwp_v = TOOLCHAIN_PLATFORM_UWP;
+
+    /// @brief True if the current platform is MacOS.
     constexpr bool is_platform_macos_v = TOOLCHAIN_PLATFORM_MACOS;
+
+    /// @brief True if the current platform is iOS.
     constexpr bool is_platform_ios_v = TOOLCHAIN_PLATFORM_IOS;
+	
+    /// @brief True if the current platform is Linux but not Android.
     constexpr bool is_platform_linux_v = TOOLCHAIN_PLATFORM_LINUX;
+	
+    /// @brief True if the current platform is Android.
     constexpr bool is_platform_android_v = TOOLCHAIN_PLATFORM_ANDROID;
 
+    /// @brief True if the current compiler is MSVC.
     constexpr bool is_compiler_msvc_v = TOOLCHAIN_COMPILER_MSVC;
+	
+    /// @brief True if the current compiler is Clang.
     constexpr bool is_compiler_clang_v = TOOLCHAIN_COMPILER_CLANG;
+	
+    /// @brief True if the current compiler is GCC.
     constexpr bool is_compiler_gcc_v = TOOLCHAIN_COMPILER_GCC;
 
+    /// @brief True if the current build variant is debug.
     constexpr bool is_build_debug_v = TOOLCHAIN_BUILD_DEBUG;
+	
+    /// @brief True if the current build variant is release.
     constexpr bool is_build_release_v = TOOLCHAIN_BUILD_RELEASE;
 
 }

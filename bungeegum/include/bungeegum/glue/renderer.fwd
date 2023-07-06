@@ -1,24 +1,28 @@
 #pragma once
 
-#include <any>
-#include <array>
+#include <memory>
 
 #include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/toolchain.fwd>
 #include <bungeegum/glue/window.fwd>
 
-#define RENDERER_BACKEND_DIRECTX (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
-#define RENDERER_BACKEND_VULKAN (TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
-#define RENDERER_BACKEND_OPENGL (TOOLCHAIN_PLATFORM_EMSCRIPTEN || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_IOS)
+/// @brief Defines if the preferred GPU renderer is DirectX.
+/// @details Only D3D11 is implemented right now.
+#define PREFERRED_RENDERER_DIRECTX (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
+
+/// @brief Defines if the preferred GPU renderer is Vulkan.
+#define PREFERRED_RENDERER_VULKAN (TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
+
+/// @brief Defines if the preferred GPU renderer is OpenGL.
+#define PREFERRED_RENDERER_OPENGL (TOOLCHAIN_PLATFORM_EMSCRIPTEN || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_IOS)
 
 namespace bungeegum {
 namespace detail {
 
-    constexpr bool is_renderer_backend_directx = RENDERER_BACKEND_DIRECTX;
-    constexpr bool is_renderer_backend_vulkan = RENDERER_BACKEND_VULKAN;
-    constexpr bool is_renderer_backend_opengl = RENDERER_BACKEND_OPENGL;
-
-    /// @brief
+    /// @brief Instances of this struct represent cross-platform GPU renderers that will select the
+    /// most appropriate graphics API depending on the platform. Macros defined above can be
+    /// modified to force usage of a specific platform.
+    /// @details Instances of this struct can only be moved.
     struct renderer {
         renderer() = delete;
         renderer(const renderer& other) = delete;
@@ -26,25 +30,40 @@ namespace detail {
         renderer(renderer&& other) = default;
         renderer& operator=(renderer&& other) = default;
 
+        /// @brief Creates an instance from a cross-platform window.
         renderer(const window& existing);
 
+        /// @brief Begins a new frame, enabling all drawing commands.
+        /// @exception Throws a backtraced exception if a new frame has already begun.
         void new_frame();
 
+        /// @brief Ends the frame, disabling all drawing commands. Swaps the window buffers.
+        /// @exception Throws a backtraced exception if the frame has already been ended.
         void present();
 
+        /// @brief Processes ImGui events from SDL. (To be removed)
         void process_sdl_event_for_imgui(const SDL_Event* event);
 
+        /// @brief Processes window resized events from a window, and resizes the swapchain.
         void process_window_resized_event(const window_resized_event& event);
 
+        /// @brief Rebuilds the ImGui fonts. (To be removed)
         void rebuild_fonts();
 
-        // void resize(const uint2 size);
+        /// @brief Resizes the swapchain.
+        void resize_swapchain(const uint2 size);
 
-        void set_clear_color(const float4 color);
+        /// @brief The color to use when clearing the screen.
+        float4 clear_color = { 0.f, 0.f, 0.f, 1.f };
+
+        /// @brief Length of the trace when collecting runtime backtraced exceptions.
+        inline static std::size_t backtrace_size = 10u;
 
     private:
-        std::any _diligent_renderer = nullptr;
-        float4 _clear_color = { 0.f, 0.f, 0.f, 1.f };
+        bool1 _is_rendering = false;
+
+        struct renderer_data;
+        std::shared_ptr<renderer_data> _data = nullptr;
     };
 }
 }
