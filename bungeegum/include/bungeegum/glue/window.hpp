@@ -6,7 +6,7 @@
 #include <string>
 
 #include <bungeegum/glue/simd.hpp>
-#include <bungeegum/glue/toolchain.fwd>
+#include <bungeegum/glue/toolchain.hpp>
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
 struct SDL_Window;
@@ -101,12 +101,12 @@ namespace detail {
         /// @details Event callbacks are fired after poll() has been invoked.
         void on_window_resized(const std::function<void(const window_resized_event&)>& window_resized_callback);
 
-        /// @brief Collects all the events fired since the last call to poll() and triggers 
-		/// appropriate callbacks.
+        /// @brief Collects all the events fired since the last call to poll() and triggers
+        /// appropriate callbacks.
         bool poll();
 
         /// @brief Blocks the thread and starts an infinite loop that executes the callback defined
-		/// with on_update() then swaps buffers.
+        /// with on_update() then swaps buffers.
         void run_loop();
 
         /// @brief Sets the fullscreen mode of this instance.

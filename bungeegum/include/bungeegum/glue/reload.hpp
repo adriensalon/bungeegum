@@ -7,8 +7,8 @@
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
-#include <bungeegum/glue/archive.fwd>
-#include <bungeegum/glue/foreach.fwd>
+#include <bungeegum/glue/archive.hpp>
+#include <bungeegum/glue/foreach.hpp>
 #include <bungeegum/glue/simd.hpp>
 
 namespace hscpp {

@@ -1,6 +1,6 @@
-#include <bungeegum/glue/backtrace.fwd>
-#include <bungeegum/glue/toolchain.fwd>
-#include <bungeegum/glue/window.fwd>
+#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/toolchain.hpp>
+#include <bungeegum/glue/window.hpp>
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <emscripten/emscripten.h>

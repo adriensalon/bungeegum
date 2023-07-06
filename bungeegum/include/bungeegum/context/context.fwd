@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <bungeegum/context/interact.hpp>
-#include <bungeegum/glue/detection.fwd>
+#include <bungeegum/glue/detection.hpp>
 
 struct ImDrawList;
 

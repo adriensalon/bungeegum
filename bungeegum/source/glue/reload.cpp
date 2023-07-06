@@ -3,8 +3,8 @@
 #include <hscpp/mem/MemoryManager.h>
 
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/archive.fwd>
-#include <bungeegum/glue/reload.fwd>
+#include <bungeegum/glue/archive.hpp>
+#include <bungeegum/glue/reload.hpp>
 
 namespace bungeegum {
 namespace detail {

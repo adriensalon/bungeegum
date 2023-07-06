@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include <bungeegum/glue/console.fwd>
-#include <bungeegum/glue/toolchain.fwd>
+#include <bungeegum/glue/console.hpp>
+#include <bungeegum/glue/toolchain.hpp>
 
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
 #include <windows.h>

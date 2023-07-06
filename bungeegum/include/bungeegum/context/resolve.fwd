@@ -4,7 +4,7 @@
 #include <optional>
 #include <type_traits>
 
-#include <bungeegum/glue/raw.fwd>
+#include <bungeegum/glue/raw.hpp>
 #include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {

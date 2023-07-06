@@ -5,7 +5,7 @@
 
 #include <entt/entt.hpp>
 
-#include <bungeegum/glue/typelist.fwd>
+#include <bungeegum/glue/typelist.hpp>
 
 namespace bungeegum {
 namespace detail {

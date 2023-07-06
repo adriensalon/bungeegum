@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/backtrace.hpp>
 
 namespace bungeegum {
 namespace detail {

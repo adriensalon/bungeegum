@@ -36,8 +36,9 @@
 #include <ImGui/interface/ImGuiImplDiligent.hpp>
 #include <ImGui/interface/ImGuiImplSDL.hpp>
 
-#include <bungeegum/glue/renderer.fwd>
-#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/renderer.hpp>
+
 
 namespace bungeegum {
 namespace detail {

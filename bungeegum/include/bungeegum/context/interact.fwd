@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <bungeegum/glue/simd.hpp>
-#include <bungeegum/glue/window.fwd>
+#include <bungeegum/glue/window.hpp>
 
 namespace bungeegum {
 

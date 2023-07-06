@@ -7,10 +7,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include <bungeegum/glue/map.fwd>
-#include <bungeegum/glue/raw.fwd>
-#include <bungeegum/glue/registry.fwd>
-#include <bungeegum/glue/typelist.fwd>
+#include <bungeegum/glue/map.hpp>
+#include <bungeegum/glue/raw.hpp>
+#include <bungeegum/glue/registry.hpp>
+#include <bungeegum/glue/typelist.hpp>
 
 namespace bungeegum {
 

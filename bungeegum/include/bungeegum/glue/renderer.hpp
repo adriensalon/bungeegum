@@ -3,8 +3,8 @@
 #include <memory>
 
 #include <bungeegum/glue/simd.hpp>
-#include <bungeegum/glue/toolchain.fwd>
-#include <bungeegum/glue/window.fwd>
+#include <bungeegum/glue/toolchain.hpp>
+#include <bungeegum/glue/window.hpp>
 
 /// @brief Defines if the preferred GPU renderer is DirectX.
 /// @details Only D3D11 is implemented right now.

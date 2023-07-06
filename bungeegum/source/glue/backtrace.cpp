@@ -1,6 +1,6 @@
 #include <backward.hpp>
 
-#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/backtrace.hpp>
 
 namespace bungeegum {
 namespace detail {

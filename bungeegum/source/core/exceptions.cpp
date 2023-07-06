@@ -4,8 +4,8 @@
 
 #include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/backtrace.fwd>
-#include <bungeegum/glue/console.fwd>
+#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/console.hpp>
 
 namespace bungeegum {
 namespace detail {

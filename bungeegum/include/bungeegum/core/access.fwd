@@ -4,8 +4,8 @@
 #include <bungeegum/context/interact.hpp>
 #include <bungeegum/context/resolve.hpp>
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/archive.fwd>
-#include <bungeegum/glue/detection.fwd>
+#include <bungeegum/glue/archive.hpp>
+#include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {

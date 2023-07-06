@@ -1,4 +1,4 @@
-#include <bungeegum/glue/registry.fwd>
+#include <bungeegum/glue/registry.hpp>
 
 namespace bungeegum {
 namespace detail {
