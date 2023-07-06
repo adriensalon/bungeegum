@@ -10,7 +10,9 @@
 namespace bungeegum {
 namespace detail {
 
-    /// @brief
+    /// @brief Instances of this struct store key-value pairs with a design that favors fast
+    /// iteration, while only adding an indexing operation for accessing a value from a key.
+    /// @details Instances of this struct can be copied and moved.
     /// @tparam key_t is the type to use for keys. This type must meet the requirements of a
     /// in a std::unordered_map key type.
     /// @tparam value_t is the type to use for values. This type must meet the requirements of a
@@ -23,7 +25,7 @@ namespace detail {
         indexed_map(indexed_map&& other) = default;
         indexed_map& operator=(indexed_map&& other) = default;
 
-        /// @brief Creates an indexed_map from a set of key-value pairs.
+        /// @brief Creates an instance from a set of key-value pairs.
         indexed_map(std::initializer_list<std::pair<key_t, value_t>> values);
 
         /// @brief Gets a reference to a value from its key.
@@ -34,10 +36,10 @@ namespace detail {
         /// @exception Throws a backtraced exception if the key is not contained.
         [[nodiscard]] const value_t& at(const key_t& key) const;
 
-        /// @brief Gets a begin iterator to use with range loops
+        /// @brief Gets a begin iterator to use with range loops.
         [[nodiscard]] std::vector<value_t>::template iterator begin();
 
-        /// @brief Gets a const begin iterator to use with range loops
+        /// @brief Gets a const begin iterator to use with range loops.
         [[nodiscard]] std::vector<value_t>::template const_iterator begin() const;
 
         /// @brief Gets if a key is contained.
@@ -51,10 +53,10 @@ namespace detail {
         /// @exception Throws a backtraced exception if the key is not contained.
         void erase(const key_t& key);
 
-        /// @brief Gets a end iterator to use with range loops
+        /// @brief Gets a end iterator to use with range loops.
         [[nodiscard]] std::vector<value_t>::template iterator end();
 
-        /// @brief Gets a const end iterator to use with range loops
+        /// @brief Gets a const end iterator to use with range loops.
         [[nodiscard]] std::vector<value_t>::template const_iterator end() const;
 
         /// @brief Gets a reference to a value from its key.

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <filesystem>
 
 #define HSCPP_CXX_STANDARD 17
@@ -108,7 +109,8 @@ namespace detail {
         friend struct reloader;
     };
 
-    enum struct reload_result {
+    /// @brief Current state of the hotswapping.
+    enum struct reload_state {
         idle,
         compiling,
         started_compiling,
@@ -116,6 +118,9 @@ namespace detail {
         failed_swap,
     };
 
+    /// @brief Instances of this struct allocate memory that can be hotswapped. They trigger
+    /// compilation and manage the files and directories to provide to the compiler.
+    /// @details Instances of this struct can only be moved.
     struct reloader {
         reloader();
         reloader(const reloader& other) = delete;
@@ -123,17 +128,36 @@ namespace detail {
         reloader(reloader&& other) = default;
         reloader& operator=(reloader&& other) = default;
 
+        /// @brief Allocates a new object that can be hotswapped, taking no argument.
+        /// @exception Throws a compile-time exception if the widget type is not default-
+        /// constructible.
         template <typename widget_t>
         reloaded<widget_t> allocate();
 
-        uint1 allocated_blocks_count();
+        /// @brief Gets the amount of memory blocks currently allocated.
+        std::size_t allocated_blocks_count();
+
+        /// @brief Emplaces an include directory for recompilation.
         void add_include_directory(const std::filesystem::path& directory);
+
+        /// @brief Emplaces a static library for recompilation.
         void add_library(const std::filesystem::path& file);
+
+        /// @brief Emplaces a source directory for recompilation.
         void add_source_directory(const std::filesystem::path& directory);
+
+        /// @brief Emplaces a source file that will be recompiled each time.
         void add_force_compiled_source_file(const std::filesystem::path& file);
+
+        /// @brief Clears all files and directories provided for recompilation.
         void clear();
+
+        /// @brief Forces an update, blocking the thread until recompilation has finished.
         void force_update();
-        reload_result update();
+
+        /// @brief Asynchronously waits for changes in the provided files and folders, triggers
+        /// recompilation when needed and hotswaps allocated objects.
+        reload_state update();
 
     private:
         std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
@@ -143,7 +167,7 @@ namespace detail {
 #else
 
     template <typename widget_t>
-    using reloaded = widget_t&;
+    using reloaded = std::reference_wrapper<widget_t>;
 
 #endif
 }

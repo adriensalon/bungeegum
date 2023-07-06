@@ -44,6 +44,8 @@ namespace detail {
         std::unordered_map<std::uintptr_t, entity_t> possessed = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_event_data>> registered = {};
 
+        indexed_map<std::uintptr_t, std::reference_wrapper<untyped_event_data>> tickables = {};
+
         template <typename... values_t>
         typed_event_data<values_t...>& get_typed(event<values_t...>& event_object);
     };

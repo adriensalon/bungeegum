@@ -1,6 +1,10 @@
 #pragma once
 
+// THE C++ DETECTION IDIOM
+
 // https://en.cppreference.com/w/cpp/experimental/is_detected
+
+// These will no longer be useful with C++20 thanks to concepts (!)
 
 #include <type_traits>
 

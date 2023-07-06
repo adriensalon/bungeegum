@@ -74,10 +74,10 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
 
             // FAIRE PAREIL AVANT / APRES FORCE UPDATE
             //
-            detail::reload_result _reload_result = detail::reload_manager->update();
-            if (_reload_result == detail::reload_result::started_compiling) {
+            detail::reload_state _reload_result = detail::reload_manager->update();
+            if (_reload_result == detail::reload_state::started_compiling) {
                 detail::widgets_context.save_widgets("C:/Users/adri/desktop/ok.json");
-            } else if (_reload_result == detail::reload_result::performed_swap) {
+            } else if (_reload_result == detail::reload_state::performed_swap) {
                 detail::widgets_context.load_widgets("C:/Users/adri/desktop/ok.json");
             }
             //

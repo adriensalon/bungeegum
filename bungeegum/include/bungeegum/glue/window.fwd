@@ -11,15 +11,23 @@ struct SDL_Window;
 namespace bungeegum {
 namespace detail {
 
+    /// @brief Instances of this struct represent cross-platform OS windows that can be modified
+    /// at runtime, collect OS events such as input, and swap buffers after rendering has finished.
+    /// @brief Instances of this struct can only be moved.
     struct window {
         window();
-        window(void* native_window);
-        window(SDL_Window* sdl_window);
         window(const window& other) = delete;
         window& operator=(const window& other) = delete;
         window(window&& other);
         window& operator=(window&& other);
         ~window();
+
+        /// @brief Creates an instance from an opaque OS window.
+        /// @details This only works on platforms : Windows, MacOS, Linux
+        window(void* native_window);
+
+        /// @brief Creates an instance from an existing SDL window.
+        window(SDL_Window* sdl_window);
 
         [[nodiscard]] void* get_native_window() const;
         [[nodiscard]] SDL_Window* get_sdl_window() const;

@@ -31,9 +31,10 @@ namespace detail {
         emplace_traces(tracing, tracing_size);
     }
 
-    backtraced_exception::backtraced_exception(const std::exception& existing)
+    backtraced_exception::backtraced_exception(const std::exception& existing, const std::size_t tracing_size)
     {
         _what = std::string(existing.what());
+        emplace_traces(tracing, tracing_size);
     }
 
     backtraced_exception::backtraced_exception(backtraced_exception&& other)

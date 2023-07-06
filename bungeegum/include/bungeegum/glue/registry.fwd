@@ -12,22 +12,22 @@ namespace detail {
 
     using entity_t = ENTT_ID_TYPE;
 
-    struct generator {
-        inline static entity_t create()
-        {
-            entity_t _retval = _max_entity;
-            _max_entity++;
-            return _retval;
-        }
-        inline static void destroy(const entity_t& ent)
-        {
-            (void)ent;
-        }
+    // struct generator {
+    //     inline static entity_t create()
+    //     {
+    //         entity_t _retval = _max_entity;
+    //         _max_entity++;
+    //         return _retval;
+    //     }
+    //     inline static void destroy(const entity_t& ent)
+    //     {
+    //         (void)ent;
+    //     }
 
-    private:
-        inline static entity_t _max_entity = 0;
-        inline static std::vector<entity_t> _deleted_entities;
-    };
+    // private:
+    //     inline static entity_t _max_entity = 0;
+    //     inline static std::vector<entity_t> _deleted_entities;
+    // };
 
     struct registry {
         registry();

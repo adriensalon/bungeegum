@@ -20,9 +20,9 @@ namespace detail {
         // _swapper->SetGlobalUserData(&(widgets_context));
     }
 
-    uint1 reloader::allocated_blocks_count()
+    std::size_t reloader::allocated_blocks_count()
     {
-        return static_cast<uint1>(_manager.get()->operator->()->GetNumBlocks());
+        return (_manager.get()->operator->()->GetNumBlocks());
     }
 
     void reloader::add_include_directory(const std::filesystem::path& directory)
@@ -56,9 +56,9 @@ namespace detail {
         _swapper->ClearSourceDirectories();
     }
 
-    reload_result reloader::update()
+    reload_state reloader::update()
     {
-        return (static_cast<reload_result>(_swapper->Update()));
+        return (static_cast<reload_state>(_swapper->Update()));
     }
 
     void reloader::force_update()
