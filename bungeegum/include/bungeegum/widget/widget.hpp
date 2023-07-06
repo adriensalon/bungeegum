@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/core/widget.fwd>
+#include <bungeegum/widget/widget.fwd>
 
 namespace bungeegum {
 
@@ -157,4 +157,4 @@ void destroy_property(const runtime_widget& widget, const std::string& name);
 // traverse children ?
 }
 
-#include <bungeegum/core/widget.inl>
+#include <bungeegum/widget/widget.inl>

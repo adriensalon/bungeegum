@@ -4,12 +4,12 @@
 #include <optional>
 #include <typeindex>
 
-#include <bungeegum/context/draw.hpp>
-#include <bungeegum/context/interact.hpp>
-#include <bungeegum/context/resolve.hpp>
 #include <bungeegum/glue/raw.hpp>
 #include <bungeegum/glue/registry.hpp>
 #include <bungeegum/glue/reload.hpp>
+#include <bungeegum/widget/draw.hpp>
+#include <bungeegum/widget/interact.hpp>
+#include <bungeegum/widget/resolve.hpp>
 
 namespace bungeegum {
 

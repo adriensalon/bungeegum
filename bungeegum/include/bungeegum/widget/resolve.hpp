@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/context/resolve.fwd>
+#include <bungeegum/widget/resolve.fwd>
 
 namespace bungeegum {
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bungeegum/core/exceptions.hpp>
-#include <bungeegum/core/widget.hpp>
+#include <bungeegum/widget/widget.hpp>
 
 namespace bungeegum {
 namespace detail {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/context/interact.fwd>
+#include <bungeegum/widget/interact.fwd>
 
 namespace bungeegum {
 
@@ -135,9 +135,9 @@ private:
     friend struct detail::context;
 };
 
-/// @brief 
-/// @param widget 
-/// @param interact_callback 
+/// @brief
+/// @param widget
+/// @param interact_callback
 void on_interact(const runtime_widget& widget, const std::function<void(interact_command&)>& interact_callback);
 
 }

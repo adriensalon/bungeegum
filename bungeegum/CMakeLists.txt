@@ -6,9 +6,6 @@ option(BUNGEEGUM_ENABLE_OVERLAY "Enables an overlay diplaying errors etc" ON)
 
 set(bungeegum_source
 
-	"source/backend/common.cpp"
-	"source/backend/standalone.cpp"
-
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"
 	"source/glue/curve.cpp"
@@ -17,24 +14,26 @@ set(bungeegum_source
 	"source/glue/reload.cpp"
 	"source/glue/time.cpp"
 
-	"source/context/context.cpp"
-	"source/context/draw.cpp"
-	"source/context/interact.cpp"
-	"source/context/resolve.cpp"
-
 	"source/core/exceptions.cpp"
-	"source/core/widget.cpp"
 
-	"source/overlay/compressed/fa4.cpp"
-	"source/overlay/compressed/inter_extrabold.cpp"
-	"source/overlay/compressed/inter_regular.cpp"
-	"source/overlay/hierarchy.cpp"
-	"source/overlay/hotswapper.cpp"
-	"source/overlay/inspector.cpp"
-	"source/overlay/overlay.cpp"
-	"source/overlay/profiler.cpp"
-	"source/overlay/report.cpp"
-	"source/overlay/wireframe.cpp"
+	"source/widget/context.cpp"
+	"source/widget/draw.cpp"
+	"source/widget/interact.cpp"
+	"source/widget/resolve.cpp"
+	"source/widget/widget.cpp"
+
+	"source/backend/common.cpp"
+	"source/backend/standalone.cpp"
+	"source/backend/overlay/hierarchy.cpp"
+	"source/backend/overlay/hotswapper.cpp"
+	"source/backend/overlay/inspector.cpp"
+	"source/backend/overlay/overlay.cpp"
+	"source/backend/overlay/profiler.cpp"
+	"source/backend/overlay/report.cpp"
+	"source/backend/overlay/wireframe.cpp"
+	"source/backend/overlay/compressed/fa4.cpp"
+	"source/backend/overlay/compressed/inter_extrabold.cpp"
+	"source/backend/overlay/compressed/inter_regular.cpp"
 )
 
 if(BUNGEEGUM_ENABLE_STANDALONE)

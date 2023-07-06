@@ -2,7 +2,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/core/overlay.fwd>
+#include <bungeegum/backend/overlay.fwd>
 
 namespace bungeegum {
 namespace detail {

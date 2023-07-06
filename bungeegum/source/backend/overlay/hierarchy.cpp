@@ -7,9 +7,9 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/core/overlay.fwd>
-#include <bungeegum/core/widget.hpp>
+#include <bungeegum/backend/overlay.fwd>
 #include <bungeegum/glue/imguarded.fwd>
+#include <bungeegum/widget/widget.hpp>
 
 namespace bungeegum {
 namespace detail {

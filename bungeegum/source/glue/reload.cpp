@@ -2,7 +2,6 @@
 #include <hscpp/Hotswapper.h>
 #include <hscpp/mem/MemoryManager.h>
 
-#include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/archive.hpp>
 #include <bungeegum/glue/reload.hpp>
 

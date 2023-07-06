@@ -6,8 +6,8 @@
 #include <implot.h>
 #include <iostream>
 
+#include <bungeegum/backend/overlay.fwd>
 #include <bungeegum/core/exceptions.hpp>
-#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/imguarded.fwd>
 
 #include "compressed/fa4.cpp"

@@ -4,12 +4,12 @@
 #include <SDL.h>
 
 #include <bungeegum/backend/common.fwd>
-#include <bungeegum/context/context.fwd>
+#include <bungeegum/backend/overlay.fwd>
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.fwd>
-#include <bungeegum/core/overlay.fwd>
-#include <bungeegum/core/widget.hpp>
+#include <bungeegum/widget/context.fwd>
+#include <bungeegum/widget/widget.hpp>
 
 namespace bungeegum {
 namespace detail {

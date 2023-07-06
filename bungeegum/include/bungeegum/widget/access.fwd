@@ -1,0 +1,158 @@
+#pragma once
+
+#include <bungeegum/glue/archive.hpp>
+#include <bungeegum/glue/detection.hpp>
+#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/widget/draw.hpp>
+#include <bungeegum/widget/interact.hpp>
+#include <bungeegum/widget/resolve.hpp>
+#include <bungeegum/widget/widget.hpp>
+
+namespace bungeegum {
+
+struct access {
+
+    // draw
+
+    template <typename widget_t>
+    using draw_function = decltype(std::declval<widget_t>().draw(std::declval<draw_command&>()));
+
+    template <typename widget_t>
+    constexpr static bool has_draw_function = detail::is_detected_exact_v<void, draw_function, widget_t>;
+
+    template <typename widget_t>
+    constexpr static void detect_on_draw(widget_t& widget, const detail::registry_entity entity)
+    {
+        if constexpr (has_draw_function<widget_t>) {
+            detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+            _widget_data.drawer_command = draw_command();
+#if 0
+            _widget_data.drawer = [&widget](draw_command& command) {
+                widget.draw(command);
+            };
+#else
+            _widget_data.drawer = [entity](draw_command& command) {
+                widget_t& _widget = &detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+                _widget.draw(command);
+#endif
+        };
+    }
+}
+
+// interact
+
+template <typename widget_t>
+using interact_function = decltype(std::declval<widget_t>().interact(std::declval<interact_command&>()));
+
+template <typename widget_t>
+constexpr static bool has_interact_function = detail::is_detected_exact_v<void, interact_function, widget_t>;
+
+template <typename widget_t>
+constexpr static void detect_on_interact(widget_t& widget)
+{
+    if constexpr (has_interact_function<widget_t>) {
+        detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+        _widget_data.interactor_command = interact_command();
+        _widget_data.interactor = [&widget](interact_command& command) {
+            widget.interact(command);
+        };
+    }
+}
+
+// resolve
+
+template <typename widget_t>
+using resolve_function = decltype(std::declval<widget_t>().resolve(std::declval<resolve_command&>()));
+
+template <typename widget_t>
+constexpr static bool has_resolve_function = detail::is_detected_exact_v<void, resolve_function, widget_t>;
+
+template <typename widget_t>
+constexpr static void detect_on_resolve(widget_t& widget, const detail::registry_entity entity)
+{
+    detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+    _widget_data.resolver_command = resolve_command();
+    if constexpr (has_resolve_function<widget_t>) {
+#if 0
+            _widget_data.resolver = [&widget](resolve_command& command) {
+                widget.resolve(command);
+            };
+#else
+            _widget_data.resolver = [entity](resolve_command& command) {
+                widget_t& _widget = &detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+                _widget.resolve(command);
+            };
+#endif
+    } else {
+        _widget_data.resolver = [&widget, &_widget_data](resolve_command& command) {
+            if (_widget_data.children.empty()) {
+                command.resize(command.max_size());
+            } else {
+                float2 _max_size = zero<float2>;
+                for (detail::untyped_widget_data& _child_widget_data : _widget_data.children) {
+                    runtime_widget _child_widget = detail::widgets_context.get_runtime_widget(_child_widget_data);
+                    float2 _child_size = command.resolve_child(_child_widget, command.min_size(), command.max_size());
+                    _max_size = glm::max(_max_size, _child_size);
+                    command.position_child(_child_widget, zero<float2>);
+                }
+                command.resize(_max_size);
+            }
+        };
+    }
+}
+
+// SAVE + LOAD
+
+template <typename widget_t>
+using load_function = decltype(std::declval<widget_t>()._bungeegum_load(std::declval<cereal::JSONInputArchive&>()));
+
+template <typename widget_t>
+using save_function = decltype(std::declval<widget_t>()._bungeegum_save(std::declval<cereal::JSONOutputArchive&>()));
+
+template <typename widget_t>
+constexpr static bool has_load_function = detail::is_detected_exact_v<void, load_function, widget_t>;
+
+template <typename widget_t>
+constexpr static bool has_save_function = detail::is_detected_exact_v<void, save_function, widget_t>;
+
+template <typename widget_t>
+constexpr static void detect_on_load(widget_t& widget, const detail::registry_entity entity)
+{
+    detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+    _widget_data.resolver_command = resolve_command();
+    if constexpr (has_load_function<widget_t>) {
+#if 0
+            // _widget_data.resolver = [&widget](resolve_command& command) {
+            //     widget.resolve(command);
+            // };
+
+#else
+            _widget_data.loader = [entity](detail::input_archiver& archiver) {
+                reference_widget<widget_t>& _ref_widget = detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+                archiver.load(_ref_widget);
+            };
+#endif
+    }
+}
+
+template <typename widget_t>
+constexpr static void detect_on_save(widget_t& widget, const detail::registry_entity entity)
+{
+    detail::untyped_widget_data& _widget_data = detail::get_untyped_widget(widget);
+    _widget_data.resolver_command = resolve_command();
+    if constexpr (has_save_function<widget_t>) {
+#if 0
+            // _widget_data.resolver = [&widget](resolve_command& command) {
+            //     widget.resolve(command);
+            // };
+
+#else
+            _widget_data.saver = [entity](detail::output_archiver& archiver) {
+                reference_widget<widget_t>& _ref_widget = detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+                archiver.save(_ref_widget);
+            };
+#endif
+    }
+}
+};
+}

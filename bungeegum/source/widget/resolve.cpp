@@ -1,6 +1,6 @@
-#include <bungeegum/context/resolve.hpp>
 #include <bungeegum/core/exceptions.hpp>
-#include <bungeegum/core/widget.hpp>
+#include <bungeegum/widget/resolve.hpp>
+#include <bungeegum/widget/widget.hpp>
 
 namespace bungeegum {
 

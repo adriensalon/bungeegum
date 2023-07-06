@@ -4,8 +4,7 @@
 #include <chrono>
 #include <vector>
 
-#include <bungeegum/context/interact.hpp>
-#include <bungeegum/glue/detection.hpp>
+#include <bungeegum/widget/interact.hpp>
 
 struct ImDrawList;
 
