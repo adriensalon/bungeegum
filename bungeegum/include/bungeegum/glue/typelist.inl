@@ -23,7 +23,7 @@ namespace detail {
         using type_t = typename front_helper<typelist<recursive_types_t...>>::type_t;
     };
 
-    template <unsigned int index_t, typename... recursive_types_t>
+    template <std::size_t index_t, typename... recursive_types_t>
     struct at_helper<index_t, typelist<recursive_types_t...>> {
         using type_t = typename at_helper<index_t - 1, typename pop_front_helper<typelist<recursive_types_t...>>::type_t>::type_t;
     };
@@ -33,9 +33,9 @@ namespace detail {
         using type_t = typename at_helper<sizeof...(types_t) - 1, typelist<types_t...>>::type_t;
     };
 
-    template <typename head_type_t, typename... tail_types_t>
-    struct pop_back_helper<typelist<head_type_t, tail_types_t...>> {
-        using type_t = typelist<tail_types_t...>; // WRONG ! THIS IS POP FRONT !!! / GO WITH ERASE + AT
+    template <typename... head_types_t, typename tail_type_t>
+    struct pop_back_helper<typelist<head_types_t..., tail_type_t>> {
+        using type_t = typelist<head_types_t...>;
     };
 
     template <typename... existing_types_t, typename new_type_t>
@@ -58,7 +58,7 @@ namespace detail {
         template <typename new_type_t>
         using push_front_type = typelist<new_type_t>;
 
-        template <unsigned int index_t>
+        template <std::size_t index_t>
         using at_type = void;
 
         using back_type = void;
@@ -68,7 +68,7 @@ namespace detail {
         template <typename new_type_t>
         using push_back_type = typelist<new_type_t>;
 
-        static constexpr unsigned int size() { return 0; }
+        static constexpr std::size_t size() { return 0; }
 
         static constexpr bool empty() { return true; }
     };
@@ -109,7 +109,7 @@ namespace detail {
     }
 
     template <typename... types_t>
-    template <unsigned int index_t>
+    template <std::size_t index_t>
     constexpr typename typelist<types_t...>::template at_type<index_t> typelist<types_t...>::at()
     {
         static_assert(!empty(), "BAD USAGE (calling at() on empty typelist)");
@@ -138,7 +138,7 @@ namespace detail {
     }
 
     template <typename... types_t>
-    constexpr unsigned int typelist<types_t...>::size()
+    constexpr std::size_t typelist<types_t...>::size()
     {
         return (sizeof...(types_t));
     }
@@ -185,7 +185,7 @@ namespace detail {
     }
 
     template <template <typename...> typename typelist_t, typename... types_t>
-    template <unsigned int index_t>
+    template <std::size_t index_t>
     constexpr auto strong_typelist<typelist_t, types_t...>::at()
     {
         static_assert(!empty(), "BAD USAGE (calling at() on empty typelist)");
@@ -214,7 +214,7 @@ namespace detail {
     }
 
     template <template <typename...> typename typelist_t, typename... types_t>
-    constexpr unsigned int strong_typelist<typelist_t, types_t...>::size()
+    constexpr std::size_t strong_typelist<typelist_t, types_t...>::size()
     {
         return typelist<types_t...>::size();
     }

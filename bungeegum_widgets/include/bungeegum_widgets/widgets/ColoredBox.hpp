@@ -50,7 +50,7 @@ namespace widgets {
         float ff3 = 56.f;
         float ff4 = 56.f;
 
-        HOTRELOAD_FIELDS(ii, ff, ff2, ff3, ff4)
+        HOTRELOAD_FIELDS(ii, ff, ff2)
     };
 }
 }

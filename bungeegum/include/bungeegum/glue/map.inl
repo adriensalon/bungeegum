@@ -36,13 +36,13 @@ namespace detail {
     }
 
     template <typename key_t, typename value_t>
-    std::vector<value_t>::template iterator indexed_map<key_t, value_t>::begin()
+    indexed_map<key_t, value_t>::template iterator indexed_map<key_t, value_t>::begin()
     {
         return (_values.begin());
     }
 
     template <typename key_t, typename value_t>
-    std::vector<value_t>::template const_iterator indexed_map<key_t, value_t>::begin() const
+    indexed_map<key_t, value_t>::template const_iterator indexed_map<key_t, value_t>::begin() const
     {
         return (_values.begin());
     }
@@ -80,13 +80,13 @@ namespace detail {
     }
 
     template <typename key_t, typename value_t>
-    std::vector<value_t>::template const_iterator indexed_map<key_t, value_t>::end() const
+    indexed_map<key_t, value_t>::template const_iterator indexed_map<key_t, value_t>::end() const
     {
         return (_values.end());
     }
 
     template <typename key_t, typename value_t>
-    std::vector<value_t>::template iterator indexed_map<key_t, value_t>::end()
+    indexed_map<key_t, value_t>::template iterator indexed_map<key_t, value_t>::end()
     {
         return (_values.end());
     }

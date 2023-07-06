@@ -25,6 +25,12 @@ namespace detail {
         indexed_map(indexed_map&& other) = default;
         indexed_map& operator=(indexed_map&& other) = default;
 
+        /// @brief Iterator type to use with std algorithms and range loops
+        using iterator = std::vector<value_t>::template iterator;
+
+        /// @brief Const iterator type to use with std algorithms and range loops
+        using const_iterator = std::vector<value_t>::template const_iterator;
+
         /// @brief Creates an instance from a set of key-value pairs.
         indexed_map(std::initializer_list<std::pair<key_t, value_t>> values);
 
@@ -37,10 +43,10 @@ namespace detail {
         [[nodiscard]] const value_t& at(const key_t& key) const;
 
         /// @brief Gets a begin iterator to use with range loops.
-        [[nodiscard]] std::vector<value_t>::template iterator begin();
+        [[nodiscard]] iterator begin();
 
         /// @brief Gets a const begin iterator to use with range loops.
-        [[nodiscard]] std::vector<value_t>::template const_iterator begin() const;
+        [[nodiscard]] const_iterator begin() const;
 
         /// @brief Gets if a key is contained.
         [[nodiscard]] bool contains(const key_t& key);
@@ -54,10 +60,10 @@ namespace detail {
         void erase(const key_t& key);
 
         /// @brief Gets a end iterator to use with range loops.
-        [[nodiscard]] std::vector<value_t>::template iterator end();
+        [[nodiscard]] iterator end();
 
         /// @brief Gets a const end iterator to use with range loops.
-        [[nodiscard]] std::vector<value_t>::template const_iterator end() const;
+        [[nodiscard]] const_iterator end() const;
 
         /// @brief Gets a reference to a value from its key.
         /// @details A default-constructed value will be created if the key is not contained.

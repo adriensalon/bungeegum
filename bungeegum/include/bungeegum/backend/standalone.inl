@@ -52,7 +52,7 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
         if (on_renderer_started)
             on_renderer_started();
         _renderer.rebuild_fonts();
-        _window.on_input([&_renderer](const std::any& _event) {
+        _window.on_event([&_renderer](const std::any& _event) {
             _renderer.process_input(_event);
             detail::process_input(_event);
         });

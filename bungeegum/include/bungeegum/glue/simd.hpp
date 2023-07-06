@@ -8,33 +8,35 @@
 
 namespace bungeegum {
 
+namespace math = glm;
+
 using float1 = float;
-using float2 = glm::vec<2, float, simd_precision>;
-using float3 = glm::vec<3, float, simd_precision>;
-using float4 = glm::vec<4, float, simd_precision>;
-using float3x3 = glm::mat<3, 3, glm::f32, simd_precision>;
-using float4x4 = glm::mat<4, 4, glm::f32, simd_precision>;
+using float2 = math::vec<2, float, simd_precision>;
+using float3 = math::vec<3, float, simd_precision>;
+using float4 = math::vec<4, float, simd_precision>;
+using float3x3 = math::mat<3, 3, math::f32, simd_precision>;
+using float4x4 = math::mat<4, 4, math::f32, simd_precision>;
 
 using int1 = int;
-using int2 = glm::vec<2, int, simd_precision>;
-using int3 = glm::vec<3, int, simd_precision>;
-using int4 = glm::vec<4, int, simd_precision>;
-using int3x3 = glm::mat<3, 3, int, simd_precision>;
-using int4x4 = glm::mat<4, 4, int, simd_precision>;
+using int2 = math::vec<2, int, simd_precision>;
+using int3 = math::vec<3, int, simd_precision>;
+using int4 = math::vec<4, int, simd_precision>;
+using int3x3 = math::mat<3, 3, int, simd_precision>;
+using int4x4 = math::mat<4, 4, int, simd_precision>;
 
 using uint1 = unsigned int;
-using uint2 = glm::vec<2, unsigned int, simd_precision>;
-using uint3 = glm::vec<3, unsigned int, simd_precision>;
-using uint4 = glm::vec<4, unsigned int, simd_precision>;
-using uint3x3 = glm::mat<3, 3, unsigned int, simd_precision>;
-using uint4x4 = glm::mat<4, 4, unsigned int, simd_precision>;
+using uint2 = math::vec<2, unsigned int, simd_precision>;
+using uint3 = math::vec<3, unsigned int, simd_precision>;
+using uint4 = math::vec<4, unsigned int, simd_precision>;
+using uint3x3 = math::mat<3, 3, unsigned int, simd_precision>;
+using uint4x4 = math::mat<4, 4, unsigned int, simd_precision>;
 
 using bool1 = bool;
-using bool2 = glm::vec<2, bool, simd_precision>;
-using bool3 = glm::vec<3, bool, simd_precision>;
-using bool4 = glm::vec<4, bool, simd_precision>;
-using bool3x3 = glm::mat<3, 3, bool, simd_precision>;
-using bool4x4 = glm::mat<4, 4, bool, simd_precision>;
+using bool2 = math::vec<2, bool, simd_precision>;
+using bool3 = math::vec<3, bool, simd_precision>;
+using bool4 = math::vec<4, bool, simd_precision>;
+using bool3x3 = math::mat<3, 3, bool, simd_precision>;
+using bool4x4 = math::mat<4, 4, bool, simd_precision>;
 
 // zero
 

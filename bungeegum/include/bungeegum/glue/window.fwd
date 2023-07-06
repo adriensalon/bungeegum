@@ -1,12 +1,19 @@
 #pragma once
 
 #include <any>
+#include <cstddef>
 #include <functional>
 #include <string>
 
 #include <bungeegum/glue/simd.hpp>
+#include <bungeegum/glue/toolchain.fwd>
 
+#define BUNGEEGUM_WEB_WINDOW TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#define BUNGEEGUM_NATIVE_WINDOW !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+
+#if BUNGEEGUM_NATIVE_WINDOW
 struct SDL_Window;
+#endif
 
 namespace bungeegum {
 namespace detail {
@@ -18,35 +25,79 @@ namespace detail {
         window();
         window(const window& other) = delete;
         window& operator=(const window& other) = delete;
-        window(window&& other);
-        window& operator=(window&& other);
+        window(window&& other) = default;
+        window& operator=(window&& other) = default;
         ~window();
 
+#if BUNGEEGUM_NATIVE_WINDOW
         /// @brief Creates an instance from an opaque OS window.
         /// @details This only works on platforms : Windows, MacOS, Linux
         window(void* native_window);
+#endif
 
+#if BUNGEEGUM_NATIVE_WINDOW
         /// @brief Creates an instance from an existing SDL window.
         window(SDL_Window* sdl_window);
+#endif
 
+#if BUNGEEGUM_NATIVE_WINDOW
+        /// @brief
         [[nodiscard]] void* get_native_window() const;
+#endif
+
+#if BUNGEEGUM_NATIVE_WINDOW
+        /// @brief
         [[nodiscard]] SDL_Window* get_sdl_window() const;
-        void set_title(const std::string& title);
-        uint2 get_size() const;
-        void set_size(const float2 size);
-        void set_fullscreen(const bool enabled);
-        void on_input(const std::function<void(const std::any&)>& event_callback);
+#endif
+
+        /// @brief
+        [[nodiscard]] uint2 get_size() const;
+
+        /// @brief
+        void on_event(const std::function<void(const std::any&)>& event_callback);
+
+        /// @brief
         void on_update(const std::function<void()>& update_callback);
-        void run_loop();
+
+        // WEB EVENTS HERE
+
+        /// @brief
         bool poll();
 
+        /// @brief
+        void run_loop();
+
+        /// @brief
+        void set_fullscreen(const bool enabled);
+
+        /// @brief
+        void set_size(const uint2 size);
+
+        /// @brief
+        void set_title(const std::string& title);
+
+        /// @brief
         static void show_cursor(const bool show);
 
+        /// @brief Length of the trace when collecting runtime backtraced exceptions.
+        inline static std::size_t backtrace_size = 10u;
+
     private:
+        struct event_data;
+
         bool _is_running = false;
         std::function<void(const std::any&)> _event_callback = nullptr;
         std::function<void()> _update_callback = nullptr;
-        std::any _sdl_window = nullptr;
+
+#if BUNGEEGUM_WEB_WINDOW
+        struct web_window_data;
+        std::shared_ptr<web_window_data> _data = nullptr;
+#endif
+
+#if BUNGEEGUM_NATIVE_WINDOW
+        struct native_window_data;
+        std::shared_ptr<native_window_data> _data = nullptr;
+#endif
     };
 
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <tuple>
 
 namespace bungeegum {
@@ -14,7 +15,7 @@ namespace detail {
     template <typename typelist_t, typename new_type_t>
     struct push_front_helper;
 
-    template <unsigned int index_t, typename... recursive_types_t>
+    template <std::size_t index_t, typename... recursive_types_t>
     struct at_helper;
 
     template <typename typelist_t>
@@ -41,7 +42,7 @@ namespace detail {
         template <typename new_type_t>
         using push_front_type = typename detail::push_front_helper<typelist, new_type_t>::type_t;
 
-        template <unsigned int index_t>
+        template <std::size_t index_t>
         using at_type = typename detail::at_helper<index_t, typelist>::type_t;
 
         using back_type = typename detail::back_helper<typelist>::type_t;
@@ -64,7 +65,7 @@ namespace detail {
         template <typename new_type_t>
         [[nodiscard]] static constexpr push_front_type<new_type_t> push_front();
 
-        template <unsigned int index_t>
+        template <std::size_t index_t>
         [[nodiscard]] static constexpr at_type<index_t> at();
 
         [[nodiscard]] static constexpr back_type back();
@@ -74,7 +75,7 @@ namespace detail {
         template <typename new_type_t>
         [[nodiscard]] static constexpr push_back_type<new_type_t> push_back();
 
-        [[nodiscard]] static constexpr unsigned int size();
+        [[nodiscard]] static constexpr std::size_t size();
 
         [[nodiscard]] static constexpr bool empty();
     };
@@ -94,7 +95,7 @@ namespace detail {
         template <typename new_type_t>
         [[nodiscard]] static constexpr auto push_front();
 
-        template <unsigned int index_t>
+        template <std::size_t index_t>
         [[nodiscard]] static constexpr auto at();
 
         [[nodiscard]] static constexpr auto back();
@@ -104,7 +105,7 @@ namespace detail {
         template <typename new_type_t>
         [[nodiscard]] static constexpr auto push_back();
 
-        [[nodiscard]] static constexpr unsigned int size();
+        [[nodiscard]] static constexpr std::size_t size();
 
         [[nodiscard]] static constexpr bool empty();
     };
