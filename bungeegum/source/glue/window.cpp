@@ -28,7 +28,7 @@ namespace detail {
             std::string _error_message = SDL_GetError();
             SDL_ClearError();
             if (!_error_message.empty()) {
-                throw backtraced_exception(_error_message, detail::window::backtraced_size);
+                throw backtraced_exception(_error_message, detail::window::backtrace_size);
             }
         }
     };
