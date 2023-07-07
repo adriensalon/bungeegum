@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/glue/lerp.hpp>
 
 namespace bungeegum {
@@ -96,9 +95,6 @@ template <typename value_t>
 animation<value_t>& animation<value_t>::min(value_t&& min_value)
 {
     _data.min_value = std::make_unique<value_t>(std::forward<value_t>(min_value));
-    if (_data.min_value && _data.max_value)
-        if (*(_data.max_value) < *(_data.min_value))
-            detail::throw_error<detail::error_type::bad_usage>("Bad animation min value");
     return *this;
 }
 
@@ -106,9 +102,6 @@ template <typename value_t>
 animation<value_t>& animation<value_t>::max(value_t&& max_value)
 {
     _data.max_value = std::make_unique<value_t>(std::forward<value_t>(max_value));
-    if (_data.min_value && _data.max_value)
-        if (*(_data.max_value) < *(_data.min_value))
-            detail::throw_error<detail::error_type::bad_usage>("Bad animation max value");
     return *this;
 }
 
