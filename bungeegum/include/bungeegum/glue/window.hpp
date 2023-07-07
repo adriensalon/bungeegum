@@ -58,15 +58,21 @@ namespace detail {
         /// @brief Creates an instance from an opaque OS window.
         /// @exception Throws a compile-time exception if the platform is web.
         window(void* native_window);
+#endif
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         /// @brief Creates an instance from an existing SDL window.
         /// @exception Throws a compile-time exception if the platform is web.
         window(SDL_Window* sdl_window);
+#endif
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         /// @brief Gets an opaque pointer to the OS window struct.
         /// @exception Throws a compile-time exception if the platform is web.
         [[nodiscard]] void* get_native_window() const;
+#endif
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         /// @brief Gets a raw pointer to the underlying SDL_Window.
         /// @exception Throws a compile-time exception if the platform is web.
         [[nodiscard]] SDL_Window* get_sdl_window() const;
