@@ -11,6 +11,7 @@ struct ImDrawList;
 namespace bungeegum {
 namespace detail {
 
+    // go mettre tt ca dans le global_widget_container
     struct context {
         inline static std::vector<window_resized_event> window_resized_events = {};
         inline static std::vector<mouse_moved_event> mouse_moved_events = {};
@@ -25,8 +26,8 @@ namespace detail {
         static void execute_draw(ImDrawList* imgui_drawlist, const bool heads_start);
     };
 
+    // et ca dans le backend
     bool tick(const std::chrono::milliseconds& delta_time);
-
     void draw(const bool heads_start);
 }
 }

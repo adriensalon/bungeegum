@@ -108,6 +108,7 @@ namespace detail {
         //
     }
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
     window::window(SDL_Window* sdl_window)
     {
         static_assert(!is_platform_emscripten_v, "An instance can only be created from an SDL_Window on platforms "
@@ -140,6 +141,7 @@ namespace detail {
                                                  "where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
         return _data->sdl_window;
     }
+#endif
 
     uint2 window::get_size() const
     {
@@ -173,12 +175,14 @@ namespace detail {
         _mouse_up_callback = mouse_up_callback;
     }
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
     void window::on_sdl_event(const std::function<void(const SDL_Event*)>& sdl_event_callback)
     {
         static_assert(!is_platform_emscripten_v, "A callback taking an SDL_Event can only be stored on platforms "
                                                  "where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
         _data->sdl_event_callback = sdl_event_callback;
     }
+#endif
 
     void window::on_window_resized(const std::function<void(const window_resized_event&)>& window_resized_callback)
     {

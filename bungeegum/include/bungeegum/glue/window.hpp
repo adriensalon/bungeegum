@@ -54,6 +54,7 @@ namespace detail {
         window& operator=(window&& other) = default;
         ~window();
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         /// @brief Creates an instance from an opaque OS window.
         /// @exception Throws a compile-time exception if the platform is web.
         window(void* native_window);
@@ -69,6 +70,7 @@ namespace detail {
         /// @brief Gets a raw pointer to the underlying SDL_Window.
         /// @exception Throws a compile-time exception if the platform is web.
         [[nodiscard]] SDL_Window* get_sdl_window() const;
+#endif
 
         /// @brief Gets the current size of this instance.
         [[nodiscard]] uint2 get_size() const;
@@ -92,10 +94,12 @@ namespace detail {
         /// @details Event callbacks are fired after poll() has been invoked.
         void on_mouse_up(const std::function<void(const mouse_up_event&)>& mouse_up_callback);
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         /// @brief Sets a callback to be triggered each time a SDL_Event is received.
         /// @details Event callbacks are fired after poll() has been invoked.
         /// @exception Throws a compile-time exception if the platform is web.
         void on_sdl_event(const std::function<void(const SDL_Event*)>& sdl_event_callback);
+#endif
 
         /// @brief Sets a callback to be triggered each time a window resized event is received.
         /// @details Event callbacks are fired after poll() has been invoked.
