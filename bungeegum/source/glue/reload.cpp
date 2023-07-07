@@ -2,7 +2,6 @@
 #include <hscpp/Hotswapper.h>
 #include <hscpp/mem/MemoryManager.h>
 
-#include <bungeegum/glue/archive.hpp>
 #include <bungeegum/glue/reload.hpp>
 
 namespace bungeegum {
@@ -63,6 +62,18 @@ namespace detail {
     void reloader::force_update()
     {
         _swapper->TriggerManualBuild();
+    }
+
+    reloaded_loader::reloaded_loader(const std::filesystem::path& archive_path)
+        : _fstream(archive_path)
+        , _archive(_fstream)
+    {
+    }
+
+    reloaded_saver::reloaded_saver(const std::filesystem::path& archive_path)
+        : _fstream(archive_path)
+        , _archive(_fstream)
+    {
     }
 }
 }

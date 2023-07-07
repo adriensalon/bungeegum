@@ -46,7 +46,7 @@ struct multiDelegateTest {
 
 struct Composed {
 
-    HOTRELOAD_CLASS(Composed, "ComposedClass")
+    HOTRELOAD_CLASS(Composed)
 
     HOTRELOAD_METHOD Composed& build()
     {

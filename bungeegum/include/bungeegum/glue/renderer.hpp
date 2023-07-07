@@ -2,19 +2,26 @@
 
 #include <memory>
 
+#include <bungeegum/glue/config.hpp>
 #include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/toolchain.hpp>
 #include <bungeegum/glue/window.hpp>
 
 /// @brief Defines if the preferred GPU renderer is DirectX.
 /// @details Only D3D11 is implemented right now.
-#define PREFERRED_RENDERER_DIRECTX (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
+#if !defined(BUNGEEGUM_USE_RENDERER_DIRECTX)
+#define BUNGEEGUM_USE_RENDERER_DIRECTX (BUNGEEGUM_ENABLE_DIRECTX && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP))
+#endif
 
 /// @brief Defines if the preferred GPU renderer is Vulkan.
-#define PREFERRED_RENDERER_VULKAN (TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
+#if !defined(BUNGEEGUM_USE_RENDERER_VULKAN)
+#define BUNGEEGUM_USE_RENDERER_VULKAN (BUNGEEGUM_ENABLE_VULKAN && (TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID))
+#endif
 
 /// @brief Defines if the preferred GPU renderer is OpenGL.
-#define PREFERRED_RENDERER_OPENGL (TOOLCHAIN_PLATFORM_EMSCRIPTEN || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_IOS)
+#if !defined(BUNGEEGUM_USE_RENDERER_OPENGL)
+#define BUNGEEGUM_USE_RENDERER_OPENGL (BUNGEEGUM_ENABLE_OPENGL && (TOOLCHAIN_PLATFORM_EMSCRIPTEN || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_IOS))
+#endif
 
 namespace bungeegum {
 namespace detail {

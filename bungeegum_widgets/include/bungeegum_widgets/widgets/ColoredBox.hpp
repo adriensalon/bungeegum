@@ -20,8 +20,6 @@ namespace widgets {
             std::cout << ok << " create ColorBox \n";
         }
 
-        HOTRELOAD_CLASS(ColoredBox, "ColoredBoxClass");
-
         /// @brief The widget below this widget in the tree.
         template <typename childWidget_t>
         ColoredBox& child(childWidget_t& value)
@@ -50,7 +48,7 @@ namespace widgets {
         float ff3 = 56.f;
         float ff4 = 56.f;
 
-        HOTRELOAD_FIELDS(ii, ff, ff2)
+        HOTRELOAD_CLASS(ColoredBox, ii, ff, ff2, ff3)
     };
 }
 }

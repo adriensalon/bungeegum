@@ -1,11 +1,12 @@
 #pragma once
 
-#include <bungeegum/glue/archive.hpp>
 #include <bungeegum/glue/detection.hpp>
+#include <bungeegum/glue/reload.hpp>
 #include <bungeegum/glue/simd.hpp>
 #include <bungeegum/widget/draw.hpp>
 #include <bungeegum/widget/interact.hpp>
 #include <bungeegum/widget/resolve.hpp>
+
 // #include <bungeegum/widget/widget.hpp>
 
 namespace bungeegum {
@@ -127,10 +128,10 @@ constexpr static void detect_on_load(widget_t& widget, const detail::registry_en
             // };
 
 #else
-            _widget_data.loader = [entity](detail::input_archiver& archiver) {
-                reference_widget<widget_t>& _ref_widget = detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
-                archiver.load(_ref_widget);
-            };
+        _widget_data.loader = [entity](detail::reloaded_loader& archiver) {
+            reference_widget<widget_t>& _ref_widget = detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+            archiver.load(_ref_widget);
+        };
 #endif
     }
 }
@@ -147,10 +148,10 @@ constexpr static void detect_on_save(widget_t& widget, const detail::registry_en
             // };
 
 #else
-            _widget_data.saver = [entity](detail::output_archiver& archiver) {
-                reference_widget<widget_t>& _ref_widget = detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
-                archiver.save(_ref_widget);
-            };
+        _widget_data.saver = [entity](detail::reloaded_saver& archiver) {
+            reference_widget<widget_t>& _ref_widget = detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
+            archiver.save(_ref_widget);
+        };
 #endif
     }
 }

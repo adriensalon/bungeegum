@@ -1,13 +1,27 @@
 #pragma once
 
+#include <bungeegum/glue/config.hpp>
+#include <bungeegum/glue/toolchain.hpp>
+
+/// @brief Defines if we use hotreload.
+#if !defined(BUNGEEGUM_USE_HOTRELOAD)
+#define BUNGEEGUM_USE_HOTRELOAD (BUNGEEGUM_ENABLE_HOTRELOAD && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_LINUX))
+#endif
+
+#if BUNGEEGUM_USE_HOTRELOAD
+
 #include <cstddef>
 #include <filesystem>
+#include <fstream>
+
+#include <cereal/access.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/cereal.hpp>
 
 #define HSCPP_CXX_STANDARD 17
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
-#include <bungeegum/glue/archive.hpp>
 #include <bungeegum/glue/foreach.hpp>
 #include <bungeegum/glue/simd.hpp>
 
@@ -18,63 +32,36 @@ namespace mem {
 }
 }
 
+/// @brief
+/// @details
+#define HOTRELOAD_CLASS(classname, ...)                                                                         \
+    friend class cereal::access;                                                                                \
+    template <typename value_t>                                                                                 \
+    friend struct bungeegum::detail::value_wrapper;                                                             \
+    HSCPP_TRACK(classname, #classname)                                                                          \
+    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                       \
+    {                                                                                                           \
+        bungeegum::detail::serialize_fields<cereal::JSONInputArchive>(archive, { #__VA_ARGS__ }, __VA_ARGS__);  \
+    }                                                                                                           \
+    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                      \
+    {                                                                                                           \
+        bungeegum::detail::serialize_fields<cereal::JSONOutputArchive>(archive, { #__VA_ARGS__ }, __VA_ARGS__); \
+    }
+
+/// @brief
+/// @details
+#define HOTRELOAD_METHOD hscpp_virtual
+
 namespace bungeegum {
 namespace detail {
 
-#if !defined(BUNGEEGUM_ENABLE_HOTRELOAD)
-#define BUNGEEGUM_ENABLE_HOTRELOAD 1 // TODO SET FROM CMAKE AND THIS TO 0
-#endif
+    /// @brief
+    /// @tparam archive_t
+    /// @tparam ...fields_t
+    template <typename archive_t, typename... fields_t>
+    void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields);
 
-#if !BUNGEEGUM_ENABLE_HOTRELOAD
-
-    template <typename widget_t>
-    using reloaded = std::reference_wrapper<widget_t>;
-
-#else
-
-#define HOTRELOAD_CLASS(class, name) HSCPP_TRACK(class, name)
-#define HOTRELOAD_METHOD hscpp_virtual
-#define HOTRELOAD_FIELDS(...)                                                                            \
-    template <typename value_t>                                                                          \
-    friend struct bungeegum::detail::wrapper;                                                            \
-    friend struct bungeegum::detail::input_archiver;                                                     \
-    friend struct bungeegum::detail::output_archiver;                                                    \
-    friend class cereal::access;                                                                         \
-    template <typename archive_t, typename... fields_t>                                                  \
-    void _bungeegum_serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields) \
-    {                                                                                                    \
-        std::vector<std::string> _names;                                                                 \
-        std::stringstream _sstream(names);                                                               \
-        while (_sstream.good()) {                                                                        \
-            std::string _substr;                                                                         \
-            std::getline(_sstream, _substr, ',');                                                        \
-            if (_substr[0] == ' ') {                                                                     \
-                _substr = _substr.substr(1, _substr.length() - 1);                                       \
-            }                                                                                            \
-            _names.push_back(_substr);                                                                   \
-        }                                                                                                \
-        std::tuple<fields_t&...> _tuple((fields)...);                                                    \
-        constexpr size_t _count = std::variant_size_v<std::variant<fields_t...>>;                        \
-        bungeegum::detail::constexpr_for<0, _count, 1>([&](auto _index) {                                \
-            using field_type_t = std::variant_alternative_t<_index, std::variant<fields_t...>>;          \
-            field_type_t& _field = std::get<_index>(_tuple);                                             \
-            try {                                                                                        \
-                archive(cereal::make_nvp(_names[_index].c_str(), _field));                               \
-            } catch (...) {                                                                              \
-                std::cout << "error detected :) \n";                                                     \
-            }                                                                                            \
-        });                                                                                              \
-    }                                                                                                    \
-    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                \
-    {                                                                                                    \
-        _bungeegum_serialize_fields<cereal::JSONInputArchive>(archive, { #__VA_ARGS__ }, __VA_ARGS__);   \
-    }                                                                                                    \
-    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                               \
-    {                                                                                                    \
-        _bungeegum_serialize_fields<cereal::JSONOutputArchive>(archive, { #__VA_ARGS__ }, __VA_ARGS__);  \
-    }
-
-    template <typename widget_t>
+    template <typename value_t>
     struct reloaded {
         reloaded() = delete;
         reloaded(const reloaded& other);
@@ -82,12 +69,12 @@ namespace detail {
         reloaded(reloaded&& other);
         reloaded& operator=(reloaded&& other);
 
-        widget_t& get();
-        const widget_t& get() const;
+        value_t& get();
+        const value_t& get() const;
 
     private:
-        hscpp::mem::UniqueRef<widget_t> _ref;
-        reloaded(hscpp::mem::UniqueRef<widget_t>&& ref);
+        hscpp::mem::UniqueRef<value_t> _ref;
+        reloaded(hscpp::mem::UniqueRef<value_t>&& ref);
         friend struct reloader;
     };
 
@@ -113,8 +100,8 @@ namespace detail {
         /// @brief Allocates a new object that can be hotswapped, taking no argument.
         /// @exception Throws a compile-time exception if the widget type is not default-
         /// constructible.
-        template <typename widget_t>
-        reloaded<widget_t> allocate();
+        template <typename value_t>
+        reloaded<value_t> allocate();
 
         /// @brief Gets the amount of memory blocks currently allocated.
         std::size_t allocated_blocks_count();
@@ -146,8 +133,64 @@ namespace detail {
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
     };
 
-#endif
+    /// @brief
+    struct reloaded_loader {
+        reloaded_loader() = delete;
+        reloaded_loader(const reloaded_loader& other) = delete;
+        reloaded_loader& operator=(const reloaded_loader& other) = delete;
+        reloaded_loader(reloaded_loader&& other) = default;
+        reloaded_loader& operator=(reloaded_loader&& other) = default;
+
+        /// @brief
+        reloaded_loader(const std::filesystem::path& archive_path);
+
+        /// @brief
+        /// @tparam reloaded_value_t
+        template <typename reloaded_value_t>
+        void load(reloaded_value_t& value);
+
+    private:
+        std::ifstream _fstream;
+        cereal::JSONInputArchive _archive;
+    };
+
+    /// @brief
+    struct reloaded_saver {
+        reloaded_saver() = delete;
+        reloaded_saver(const reloaded_saver& other) = delete;
+        reloaded_saver& operator=(const reloaded_saver& other) = delete;
+        reloaded_saver(reloaded_saver&& other) = default;
+        reloaded_saver& operator=(reloaded_saver&& other) = default;
+
+        /// @brief
+        reloaded_saver(const std::filesystem::path& archive_path);
+
+        /// @brief
+        /// @tparam reloaded_value_t
+        template <typename reloaded_value_t>
+        void save(reloaded_value_t& value);
+
+    private:
+        std::ofstream _fstream;
+        cereal::JSONOutputArchive _archive;
+    };
 }
 }
 
 #include <bungeegum/glue/reload.inl>
+
+#else
+
+#define HOTRELOAD_CLASS(class, name)
+#define HOTRELOAD_METHOD
+#define HOTRELOAD_FIELDS(...)
+
+// namespace bungeegum {
+// namespace detail {
+
+//     template <typename value_t>
+//     using reloaded = std::reference_wrapper<value_t>;
+// }
+// }
+
+#endif

@@ -62,13 +62,13 @@ namespace detail {
         bungeegum::access::detect_on_resolve(widget, entity);
         bungeegum::access::detect_on_draw(widget, entity);
         // if constexpr (cereal::traits::detail::count_input_serializers<widget_t, cereal::JSONInputArchive>::value == 1) {
-        //     untyped_widget.loader = [entity](input_archiver& archiver) {
+        //     untyped_widget.loader = [entity](reloaded_loader& archiver) {
         //         widget_t& _widget = &detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
         //         archiver.load(_widget);
         //     };
         // }
         // if constexpr (cereal::traits::detail::count_output_serializers<widget_t, cereal::JSONOutputArchive>::value == 1) {
-        //     untyped_widget.saver = [entity](output_archiver& archiver) {
+        //     untyped_widget.saver = [entity](reloaded_saver& archiver) {
         //         widget_t& _widget = &detail::widgets_context.widgets.get_component<reference_widget<widget_t>>(entity);
         //         archiver.save(_widget);
         //     };

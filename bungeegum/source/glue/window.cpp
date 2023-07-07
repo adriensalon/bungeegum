@@ -2,7 +2,7 @@
 #include <bungeegum/glue/toolchain.hpp>
 #include <bungeegum/glue/window.hpp>
 
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WEB_WINDOW
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
 #else
@@ -16,7 +16,7 @@ namespace bungeegum {
 namespace detail {
 
     struct window::window_data {
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WINDOW_WEB
 
         //
         //
@@ -24,7 +24,7 @@ namespace detail {
         //
         //
 
-#else
+#elif BUNGEEGUM_USE_WINDOW_NATIVE
         SDL_Window* sdl_window = nullptr;
         std::function<void(const SDL_Event*)> sdl_event_callback = nullptr;
         inline static bool is_sdl_main_ready = false;
@@ -45,55 +45,56 @@ namespace detail {
     window::window()
     {
         _data = std::make_shared<window_data>();
-        if constexpr (is_platform_emscripten_v) {
-            static bool1 _is_already_created = false;
-            if (_is_already_created) {
-                throw backtraced_exception("TODO ");
-            }
-            _is_already_created = true;
-
-            //
-            //
-            // TODO
-            //
-            //
-
-        } else {
-            if (!window_data::is_sdl_main_ready) {
-                SDL_SetMainReady();
-                if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) < 0) {
-                    window_data::check_errors();
-                }
-                window_data::is_sdl_main_ready = true;
-            }
-            SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-            _data->sdl_window = SDL_CreateWindow(
-                window_data::sdl_default_window_title.data(),
-                SDL_WINDOWPOS_CENTERED,
-                SDL_WINDOWPOS_CENTERED,
-                window_data::sdl_default_window_size.x,
-                window_data::sdl_default_window_size.y,
-                _window_flags);
-            window_data::check_errors();
+#if BUNGEEGUM_USE_WINDOW_WEB
+        static bool1 _is_already_created = false;
+        if (_is_already_created) {
+            throw backtraced_exception("TODO ");
         }
+        _is_already_created = true;
+
+        //
+        //
+        // TODO
+        //
+        //
+
+#elif BUNGEEGUM_USE_WINDOW_NATIVE
+        if (!window_data::is_sdl_main_ready) {
+            SDL_SetMainReady();
+            if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) < 0) {
+                window_data::check_errors();
+            }
+            window_data::is_sdl_main_ready = true;
+        }
+        SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        _data->sdl_window = SDL_CreateWindow(
+            window_data::sdl_default_window_title.data(),
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            window_data::sdl_default_window_size.x,
+            window_data::sdl_default_window_size.y,
+            _window_flags);
+        window_data::check_errors();
+#endif
     }
 
     window::~window()
     {
-        if constexpr (is_platform_emscripten_v) {
+#if BUNGEEGUM_USE_WINDOW_WEB
 
-            //
-            //
-            // TODO
-            //
-            //
+        //
+        //
+        // TODO
+        //
+        //
 
-        } else {
-            SDL_DestroyWindow(_data->sdl_window);
-            window_data::check_errors();
-        }
+#elif BUNGEEGUM_USE_WINDOW_NATIVE
+        SDL_DestroyWindow(_data->sdl_window);
+        window_data::check_errors();
+#endif
     }
 
+#if BUNGEEGUM_USE_NATIVE_WINDOW
     window::window(void* native_window)
     {
         static_assert(!is_platform_emscripten_v, "An instance can only be created from an raw pointer to an OS window on "
@@ -107,21 +108,20 @@ namespace detail {
         //
         //
     }
+#endif
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WINDOW_NATIVE
     window::window(SDL_Window* sdl_window)
     {
-        static_assert(!is_platform_emscripten_v, "An instance can only be created from an SDL_Window on platforms "
-                                                 "where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
         window_data::is_sdl_main_ready = true;
         _data = std::make_shared<window_data>();
         _data->sdl_window = sdl_window;
     }
+#endif
 
+#if BUNGEEGUM_USE_WINDOW_NATIVE
     void* window::get_native_window() const
     {
-        static_assert(!is_platform_emscripten_v, "A raw pointer to an OS window can only be retrieved on platforms "
-                                                 "where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
         if constexpr (is_platform_win32_v || is_platform_uwp_v) {
             SDL_SysWMinfo _wmi;
             SDL_VERSION(&_wmi.version);
@@ -134,12 +134,12 @@ namespace detail {
         } else if constexpr (is_platform_macos_v) {
         }
     }
+#endif
 
+#if BUNGEEGUM_USE_WINDOW_NATIVE
     SDL_Window* window::get_sdl_window() const
     {
-        static_assert(!is_platform_emscripten_v, "A raw pointer to an SDL_Window can only be retrieved on platforms "
-                                                 "where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
-        return _data->sdl_window;
+        return (_data->sdl_window);
     }
 #endif
 
@@ -175,7 +175,7 @@ namespace detail {
         _mouse_up_callback = mouse_up_callback;
     }
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WINDOW_NATIVE
     void window::on_sdl_event(const std::function<void(const SDL_Event*)>& sdl_event_callback)
     {
         static_assert(!is_platform_emscripten_v, "A callback taking an SDL_Event can only be stored on platforms "

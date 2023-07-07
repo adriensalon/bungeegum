@@ -1,28 +1,30 @@
-#include <backward.hpp>
-
 #include <bungeegum/glue/backtrace.hpp>
+
+#if BUNGEEGUM_USE_BACKTRACE
+#include <backward.hpp>
+#endif
 
 namespace bungeegum {
 namespace detail {
 
-    namespace {
-
-        void emplace_traces(std::vector<backtraced_result>& tracing, const std::size_t tracing_size)
-        {
-            backward::StackTrace _stack_trace;
-            backward::TraceResolver _trace_resolver;
-            std::size_t _offset = 3U; // escape backwardcpp calls
-            _stack_trace.load_here(tracing_size + _offset);
-            _trace_resolver.load_stacktrace(_stack_trace);
-            tracing.resize(tracing_size);
-            for (std::size_t _i = 0; _i < tracing_size; _i++) {
-                backward::ResolvedTrace _trace = _trace_resolver.resolve(_stack_trace[_i + _offset]);
-                tracing[_i].address = _trace.addr;
-                tracing[_i].primary = backtraced_source { _trace.source.filename, _trace.source.function, _trace.source.line, _trace.source.col };
-                for (auto& _inliner : _trace.inliners)
-                    tracing[_i].inliners.emplace_back(backtraced_source { _inliner.filename, _inliner.function, _inliner.line, _inliner.col });
+    void emplace_traces(std::vector<backtraced_result>& tracing, const std::size_t tracing_size)
+    {
+#if BUNGEEGUM_USE_BACKTRACE
+        backward::StackTrace _stack_trace;
+        backward::TraceResolver _trace_resolver;
+        std::size_t _offset = 3U; // escape backwardcpp calls
+        _stack_trace.load_here(tracing_size + _offset);
+        _trace_resolver.load_stacktrace(_stack_trace);
+        tracing.resize(tracing_size);
+        for (std::size_t _i = 0; _i < tracing_size; _i++) {
+            backward::ResolvedTrace _trace = _trace_resolver.resolve(_stack_trace[_i + _offset]);
+            tracing[_i].address = _trace.addr;
+            tracing[_i].primary = backtraced_source { _trace.source.filename, _trace.source.function, _trace.source.line, _trace.source.col };
+            for (backward::ResolvedTrace::SourceLoc& _inliner : _trace.inliners) {
+                tracing[_i].inliners.emplace_back(backtraced_source { _inliner.filename, _inliner.function, _inliner.line, _inliner.col });
             }
         }
+#endif
     }
 
     backtraced_exception::backtraced_exception(const std::string& what, const std::size_t tracing_size)

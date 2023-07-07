@@ -55,15 +55,15 @@ namespace detail {
         _data = std::make_shared<renderer_data>();
         _data->sdl_window = existing_window.get_sdl_window();
         Diligent::SwapChainDesc _swap_chain_descriptor;
-#if PREFERRED_RENDERER_DIRECTX
+#if BUNGEEGUM_USE_RENDERER_DIRECTX
         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
         Diligent::EngineD3D11CreateInfo _engine_create_info;
         // _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
         _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &(_data->render_device), &(_data->device_context));
         Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native_window());
         _factory_ptr->CreateSwapChainD3D11(_data->render_device, _data->device_context, _swap_chain_descriptor, Diligent::FullScreenModeDesc {}, _win32_native_window, &(_data->swap_chain));
-#elif PREFERRED_RENDERER_VULKAN
-#elif PREFERRED_RENDERER_OPENGL
+#elif BUNGEEGUM_USE_RENDERER_VULKAN
+#elif BUNGEEGUM_USE_RENDERER_OPENGL
         Diligent::IEngineFactoryOpenGL* _factory_ptr = Diligent::GetEngineFactoryOpenGL();
         Diligent::EngineGLCreateInfo _engine_create_info;
         _engine_create_info.Window = { existing_window.get_native_window() };

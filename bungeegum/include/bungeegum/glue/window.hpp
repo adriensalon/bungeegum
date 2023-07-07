@@ -8,7 +8,17 @@
 #include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/toolchain.hpp>
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+/// @brief Defines if we use a native window.
+#if !defined(BUNGEEGUM_USE_WINDOW_NATIVE)
+#define BUNGEEGUM_USE_WINDOW_NATIVE (!TOOLCHAIN_PLATFORM_EMSCRIPTEN)
+#endif
+
+/// @brief Defines if we use a web browser window.
+#if !defined(BUNGEEGUM_USE_WINDOW_WEB)
+#define BUNGEEGUM_USE_WINDOW_WEB (TOOLCHAIN_PLATFORM_EMSCRIPTEN)
+#endif
+
+#if BUNGEEGUM_USE_WINDOW_NATIVE
 struct SDL_Window;
 union SDL_Event;
 #endif
@@ -54,25 +64,25 @@ namespace detail {
         window& operator=(window&& other) = default;
         ~window();
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WINDOW_NATIVE
         /// @brief Creates an instance from an opaque OS window.
         /// @exception Throws a compile-time exception if the platform is web.
         window(void* native_window);
 #endif
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WINDOW_NATIVE
         /// @brief Creates an instance from an existing SDL window.
         /// @exception Throws a compile-time exception if the platform is web.
         window(SDL_Window* sdl_window);
 #endif
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WINDOW_NATIVE
         /// @brief Gets an opaque pointer to the OS window struct.
         /// @exception Throws a compile-time exception if the platform is web.
         [[nodiscard]] void* get_native_window() const;
 #endif
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WINDOW_NATIVE
         /// @brief Gets a raw pointer to the underlying SDL_Window.
         /// @exception Throws a compile-time exception if the platform is web.
         [[nodiscard]] SDL_Window* get_sdl_window() const;
@@ -100,7 +110,7 @@ namespace detail {
         /// @details Event callbacks are fired after poll() has been invoked.
         void on_mouse_up(const std::function<void(const mouse_up_event&)>& mouse_up_callback);
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_WINDOW_NATIVE
         /// @brief Sets a callback to be triggered each time a SDL_Event is received.
         /// @details Event callbacks are fired after poll() has been invoked.
         /// @exception Throws a compile-time exception if the platform is web.

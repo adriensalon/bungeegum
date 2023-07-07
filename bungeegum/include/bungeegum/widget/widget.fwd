@@ -31,8 +31,8 @@ namespace detail {
         std::optional<draw_command> drawer_command = std::nullopt;
 
         //
-        std::function<void(input_archiver&)> loader = nullptr;
-        std::function<void(output_archiver&)> saver = nullptr;
+        std::function<void(reloaded_loader&)> loader = nullptr;
+        std::function<void(reloaded_saver&)> saver = nullptr;
         //
 
         inline bool operator==(const untyped_widget_data& other)
@@ -60,7 +60,7 @@ namespace detail {
 
         inline void save_widgets(const std::filesystem::path& archive_path)
         {
-            output_archiver _archiver(archive_path);
+            reloaded_saver _archiver(archive_path);
             traverse_untyped(root.value().get(), [this, &_archiver](untyped_widget_data& _widget_data) {
                 if (_widget_data.saver) {
                     _widget_data.saver(_archiver);
@@ -71,7 +71,7 @@ namespace detail {
 
         inline void load_widgets(const std::filesystem::path& archive_path)
         {
-            input_archiver _archiver(archive_path);
+            reloaded_loader _archiver(archive_path);
             traverse_untyped(root.value().get(), [this, &_archiver](untyped_widget_data& _widget_data) {
                 if (_widget_data.loader) {
                     _widget_data.loader(_archiver);
