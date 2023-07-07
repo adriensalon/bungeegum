@@ -32,20 +32,27 @@ namespace mem {
 }
 }
 
+#define BUNGEEGUM_STRINGIFY_IMPL(value) #value
+#define BUNGEEGUM_STRINGIFY(value) BUNGEEGUM_STRINGIFY_IMPL(value)
+
+#define BUNGEEGUM_CONCAT_IMPL(value_a, value_b) value_a##value_b
+#define BUNGEEGUM_CONCAT(value_a, value_b) BUNGEEGUM_CONCAT_IMPL(value_a, value_b)
+
 /// @brief
 /// @details
-#define HOTRELOAD_CLASS(classname, ...)                                                                         \
-    friend class cereal::access;                                                                                \
-    template <typename value_t>                                                                                 \
-    friend struct bungeegum::detail::value_wrapper;                                                             \
-    HSCPP_TRACK(classname, #classname)                                                                          \
-    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                       \
-    {                                                                                                           \
-        bungeegum::detail::serialize_fields<cereal::JSONInputArchive>(archive, { #__VA_ARGS__ }, __VA_ARGS__);  \
-    }                                                                                                           \
-    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                      \
-    {                                                                                                           \
-        bungeegum::detail::serialize_fields<cereal::JSONOutputArchive>(archive, { #__VA_ARGS__ }, __VA_ARGS__); \
+#define HOTRELOAD_CLASS(classname, ...)                                                                                                                             \
+    friend class cereal::access;                                                                                                                                    \
+    template <typename value_t>                                                                                                                                     \
+    friend struct bungeegum::detail::value_wrapper;                                                                                                                 \
+    HSCPP_TRACK(classname, #classname)                                                                                                                              \
+    std::uintptr_t _raw_object = 0;                                                                                                                                 \
+    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                                                                           \
+    {                                                                                                                                                               \
+        bungeegum::detail::serialize_fields<cereal::JSONInputArchive>(archive, std::string("RAW_OBJECT, ") + std::string(#__VA_ARGS__), _raw_object, __VA_ARGS__);  \
+    }                                                                                                                                                               \
+    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                                                                          \
+    {                                                                                                                                                               \
+        bungeegum::detail::serialize_fields<cereal::JSONOutputArchive>(archive, std::string("RAW_OBJECT, ") + std::string(#__VA_ARGS__), _raw_object, __VA_ARGS__); \
     }
 
 /// @brief
@@ -54,6 +61,8 @@ namespace mem {
 
 namespace bungeegum {
 namespace detail {
+
+    // trait is reloadable
 
     /// @brief
     /// @tparam archive_t
