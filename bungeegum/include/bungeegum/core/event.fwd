@@ -4,8 +4,6 @@
 #include <future>
 #include <optional>
 #include <typeindex>
-#include <unordered_map>
-#include <vector>
 
 #include <bungeegum/glue/map.hpp>
 #include <bungeegum/glue/raw.hpp>
@@ -20,36 +18,40 @@ struct event;
 namespace detail {
 
     template <typename... values_t>
-    struct typed_event_data {
-        std::uintptr_t raw_event = 0u;
+    struct event_data {
+        event_data() = default;
+        event_data(const event_data& other);
+        event_data& operator=(const event_data& other);
+        event_data(event_data&& other) = default;
+        event_data& operator=(event_data&& other) = default;
+        ~event_data();
+
+        std::uintptr_t raw_event = 0;
         std::vector<std::function<void(values_t...)>> callbacks = {};
         std::vector<std::future<future_typelist_t<values_t...>>> futures = {};
         std::vector<std::shared_future<future_typelist_t<values_t...>>> shared_futures = {};
-
-        typed_event_data() = default;
-        typed_event_data(const typed_event_data& other);
-        typed_event_data& operator=(const typed_event_data& other);
-        typed_event_data(typed_event_data&& other) = default;
-        typed_event_data& operator=(typed_event_data&& other) = default;
-        ~typed_event_data();
     };
 
-    struct untyped_event_data {
+    struct event_update_data {
         std::vector<std::type_index> kinds = {};
         std::function<void()> ticker = nullptr;
     };
 
-    struct events_registry {
+    struct events_container {
+        //
+        //
         registry events = {};
         std::unordered_map<std::uintptr_t, registry_entity> possessed = {};
-        std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_event_data>> registered = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<event_update_data>> registered = {};
+        //
+        //
 
-        indexed_map<std::uintptr_t, std::reference_wrapper<untyped_event_data>> tickables = {};
+        indexed_map<std::uintptr_t, std::reference_wrapper<event_update_data>> tickables = {};
 
         template <typename... values_t>
-        typed_event_data<values_t...>& get_typed(event<values_t...>& event_object);
+        event_data<values_t...>& get_data(event<values_t...>& event_object);
     };
 
-    inline events_registry events_context;
+    inline events_container global_events_container;
 }
 }

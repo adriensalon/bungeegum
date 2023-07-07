@@ -18,7 +18,7 @@ namespace detail {
         std::uintptr_t raw_animation = 0u;
         std::unique_ptr<value_t> min_value = nullptr;
         std::unique_ptr<value_t> max_value = nullptr;
-        typed_event_data<value_t> event;
+        event_data<value_t> event;
         curve eval_curve { 0.f, 1.f, std::vector<float2> {}, false };
         float duration_seconds = 0.f;
         bool is_playing = false;

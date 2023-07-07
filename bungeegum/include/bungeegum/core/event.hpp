@@ -54,32 +54,9 @@ struct event {
     const std::vector<on_trigger_callback>& callbacks() const;
 
 private:
-    detail::typed_event_data<values_t...> _data;
-    friend struct detail::events_registry;
+    detail::event_data<values_t...> _data;
+    friend struct detail::events_container;
 };
-
-/// @brief
-/// @tparam ...values_t
-template <typename... values_t>
-[[nodiscard]] event<values_t...>& make_event();
-
-/// @brief
-/// @tparam ...values_t
-/// @param other_event
-template <typename... values_t>
-[[nodiscard]] event<values_t...>& make_event(const event<values_t...>& other_event);
-
-/// @brief
-/// @tparam ...values_t
-/// @param other_event
-template <typename... values_t>
-[[nodiscard]] event<values_t...>& make_event(event<values_t...>&& other_event);
-
-/// @brief
-/// @tparam ...values_t
-/// @param event
-template <typename... values_t>
-void unmake_event(event<values_t...>& made_event);
 }
 
 #include <bungeegum/core/event.inl>

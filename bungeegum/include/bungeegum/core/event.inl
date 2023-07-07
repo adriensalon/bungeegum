@@ -5,34 +5,34 @@
 namespace bungeegum {
 namespace detail {
 
-    // typed_event_data
+    // event_data
 
     template <typename... values_t>
-    typed_event_data<values_t...>::typed_event_data(const typed_event_data& other)
+    event_data<values_t...>::event_data(const event_data& other)
     {
         *this = other;
     }
 
     template <typename... values_t>
-    typed_event_data<values_t...>& typed_event_data<values_t...>::operator=(const typed_event_data<values_t...>& other)
+    event_data<values_t...>& event_data<values_t...>::operator=(const event_data<values_t...>& other)
     {
         callbacks = std::move(other.callbacks);
         return *this;
     }
 
     template <typename... values_t>
-    typed_event_data<values_t...>::~typed_event_data()
+    event_data<values_t...>::~event_data()
     {
         if (is_event_possessed(raw_event))
-            events_context.possessed.erase(raw_event);
+            global_events_container.possessed.erase(raw_event);
         if (is_event_registered(raw_event))
-            events_context.registered.erase(raw_event);
+            global_events_container.registered.erase(raw_event);
     }
 
-    // events_registry
+    // events_container
 
     template <typename... values_t>
-    typed_event_data<values_t...>& events_registry::get_typed(event<values_t...>& event_object)
+    event_data<values_t...>& events_container::get_data(event<values_t...>& event_object)
     {
         return event_object._data;
     }
@@ -50,12 +50,12 @@ namespace detail {
         if constexpr (access_mode_t == event_raw_access_mode::event_recast)
             return raw_cast(event_object);
         else if constexpr (access_mode_t == event_raw_access_mode::event_stored)
-            return events_context.get_typed<values_t...>(event_object).raw_event;
+            return global_events_container.get_data<values_t...>(event_object).raw_event;
     }
 
     inline bool is_event_registered(const std::uintptr_t raw_event)
     {
-        return events_context.registered.find(raw_event) != events_context.registered.end();
+        return global_events_container.registered.find(raw_event) != global_events_container.registered.end();
     }
 
     template <event_raw_access_mode access_mode_t, typename... values_t>
@@ -67,7 +67,7 @@ namespace detail {
 
     inline bool is_event_possessed(const std::uintptr_t raw_event)
     {
-        return events_context.possessed.find(raw_event) != events_context.possessed.end();
+        return global_events_container.possessed.find(raw_event) != global_events_container.possessed.end();
     }
 
     template <event_raw_access_mode access_mode_t, typename... values_t>
@@ -78,7 +78,7 @@ namespace detail {
     }
 
     template <typename... values_t>
-    void assign_on_tick(typed_event_data<values_t...>& typed_event, untyped_event_data& untyped_event)
+    void assign_on_tick(event_data<values_t...>& typed_event, event_update_data& untyped_event)
     {
         using callback_iterator = typename event<values_t...>::on_trigger_callback;
         using future_iterator = typename std::vector<std::future<event<values_t...>::future_values>>::iterator;
@@ -127,13 +127,13 @@ namespace detail {
     }
 
     template <typename... values_t>
-    void assign_event(event<values_t...>& event_object, untyped_event_data& untyped_event, std::uintptr_t raw_event)
+    void assign_event(event<values_t...>& event_object, event_update_data& untyped_event, std::uintptr_t raw_event)
     {
-        typed_event_data<values_t...>& _typed_event = events_context.get_typed<values_t...>(event_object);
+        event_data<values_t...>& _typed_event = global_events_container.get_data<values_t...>(event_object);
         _typed_event.raw_event = raw_event;
         untyped_event.kinds = {};
         (untyped_event.kinds.push_back(typeid(values_t)), ...);
-        events_context.registered.insert_or_assign(raw_event, std::ref(untyped_event));
+        global_events_container.registered.insert_or_assign(raw_event, std::ref(untyped_event));
         assign_on_tick(_typed_event, untyped_event);
     }
 
@@ -142,23 +142,23 @@ namespace detail {
     {
         registry_entity _entity;
         if (is_event_possessed(raw_event)) {
-            _entity = events_context.possessed.at(raw_event);
-            untyped_event_data& _untyped_event = events_context.events.get_component<untyped_event_data>(_entity);
+            _entity = global_events_container.possessed.at(raw_event);
+            event_update_data& _untyped_event = global_events_container.events.get_component<event_update_data>(_entity);
             assign_event(event_object, _untyped_event, raw_event);
             return;
         }
         // else {
-        //     std::optional<registry_entity> _existing_entity = events_context.events.try_get_entity(event_object);
+        //     std::optional<registry_entity> _existing_entity = global_events_container.events.try_get_entity(event_object);
         //     if (_existing_entity != std::nullopt) {
         //         _entity = _existing_entity.value();
-        //         untyped_event_data& _untyped_event = events_context.events.get_component<untyped_event_data>(_entity);
+        //         event_update_data& _untyped_event = global_events_container.events.get_component<event_update_data>(_entity);
         //         assign_event(event_object, _untyped_event, raw_event);
         //         return;
         //     }
         // }
-        _entity = events_context.events.create_entity();
-        events_context.events.create_component<std::reference_wrapper<event<values_t...>>>(_entity, event_object);
-        untyped_event_data& _untyped_event = events_context.events.create_component<untyped_event_data>(_entity);
+        _entity = global_events_container.events.create_entity();
+        global_events_container.events.create_component<std::reference_wrapper<event<values_t...>>>(_entity, event_object);
+        event_update_data& _untyped_event = global_events_container.events.create_component<event_update_data>(_entity);
         assign_event(event_object, _untyped_event, raw_event);
     }
 }
@@ -234,48 +234,5 @@ template <typename... values_t>
 const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::callbacks() const
 {
     return _data.callbacks;
-}
-
-// free
-
-template <typename... values_t>
-event<values_t...>& make_event()
-{
-    detail::registry_entity _entity = detail::events_context.events.create_entity();
-    detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
-    event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity);
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
-    detail::events_context.possessed.emplace(_raw_event, _entity);
-    return _event;
-}
-
-template <typename... values_t>
-event<values_t...>& make_event(const event<values_t...>& other_event)
-{
-    detail::registry_entity _entity = detail::events_context.events.create_entity();
-    detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
-    event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity, other_event);
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
-    detail::events_context.possessed.emplace(_raw_event, _entity);
-    return _event;
-}
-
-template <typename... values_t>
-event<values_t...>& make_event(event<values_t...>&& other_event)
-{
-    detail::registry_entity _entity = detail::events_context.events.create_entity();
-    detail::events_context.events.create_component<detail::untyped_event_data>(_entity);
-    event<values_t...>& _event = detail::events_context.events.create_component<event<values_t...>>(_entity, std::move(other_event));
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_recast>(_event);
-    detail::events_context.possessed.emplace(_raw_event, _entity);
-    return _event;
-}
-
-template <typename... values_t>
-void unmake_event(event<values_t...>& made_event)
-{
-    std::uintptr_t _raw_event = detail::get_raw_event<detail::event_raw_access_mode::event_stored>(made_event);
-    detail::registry_entity _entity = detail::events_context.possessed.at(_raw_event);
-    detail::events_context.events.destroy_entity(_entity);
 }
 }
