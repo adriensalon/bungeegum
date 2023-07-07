@@ -85,8 +85,8 @@ namespace detail {
     void renderer::new_frame()
     {
 		if (_is_rendering) {
-			throw backtraced_exception("TODO", backtrace_size);
-		}
+                    throw backtraced_exception("TODO");
+                }
         Diligent::ITextureView* _rtv_ptr = _data->swap_chain->GetCurrentBackBufferRTV();
         Diligent::ITextureView* _dsv_ptr = _data->swap_chain->GetDepthBufferDSV();
         _data->device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
@@ -101,8 +101,8 @@ namespace detail {
     void renderer::present()
     {
 		if (!_is_rendering) {
-			throw backtraced_exception("TODO", backtrace_size);
-		}
+                    throw backtraced_exception("TODO");
+                }
         _data->imgui_renderer->Render(_data->device_context);
         _data->swap_chain->Present();
 		_is_rendering = false;
