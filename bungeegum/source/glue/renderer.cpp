@@ -39,7 +39,6 @@
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/renderer.hpp>
 
-
 namespace bungeegum {
 namespace detail {
 
@@ -84,9 +83,9 @@ namespace detail {
 
     void renderer::new_frame()
     {
-		if (_is_rendering) {
-                    throw backtraced_exception("TODO");
-                }
+        if (_is_rendering) {
+            throw backtraced_exception("TODO");
+        }
         Diligent::ITextureView* _rtv_ptr = _data->swap_chain->GetCurrentBackBufferRTV();
         Diligent::ITextureView* _dsv_ptr = _data->swap_chain->GetDepthBufferDSV();
         _data->device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
@@ -95,17 +94,17 @@ namespace detail {
         _data->device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         const Diligent::SwapChainDesc& _swap_chain_desc = _data->swap_chain->GetDesc();
         _data->imgui_renderer->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
-		_is_rendering = true;
+        _is_rendering = true;
     }
 
     void renderer::present()
     {
-		if (!_is_rendering) {
-                    throw backtraced_exception("TODO");
-                }
+        if (!_is_rendering) {
+            throw backtraced_exception("TODO");
+        }
         _data->imgui_renderer->Render(_data->device_context);
         _data->swap_chain->Present();
-		_is_rendering = false;
+        _is_rendering = false;
     }
 
     void renderer::process_sdl_event_for_imgui(const SDL_Event* event)
