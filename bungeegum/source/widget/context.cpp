@@ -173,9 +173,10 @@ namespace detail {
         detail::animations_context.animations.template iterate<detail::untyped_animation_data>([delta_time](detail::untyped_animation_data& _animation_data) {
             _animation_data.ticker(delta_time);
         });
-        detail::global_events_container.events.template iterate<detail::event_update_data>([](detail::event_update_data& _event_data) {
-            _event_data.ticker();
-        });
+        global_event_container.tick();
+        ////
+        ////
+        ////
 
         // debug only !
         must_resolve();

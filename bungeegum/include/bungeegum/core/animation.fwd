@@ -5,6 +5,7 @@
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/glue/curve.hpp>
 #include <bungeegum/glue/lerp.hpp>
+#include <bungeegum/glue/registry.hpp>
 
 namespace bungeegum {
 

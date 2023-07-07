@@ -2,18 +2,12 @@
 
 #include <functional>
 #include <future>
-#include <optional>
 #include <typeindex>
 
 #include <bungeegum/glue/map.hpp>
-#include <bungeegum/glue/raw.hpp>
-#include <bungeegum/glue/registry.hpp>
 #include <bungeegum/glue/typelist.hpp>
 
 namespace bungeegum {
-
-template <typename... values_t>
-struct event;
 
 namespace detail {
 
@@ -37,21 +31,16 @@ namespace detail {
         std::function<void()> ticker = nullptr;
     };
 
-    struct events_container {
-        //
-        //
-        registry events = {};
-        std::unordered_map<std::uintptr_t, registry_entity> possessed = {};
-        std::unordered_map<std::uintptr_t, std::reference_wrapper<event_update_data>> registered = {};
-        //
-        //
+    struct event_container_data {
+        void notify_erase(const std::uintptr_t& raw_event);
+        void tick();
 
-        indexed_map<std::uintptr_t, std::reference_wrapper<event_update_data>> tickables = {};
+        indexed_map<std::uintptr_t, event_update_data> tickables = {};
 
-        template <typename... values_t>
-        event_data<values_t...>& get_data(event<values_t...>& event_object);
+    private:
+        std::vector<std::uintptr_t> _tickables_to_erase = {};
     };
 
-    inline events_container global_events_container;
+    inline event_container_data global_event_container;
 }
 }
