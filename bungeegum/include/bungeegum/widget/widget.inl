@@ -130,33 +130,33 @@ reference_widget<widget_t>::reference_widget(detail::reloaded<widget_t>&& reload
 
 // runtime_widget
 
-template <typename widget_t>
-runtime_widget::runtime_widget(widget_t* widget)
-{
-    std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(*widget);
-    if (!detail::is_widget_registered(_raw_widget))
-        detail::register_widget(*widget, _raw_widget);
-    _data.untyped_widget = detail::get_untyped_widget(_raw_widget);
-}
+// template <typename widget_t>
+// runtime_widget::runtime_widget(widget_t* widget)
+// {
+//     std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(*widget);
+//     if (!detail::is_widget_registered(_raw_widget))
+//         detail::register_widget(*widget, _raw_widget);
+//     _data.untyped_widget = detail::get_untyped_widget(_raw_widget);
+// }
 
-template <typename widget_t>
-runtime_widget::runtime_widget(widget_t& widget)
-{
-    std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(widget);
-    if (!detail::is_widget_registered(_raw_widget)) {
-#if 1
-        detail::register_widget(widget, _raw_widget);
-#else
-        detail::register_widget(widget.get(), _raw_widget);
-#endif
-    }
-    _data.untyped_widget = detail::get_untyped_widget(_raw_widget);
-}
+// template <typename widget_t>
+// runtime_widget::runtime_widget(widget_t& widget)
+// {
+//     std::uintptr_t _raw_widget = detail::get_raw_widget<widget_t>(widget);
+//     if (!detail::is_widget_registered(_raw_widget)) {
+// #if 1
+//         detail::register_widget(widget, _raw_widget);
+// #else
+//         detail::register_widget(widget.get(), _raw_widget);
+// #endif
+//     }
+//     _data.untyped_widget = detail::get_untyped_widget(_raw_widget);
+// }
 
 // free
 
 template <typename widget_t, typename... widget_args_t>
-reference_widget<widget_t>& make(widget_args_t&&... widget_args)
+reference_widget<widget_t>& make_reference(widget_args_t&&... widget_args)
 {
     detail::registry_entity _entity = detail::widgets_context.widgets.create_entity();
     detail::widgets_context.widgets.create_component<detail::untyped_widget_data>(_entity);
@@ -180,21 +180,21 @@ reference_widget<widget_t>& make(widget_args_t&&... widget_args)
     return _widget_reference;
 }
 
-template <template <typename, typename> typename container_t, typename allocator_t>
-void get_children(
-    const runtime_widget& widget,
-    container_t<runtime_widget, allocator_t>& container)
-{
-    (void)widget;
-    (void)container;
-}
+// template <template <typename, typename> typename container_t, typename allocator_t>
+// void get_children(
+//     const runtime_widget& widget,
+//     container_t<runtime_widget, allocator_t>& container)
+// {
+//     (void)widget;
+//     (void)container;
+// }
 
-template <typename widget_t>
-bool has_type(const runtime_widget& widget)
-{
-    (void)widget;
-    return false;
-}
+// template <typename widget_t>
+// bool has_type(const runtime_widget& widget)
+// {
+//     (void)widget;
+//     return false;
+// }
 
 template <typename property_t>
 property_t& make_property(const runtime_widget& widget, const std::string& name)

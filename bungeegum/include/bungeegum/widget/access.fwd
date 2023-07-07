@@ -6,7 +6,7 @@
 #include <bungeegum/widget/draw.hpp>
 #include <bungeegum/widget/interact.hpp>
 #include <bungeegum/widget/resolve.hpp>
-#include <bungeegum/widget/widget.hpp>
+// #include <bungeegum/widget/widget.hpp>
 
 namespace bungeegum {
 
