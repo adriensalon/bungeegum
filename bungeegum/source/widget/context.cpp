@@ -170,9 +170,7 @@ namespace detail {
 
     bool tick(const std::chrono::milliseconds& delta_time)
     {
-        detail::animations_context.animations.template iterate<detail::untyped_animation_data>([delta_time](detail::untyped_animation_data& _animation_data) {
-            _animation_data.ticker(delta_time);
-        });
+        global_animation_container.tick(delta_time);
         global_event_container.tick();
         ////
         ////

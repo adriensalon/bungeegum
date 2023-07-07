@@ -13,7 +13,7 @@ namespace bungeegum {
 template <typename... values_t>
 struct event {
 
-    /// @brief Callback objects
+    /// @brief Instances of this type are the callback objects.
     using on_trigger_callback = std::function<void(const values_t&...)>;
 
     /// @brief Future values resolve to void for event<>, to value_t for event<value_t> and to

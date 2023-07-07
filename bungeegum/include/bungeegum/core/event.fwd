@@ -8,7 +8,6 @@
 #include <bungeegum/glue/typelist.hpp>
 
 namespace bungeegum {
-
 namespace detail {
 
     template <typename... values_t>

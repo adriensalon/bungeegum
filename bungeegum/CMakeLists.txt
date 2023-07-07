@@ -14,6 +14,7 @@ set(bungeegum_source
 	"source/glue/reload.cpp"
 	"source/glue/time.cpp"
 
+	"source/core/animation.cpp"
 	"source/core/event.cpp"
 	"source/core/exceptions.cpp"
 

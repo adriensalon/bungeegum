@@ -4,7 +4,7 @@
 
 namespace bungeegum {
 
-/// @brief
+/// @brief TODO GO SEE FLUTTER START / STOP / RESET BIZARRE PEUT ETRE
 /// @details
 enum struct animation_mode {
     forward,
@@ -16,85 +16,49 @@ enum struct animation_mode {
 
 /// @brief Animation objects use curves to update variables and can be passed around the user
 /// code with events or typed callbacks. Animations will be fired each frame when started.
-/// @details lifetime
-/// @tparam value_t
+/// @details Animation object instances can be copied (deep copy but the new animation is
+/// stopped) and moved.
+/// @tparam value_t is the lerpable type to use as argument for callbacks after interpolation.
 template <typename value_t>
 struct animation {
 
-    /// @brief
-    using lerpable_value = detail::lerpable_t<value_t>;
+    /// @brief Instances of this type are the callback objects.
+    using on_value_changed_callback = std::function<void(const value_t&)>;
 
-    /// @brief
-    using on_tick_callback = std::function<void(const value_t&)>;
-
-    /// @brief
-    /// @param value_changed_event
-    animation& on_value_changed(const event<value_t>& value_changed_event);
-
-    /// @brief
-    /// @param tick_callback
-    animation& on_tick(const on_tick_callback& tick_callback);
-
-    /// @brief
-    /// @param value
-    /// @param must_draw
-    /// @param must_resolve
-    animation& on_tick(value_t& value, const bool must_draw = false, const bool must_resolve = false);
-
-    /// @brief Starts the animation
-    animation& start();
-
-    /// @brief Stops the animation
-    animation& stop();
-
-    /// @brief Resets the animation
-    animation& reset();
-
-    /// @brief Sets the animation shape from a curve
-    /// @param curved_shape
-    animation& shape(const curve& curved_shape);
-
-    /// @brief Sets the minimal value
-    /// @param min_value
-    animation& min(value_t&& min_value);
-
-    /// @brief
-    /// @param min_value
+    /// @brief Sets the maximum value corresponding to y = 1.f on the curve.
     animation& max(value_t&& min_value);
 
-    /// @brief Sets the length
-    /// @tparam duration_unit_t
-    /// @param count
+    /// @brief Sets the minimum value corresponding to y = 0.f on the curve.
+    animation& min(value_t&& min_value);
+
+    /// @brief Emplaces new callbacks from an event to be fired when the animation is playing and
+    /// the value has changed.
+    animation& on_value_changed(const event<value_t>& value_changed_event);
+
+    /// @brief Emplaces a new callback to be fired when the animation is playing and the value has
+    /// changed.
+    animation& on_value_changed(const on_value_changed_callback& tick_callback);
+
+    /// @brief Resets the animation.
+    animation& reset();
+
+    /// @brief Sets the animation shape from a curve.
+    animation& shape(const curve& curved_shape);
+
+    /// @brief Starts the animation.
+    animation& start();
+
+    /// @brief Stops the animation.
+    animation& stop();
+
+    /// @brief Sets the duration.
+    /// @tparam duration_unit_t is the type from std::chrono to use as unit.
     template <typename duration_unit_t = std::chrono::seconds>
     animation& duration(const unsigned int count);
 
 private:
-    detail::typed_animation_data<value_t> _data;
-    friend struct detail::animations_registry;
+    detail::animation_data<value_t> _data;
 };
-
-/// @brief
-/// @tparam value_t
-template <typename value_t>
-[[nodiscard]] animation<value_t>& make_animation();
-
-/// @brief
-/// @tparam value_t
-/// @param other_animation
-template <typename value_t>
-[[nodiscard]] animation<value_t>& make_animation(const animation<value_t>& other_animation);
-
-/// @brief
-/// @tparam value_t
-/// @param other_animation
-template <typename value_t>
-[[nodiscard]] animation<value_t>& make_animation(animation<value_t>&& other_animation);
-
-/// @brief
-/// @tparam value_t
-/// @param made_animation
-template <typename value_t>
-void unmake_animation(animation<value_t>& made_animation);
 }
 
 #include <bungeegum/core/animation.inl>

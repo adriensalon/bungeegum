@@ -15,7 +15,7 @@ namespace detail {
         ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
         if (ImGui::Begin("inspector##__bungeegum_window_inspector_title__", 0, ImGuiWindowFlags_NoCollapse)) {
             int _k = 0;
-            animations_context.animations.template iterate<detail::untyped_animation_data>([&](untyped_animation_data& _animation_data) {
+            for (animation_update_data& _animation_data : global_animation_container.tickables) {
                 // if (_animation_data.is_playing) {
                 std::string _title = "##StatsGraphTitle" + std::to_string(_k);
                 static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
@@ -36,7 +36,7 @@ namespace detail {
                 ImPlot::PopStyleColor();
                 // }
                 _k++;
-            });
+            }
         }
         ImGui::End();
     }
