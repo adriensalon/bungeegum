@@ -56,9 +56,6 @@ namespace detail {
         /// @brief The color to use when clearing the screen.
         float4 clear_color = { 0.f, 0.f, 0.f, 1.f };
 
-        /// @brief Length of the trace when collecting runtime backtraced exceptions.
-        inline static std::size_t backtrace_size = 10u;
-
     private:
         bool1 _is_rendering = false;
 

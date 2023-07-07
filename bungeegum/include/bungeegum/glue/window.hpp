@@ -132,9 +132,6 @@ namespace detail {
         /// @details Applies to all windows on native platforms.
         static void show_cursor(const bool show);
 
-        /// @brief Length of the trace when collecting runtime backtraced exceptions.
-        inline static std::size_t backtrace_size = 10u;
-
     private:
         bool1 _is_running = false;
         std::function<void()> _update_callback = nullptr;

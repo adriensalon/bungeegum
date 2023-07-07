@@ -75,9 +75,6 @@ namespace detail {
         /// @exception Throws a compile-time exception if the type is not default-constructible.
         [[nodiscard]] const value_t& operator[](const key_t& key) const;
 
-        /// @brief Length of the trace when collecting runtime backtraced exceptions.
-        inline static std::size_t backtrace_size = 10u;
-
     private:
         std::vector<value_t> _values = {};
         std::unordered_map<key_t, std::size_t> _indices = {};

@@ -6,6 +6,10 @@
 #include <string>
 #include <vector>
 
+#if !defined(BUNGEEGUM_BACKTRACE_SIZE)
+#define BUNGEEGUM_BACKTRACE_SIZE 10
+#endif
+
 namespace bungeegum {
 namespace detail {
 
@@ -35,11 +39,11 @@ namespace detail {
         backtraced_exception& operator=(backtraced_exception&& other);
 
         /// @brief Creates an instance from an error message and the count of calls to backtrace.
-        backtraced_exception(const std::string& what, const std::size_t tracing_size);
+        backtraced_exception(const std::string& what, const std::size_t tracing_size = BUNGEEGUM_BACKTRACE_SIZE);
 
         /// @brief Creates an instance from an existing exception and the count of calls to
         /// backtrace.
-        backtraced_exception(const std::exception& existing, const std::size_t tracing_size);
+        backtraced_exception(const std::exception& existing, const std::size_t tracing_size = BUNGEEGUM_BACKTRACE_SIZE);
 
         /// @brief Gets the error message.
         [[nodiscard]] const char* what() const;

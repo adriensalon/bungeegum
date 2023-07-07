@@ -36,7 +36,7 @@ namespace detail {
             std::string _error_message = SDL_GetError();
             SDL_ClearError();
             if (!_error_message.empty()) {
-                throw backtraced_exception(_error_message, detail::window::backtrace_size);
+                throw backtraced_exception(_error_message);
             }
         }
 #endif
@@ -48,7 +48,7 @@ namespace detail {
         if constexpr (is_platform_emscripten_v) {
             static bool1 _is_already_created = false;
             if (_is_already_created) {
-                throw backtraced_exception("", backtrace_size);
+                throw backtraced_exception("TODO ");
             }
             _is_already_created = true;
 

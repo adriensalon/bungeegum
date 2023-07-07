@@ -16,8 +16,7 @@ namespace detail {
     {
         if (!contains(key)) {
             throw backtraced_exception("No value can be accessed because the "
-                                       "provided key is not contained.",
-                backtrace_size);
+                                       "provided key is not contained.");
         }
         std::size_t _index = _indices.at(key);
         return (_values[_index]);
@@ -28,8 +27,7 @@ namespace detail {
     {
         if (!contains(key)) {
             throw backtraced_exception("No value can be accessed because the "
-                                       "provided key is not contained.",
-                backtrace_size);
+                                       "provided key is not contained.");
         }
         std::size_t _index = _indices.at(key);
         return (_values[_index]);
@@ -58,8 +56,7 @@ namespace detail {
     {
         if (contains(key)) {
             throw backtraced_exception("No key-value pair can be emplaced because the "
-                                       "provided key is already contained.",
-                backtrace_size);
+                                       "provided key is already contained.");
         }
         std::size_t _index = _values.size();
         _indices.emplace(key, _index);
@@ -71,8 +68,7 @@ namespace detail {
     {
         if (!contains(key)) {
             throw backtraced_exception("No key-value pair can be erased because the "
-                                       "provided key is not contained.",
-                backtrace_size);
+                                       "provided key is not contained.");
         }
         std::size_t _index = _indices.at(key);
         _values.erase(_values.begin() + _index);
