@@ -1,8 +1,7 @@
 #include <bungeegum/core/exceptions.hpp>
-#include <bungeegum/widget/resolve.hpp>
-#include <bungeegum/widget/runtime.hpp>
-#include <bungeegum/widget/widget.hpp>
-
+#include <bungeegum/core/resolve.hpp>
+#include <bungeegum/core/runtime.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 

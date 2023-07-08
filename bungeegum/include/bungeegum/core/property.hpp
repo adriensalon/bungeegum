@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/widget/runtime.hpp>
+#include <bungeegum/core/runtime.hpp>
 
 namespace bungeegum {
 
@@ -28,4 +28,4 @@ void destroy_property(const runtime_widget& widget, const std::string& name);
 
 }
 
-#include <bungeegum/widget/property.inl>
+#include <bungeegum/core/property.inl>

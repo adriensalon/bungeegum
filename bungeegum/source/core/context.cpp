@@ -6,10 +6,10 @@
 #include <bungeegum/backend/common.fwd>
 #include <bungeegum/backend/overlay.fwd>
 #include <bungeegum/core/animation.hpp>
+#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.fwd>
-#include <bungeegum/widget/context.fwd>
-#include <bungeegum/widget/widget.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 namespace detail {

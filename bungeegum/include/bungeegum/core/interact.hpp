@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/widget/interact.fwd>
+#include <bungeegum/core/interact.fwd>
 
 namespace bungeegum {
 

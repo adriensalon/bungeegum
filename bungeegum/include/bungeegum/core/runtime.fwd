@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/widget/widget.fwd>
+#include <bungeegum/core/widget.fwd>
 
 namespace bungeegum {
 namespace detail {

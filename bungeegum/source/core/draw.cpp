@@ -1,7 +1,7 @@
 #include <ImGui.h>
 
-#include <bungeegum/widget/draw.hpp>
-#include <bungeegum/widget/widget.hpp>
+#include <bungeegum/core/draw.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 namespace detail {

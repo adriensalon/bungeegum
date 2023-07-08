@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bungeegum/backend/overlay.fwd>
+#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
-#include <bungeegum/widget/context.fwd>
 
 namespace bungeegum {
 

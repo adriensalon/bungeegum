@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/widget/runtime.fwd>
+#include <bungeegum/core/runtime.fwd>
 
 namespace bungeegum {
 
@@ -65,4 +65,4 @@ template <typename widget_t>
 
 }
 
-#include <bungeegum/widget/runtime.inl>
+#include <bungeegum/core/runtime.inl>

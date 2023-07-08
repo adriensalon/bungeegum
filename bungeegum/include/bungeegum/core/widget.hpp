@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/widget/widget.fwd>
+#include <bungeegum/core/widget.fwd>
 
 namespace bungeegum {
 
@@ -50,4 +50,4 @@ template <typename widget_t, typename... widget_args_t>
 }
 }
 
-#include <bungeegum/widget/widget.inl>
+#include <bungeegum/core/widget.inl>
