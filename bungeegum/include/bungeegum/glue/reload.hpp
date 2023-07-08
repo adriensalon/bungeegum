@@ -22,6 +22,7 @@
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
+#include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/foreach.hpp>
 #include <bungeegum/glue/simd.hpp>
 
@@ -32,27 +33,21 @@ namespace mem {
 }
 }
 
-#define BUNGEEGUM_STRINGIFY_IMPL(value) #value
-#define BUNGEEGUM_STRINGIFY(value) BUNGEEGUM_STRINGIFY_IMPL(value)
-
-#define BUNGEEGUM_CONCAT_IMPL(value_a, value_b) value_a##value_b
-#define BUNGEEGUM_CONCAT(value_a, value_b) BUNGEEGUM_CONCAT_IMPL(value_a, value_b)
-
 /// @brief
 /// @details
-#define HOTRELOAD_CLASS(classname, ...)                                                                                                                             \
-    friend class cereal::access;                                                                                                                                    \
-    template <typename value_t>                                                                                                                                     \
-    friend struct bungeegum::detail::value_wrapper;                                                                                                                 \
-    HSCPP_TRACK(classname, #classname)                                                                                                                              \
-    std::uintptr_t _raw_object = 0;                                                                                                                                 \
-    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                                                                           \
-    {                                                                                                                                                               \
-        bungeegum::detail::serialize_fields<cereal::JSONInputArchive>(archive, std::string("RAW_OBJECT, ") + std::string(#__VA_ARGS__), _raw_object, __VA_ARGS__);  \
-    }                                                                                                                                                               \
-    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                                                                          \
-    {                                                                                                                                                               \
-        bungeegum::detail::serialize_fields<cereal::JSONOutputArchive>(archive, std::string("RAW_OBJECT, ") + std::string(#__VA_ARGS__), _raw_object, __VA_ARGS__); \
+#define HOTRELOAD_CLASS(classname, ...)                                                                                                                                                             \
+    friend class cereal::access;                                                                                                                                                                    \
+    template <typename value_t>                                                                                                                                                                     \
+    friend struct bungeegum::detail::value_wrapper;                                                                                                                                                 \
+    HSCPP_TRACK(classname, #classname)                                                                                                                                                              \
+    std::uintptr_t _bungeegum_object_reference = 0;                                                                                                                                                 \
+    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                                                                                                           \
+    {                                                                                                                                                                                               \
+        bungeegum::detail::serialize_fields<cereal::JSONInputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__);  \
+    }                                                                                                                                                                                               \
+    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                                                                                                          \
+    {                                                                                                                                                                                               \
+        bungeegum::detail::serialize_fields<cereal::JSONOutputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__); \
     }
 
 /// @brief
@@ -61,8 +56,6 @@ namespace mem {
 
 namespace bungeegum {
 namespace detail {
-
-    // trait is reloadable
 
     /// @brief
     /// @tparam archive_t
@@ -186,20 +179,70 @@ namespace detail {
 }
 }
 
-#include <bungeegum/glue/reload.inl>
-
 #else
 
-#define HOTRELOAD_CLASS(class, name)
+/// @brief
+/// @details
+#define HOTRELOAD_CLASS(classname, ...)
+
+/// @brief
+/// @details
 #define HOTRELOAD_METHOD
-#define HOTRELOAD_FIELDS(...)
-
-// namespace bungeegum {
-// namespace detail {
-
-//     template <typename value_t>
-//     using reloaded = std::reference_wrapper<value_t>;
-// }
-// }
 
 #endif
+
+namespace bungeegum {
+namespace detail {
+
+    namespace traits {
+
+        template <typename value_t>
+        using detected_load_function = decltype(std::declval<value_t>()._bungeegum_load(std::declval<cereal::JSONInputArchive&>()));
+
+        template <typename value_t>
+        using detected_save_function = decltype(std::declval<value_t>()._bungeegum_save(std::declval<cereal::JSONOutputArchive&>()));
+
+        template <typename value_t>
+        constexpr bool has_load_function_v = detail::is_detected_exact_v<void, detected_load_function, value_t>;
+
+        template <typename value_t>
+        constexpr bool has_save_function_v = detail::is_detected_exact_v<void, detected_save_function, value_t>;
+
+        template <typename value_t>
+        constexpr bool is_reloadable_v = (has_load_function_v<value_t> && has_save_function_v<value_t>);
+
+        template <typename value_t, typename = void>
+        struct value_type {
+            using type = value_t;
+        };
+
+        template <typename value_t>
+        struct value_type<value_t, std::enable_if_t<is_reloadable_v<value_t>>> {
+            using type = reloaded<value_t>;
+        };
+
+        template <typename value_t, typename = void>
+        struct value_constructor_type {
+            using type = value_t&;
+        };
+
+        template <typename value_t>
+        struct value_constructor_type<value_t, std::enable_if_t<traits::is_reloadable_v<value_t>>> {
+            using type = reloaded<value_t>&&;
+        };
+
+    }
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    using value_type_t = typename traits::value_type<value_t>::type;
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    using value_constructor_type_t = typename traits::value_constructor_type<value_t>::type;
+}
+}
+
+#include <bungeegum/glue/reload.inl>
