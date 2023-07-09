@@ -63,6 +63,8 @@ namespace detail {
     template <typename archive_t, typename... fields_t>
     void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields);
 
+    /// @brief
+    /// @tparam value_t
     template <typename value_t>
     struct reloaded {
         reloaded() = delete;
@@ -71,7 +73,10 @@ namespace detail {
         reloaded(reloaded&& other);
         reloaded& operator=(reloaded&& other);
 
+        /// @brief
         value_t& get();
+
+        /// @brief
         const value_t& get() const;
 
     private:

@@ -65,8 +65,8 @@ namespace detail {
                     // if (_widget_data.drawer)
                     //     ImGui::Text("has advanced draw");
                     ImGui::Text("Constraints");
-                    ImGui::Text(("min_size = " + size_to_string(_widget_data.resolver_command.value().min_size())).c_str());
-                    ImGui::Text(("max_size = " + size_to_string(_widget_data.resolver_command.value().max_size())).c_str());
+                    ImGui::Text(("min_size = " + size_to_string(_widget_data.resolver_command.min_size())).c_str());
+                    ImGui::Text(("max_size = " + size_to_string(_widget_data.resolver_command.max_size())).c_str());
 
                     // ImGui::Text((std::to_string(_widget_data.command.value()._commands.size()) + " advanced draw commands)").c_str());
                     // if (!_widget_data.detached_events_removers.empty())
@@ -80,7 +80,7 @@ namespace detail {
                 }
             };
 
-            _tf(widgets_context.root.value().get());
+            _tf(global_widgets_manager.root.value().get());
         }
         ImGui::End();
     }

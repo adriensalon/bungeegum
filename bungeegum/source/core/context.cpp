@@ -16,21 +16,21 @@ namespace detail {
 
     void context::execute_interact()
     {
-#define traverse_interact_impl(interaction_name)                                                                      \
-    for (const interaction_name##_event& _event : interaction_name##_events) {                                        \
-        widgets_context.traverse_untyped(widgets_context.root.value(), [&_event](untyped_widget_data& _widget_data) { \
-            if (_widget_data.interactor_command.has_value()) {                                                        \
-                _widget_data.interactor_command.value()._data.is_blocked = false;                                     \
-                _widget_data.interactor_command.value()._data.command_data = _event;                                  \
-                protect_userspace([&_widget_data]() {                                                                 \
-                    _widget_data.interactor(_widget_data.interactor_command.value());                                 \
-                });                                                                                                   \
-                bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                           \
-                return _retval;                                                                                       \
-            }                                                                                                         \
-            return true;                                                                                              \
-        });                                                                                                           \
-    }                                                                                                                 \
+#define traverse_interact_impl(interaction_name)                                                                                    \
+    for (const interaction_name##_event& _event : interaction_name##_events) {                                                      \
+        global_widgets_manager.traverse_untyped(global_widgets_manager.root.value(), [&_event](untyped_widget_data& _widget_data) { \
+            if (_widget_data.interactor_command.has_value()) {                                                                      \
+                _widget_data.interactor_command.value()._data.is_blocked = false;                                                   \
+                _widget_data.interactor_command.value()._data.command_data = _event;                                                \
+                protect_userspace([&_widget_data]() {                                                                               \
+                    _widget_data.interactor(_widget_data.interactor_command.value());                                               \
+                });                                                                                                                 \
+                bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                                         \
+                return _retval;                                                                                                     \
+            }                                                                                                                       \
+            return true;                                                                                                            \
+        });                                                                                                                         \
+    }                                                                                                                               \
     interaction_name##_events.clear();
 
         traverse_interact_impl(window_resized);
@@ -48,38 +48,27 @@ namespace detail {
         while (!_resolve_done) {
             std::for_each(
                 std::execution::seq, // go parallel
-                widgets_context.resolvables.begin(),
-                widgets_context.resolvables.end(),
+                global_widgets_manager.resolvables.begin(),
+                global_widgets_manager.resolvables.end(),
                 [](auto&& _data_reference) {
                     untyped_widget_data& _widget_data = _data_reference.get();
-                    resolve_command& _resolve_command = _widget_data.resolver_command.value();
+                    resolve_command& _resolve_command = _widget_data.resolver_command;
 
-                    if (_widget_data == widgets_context.root.value().get()) {
+                    if (_widget_data == global_widgets_manager.root.value().get()) {
                         _resolve_command._data.constraint.min_size = detail::viewport_size;
                         _resolve_command._data.constraint.max_size = detail::viewport_size;
                     } else {
                         untyped_widget_data* _parent_widget_data_ptr = &_widget_data.parent.value().get();
-                        bool _root_is_parent = false;
-                        while (!_parent_widget_data_ptr->resolver_command.has_value()) {
-                            if (*_parent_widget_data_ptr == widgets_context.root.value().get()) {
-                                _resolve_command._data.constraint.min_size = detail::viewport_size;
-                                _resolve_command._data.constraint.max_size = detail::viewport_size;
-                                std::cout << "viewport size = " << detail::viewport_size.x << ", " << detail::viewport_size.y << std::endl;
-                                _root_is_parent = true;
-                                break;
-                            }
-                            _parent_widget_data_ptr = &_parent_widget_data_ptr->parent.value().get();
-                        }
-                        if (!_root_is_parent) {
-                            resolve_command& _parent_resolve_command = _parent_widget_data_ptr->resolver_command.value();
-                            _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
-                            _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
-                        }
+
+                        resolve_command& _parent_resolve_command = _parent_widget_data_ptr->resolver_command;
+                        _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
+                        _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
+
                         // _resolve_command._data.resolved_position = _parent_widget_data_ptr->resolver_command.value()._data.resolved_position;
                     }
 
                     protect_userspace([&_widget_data]() {
-                        _widget_data.resolver(_widget_data.resolver_command.value());
+                        _widget_data.resolver(_widget_data.resolver_command);
                     });
 
                     // float2 _resolved_size = _resolve_command._data.resolved_size;
@@ -88,8 +77,8 @@ namespace detail {
                     //     _draw_command._data.resolved_size = _resolved_size;
                     // }
                 });
-            widgets_context.resolvables.erase(widgets_context.resolvables.begin(), widgets_context.resolvables.end());
-            _resolve_done = widgets_context.resolvables.empty();
+            global_widgets_manager.resolvables.erase(global_widgets_manager.resolvables.begin(), global_widgets_manager.resolvables.end());
+            _resolve_done = global_widgets_manager.resolvables.empty();
         }
     }
 
@@ -102,15 +91,15 @@ namespace detail {
             while (!_draw_done) {
                 std::for_each(
                     std::execution::seq, // go parallel
-                    widgets_context.drawables.begin(),
-                    widgets_context.drawables.end(),
+                    global_widgets_manager.drawables.begin(),
+                    global_widgets_manager.drawables.end(),
                     [imgui_drawlist](auto&& _data_reference) {
                         untyped_widget_data& _drawable_widget_data = _data_reference.get();
-                        widgets_context.traverse_untyped(_drawable_widget_data, [imgui_drawlist](untyped_widget_data& _widget_data) {
+                        global_widgets_manager.traverse_untyped(_drawable_widget_data, [imgui_drawlist](untyped_widget_data& _widget_data) {
                             // accumulate position anyway
-                            resolve_command& _widget_resolver_command = _widget_data.resolver_command.value();
+                            resolve_command& _widget_resolver_command = _widget_data.resolver_command;
                             if (_widget_data.parent.has_value()) {
-                                resolve_command& _parent_resolver_command = _widget_data.parent.value().get().resolver_command.value();
+                                resolve_command& _parent_resolver_command = _widget_data.parent.value().get().resolver_command;
                                 _widget_resolver_command._data.accumulated_position = _widget_resolver_command._data.resolved_position + _parent_resolver_command._data.accumulated_position;
                             }
 
@@ -129,8 +118,8 @@ namespace detail {
                             return true;
                         });
                     });
-                widgets_context.drawables.erase(widgets_context.drawables.begin(), widgets_context.drawables.end());
-                _draw_done = widgets_context.drawables.empty();
+                global_widgets_manager.drawables.erase(global_widgets_manager.drawables.begin(), global_widgets_manager.drawables.end());
+                _draw_done = global_widgets_manager.drawables.empty();
             }
         }
     }
@@ -183,7 +172,7 @@ namespace detail {
 
         // context::execute_interact();
         context::execute_resolve();
-        return (has_userspace_thrown() || !widgets_context.drawables.empty());
+        return (has_userspace_thrown() || !global_widgets_manager.drawables.empty());
         // return true;
     }
 

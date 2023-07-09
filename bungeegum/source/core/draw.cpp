@@ -123,7 +123,7 @@ void draw_command::draw_rect_filled(
 
 void must_draw()
 {
-    detail::untyped_widget_data& _data = detail::widgets_context.root.value().get();
-    detail::widgets_context.drawables.emplace_back(_data);
+    detail::untyped_widget_data& _data = detail::global_widgets_manager.root.value().get();
+    detail::global_widgets_manager.drawables.emplace_back(_data);
 }
 }

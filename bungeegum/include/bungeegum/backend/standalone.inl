@@ -22,7 +22,7 @@ template <typename widget_t>
 void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
 {
     detail::protect_library([&]() {
-        detail::widgets_context.root = detail::get_untyped_widget(widget);
+        detail::global_widgets_manager.root = detail::get_untyped_widget(widget);
         detail::stopwatch _stopwatch;
         detail::window _window;
         detail::viewport_size = _window.get_size();
@@ -97,9 +97,9 @@ void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
             //
             detail::reload_state _reload_result = detail::reload_manager->update();
             if (_reload_result == detail::reload_state::started_compiling) {
-                detail::widgets_context.save_widgets("C:/Users/adri/desktop/ok.json");
+                detail::global_widgets_manager.save_widgets("C:/Users/adri/desktop/ok.json");
             } else if (_reload_result == detail::reload_state::performed_swap) {
-                detail::widgets_context.load_widgets("C:/Users/adri/desktop/ok.json");
+                detail::global_widgets_manager.load_widgets("C:/Users/adri/desktop/ok.json");
             }
             //
             //

@@ -22,7 +22,7 @@ bungeegum_functor embed(widget_t& widget)
 {
     bungeegum_functor _functor;
     // detail::protect_library([&]() {
-    detail::widgets_context.root = detail::widgets_context.get(widget);
+    detail::global_widgets_manager.root = detail::global_widgets_manager.get(widget);
     detail::setup_overlay();
     // });
 

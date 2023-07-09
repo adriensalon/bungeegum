@@ -10,7 +10,7 @@ namespace detail {
 
     bool events_manager::contains(const std::uintptr_t raw_event) const
     {
-        return (_tickables.find(raw_event) != _tickables.end());
+        return _tickables.find(raw_event) != _tickables.end();
     }
 
     events_manager::const_iterator events_manager::end() const
@@ -25,7 +25,7 @@ namespace detail {
 
     event_update_data& events_manager::operator[](const std::uintptr_t raw_event)
     {
-        return (_tickables[raw_event]);
+        return _tickables[raw_event];
     }
 
     void events_manager::update()

@@ -1,9 +1,7 @@
 #pragma once
 
 #include <bungeegum/backend/common.fwd>
-#include <bungeegum/core/access.fwd>
 #include <bungeegum/core/exceptions.fwd>
-
 
 namespace bungeegum {
 

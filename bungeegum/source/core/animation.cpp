@@ -10,7 +10,7 @@ namespace detail {
 
     bool animations_manager::contains(const std::uintptr_t raw_event) const
     {
-        return (_tickables.find(raw_event) != _tickables.end());
+        return _tickables.find(raw_event) != _tickables.end();
     }
 
     animations_manager::const_iterator animations_manager::end() const
@@ -25,7 +25,7 @@ namespace detail {
 
     animation_update_data& animations_manager::operator[](const std::uintptr_t raw_event)
     {
-        return (_tickables[raw_event]);
+        return _tickables[raw_event];
     }
 
     void animations_manager::update(const std::chrono::milliseconds& delta_time)

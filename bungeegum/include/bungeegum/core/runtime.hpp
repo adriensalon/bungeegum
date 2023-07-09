@@ -19,7 +19,7 @@ struct runtime_widget {
     runtime_widget& operator=(runtime_widget&& other) = default;
 
 private:
-    friend struct detail::widgets_registry;
+    friend struct detail::widgets_manager;
     detail::runtime_widget_data _data;
     runtime_widget();
 };
