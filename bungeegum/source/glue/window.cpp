@@ -97,8 +97,8 @@ namespace detail {
 #if BUNGEEGUM_USE_NATIVE_WINDOW
     window::window(void* native_window)
     {
-        static_assert(!is_platform_emscripten_v, "An instance can only be created from an raw pointer to an OS window on "
-                                                 "platforms where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
+        static_assert(!is_platform_emscripten, "An instance can only be created from an raw pointer to an OS window on "
+                                               "platforms where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
         (void)native_window;
         _data = std::make_shared<window_data>();
 
@@ -122,16 +122,16 @@ namespace detail {
 #if BUNGEEGUM_USE_WINDOW_NATIVE
     void* window::get_native_window() const
     {
-        if constexpr (is_platform_win32_v || is_platform_uwp_v) {
+        if constexpr (is_platform_win32 || is_platform_uwp) {
             SDL_SysWMinfo _wmi;
             SDL_VERSION(&_wmi.version);
             if (SDL_GetWindowWMInfo(_data->sdl_window, &_wmi) != SDL_TRUE) {
                 window_data::check_errors();
             }
             return _wmi.info.win.window;
-        } else if constexpr (is_platform_linux_v) {
+        } else if constexpr (is_platform_linux) {
 
-        } else if constexpr (is_platform_macos_v) {
+        } else if constexpr (is_platform_macos) {
         }
     }
 #endif
@@ -178,8 +178,8 @@ namespace detail {
 #if BUNGEEGUM_USE_WINDOW_NATIVE
     void window::on_sdl_event(const std::function<void(const SDL_Event*)>& sdl_event_callback)
     {
-        static_assert(!is_platform_emscripten_v, "A callback taking an SDL_Event can only be stored on platforms "
-                                                 "where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
+        static_assert(!is_platform_emscripten, "A callback taking an SDL_Event can only be stored on platforms "
+                                               "where SDL2 is supported such as Windows, MacOS, Linux, iOS, Android.");
         _data->sdl_event_callback = sdl_event_callback;
     }
 #endif
@@ -200,7 +200,7 @@ namespace detail {
             else if (_event.type == SDL_WINDOWEVENT && _event.window.event == SDL_WINDOWEVENT_CLOSE && _event.window.windowID == SDL_GetWindowID(_data->sdl_window))
                 _is_running = false;
             else {
-                if constexpr (!is_platform_emscripten_v) {
+                if constexpr (!is_platform_emscripten) {
                     if (_data->sdl_event_callback) {
                         const SDL_Event* _event_ptr = &_event;
                         _data->sdl_event_callback(_event_ptr);
@@ -242,7 +242,7 @@ namespace detail {
 
     void window::run_loop()
     {
-        if constexpr (is_platform_emscripten_v) {
+        if constexpr (is_platform_emscripten) {
 
             //
             //
@@ -260,7 +260,7 @@ namespace detail {
 
     void window::set_fullscreen(const bool enabled)
     {
-        if constexpr (is_platform_emscripten_v) {
+        if constexpr (is_platform_emscripten) {
 
             //
             //
@@ -279,7 +279,7 @@ namespace detail {
 
     void window::set_size(const uint2 size)
     {
-        if constexpr (is_platform_emscripten_v) {
+        if constexpr (is_platform_emscripten) {
 
             //
             //
@@ -296,7 +296,7 @@ namespace detail {
 
     void window::set_title(const std::string& title)
     {
-        if constexpr (is_platform_emscripten_v) {
+        if constexpr (is_platform_emscripten) {
 
             //
             //
@@ -311,7 +311,7 @@ namespace detail {
 
     void window::show_cursor(const bool enabled)
     {
-        if constexpr (is_platform_emscripten_v) {
+        if constexpr (is_platform_emscripten) {
 
             //
             //

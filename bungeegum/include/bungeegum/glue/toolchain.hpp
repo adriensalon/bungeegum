@@ -139,55 +139,54 @@ namespace bungeegum {
 namespace detail {
 
     /// @brief True if the current architecture is 32bits.
-    constexpr bool is_arch_32_v = TOOLCHAIN_ARCH_32;
+    constexpr bool is_arch_32 = TOOLCHAIN_ARCH_32;
 
     /// @brief True if the current architecture is 64bits.
-    constexpr bool is_arch_64_v = TOOLCHAIN_ARCH_64;
+    constexpr bool is_arch_64 = TOOLCHAIN_ARCH_64;
 
     /// @brief True if the current CPU architecture is x86.
-    constexpr bool is_cpu_x86_v = TOOLCHAIN_CPU_X86;
+    constexpr bool is_cpu_x86 = TOOLCHAIN_CPU_X86;
 
     /// @brief True if the current CPU architecture is ARM.
-    constexpr bool is_cpu_arm_v = TOOLCHAIN_CPU_ARM;
+    constexpr bool is_cpu_arm = TOOLCHAIN_CPU_ARM;
 
     /// @brief True if the current "CPU" architecture is WEBASM.
-    constexpr bool is_cpu_webasm_v = TOOLCHAIN_CPU_WEBASM;
+    constexpr bool is_cpu_webasm = TOOLCHAIN_CPU_WEBASM;
 
     /// @brief True if the current platform is emscripten.
-    constexpr bool is_platform_emscripten_v = TOOLCHAIN_PLATFORM_EMSCRIPTEN;
+    constexpr bool is_platform_emscripten = TOOLCHAIN_PLATFORM_EMSCRIPTEN;
 
     /// @brief True if the current platform is Win32.
-    constexpr bool is_platform_win32_v = TOOLCHAIN_PLATFORM_WIN32;
+    constexpr bool is_platform_win32 = TOOLCHAIN_PLATFORM_WIN32;
 
     /// @brief True if the current platform is Universal Windows Platform.
-    constexpr bool is_platform_uwp_v = TOOLCHAIN_PLATFORM_UWP;
+    constexpr bool is_platform_uwp = TOOLCHAIN_PLATFORM_UWP;
 
     /// @brief True if the current platform is MacOS.
-    constexpr bool is_platform_macos_v = TOOLCHAIN_PLATFORM_MACOS;
+    constexpr bool is_platform_macos = TOOLCHAIN_PLATFORM_MACOS;
 
     /// @brief True if the current platform is iOS.
-    constexpr bool is_platform_ios_v = TOOLCHAIN_PLATFORM_IOS;
-	
+    constexpr bool is_platform_ios = TOOLCHAIN_PLATFORM_IOS;
+
     /// @brief True if the current platform is Linux but not Android.
-    constexpr bool is_platform_linux_v = TOOLCHAIN_PLATFORM_LINUX;
-	
+    constexpr bool is_platform_linux = TOOLCHAIN_PLATFORM_LINUX;
+
     /// @brief True if the current platform is Android.
-    constexpr bool is_platform_android_v = TOOLCHAIN_PLATFORM_ANDROID;
+    constexpr bool is_platform_android = TOOLCHAIN_PLATFORM_ANDROID;
 
     /// @brief True if the current compiler is MSVC.
-    constexpr bool is_compiler_msvc_v = TOOLCHAIN_COMPILER_MSVC;
-	
+    constexpr bool is_compiler_msvc = TOOLCHAIN_COMPILER_MSVC;
+
     /// @brief True if the current compiler is Clang.
-    constexpr bool is_compiler_clang_v = TOOLCHAIN_COMPILER_CLANG;
-	
+    constexpr bool is_compiler_clang = TOOLCHAIN_COMPILER_CLANG;
+
     /// @brief True if the current compiler is GCC.
-    constexpr bool is_compiler_gcc_v = TOOLCHAIN_COMPILER_GCC;
+    constexpr bool is_compiler_gcc = TOOLCHAIN_COMPILER_GCC;
 
     /// @brief True if the current build variant is debug.
-    constexpr bool is_build_debug_v = TOOLCHAIN_BUILD_DEBUG;
-	
-    /// @brief True if the current build variant is release.
-    constexpr bool is_build_release_v = TOOLCHAIN_BUILD_RELEASE;
+    constexpr bool is_build_debug = TOOLCHAIN_BUILD_DEBUG;
 
+    /// @brief True if the current build variant is release.
+    constexpr bool is_build_release = TOOLCHAIN_BUILD_RELEASE;
 }
 }
