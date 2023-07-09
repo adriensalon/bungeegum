@@ -8,7 +8,7 @@ namespace detail {
         return _tickables.begin();
     }
 
-    bool events_manager::contains(const std::uintptr_t raw_event) const
+    bool events_manager::contains(const std::uintptr_t& raw_event) const
     {
         return _tickables.find(raw_event) != _tickables.end();
     }
@@ -18,12 +18,12 @@ namespace detail {
         return _tickables.end();
     }
 
-    void events_manager::notify_erase(const std::uintptr_t raw_event)
+    void events_manager::notify_erase(const std::uintptr_t& raw_event)
     {
         _tickables_to_erase.push_back(raw_event);
     }
 
-    event_update_data& events_manager::operator[](const std::uintptr_t raw_event)
+    event_update_data& events_manager::operator[](const std::uintptr_t& raw_event)
     {
         return _tickables[raw_event];
     }

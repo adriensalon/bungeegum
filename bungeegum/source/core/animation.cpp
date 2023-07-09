@@ -8,7 +8,7 @@ namespace detail {
         return _tickables.begin();
     }
 
-    bool animations_manager::contains(const std::uintptr_t raw_event) const
+    bool animations_manager::contains(const std::uintptr_t& raw_event) const
     {
         return _tickables.find(raw_event) != _tickables.end();
     }
@@ -18,12 +18,12 @@ namespace detail {
         return _tickables.end();
     }
 
-    void animations_manager::notify_erase(const std::uintptr_t raw_event)
+    void animations_manager::notify_erase(const std::uintptr_t& raw_event)
     {
         _tickables_to_erase.push_back(raw_event);
     }
 
-    animation_update_data& animations_manager::operator[](const std::uintptr_t raw_event)
+    animation_update_data& animations_manager::operator[](const std::uintptr_t& raw_event)
     {
         return _tickables[raw_event];
     }
