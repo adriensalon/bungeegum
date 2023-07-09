@@ -58,30 +58,28 @@ float2 draw_command::resolved_size() const
     return _data.resolved_size;
 }
 
-void draw_command::clip_rect(
-    const float2 first_point, const float2 second_point,
-    const bool1 intersect_with_current_clip_rect)
+void draw_command::clip_rect(const float2 first_point, const float2 second_point)
 {
     _data.clipping = {
         first_point,
         second_point,
-        intersect_with_current_clip_rect
+        true
     };
 }
 
-void draw_command::clip_temporary_rect(
-    const float2 first_point, const float2 second_point,
-    const bool1 intersect_with_current_clip_rect,
-    const std::function<void(draw_command&)>& clipped_callback)
-{
-    ImVec2 _first_point { first_point.x, first_point.y };
-    ImVec2 _second_point { second_point.x, second_point.y };
-    _data.commands.emplace_back([=](ImDrawList* _drawlist) {
-        _drawlist->PushClipRect(_first_point, _second_point, intersect_with_current_clip_rect);
-        clipped_callback(*this);
-        _drawlist->PopClipRect();
-    });
-}
+// void draw_command::clip_temporary_rect(
+//     const float2 first_point, const float2 second_point,
+//     const bool1 intersect_with_current_clip_rect,
+//     const std::function<void(draw_command&)>& clipped_callback)
+// {
+//     ImVec2 _first_point { first_point.x, first_point.y };
+//     ImVec2 _second_point { second_point.x, second_point.y };
+//     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
+//         _drawlist->PushClipRect(_first_point, _second_point, intersect_with_current_clip_rect);
+//         clipped_callback(*this);
+//         _drawlist->PopClipRect();
+//     });
+// }
 
 void draw_command::draw_line(
     const float2 first_point, const float2 second_point,

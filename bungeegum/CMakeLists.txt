@@ -10,7 +10,6 @@ set(bungeegum_source
 	"source/glue/console.cpp"
 	"source/glue/curve.cpp"
 	"source/glue/imguarded.cpp"
-	"source/glue/registry.cpp"
 	"source/glue/reload.cpp"
 	"source/glue/time.cpp"
 
@@ -23,18 +22,19 @@ set(bungeegum_source
 	"source/core/resolve.cpp"
 	"source/core/widget.cpp"
 
+	"source/core/overlay/hierarchy.cpp"
+	"source/core/overlay/hotswapper.cpp"
+	"source/core/overlay/inspector.cpp"
+	"source/core/overlay/overlay.cpp"
+	"source/core/overlay/profiler.cpp"
+	"source/core/overlay/report.cpp"
+	"source/core/overlay/wireframe.cpp"
+	"source/core/overlay/compressed/fa4.cpp"
+	"source/core/overlay/compressed/inter_extrabold.cpp"
+	"source/core/overlay/compressed/inter_regular.cpp"
+
 	"source/backend/common.cpp"
 	"source/backend/standalone.cpp"
-	"source/backend/overlay/hierarchy.cpp"
-	"source/backend/overlay/hotswapper.cpp"
-	"source/backend/overlay/inspector.cpp"
-	"source/backend/overlay/overlay.cpp"
-	"source/backend/overlay/profiler.cpp"
-	"source/backend/overlay/report.cpp"
-	"source/backend/overlay/wireframe.cpp"
-	"source/backend/overlay/compressed/fa4.cpp"
-	"source/backend/overlay/compressed/inter_extrabold.cpp"
-	"source/backend/overlay/compressed/inter_regular.cpp"
 )
 
 if(BUNGEEGUM_ENABLE_STANDALONE)

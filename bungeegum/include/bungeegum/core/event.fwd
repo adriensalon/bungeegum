@@ -4,7 +4,6 @@
 #include <future>
 #include <typeindex>
 
-#include <bungeegum/glue/map.hpp>
 #include <bungeegum/glue/typelist.hpp>
 
 namespace bungeegum {
@@ -30,16 +29,32 @@ namespace detail {
         std::function<void()> ticker = nullptr;
     };
 
-    struct event_container_data {
-        void notify_erase(const std::uintptr_t& raw_event);
-        void tick();
+    struct events_manager {
+        events_manager() = default;
+        events_manager(const events_manager& other) = delete;
+        events_manager& operator=(const events_manager& other) = delete;
+        events_manager(events_manager&& other) = delete;
+        events_manager& operator=(events_manager&& other) = delete;
 
-        indexed_map<std::uintptr_t, event_update_data> tickables = {};
+        using const_iterator = std::unordered_map<std::uintptr_t, event_update_data>::template const_iterator;
+
+        [[nodiscard]] const_iterator begin() const;
+
+        [[nodiscard]] bool contains(const std::uintptr_t raw_event) const;
+
+        [[nodiscard]] const_iterator end() const;
+
+        void notify_erase(const std::uintptr_t raw_event);
+
+        [[nodiscard]] event_update_data& operator[](const std::uintptr_t raw_event);
+
+        void update();
 
     private:
+        std::unordered_map<std::uintptr_t, event_update_data> _tickables = {};
         std::vector<std::uintptr_t> _tickables_to_erase = {};
     };
 
-    inline event_container_data global_event_container;
+    inline events_manager global_events_manager;
 }
 }

@@ -8,8 +8,8 @@ namespace detail {
     template <typename value_t>
     animation_data<value_t>::~animation_data()
     {
-        if (detail::global_animation_container.tickables.contains(raw_animation)) {
-            detail::global_animation_container.notify_erase(raw_animation);
+        if (detail::global_animations_manager.contains(raw_animation)) {
+            detail::global_animations_manager.notify_erase(raw_animation);
         }
     }
 
@@ -17,26 +17,27 @@ namespace detail {
     void assign_ticker(animation_data<value_t>& data, animation_update_data& update_data)
     {
         update_data.ticker = [&](const std::chrono::milliseconds& delta_time) {
-            if (data.is_playing) {
-                data.playing_cursor_seconds += 0.001f * delta_time.count();
-                if (data.playing_cursor_seconds > data.duration_seconds) {
-                    std::cout << "STOPPED animation \n";
-                    data.playing_cursor_seconds = data.duration_seconds;
-                    data.is_playing = false;
-                }
-                float _frac = data.playing_cursor_seconds / data.duration_seconds;
-                float2 _curve_eval = data.eval_curve.evaluate(_frac);
-                // ifdef protected
-                update_data.overlay_position = { _curve_eval.x, _curve_eval.y };
-                update_data.overlay_samples = data.eval_curve.strided_samples(100);
-                //
-                float _t = _curve_eval.y;
-                value_t _lerped = lerp<value_t>(std::forward<value_t>(*(data.min_value)), std::forward<value_t>(*(data.max_value)), _t);
-                for (auto& _callback : data.event.callbacks)
-                    _callback(std::forward<value_t>(_lerped));
-            } else {
-                global_animation_container.notify_erase(data.raw_animation);
+            if (!data.is_playing) {
+                global_animations_manager.notify_erase(data.raw_animation);
+                return;
             }
+            if (data.playing_cursor_seconds > data.duration_seconds) {
+                data.playing_cursor_seconds = data.duration_seconds;
+                data.is_playing = false;
+                global_animations_manager.notify_erase(data.raw_animation);
+                return;
+            }
+            float _frac = data.playing_cursor_seconds / data.duration_seconds;
+            float2 _curve_eval = data.eval_curve.evaluate(_frac);
+#if BUNGEEGUM_USE_OVERLAY
+            update_data.overlay_position = { _curve_eval.x, _curve_eval.y };
+            update_data.overlay_samples = data.eval_curve.strided_samples(100);
+#endif
+            float _t = _curve_eval.y;
+            value_t _lerped = lerp<value_t>(std::forward<value_t>(*(data.min_value)), std::forward<value_t>(*(data.max_value)), _t);
+            for (auto& _callback : data.event.callbacks)
+                _callback(std::forward<value_t>(_lerped));
+            data.playing_cursor_seconds += 0.001f * delta_time.count();
         };
     }
 }
@@ -59,8 +60,8 @@ template <typename value_t>
 animation<value_t>& animation<value_t>::start()
 {
     std::uintptr_t _raw_animation = detail::raw_cast<animation<value_t>>(this);
-    if (!detail::global_animation_container.tickables.contains(_raw_animation)) {
-        detail::event_update_data& _update_data = detail::global_animation_container.tickables[_raw_animation];
+    if (!detail::global_animations_manager.contains(_raw_animation)) {
+        detail::event_update_data& _update_data = detail::global_animations_manager[_raw_animation];
         _data.raw_animation = _raw_animation;
         _update_data.kind = std::make_unique<std::type_index>(typeid(values_t));
         detail::assign_ticker(_data, _update_data);

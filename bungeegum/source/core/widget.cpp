@@ -49,7 +49,7 @@ void destroy(const runtime_widget& widget)
     // if (detail::widgets_context.accessors.find(_void_widget) == detail::widgets_context.accessors.end())
     //     detail::throw_error<detail::error_type::bad_implementation>("widget not found in accessors");
     // _entity = detail::widgets_context.possessed.at(_void_widget);
-    // detail::widgets_context.widgets.destroy_entity(_entity);
+    // detail::widgets_context.widgets.erase(_entity);
     // detail::widgets_context.possessed.erase(_void_widget);
     // detail::widgets_context.accessors.erase(_void_widget);
 }

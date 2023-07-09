@@ -43,7 +43,7 @@ namespace detail {
     };
 
     struct widgets_registry {
-        registry widgets = {};
+        registry<registry_entity> widgets = {};
         std::unordered_map<std::uintptr_t, registry_entity> possessed = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_widget_data>> registered = {};
         std::optional<std::reference_wrapper<untyped_widget_data>> root = std::nullopt;
@@ -57,6 +57,7 @@ namespace detail {
 
         untyped_widget_data& get_widget_data(const runtime_widget& widget);
 
+        // only use by context go context maybe
         void traverse_untyped(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback);
 
         inline void save_widgets(const std::filesystem::path& archive_path)

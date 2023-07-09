@@ -4,8 +4,8 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/backend/overlay.fwd>
 #include <bungeegum/core/animation.hpp>
+#include <bungeegum/core/overlay.fwd>
 
 namespace bungeegum {
 namespace detail {
@@ -15,7 +15,11 @@ namespace detail {
         ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
         if (ImGui::Begin("inspector##__bungeegum_window_inspector_title__", 0, ImGuiWindowFlags_NoCollapse)) {
             int _k = 0;
-            for (animation_update_data& _animation_data : global_animation_container.tickables) {
+            for (const auto& _event_data : global_events_manager) {
+                (void)_event_data;
+                ImGui::Text("event future....");
+            }
+            for (const auto& _animation_data : global_animations_manager) {
                 // if (_animation_data.is_playing) {
                 std::string _title = "##StatsGraphTitle" + std::to_string(_k);
                 static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
@@ -27,8 +31,8 @@ namespace detail {
                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
                     // auto _samples = _animation_data.eval_curve.strided_samples(100);
                     // auto _point = std::vector<float> { _animation_data.eval_point.x, _animation_data.eval_point.y };
-                    auto _samples = _animation_data.overlay_samples;
-                    auto _point = _animation_data.overlay_position;
+                    auto _samples = _animation_data.second.overlay_samples;
+                    auto _point = _animation_data.second.overlay_position;
                     ImPlot::PlotLine("", _samples.data(), &(_samples[1]), 100, 0, 0, 2 * sizeof(float));
                     ImPlot::PlotScatter("", _point.data(), _point.data() + 1, 1, 0, 0, 2 * sizeof(float));
                     ImPlot::EndPlot();

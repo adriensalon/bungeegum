@@ -7,6 +7,9 @@ namespace bungeegum {
 /// @brief
 struct resolve_command {
 
+    /// @brief Stops propagation
+    void block();
+
     /// @brief
     [[nodiscard]] float2 min_size() const;
 

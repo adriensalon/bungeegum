@@ -1,8 +1,8 @@
 #pragma once
 
-#include <bungeegum/backend/overlay.fwd>
 #include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/renderer.hpp>
 #include <bungeegum/glue/time.hpp>
 #include <bungeegum/glue/window.hpp>

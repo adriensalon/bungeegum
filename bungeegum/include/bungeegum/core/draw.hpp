@@ -8,6 +8,9 @@ namespace bungeegum {
 /// @details
 struct draw_command {
 
+    /// @brief Stops propagation
+    void block();
+
     /// @brief
     [[nodiscard]] float2 resolved_position() const;
 

@@ -16,6 +16,7 @@ namespace detail {
     struct context;
 
     struct resolve_constraint_data {
+        bool is_blocked = false;
         float2 min_size = zero<float2>;
         float2 max_size = infinity<float2>;
     };

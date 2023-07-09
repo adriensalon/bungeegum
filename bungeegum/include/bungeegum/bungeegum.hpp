@@ -6,7 +6,6 @@
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/foreach.hpp>
 #include <bungeegum/glue/lerp.hpp>
-#include <bungeegum/glue/map.hpp>
 #include <bungeegum/glue/raw.hpp>
 #include <bungeegum/glue/registry.hpp>
 #include <bungeegum/glue/reload.hpp>

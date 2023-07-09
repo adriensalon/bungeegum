@@ -4,8 +4,8 @@
 #include <chrono>
 
 #include <bungeegum/core/event.hpp>
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/curve.hpp>
-#include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -32,24 +32,39 @@ namespace detail {
     struct animation_update_data {
         std::unique_ptr<std::type_index> kind = nullptr;
         std::function<void(const std::chrono::milliseconds&)> ticker = nullptr;
-        // ifdef protected for overlay
-#if defined(BUNGEEGUM_ENABLE_OVERLAY)
+
+#if BUNGEEGUM_USE_OVERLAY
         std::vector<float1> overlay_samples = {};
         std::array<float1, 2> overlay_position = { 0.f, 0.f };
 #endif
-        //
     };
 
-    struct animation_container_data {
-        void notify_erase(const std::uintptr_t& raw_event);
-        void tick(const std::chrono::milliseconds& delta_time);
+    struct animations_manager {
+        animations_manager() = default;
+        animations_manager(const animations_manager& other) = delete;
+        animations_manager& operator=(const animations_manager& other) = delete;
+        animations_manager(animations_manager&& other) = delete;
+        animations_manager& operator=(animations_manager&& other) = delete;
 
-        indexed_map<std::uintptr_t, animation_update_data> tickables = {};
+        using const_iterator = std::unordered_map<std::uintptr_t, animation_update_data>::template const_iterator;
+
+        [[nodiscard]] const_iterator begin() const;
+
+        [[nodiscard]] bool contains(const std::uintptr_t raw_event) const;
+
+        [[nodiscard]] const_iterator end() const;
+
+        void notify_erase(const std::uintptr_t raw_event);
+
+        [[nodiscard]] animation_update_data& operator[](const std::uintptr_t raw_event);
+
+        void update(const std::chrono::milliseconds& delta_time);
 
     private:
+        std::unordered_map<std::uintptr_t, animation_update_data> _tickables = {};
         std::vector<std::uintptr_t> _tickables_to_erase = {};
     };
 
-    inline animation_container_data global_animation_container;
+    inline animations_manager global_animations_manager;
 }
 }

@@ -83,19 +83,6 @@ struct Composed {
 
 int main()
 {
-    bungeegum::detail::indexed_map<unsigned int, float> _map = {
-        { 20, 33.f },
-        { 21, 33.f },
-        { 19, 33.f }
-    };
-    _map.emplace(55, 666.f);
-    _map.emplace(44, 333.f);
-    _map.emplace(22, 111.f);
-    _map[22] += 11.f;
-    for (auto& m : _map) {
-        std::cout << m << std::endl;
-    }
-    _map.erase(55);
 
     std::wostringstream _osstream2;
 

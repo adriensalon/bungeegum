@@ -4,11 +4,11 @@
 #include <SDL.h>
 
 #include <bungeegum/backend/common.fwd>
-#include <bungeegum/backend/overlay.fwd>
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.fwd>
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
@@ -170,8 +170,8 @@ namespace detail {
 
     bool tick(const std::chrono::milliseconds& delta_time)
     {
-        global_animation_container.tick(delta_time);
-        global_event_container.tick();
+        global_animations_manager.update(delta_time);
+        global_events_manager.update();
         ////
         ////
         ////

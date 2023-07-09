@@ -7,7 +7,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/backend/overlay.fwd>
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/imguarded.fwd>
 
