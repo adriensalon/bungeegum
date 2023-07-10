@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <thread>
 
 #include <bungeegum/glue/toolchain.hpp>
 

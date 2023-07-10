@@ -2,7 +2,6 @@
 
 #include <functional>
 
-#include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/time.hpp>
 
 namespace bungeegum {

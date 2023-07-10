@@ -4,3 +4,9 @@
 
 #include <bungeegum/backend/common.fwd>
 #include <bungeegum/glue/simd.hpp>
+
+namespace bungeegum {
+
+struct runtime_widget;
+
+}
