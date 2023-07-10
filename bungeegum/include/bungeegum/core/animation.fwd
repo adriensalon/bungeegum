@@ -50,13 +50,13 @@ namespace detail {
 
         [[nodiscard]] const_iterator begin() const;
 
-        [[nodiscard]] bool contains(const std::uintptr_t& raw_event) const;
+        [[nodiscard]] bool contains(const std::uintptr_t raw_animation) const;
 
         [[nodiscard]] const_iterator end() const;
 
-        void notify_erase(const std::uintptr_t& raw_event);
+        void notify_erase(const std::uintptr_t raw_animation);
 
-        [[nodiscard]] animation_update_data& operator[](const std::uintptr_t& raw_event);
+        [[nodiscard]] animation_update_data& operator[](const std::uintptr_t raw_animation);
 
         void update(const std::chrono::milliseconds& delta_time);
 

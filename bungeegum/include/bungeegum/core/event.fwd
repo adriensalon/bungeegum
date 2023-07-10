@@ -40,13 +40,13 @@ namespace detail {
 
         [[nodiscard]] const_iterator begin() const;
 
-        [[nodiscard]] bool contains(const std::uintptr_t& raw_event) const;
+        [[nodiscard]] bool contains(const std::uintptr_t raw_event) const;
 
         [[nodiscard]] const_iterator end() const;
 
-        void notify_erase(const std::uintptr_t& raw_event);
+        void notify_erase(const std::uintptr_t raw_event);
 
-        [[nodiscard]] event_update_data& operator[](const std::uintptr_t& raw_event);
+        [[nodiscard]] event_update_data& operator[](const std::uintptr_t raw_event);
 
         void update();
 

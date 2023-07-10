@@ -77,8 +77,8 @@ struct Composed {
 
     // ColoredBox _box;
     // ColoredBox _box2;
-    bungeegum::reference_widget<ColoredBox> _box = bungeegum::make_reference<ColoredBox>(56);
-    bungeegum::reference_widget<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>(44);
+    bungeegum::reference_widget<ColoredBox> _box = bungeegum::make_reference<ColoredBox>();
+    bungeegum::reference_widget<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>();
 };
 
 int main()

@@ -5,47 +5,46 @@
 namespace bungeegum {
 
 /// @brief
+/// @details Instances of this type can be copied (shallow copy) and moved.
 /// @tparam widget_t
 template <typename widget_t>
 struct reference_widget {
-
-    /// @brief
-    widget_t& get();
-
-    /// @brief
-    const widget_t& get() const;
-
-    /// @brief
-    widget_t& operator&();
-
-    /// @brief
-    const widget_t& operator&() const;
-
     reference_widget() = delete;
     reference_widget(const reference_widget& other) = default;
     reference_widget& operator=(const reference_widget& other) = default;
     reference_widget(reference_widget&& other) = default;
     reference_widget& operator=(reference_widget&& other) = default;
 
-    reference_widget(detail::reloaded<widget_t>&& reloaded);
+    /// @brief
+    widget_t& get() const;
+
+    /// @brief
+    // const widget_t& get() const;
+
+    /// @brief
+    widget_t* operator->() const;
+
+    /// @brief
+    // const widget_t* operator->() const;
 
 private:
     friend struct detail::widgets_manager;
-    detail::reloaded<widget_t> _data;
+    detail::reference_type_t<widget_t> _data;
+
+    reference_widget(detail::value_type_t<widget_t>& reference);
 };
 
 /// @brief Creates a new widget managed by bungeegum and returns a reference to it. This reference
 /// will be valid until it is destroyed by the user.
 /// @tparam widget_t Custom type for the widget. Must be at least copy or move constructible.
 /// @return Returns a reference to the new widget
-template <typename widget_t, typename... widget_args_t>
-[[nodiscard]] reference_widget<widget_t>& make_reference(widget_args_t&&... widget_args);
+template <typename widget_t>
+[[nodiscard]] reference_widget<widget_t> make_reference();
 
-template <typename widget_t, typename... widget_args_t>
-[[nodiscard]] widget_t& make(widget_args_t&&... widget_args)
-{
-    return make_reference<widget_t>(std::forward<widget_args_t>()...).get();
-}
+/// @brief
+/// @tparam widget_t
+template <typename widget_t>
+[[nodiscard]] widget_t& make();
 }
 
 #include <bungeegum/core/widget.inl>

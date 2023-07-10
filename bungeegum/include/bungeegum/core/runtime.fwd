@@ -6,7 +6,7 @@ namespace bungeegum {
 namespace detail {
 
     struct runtime_widget_data {
-        std::optional<std::reference_wrapper<untyped_widget_data>> untyped_widget = std::nullopt;
+        std::uintptr_t raw_widget;
     };
 
 }

@@ -12,10 +12,14 @@
 #include <bungeegum/glue/registry.hpp>
 #include <bungeegum/glue/reload.hpp>
 
+struct ImDrawList;
 
 namespace bungeegum {
 
 struct runtime_widget;
+
+template <typename widget_t>
+struct reference_widget;
 
 namespace detail {
 
@@ -41,12 +45,12 @@ namespace detail {
 
     }
 
-    struct untyped_widget_data {
+    struct widget_update_data {
         std::uintptr_t raw_widget = 0u;
         std::unique_ptr<std::type_index> kind = nullptr;
         std::string kind_debug = ""; // to show type in debugger TODO REMOVE
-        std::optional<std::reference_wrapper<untyped_widget_data>> parent = std::nullopt;
-        std::vector<std::reference_wrapper<untyped_widget_data>> children = {};
+        std::optional<std::reference_wrapper<widget_update_data>> parent = std::nullopt;
+        std::vector<std::reference_wrapper<widget_update_data>> children = {};
         resolve_command resolver_command;
         std::function<void(resolve_command&)> resolver = nullptr;
         std::optional<interact_command> interactor_command = std::nullopt;
@@ -58,32 +62,65 @@ namespace detail {
         std::function<void(reloaded_loader&)> loader = nullptr;
         std::function<void(reloaded_saver&)> saver = nullptr;
 #endif
-
-        bool operator==(const untyped_widget_data& other);
     };
 
     struct widgets_manager {
-        registry<registry_entity> widgets = {};
-        std::unordered_map<std::uintptr_t, registry_entity> possessed = {};
-        std::unordered_map<std::uintptr_t, std::reference_wrapper<untyped_widget_data>> registered = {};
-        std::optional<std::reference_wrapper<untyped_widget_data>> root = std::nullopt;
-        std::vector<std::reference_wrapper<untyped_widget_data>> resolvables = {};
-        std::vector<std::reference_wrapper<untyped_widget_data>> interactables = {};
-        std::vector<std::reference_wrapper<untyped_widget_data>> drawables = {};
+        widgets_manager() = default;
+        widgets_manager(const widgets_manager& other) = delete;
+        widgets_manager& operator=(const widgets_manager& other) = delete;
+        widgets_manager(widgets_manager&& other) = delete;
+        widgets_manager& operator=(widgets_manager&& other) = delete;
 
-        // template <typename widget_t>
-        // reference_widget<widget_t> get_reference_widget(detail::reloaded<widget_t>&& reloaded)
+        [[nodiscard]] bool contains(const std::uintptr_t raw_widget) const;
 
-        runtime_widget get_runtime_widget(untyped_widget_data& widget_data);
+        template <typename widget_t>
+        [[nodiscard]] reference_widget<widget_t> create_widget(detail::value_type_t<widget_t>& reference);
 
-        untyped_widget_data& get_widget_data(const runtime_widget& widget);
+        void notify_erase(const std::uintptr_t raw_widget);
 
-        // only use by context go context maybe
-        void traverse_untyped(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback);
+        [[nodiscard]] widget_update_data& operator[](const std::uintptr_t raw_widget);
+
+        [[nodiscard]] widget_update_data& operator[](const runtime_widget& widget);
+
+        [[nodiscard]] std::uintptr_t raw(const runtime_widget& widget);
+
+        template <typename widget_t>
+        [[nodiscard]] std::uintptr_t raw(widget_t& widget);
+
+        template <typename widget_t>
+        void set_reloadable_raw(widget_t& widget, const std::uintptr_t raw_widget);
+
+        [[nodiscard]] std::uintptr_t& root();
+
+        [[nodiscard]] std::uintptr_t root() const;
+
+        [[nodiscard]] widget_update_data& root_update_data();
+
+        //
+        //
+        //
+        //
+        //
+
+        runtime_widget get_runtime_widget(widget_update_data& widget_data);
+
+        widget_update_data& get_widget_data(const runtime_widget& widget);
+
+        void traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback);
 
         void save_widgets(const std::filesystem::path& archive_path);
 
         void load_widgets(const std::filesystem::path& archive_path);
+
+        registry<registry_entity> widgets = {};
+        std::vector<std::uintptr_t> resolvables = {};
+        std::vector<std::uintptr_t> interactables = {};
+        std::vector<std::uintptr_t> drawables = {};
+
+    private:
+        std::unordered_map<std::uintptr_t, widget_update_data> _updatables = {};
+        std::vector<std::uintptr_t> _updatables_to_erase = {};
+        std::uintptr_t _root = {};
     };
 
     inline widgets_manager global_widgets_manager;

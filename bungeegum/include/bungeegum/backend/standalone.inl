@@ -22,7 +22,38 @@ template <typename widget_t>
 void launch(widget_t& widget, const std::function<void()>& on_renderer_started)
 {
     detail::protect_library([&]() {
-        detail::global_widgets_manager.root = detail::get_untyped_widget(widget);
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        /////////////// NON TEMPLATE GO RUNTIME_WIDGET
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        ///////////////
+        detail::global_widgets_manager.root() = detail::global_widgets_manager.raw(widget);
         detail::stopwatch _stopwatch;
         detail::window _window;
         detail::viewport_size = _window.get_size();

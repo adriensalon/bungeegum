@@ -7,28 +7,68 @@
 namespace bungeegum {
 namespace detail {
 
-    bool untyped_widget_data::operator==(const untyped_widget_data& other)
-    {
-        return raw_widget == other.raw_widget;
-    }
-
     // widgets_manager
 
-    runtime_widget widgets_manager::get_runtime_widget(untyped_widget_data& widget_data)
+    bool widgets_manager::contains(const std::uintptr_t raw_widget) const
+    {
+        return _updatables.find(raw_widget) != _updatables.end();
+    }
+
+    void widgets_manager::notify_erase(const std::uintptr_t raw_widget)
+    {
+       _updatables_to_erase.push_back(raw_widget);
+    }
+
+    widget_update_data& widgets_manager::operator[](const std::uintptr_t raw_widget)
+    {
+        return _updatables[raw_widget];
+    }
+
+    widget_update_data& widgets_manager::operator[](const runtime_widget& widget)
+    {
+        return _updatables[raw(widget)];
+    }
+
+    std::uintptr_t widgets_manager::raw(const runtime_widget& runtime_widget)
+    {
+        return runtime_widget._data.raw_widget;
+    }
+
+    std::uintptr_t& widgets_manager::root()
+    {
+        return _root;
+    }
+
+    std::uintptr_t widgets_manager::root() const
+    {
+        return _root;
+    }
+
+    widget_update_data& widgets_manager::root_update_data()
+    {
+        return _updatables[_root];
+    }
+
+    // const widget_update_data& widgets_manager::root_update_data() const
+    // {
+    //     return _updatables.insert_or_assign(_root);
+    // }
+
+    runtime_widget widgets_manager::get_runtime_widget(widget_update_data& widget_data)
     {
         runtime_widget _runtime_widget;
-        _runtime_widget._data.untyped_widget = widget_data;
+        _runtime_widget._data.raw_widget = widget_data.raw_widget;
         return _runtime_widget;
     }
 
-    untyped_widget_data& widgets_manager::get_widget_data(const runtime_widget& widget)
+    widget_update_data& widgets_manager::get_widget_data(const runtime_widget& widget)
     {
-        return widget._data.untyped_widget.value().get();
+        return _updatables[widget._data.raw_widget];
     }
 
-    void widgets_manager::traverse_untyped(untyped_widget_data& iterate_root, const std::function<bool(untyped_widget_data&)>& iterate_callback)
+    void widgets_manager::traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback)
     {
-        std::function<void(untyped_widget_data&)> _iterate = [&](untyped_widget_data& _widget_data) {
+        std::function<void(widget_update_data&)> _iterate = [&](widget_update_data& _widget_data) {
             bool _continue = iterate_callback(_widget_data);
             if (_continue)
                 for (auto& _child : _widget_data.children)
@@ -40,7 +80,7 @@ namespace detail {
     void widgets_manager::save_widgets(const std::filesystem::path& archive_path)
     {
         reloaded_saver _archiver(archive_path);
-        traverse_untyped(root.value().get(), [this, &_archiver](untyped_widget_data& _widget_data) {
+        traverse(global_widgets_manager[global_widgets_manager.root()], [this, &_archiver](widget_update_data& _widget_data) {
             if (_widget_data.saver) {
                 _widget_data.saver(_archiver);
             }
@@ -51,7 +91,7 @@ namespace detail {
     void widgets_manager::load_widgets(const std::filesystem::path& archive_path)
     {
         reloaded_loader _archiver(archive_path);
-        traverse_untyped(root.value().get(), [this, &_archiver](untyped_widget_data& _widget_data) {
+        traverse(global_widgets_manager[global_widgets_manager.root()], [this, &_archiver](widget_update_data& _widget_data) {
             if (_widget_data.loader) {
                 _widget_data.loader(_archiver);
             }
@@ -83,20 +123,20 @@ void destroy(const runtime_widget& widget)
 
 void adopt(const runtime_widget& widget, const runtime_widget& child_widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
-    detail::untyped_widget_data& _child_widget_data = detail::global_widgets_manager.get_widget_data(child_widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _child_widget_data = detail::global_widgets_manager.get_widget_data(child_widget);
     _child_widget_data.parent = _widget_data;
     _widget_data.children.emplace_back(_child_widget_data);
 }
 
 void abandon(const runtime_widget& parent_widget, const runtime_widget& child_widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(parent_widget);
-    detail::untyped_widget_data& _child_widget_data = detail::global_widgets_manager.get_widget_data(child_widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(parent_widget);
+    detail::widget_update_data& _child_widget_data = detail::global_widgets_manager.get_widget_data(child_widget);
     _child_widget_data.parent = std::nullopt;
     for (int1 _k = 0; _k < _widget_data.children.size(); _k++) {
-        detail::untyped_widget_data& _loop_child_widget_data = _widget_data.children[_k].get();
-        if (_loop_child_widget_data == _child_widget_data) {
+        detail::widget_update_data& _loop_child_widget_data = _widget_data.children[_k].get();
+        if (_loop_child_widget_data.raw_widget == _child_widget_data.raw_widget) {
             _widget_data.children.erase(_widget_data.children.begin() + _k);
             break;
         }
@@ -105,36 +145,36 @@ void abandon(const runtime_widget& parent_widget, const runtime_widget& child_wi
 
 bool has_parent(const runtime_widget& widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
     return _widget_data.parent.has_value();
 }
 
 runtime_widget get_parent(const runtime_widget& widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
     if (!_widget_data.parent.has_value()) {
         throw_error("Error TODO");
     }
-    detail::untyped_widget_data& _parent_widget_data = _widget_data.parent.value();
+    detail::widget_update_data& _parent_widget_data = _widget_data.parent.value();
     runtime_widget _parent_widget = detail::global_widgets_manager.get_runtime_widget(_parent_widget_data);
     return _parent_widget;
 }
 
 resolve_command& get_resolve_command(const runtime_widget& widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
     return _widget_data.resolver_command;
 }
 
 bool has_interact_command(const runtime_widget& widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
     return _widget_data.interactor_command.has_value();
 }
 
 interact_command& get_interact_command(const runtime_widget& widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
     if (!_widget_data.interactor_command.has_value()) {
         throw_error("Error TODO");
     }
@@ -143,13 +183,13 @@ interact_command& get_interact_command(const runtime_widget& widget)
 
 bool has_draw_command(const runtime_widget& widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
     return _widget_data.drawer_command.has_value();
 }
 
 draw_command& get_draw_command(const runtime_widget& widget)
 {
-    detail::untyped_widget_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
     if (!_widget_data.drawer_command.has_value()) {
         throw_error("Error TODO");
     }

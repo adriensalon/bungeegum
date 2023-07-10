@@ -16,28 +16,28 @@ namespace detail {
 
     void context::execute_interact()
     {
-#define traverse_interact_impl(interaction_name)                                                                                    \
-    for (const interaction_name##_event& _event : interaction_name##_events) {                                                      \
-        global_widgets_manager.traverse_untyped(global_widgets_manager.root.value(), [&_event](untyped_widget_data& _widget_data) { \
-            if (_widget_data.interactor_command.has_value()) {                                                                      \
-                _widget_data.interactor_command.value()._data.is_blocked = false;                                                   \
-                _widget_data.interactor_command.value()._data.command_data = _event;                                                \
-                protect_userspace([&_widget_data]() {                                                                               \
-                    _widget_data.interactor(_widget_data.interactor_command.value());                                               \
-                });                                                                                                                 \
-                bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                                         \
-                return _retval;                                                                                                     \
-            }                                                                                                                       \
-            return true;                                                                                                            \
-        });                                                                                                                         \
-    }                                                                                                                               \
+#define traverse_interact_impl(interaction_name)                                                                           \
+    for (const interaction_name##_event& _event : interaction_name##_events) {                                             \
+        global_widgets_manager.traverse(global_widgets_manager.root.value(), [&_event](widget_update_data& _widget_data) { \
+            if (_widget_data.interactor_command.has_value()) {                                                             \
+                _widget_data.interactor_command.value()._data.is_blocked = false;                                          \
+                _widget_data.interactor_command.value()._data.command_data = _event;                                       \
+                protect_userspace([&_widget_data]() {                                                                      \
+                    _widget_data.interactor(_widget_data.interactor_command.value());                                      \
+                });                                                                                                        \
+                bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                                \
+                return _retval;                                                                                            \
+            }                                                                                                              \
+            return true;                                                                                                   \
+        });                                                                                                                \
+    }                                                                                                                      \
     interaction_name##_events.clear();
 
-        traverse_interact_impl(window_resized);
-        traverse_interact_impl(mouse_moved);
-        traverse_interact_impl(mouse_down);
-        traverse_interact_impl(mouse_up);
-        traverse_interact_impl(mouse_pressed);
+        // traverse_interact_impl(window_resized);
+        // traverse_interact_impl(mouse_moved);
+        // traverse_interact_impl(mouse_down);
+        // traverse_interact_impl(mouse_up);
+        // traverse_interact_impl(mouse_pressed);
 
 #undef traverse_interact_impl
     }
@@ -50,15 +50,15 @@ namespace detail {
                 std::execution::seq, // go parallel
                 global_widgets_manager.resolvables.begin(),
                 global_widgets_manager.resolvables.end(),
-                [](auto&& _data_reference) {
-                    untyped_widget_data& _widget_data = _data_reference.get();
+                [](const std::uintptr_t _raw_widget) {
+                    widget_update_data& _widget_data = global_widgets_manager[_raw_widget];
                     resolve_command& _resolve_command = _widget_data.resolver_command;
 
-                    if (_widget_data == global_widgets_manager.root.value().get()) {
+                    if (_raw_widget == global_widgets_manager.root()) {
                         _resolve_command._data.constraint.min_size = detail::viewport_size;
                         _resolve_command._data.constraint.max_size = detail::viewport_size;
                     } else {
-                        untyped_widget_data* _parent_widget_data_ptr = &_widget_data.parent.value().get();
+                        widget_update_data* _parent_widget_data_ptr = &_widget_data.parent.value().get();
 
                         resolve_command& _parent_resolve_command = _parent_widget_data_ptr->resolver_command;
                         _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
@@ -93,9 +93,9 @@ namespace detail {
                     std::execution::seq, // go parallel
                     global_widgets_manager.drawables.begin(),
                     global_widgets_manager.drawables.end(),
-                    [imgui_drawlist](auto&& _data_reference) {
-                        untyped_widget_data& _drawable_widget_data = _data_reference.get();
-                        global_widgets_manager.traverse_untyped(_drawable_widget_data, [imgui_drawlist](untyped_widget_data& _widget_data) {
+                    [imgui_drawlist](const std::uintptr_t _raw_widget) {
+                        widget_update_data& _widget_data = global_widgets_manager[_raw_widget];
+                        global_widgets_manager.traverse(_widget_data, [imgui_drawlist](widget_update_data& _widget_data) {
                             // accumulate position anyway
                             resolve_command& _widget_resolver_command = _widget_data.resolver_command;
                             if (_widget_data.parent.has_value()) {

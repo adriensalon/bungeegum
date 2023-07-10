@@ -67,16 +67,16 @@ namespace detail {
     }
 
     template <typename value_t>
-    value_t& reloaded<value_t>::get()
+    value_t& reloaded<value_t>::get() const
     {
         return *(_ref.operator->());
     }
 
-    template <typename value_t>
-    const value_t& reloaded<value_t>::get() const
-    {
-        return *(_ref.operator->());
-    }
+    // template <typename value_t>
+    // const value_t& reloaded<value_t>::get() const
+    // {
+    //     return *(_ref.operator->());
+    // }
 
     template <typename value_t>
     reloaded<value_t>::reloaded(hscpp::mem::UniqueRef<value_t>&& ref)

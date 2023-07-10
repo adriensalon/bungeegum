@@ -39,6 +39,7 @@ namespace mem {
     friend class cereal::access;                                                                                                                                                                    \
     template <typename value_t>                                                                                                                                                                     \
     friend struct bungeegum::detail::value_wrapper;                                                                                                                                                 \
+    friend struct bungeegum::detail::widgets_manager;                                                                                                                                               \
     HSCPP_TRACK(classname, #classname)                                                                                                                                                              \
     std::uintptr_t _bungeegum_object_reference = 0;                                                                                                                                                 \
     hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                                                                                                           \
@@ -74,10 +75,10 @@ namespace detail {
         reloaded& operator=(reloaded&& other);
 
         /// @brief
-        value_t& get();
+        value_t& get() const;
 
         /// @brief
-        const value_t& get() const;
+        // const value_t& get() const;
 
     private:
         hscpp::mem::UniqueRef<value_t> _ref;
@@ -216,37 +217,37 @@ namespace detail {
         template <typename value_t>
         constexpr bool is_reloadable_v = (has_load_function_v<value_t> && has_save_function_v<value_t>);
 
-        template <typename value_t, typename = void>
-        struct value_type {
-            using type = value_t;
-        };
-
-        template <typename value_t>
-        struct value_type<value_t, std::enable_if_t<is_reloadable_v<value_t>>> {
-            using type = reloaded<value_t>;
-        };
-
-        template <typename value_t, typename = void>
-        struct value_constructor_type {
-            using type = value_t&;
-        };
-
-        template <typename value_t>
-        struct value_constructor_type<value_t, std::enable_if_t<traits::is_reloadable_v<value_t>>> {
-            using type = reloaded<value_t>&&;
-        };
-
     }
 
-    /// @brief
-    /// @tparam value_t
+    template <typename value_t, typename = void>
+    struct value_type {
+        using type = value_t;
+    };
+
     template <typename value_t>
-    using value_type_t = typename traits::value_type<value_t>::type;
+    struct value_type<value_t, std::enable_if_t<traits::is_reloadable_v<value_t>>> {
+        using type = reloaded<value_t>;
+    };
+
+    template <typename value_t, typename = void>
+    struct reference_type {
+        using type = value_t&;
+    };
+
+    template <typename value_t>
+    struct reference_type<value_t, std::enable_if_t<traits::is_reloadable_v<value_t>>> {
+        using type = reloaded<value_t>;
+    };
 
     /// @brief
     /// @tparam value_t
     template <typename value_t>
-    using value_constructor_type_t = typename traits::value_constructor_type<value_t>::type;
+    using value_type_t = typename value_type<value_t>::type;
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    using reference_type_t = typename reference_type<value_t>::type;
 }
 }
 

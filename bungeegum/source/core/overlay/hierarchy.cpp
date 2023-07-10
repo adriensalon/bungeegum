@@ -50,7 +50,7 @@ namespace detail {
         if (ImGui::Begin("hierarchy##__bungeegum_window_hierarchy_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
             unsigned int _depth = 0;
             unsigned int _id = 0;
-            std::function<void(const untyped_widget_data&)> _tf = [&](const untyped_widget_data& _widget_data) {
+            std::function<void(const widget_update_data&)> _tf = [&](const widget_update_data& _widget_data) {
                 _id++;
                 std::string _clean_typename = clean_typename(_widget_data.kind->name());
                 std::string _clean_id_typename = _clean_typename + "###__hierarchy__" + std::to_string(_id);
@@ -80,7 +80,7 @@ namespace detail {
                 }
             };
 
-            _tf(global_widgets_manager.root.value().get());
+            _tf(global_widgets_manager.root_update_data());
         }
         ImGui::End();
     }
