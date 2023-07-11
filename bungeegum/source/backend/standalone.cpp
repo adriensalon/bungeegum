@@ -114,10 +114,10 @@ void launch(const runtime_widget& widget, const std::function<void()>& on_render
             std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
             bool _has_polled = _window.poll();
             (void)_has_polled;
-            bool _has_ticked = detail::tick(_delta_milliseconds);
+            bool _has_ticked = detail::process_manager::update(_delta_milliseconds);
             if (_has_ticked) {
                 _renderer.new_frame();
-                detail::draw(false);
+                detail::process_manager::render();
                 _renderer.present();
             }
 

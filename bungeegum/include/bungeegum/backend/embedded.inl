@@ -13,8 +13,8 @@ void bungeegum_functor::operator()()
         std::floorf(1000000.f / 60.f /* MAX FPS !!!*/)));
     std::chrono::microseconds _delta_time = _data.stopwatch.lap_at_least(_max_fps_period_microseconds);
     std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
-    if (detail::tick(_delta_milliseconds))
-        detail::draw(true);
+    // if (detail::update(_delta_milliseconds))
+    //     detail::draw(true);
 }
 
 template <typename widget_t>
@@ -35,7 +35,7 @@ bungeegum_functor embed(widget_t& widget)
     //         std::chrono::milliseconds _delta_time = _functor.stopwatch.lap();
     //         float _delta_milliseconds = static_cast<float>(_delta_time.count());
     //         if (!has_userspace_thrown())
-    //             context.tick(_delta_milliseconds);
+    //             context.update(_delta_milliseconds);
     //         context.draw();
     //     });
     // }
