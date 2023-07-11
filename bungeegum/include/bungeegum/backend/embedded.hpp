@@ -2,6 +2,8 @@
 
 #include <bungeegum/backend/embedded.fwd>
 
+#if BUNGEEGUM_USE_EMBEDDED
+
 namespace bungeegum {
 
 /// @brief
@@ -35,3 +37,5 @@ bungeegum_functor embed(widget_t& widget);
 }
 
 #include <bungeegum/backend/embedded.inl>
+
+#endif

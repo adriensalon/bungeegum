@@ -119,5 +119,3 @@ namespace detail {
     }
 }
 }
-
-#include <bungeegum/glue/reload.inl>

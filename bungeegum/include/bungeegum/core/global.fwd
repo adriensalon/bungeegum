@@ -1,15 +1,13 @@
 #pragma once
 
-#include <memory>
-
 namespace bungeegum {
 namespace detail {
 
     struct animations_manager;
     struct backend_manager;
-    struct embedded_manager;
     struct events_manager;
     struct process_manager;
+    // struct embedded_manager;
     struct standalone_manager;
     struct widgets_manager;
 
@@ -25,14 +23,8 @@ namespace detail {
         static widgets_manager& widgets();
         static backend_manager& backend();
         static process_manager& process();
-
-#if BUNGEEGUM_USE_EMBEDDED
-        static embedded_manager& embedded();
-#endif
-
-#if BUNGEEGUM_USE_STANDALONE
+        // static embedded_manager& embedded();
         static standalone_manager& standalone();
-#endif
     };
 
 }

@@ -84,7 +84,7 @@ struct Composed {
 
 int main()
 {
-
+    constexpr auto ii = bungeegum::is_finite<bungeegum::float2>({ 44.f, 0.f });
     std::wostringstream _osstream2;
 
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_DIRECTX");

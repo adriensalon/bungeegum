@@ -3,6 +3,11 @@
 #include <functional>
 
 #include <bungeegum/backend/common.fwd>
+#include <bungeegum/glue/config.hpp>
+
+#if !defined(BUNGEEGUM_USE_STANDALONE)
+#define BUNGEEGUM_USE_STANDALONE BUNGEEGUM_ENABLE_STANDALONE
+#endif
 
 namespace bungeegum {
 
@@ -17,11 +22,12 @@ namespace details {
         standalone_manager(standalone_manager&& other) = delete;
         standalone_manager& operator=(standalone_manager&& other) = delete;
 
+// #if BUNGEEGUM_USE_STANDALONE
         bool is_desired_app_color_changed = false;
         float4 desired_app_color = { 1.f, 1.f, 1.f, 1.f };
         bool is_desired_app_title_changed = false;
-        std::string desired_app_title = "Bungeegum App";
+        std::string desired_app_title = "Bungeegum App";		
+// #endif
     };
-
 }
 }

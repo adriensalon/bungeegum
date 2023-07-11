@@ -16,17 +16,11 @@ namespace detail {
         events_manager events = {};
         widgets_manager widgets = {};
         process_manager process = {};
+        // embedded_manager embedded = {};
+        // standalone_manager standalone = {};
     };
 
     static all_managers _managers = {};
-
-#if BUNGEEGUM_USE_EMBEDDED
-    static embedded_manager _embedded;
-#endif
-
-#if BUNGEEGUM_USE_STANDALONE
-    static standalone_manager _standalone;
-#endif
 
     animations_manager& global_manager::animations()
     {
@@ -53,19 +47,14 @@ namespace detail {
         return _managers.process;
     }
 
-#if BUNGEEGUM_USE_EMBEDDED
-    embedded_manager& global_manager::embedded()
-    {
-        return _managers.embedded;
-    }
-#endif
+    //     embedded_manager& global_manager::embedded()
+    //     {
+    //         return _managers.embedded;
+    //     }
 
-#if BUNGEEGUM_USE_STANDALONE
-    standalone_manager& global_manager::standalone()
-    {
-        return _managers.standalone;
-    }
-#endif
-
+    // standalone_manager& global_manager::standalone()
+    // {
+    //     return _managers.standalone;
+    // }
 }
 }

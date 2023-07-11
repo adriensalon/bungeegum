@@ -2,6 +2,8 @@
 
 #include <bungeegum/backend/standalone.fwd>
 
+#if BUNGEEGUM_USE_STANDALONE
+
 namespace bungeegum {
 
 /// @brief
@@ -27,3 +29,5 @@ void launch(const runtime_widget& widget, const std::function<void()>& on_render
 }
 
 #include <bungeegum/backend/standalone.inl>
+
+#endif
