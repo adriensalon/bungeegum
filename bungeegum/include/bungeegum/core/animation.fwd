@@ -65,6 +65,6 @@ namespace detail {
         std::vector<std::uintptr_t> _tickables_to_erase = {};
     };
 
-    inline animations_manager global_animations_manager;
+    // inline animations_manager global_animations_manager;
 }
 }

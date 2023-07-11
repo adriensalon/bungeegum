@@ -23,6 +23,11 @@ namespace detail {
         return (_manager.get()->operator->()->GetNumBlocks());
     }
 
+    void reloader::add_define(const std::string& define)
+    {
+        _swapper->AddPreprocessorDefinition(define);
+    }
+
     void reloader::add_include_directory(const std::filesystem::path& directory)
     {
         _swapper->AddIncludeDirectory(directory);
@@ -48,6 +53,7 @@ namespace detail {
         _swapper->ClearCompileOptions();
         _swapper->ClearForceCompiledSourceFiles();
         _swapper->ClearIncludeDirectories();
+        _swapper->ClearPreprocessorDefinitions();
         _swapper->ClearLibraries();
         _swapper->ClearLibraryDirectories();
         // etc

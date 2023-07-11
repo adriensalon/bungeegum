@@ -6,6 +6,10 @@ namespace bungeegum {
 
 /// @brief
 /// @return
+std::list<std::string>& hotreload_defines();
+
+/// @brief
+/// @return
 std::list<std::filesystem::path>& hotreload_include_directories();
 
 /// @brief

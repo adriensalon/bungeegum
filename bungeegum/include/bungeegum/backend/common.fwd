@@ -2,7 +2,8 @@
 
 #include <filesystem>
 #include <list>
-#include <optional>
+#include <memory>
+#include <string>
 
 #include <bungeegum/glue/reload.hpp>
 #include <bungeegum/glue/simd.hpp>
@@ -10,11 +11,19 @@
 namespace bungeegum {
 namespace detail {
 
-    inline uint2 viewport_size = zero<float2>;
-    inline std::unique_ptr<reloader> reload_manager = nullptr;
-    inline std::list<std::filesystem::path> reload_include_directories = {};
-    inline std::list<std::filesystem::path> reload_libraries = {};
-    inline std::list<std::filesystem::path> reload_source_directories = {};
-    inline std::list<std::filesystem::path> reload_force_compiled_source_files = {};
+    struct backend_manager {
+        uint2 viewport_size = zero<float2>; // we global this so we can
+
+#if BUNGEEGUM_USE_HOTRELOAD
+        std::unique_ptr<reloader> reload_manager = nullptr;
+        std::list<std::string> reload_defines = {};
+        std::list<std::filesystem::path> reload_include_directories = {};
+        std::list<std::filesystem::path> reload_libraries = {};
+        std::list<std::filesystem::path> reload_source_directories = {};
+        std::list<std::filesystem::path> reload_force_compiled_source_files = {};
+#endif
+    };
+
+    // inline backend_manager global_backend_manager = {};
 }
 }

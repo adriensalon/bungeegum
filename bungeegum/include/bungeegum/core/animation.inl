@@ -8,8 +8,8 @@ namespace detail {
     template <typename value_t>
     animation_data<value_t>::~animation_data()
     {
-        if (detail::global_animations_manager.contains(raw_animation)) {
-            detail::global_animations_manager.notify_erase(raw_animation);
+        if (global().animations.contains(raw_animation)) {
+            global().animations.notify_erase(raw_animation);
         }
     }
 
@@ -18,13 +18,13 @@ namespace detail {
     {
         update_data.ticker = [&](const std::chrono::milliseconds& delta_time) {
             if (!data.is_playing) {
-                global_animations_manager.notify_erase(data.raw_animation);
+                global().animations.notify_erase(data.raw_animation);
                 return;
             }
             if (data.playing_cursor_seconds > data.duration_seconds) {
                 data.playing_cursor_seconds = data.duration_seconds;
                 data.is_playing = false;
-                global_animations_manager.notify_erase(data.raw_animation);
+                global().animations.notify_erase(data.raw_animation);
                 return;
             }
             float _frac = data.playing_cursor_seconds / data.duration_seconds;
@@ -60,8 +60,8 @@ template <typename value_t>
 animation<value_t>& animation<value_t>::start()
 {
     std::uintptr_t _raw_animation = detail::raw_cast<animation<value_t>>(this);
-    if (!detail::global_animations_manager.contains(_raw_animation)) {
-        detail::event_update_data& _update_data = detail::global_animations_manager[_raw_animation];
+    if (!detail::global().animations.contains(_raw_animation)) {
+        detail::event_update_data& _update_data = detail::global().animations[_raw_animation];
         _data.raw_animation = _raw_animation;
         _update_data.kind = std::make_unique<std::type_index>(typeid(values_t));
         detail::assign_ticker(_data, _update_data);

@@ -114,6 +114,9 @@ namespace detail {
         /// @brief Gets the amount of memory blocks currently allocated.
         std::size_t allocated_blocks_count();
 
+        /// @brief
+        void add_define(const std::string& define);
+
         /// @brief Emplaces an include directory for recompilation.
         void add_include_directory(const std::filesystem::path& directory);
 

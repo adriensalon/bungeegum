@@ -1,6 +1,7 @@
 #include <ImGui.h>
 
 #include <bungeegum/core/draw.hpp>
+#include <bungeegum/core/global.fwd>
 #include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
@@ -123,7 +124,7 @@ void draw_command::draw_rect_filled(
 
 void must_draw()
 {
-    const std::uintptr_t _root = detail::global_widgets_manager.root();
-    detail::global_widgets_manager.drawables.push_back(_root);
+    const std::uintptr_t _root = detail::global_manager::widgets().root();
+    detail::global_manager::widgets().drawables.push_back(_root);
 }
 }

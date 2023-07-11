@@ -6,6 +6,11 @@ namespace bungeegum {
 
 /// @brief
 struct bungeegum_app {
+    bungeegum_app() = delete;
+    bungeegum_app(const bungeegum_app& other) = delete;
+    bungeegum_app& operator=(const bungeegum_app& other) = delete;
+    bungeegum_app(bungeegum_app&& other) = delete;
+    bungeegum_app& operator=(bungeegum_app&& other) = delete;
 
     /// @brief
     static void color(const float4 rgba);

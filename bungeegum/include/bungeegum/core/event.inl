@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include <bungeegum/core/global.fwd>
 #include <bungeegum/glue/raw.hpp>
 
 namespace bungeegum {
@@ -23,8 +24,8 @@ namespace detail {
     template <typename... values_t>
     event_data<values_t...>::~event_data()
     {
-        if (detail::global_events_manager.contains(raw_event)) {
-            detail::global_events_manager.notify_erase(raw_event);
+        if (global_manager::events().contains(raw_event)) {
+            global_manager::events().notify_erase(raw_event);
         }
     }
 
@@ -52,7 +53,7 @@ namespace detail {
                     }
                     _future_it = data.futures.erase(_future_it);
                     if (data.futures.empty() && data.shared_futures.empty()) {
-                        global_events_manager.notify_erase(data.raw_event);
+                        global_manager::events().notify_erase(data.raw_event);
                     }
                 } else
                     _future_it++;
@@ -74,7 +75,7 @@ namespace detail {
                     }
                     _shared_future_it = data.shared_futures.erase(_shared_future_it);
                     if (data.futures.empty() && data.shared_futures.empty()) {
-                        global_events_manager.notify_erase(data.raw_event);
+                        global_manager::events().notify_erase(data.raw_event);
                     }
                 } else
                     _shared_future_it++;
@@ -126,8 +127,8 @@ template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& future_value)
 {
     std::uintptr_t _raw_event = detail::raw_cast<event<values_t...>>(this);
-    if (!detail::global_events_manager.contains(_raw_event)) {
-        detail::event_update_data& _update_data = detail::global_events_manager[_raw_event];
+    if (!detail::global_manager::events().contains(_raw_event)) {
+        detail::event_update_data& _update_data = detail::global_manager::events()[_raw_event];
         _data.raw_event = _raw_event;
         (_update_data.kinds.push_back(typeid(values_t)), ...);
         detail::assign_ticker(_data, _update_data);
@@ -140,8 +141,8 @@ template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_values>& shared_future_value)
 {
     std::uintptr_t _raw_event = detail::raw_cast<event<values_t...>>(this);
-    if (!detail::global_events_manager.contains(_raw_event)) {
-        detail::event_update_data& _update_data = detail::global_events_manager[_raw_event];
+    if (!detail::global_manager::events().contains(_raw_event)) {
+        detail::event_update_data& _update_data = detail::global_manager::events()[_raw_event];
         _data.raw_event = _raw_event;
         (_update_data.kinds.push_back(typeid(values_t)), ...);
         detail::assign_ticker(_data, _update_data);

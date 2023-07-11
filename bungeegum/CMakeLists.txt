@@ -18,6 +18,7 @@ set(bungeegum_source
 	"source/core/draw.cpp"
 	"source/core/event.cpp"
 	"source/core/exceptions.cpp"
+	"source/core/global.cpp"
 	"source/core/interact.cpp"
 	"source/core/resolve.cpp"
 	"source/core/widget.cpp"

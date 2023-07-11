@@ -80,7 +80,8 @@ namespace detail {
     void widgets_manager::save_widgets(const std::filesystem::path& archive_path)
     {
         reloaded_saver _archiver(archive_path);
-        traverse(global_widgets_manager[global_widgets_manager.root()], [this, &_archiver](widget_update_data& _widget_data) {
+        widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
+        global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
             if (_widget_data.saver) {
                 _widget_data.saver(_archiver);
             }
@@ -91,7 +92,8 @@ namespace detail {
     void widgets_manager::load_widgets(const std::filesystem::path& archive_path)
     {
         reloaded_loader _archiver(archive_path);
-        traverse(global_widgets_manager[global_widgets_manager.root()], [this, &_archiver](widget_update_data& _widget_data) {
+        widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
+        global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
             if (_widget_data.loader) {
                 _widget_data.loader(_archiver);
             }
@@ -113,26 +115,26 @@ void destroy(const runtime_widget& widget)
     // ?
     // void* _void_widget = reinterpret_cast<void*>(&widget);
     // detail::registry_entity _entity;
-    // if (detail::global_widgets_manager.accessors.find(_void_widget) == detail::global_widgets_manager.accessors.end())
+    // if (detail::global().widgets->.accessors.find(_void_widget) == detail::global().widgets->.accessors.end())
     //     detail::throw_error<detail::error_type::bad_implementation>("widget not found in accessors");
-    // _entity = detail::global_widgets_manager.possessed.at(_void_widget);
-    // detail::global_widgets_manager.widgets.erase(_entity);
-    // detail::global_widgets_manager.possessed.erase(_void_widget);
-    // detail::global_widgets_manager.accessors.erase(_void_widget);
+    // _entity = detail::global().widgets->.possessed.at(_void_widget);
+    // detail::global().widgets->.widgets.erase(_entity);
+    // detail::global().widgets->.possessed.erase(_void_widget);
+    // detail::global().widgets->.accessors.erase(_void_widget);
 }
 
 void adopt(const runtime_widget& widget, const runtime_widget& child_widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
-    detail::widget_update_data& _child_widget_data = detail::global_widgets_manager.get_widget_data(child_widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
+    detail::widget_update_data& _child_widget_data = detail::global_manager::widgets()[child_widget];
     _child_widget_data.parent = _widget_data;
     _widget_data.children.emplace_back(_child_widget_data);
 }
 
 void abandon(const runtime_widget& parent_widget, const runtime_widget& child_widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(parent_widget);
-    detail::widget_update_data& _child_widget_data = detail::global_widgets_manager.get_widget_data(child_widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[parent_widget];
+    detail::widget_update_data& _child_widget_data = detail::global_manager::widgets()[child_widget];
     _child_widget_data.parent = std::nullopt;
     for (int1 _k = 0; _k < _widget_data.children.size(); _k++) {
         detail::widget_update_data& _loop_child_widget_data = _widget_data.children[_k].get();
@@ -145,36 +147,36 @@ void abandon(const runtime_widget& parent_widget, const runtime_widget& child_wi
 
 bool has_parent(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
     return _widget_data.parent.has_value();
 }
 
 runtime_widget get_parent(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
     if (!_widget_data.parent.has_value()) {
         throw_error("Error TODO");
     }
     detail::widget_update_data& _parent_widget_data = _widget_data.parent.value();
-    runtime_widget _parent_widget = detail::global_widgets_manager.get_runtime_widget(_parent_widget_data);
+    runtime_widget _parent_widget = detail::global_manager::widgets().get_runtime_widget(_parent_widget_data);
     return _parent_widget;
 }
 
 resolve_command& get_resolve_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
     return _widget_data.resolver_command;
 }
 
 bool has_interact_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
     return _widget_data.interactor_command.has_value();
 }
 
 interact_command& get_interact_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
     if (!_widget_data.interactor_command.has_value()) {
         throw_error("Error TODO");
     }
@@ -183,13 +185,13 @@ interact_command& get_interact_command(const runtime_widget& widget)
 
 bool has_draw_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
     return _widget_data.drawer_command.has_value();
 }
 
 draw_command& get_draw_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_widgets_manager.get_widget_data(widget);
+    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
     if (!_widget_data.drawer_command.has_value()) {
         throw_error("Error TODO");
     }

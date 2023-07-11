@@ -3,10 +3,25 @@
 #include <functional>
 
 #include <bungeegum/backend/common.fwd>
-#include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
 
 struct runtime_widget;
 
+namespace details {
+
+    struct standalone_manager {
+        standalone_manager() = default;
+        standalone_manager(const standalone_manager& other) = delete;
+        standalone_manager& operator=(const standalone_manager& other) = delete;
+        standalone_manager(standalone_manager&& other) = delete;
+        standalone_manager& operator=(standalone_manager&& other) = delete;
+
+        bool is_desired_app_color_changed = false;
+        float4 desired_app_color = { 1.f, 1.f, 1.f, 1.f };
+        bool is_desired_app_title_changed = false;
+        std::string desired_app_title = "Bungeegum App";
+    };
+
+}
 }

@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <bungeegum/core/animation.hpp>
+#include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
 
 namespace bungeegum {
@@ -15,11 +16,11 @@ namespace detail {
         ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
         if (ImGui::Begin("inspector##__bungeegum_window_inspector_title__", 0, ImGuiWindowFlags_NoCollapse)) {
             int _k = 0;
-            for (const auto& _event_data : global_events_manager) {
+            for (const auto& _event_data : global_manager::events()) {
                 (void)_event_data;
                 ImGui::Text("event future....");
             }
-            for (const auto& _animation_data : global_animations_manager) {
+            for (const auto& _animation_data : global_manager::animations()) {
                 // if (_animation_data.is_playing) {
                 std::string _title = "##StatsGraphTitle" + std::to_string(_k);
                 static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;

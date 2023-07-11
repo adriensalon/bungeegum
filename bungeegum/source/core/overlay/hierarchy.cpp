@@ -80,7 +80,7 @@ namespace detail {
                 }
             };
 
-            _tf(global_widgets_manager.root_update_data());
+            _tf(global_manager::widgets().root_update_data());
         }
         ImGui::End();
     }

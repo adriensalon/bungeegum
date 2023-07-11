@@ -1,0 +1,37 @@
+#pragma once
+
+#include <memory>
+
+namespace bungeegum {
+namespace detail {
+
+    struct events_manager;
+    struct animations_manager;
+    struct widgets_manager;
+    struct backend_manager;
+    struct standalone_manager;
+    struct embedded_manager;
+
+    struct global_manager {
+        global_manager() = delete;
+        global_manager(const global_manager& other) = delete;
+        global_manager& operator=(const global_manager& other) = delete;
+        global_manager(global_manager&& other) = delete;
+        global_manager& operator=(global_manager&& other) = delete;
+
+        static events_manager& events();
+        static animations_manager& animations();
+        static widgets_manager& widgets();
+        static backend_manager& backend();
+
+#if BUNGEEGUM_USE_EMBEDDED
+        static embedded_manager& embedded();
+#endif
+
+#if BUNGEEGUM_USE_STANDALONE
+        static standalone_manager& standalone();
+#endif
+    };
+
+}
+}

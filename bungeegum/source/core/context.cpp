@@ -8,6 +8,7 @@
 #include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.fwd>
+#include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 
@@ -48,15 +49,15 @@ namespace detail {
         while (!_resolve_done) {
             std::for_each(
                 std::execution::seq, // go parallel
-                global_widgets_manager.resolvables.begin(),
-                global_widgets_manager.resolvables.end(),
+                global_manager::widgets().resolvables.begin(),
+                global_manager::widgets().resolvables.end(),
                 [](const std::uintptr_t _raw_widget) {
-                    widget_update_data& _widget_data = global_widgets_manager[_raw_widget];
+                    widget_update_data& _widget_data = global_manager::widgets()[_raw_widget];
                     resolve_command& _resolve_command = _widget_data.resolver_command;
 
-                    if (_raw_widget == global_widgets_manager.root()) {
-                        _resolve_command._data.constraint.min_size = detail::viewport_size;
-                        _resolve_command._data.constraint.max_size = detail::viewport_size;
+                    if (_raw_widget == global_manager::widgets().root()) {
+                        _resolve_command._data.constraint.min_size = global_manager::backend().viewport_size;
+                        _resolve_command._data.constraint.max_size = global_manager::backend().viewport_size;
                     } else {
                         widget_update_data* _parent_widget_data_ptr = &_widget_data.parent.value().get();
 
@@ -77,8 +78,10 @@ namespace detail {
                     //     _draw_command._data.resolved_size = _resolved_size;
                     // }
                 });
-            global_widgets_manager.resolvables.erase(global_widgets_manager.resolvables.begin(), global_widgets_manager.resolvables.end());
-            _resolve_done = global_widgets_manager.resolvables.empty();
+            global_manager::widgets().resolvables.erase(
+                global_manager::widgets().resolvables.begin(),
+                global_manager::widgets().resolvables.end());
+            _resolve_done = global_manager::widgets().resolvables.empty();
         }
     }
 
@@ -91,11 +94,11 @@ namespace detail {
             while (!_draw_done) {
                 std::for_each(
                     std::execution::seq, // go parallel
-                    global_widgets_manager.drawables.begin(),
-                    global_widgets_manager.drawables.end(),
+                    global_manager::widgets().drawables.begin(),
+                    global_manager::widgets().drawables.end(),
                     [imgui_drawlist](const std::uintptr_t _raw_widget) {
-                        widget_update_data& _widget_data = global_widgets_manager[_raw_widget];
-                        global_widgets_manager.traverse(_widget_data, [imgui_drawlist](widget_update_data& _widget_data) {
+                        widget_update_data& _widget_data = global_manager::widgets()[_raw_widget];
+                        global_manager::widgets().traverse(_widget_data, [imgui_drawlist](widget_update_data& _widget_data) {
                             // accumulate position anyway
                             resolve_command& _widget_resolver_command = _widget_data.resolver_command;
                             if (_widget_data.parent.has_value()) {
@@ -118,8 +121,10 @@ namespace detail {
                             return true;
                         });
                     });
-                global_widgets_manager.drawables.erase(global_widgets_manager.drawables.begin(), global_widgets_manager.drawables.end());
-                _draw_done = global_widgets_manager.drawables.empty();
+                global_manager::widgets().drawables.erase(
+                    global_manager::widgets().drawables.begin(),
+                    global_manager::widgets().drawables.end());
+                _draw_done = global_manager::widgets().drawables.empty();
             }
         }
     }
@@ -159,8 +164,8 @@ namespace detail {
 
     bool tick(const std::chrono::milliseconds& delta_time)
     {
-        global_animations_manager.update(delta_time);
-        global_events_manager.update();
+        global_manager::animations().update(delta_time);
+        global_manager::events().update();
         ////
         ////
         ////
@@ -172,7 +177,7 @@ namespace detail {
 
         // context::execute_interact();
         context::execute_resolve();
-        return (has_userspace_thrown() || !global_widgets_manager.drawables.empty());
+        return (has_userspace_thrown() || !global_manager::widgets().drawables.empty());
         // return true;
     }
 

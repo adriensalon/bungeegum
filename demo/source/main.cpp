@@ -86,10 +86,21 @@ int main()
 
     std::wostringstream _osstream2;
 
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_DIRECTX");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_BACKTRACE");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_HOTRELOAD");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_STANDALONE");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_OVERLAY");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_DIRECTX 1");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_BACKTRACE 1");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_HOTRELOAD 1");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_STANDALONE 1");
+    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
+
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
-    bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
+    // bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum/include/");
     bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/bungeegum/Debug/bungeegum.lib");

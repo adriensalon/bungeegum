@@ -123,6 +123,6 @@ namespace detail {
         std::uintptr_t _root = {};
     };
 
-    inline widgets_manager global_widgets_manager;
+    // inline widgets_manager global_widgets_manager;
 }
 }

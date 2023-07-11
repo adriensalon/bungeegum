@@ -55,6 +55,6 @@ namespace detail {
         std::vector<std::uintptr_t> _tickables_to_erase = {};
     };
 
-    inline events_manager global_events_manager;
+    // inline events_manager global_events_manager;
 }
 }
