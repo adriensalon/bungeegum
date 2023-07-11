@@ -5,11 +5,11 @@
 
 #include <bungeegum/backend/common.fwd>
 #include <bungeegum/core/animation.hpp>
-#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.fwd>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
+#include <bungeegum/core/process.fwd>
 #include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
@@ -54,7 +54,6 @@ namespace detail {
                 [](const std::uintptr_t _raw_widget) {
                     widget_update_data& _widget_data = global_manager::widgets()[_raw_widget];
                     resolve_command& _resolve_command = _widget_data.resolver_command;
-
                     if (_raw_widget == global_manager::widgets().root()) {
                         _resolve_command._data.constraint.min_size = global_manager::backend().viewport_size;
                         _resolve_command._data.constraint.max_size = global_manager::backend().viewport_size;
@@ -65,7 +64,6 @@ namespace detail {
                         _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
                         _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
                     }
-
                     protect_userspace([&_widget_data]() {
                         _widget_data.resolver(_widget_data.resolver_command);
                     });
@@ -132,15 +130,15 @@ namespace detail {
         // debug only !
 
         // context::_process_interact();
-        process_manager::_process_resolve();
+        _process_resolve();
         return (has_userspace_thrown() || !global_manager::widgets().drawables.empty());
         // return true;
     }
 
     void process_manager::render()
     {
-        draw_overlay([](ImDrawList* imgui_drawlist) {
-            process_manager::_process_draw(imgui_drawlist);
+        draw_overlay([this](ImDrawList* imgui_drawlist) {
+            _process_draw(imgui_drawlist);
         });
     }
 }

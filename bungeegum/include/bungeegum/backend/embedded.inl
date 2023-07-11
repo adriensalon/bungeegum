@@ -1,9 +1,8 @@
 #pragma once
 
-#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/overlay.fwd>
-
+#include <bungeegum/core/process.fwd>
 
 namespace bungeegum {
 

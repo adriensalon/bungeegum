@@ -14,12 +14,12 @@ set(bungeegum_source
 	"source/glue/time.cpp"
 
 	"source/core/animation.cpp"
-	"source/core/context.cpp"
 	"source/core/draw.cpp"
 	"source/core/event.cpp"
 	"source/core/exceptions.cpp"
 	"source/core/global.cpp"
 	"source/core/interact.cpp"
+	"source/core/process.cpp"
 	"source/core/resolve.cpp"
 	"source/core/widget.cpp"
 

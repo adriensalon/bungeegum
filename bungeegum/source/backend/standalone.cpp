@@ -1,10 +1,10 @@
 #pragma once
 
 #include <bungeegum/backend/standalone.hpp>
-#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
+#include <bungeegum/core/process.fwd>
 #include <bungeegum/core/runtime.hpp>
 #include <bungeegum/glue/renderer.hpp>
 #include <bungeegum/glue/time.hpp>
@@ -83,19 +83,19 @@ void launch(const runtime_widget& widget, const std::function<void()>& on_render
         //
         // web events
         _window.on_mouse_down([](const detail::mouse_down_event& event) {
-            detail::process_manager::mouse_down_events.push_back(event);
+            detail::global_manager::process().mouse_down_events.push_back(event);
         });
         _window.on_mouse_moved([](const detail::mouse_moved_event& event) {
-            detail::process_manager::mouse_moved_events.push_back(event);
+            detail::global_manager::process().mouse_moved_events.push_back(event);
         });
         _window.on_mouse_pressed([](const detail::mouse_pressed_event& event) {
-            detail::process_manager::mouse_pressed_events.push_back(event);
+            detail::global_manager::process().mouse_pressed_events.push_back(event);
         });
         _window.on_mouse_up([](const detail::mouse_up_event& event) {
-            detail::process_manager::mouse_up_events.push_back(event);
+            detail::global_manager::process().mouse_up_events.push_back(event);
         });
         _window.on_window_resized([&_renderer](const detail::window_resized_event& event) {
-            detail::process_manager::window_resized_events.push_back(event);
+            detail::global_manager::process().window_resized_events.push_back(event);
             _renderer.process_window_resized_event(event);
         });
         _window.on_sdl_event([&_renderer](const SDL_Event* event) { // TOUJOURS CA MAIS FAUT REMOVE IMGUI PR CLEAN
@@ -114,10 +114,10 @@ void launch(const runtime_widget& widget, const std::function<void()>& on_render
             std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
             bool _has_polled = _window.poll();
             (void)_has_polled;
-            bool _has_ticked = detail::process_manager::update(_delta_milliseconds);
+            bool _has_ticked = detail::global_manager::process().update(_delta_milliseconds);
             if (_has_ticked) {
                 _renderer.new_frame();
-                detail::process_manager::render();
+                detail::global_manager::process().render();
                 _renderer.present();
             }
 

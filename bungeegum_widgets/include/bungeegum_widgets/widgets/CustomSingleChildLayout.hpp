@@ -1,5 +1,7 @@
 #pragma once
 
+#include <any>
+
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum_widgets/core/SingleChildLayoutDelegate.hpp>
 
