@@ -83,19 +83,19 @@ void launch(const runtime_widget& widget, const std::function<void()>& on_render
         //
         // web events
         _window.on_mouse_down([](const detail::mouse_down_event& event) {
-            detail::context::mouse_down_events.push_back(event);
+            detail::process_manager::mouse_down_events.push_back(event);
         });
         _window.on_mouse_moved([](const detail::mouse_moved_event& event) {
-            detail::context::mouse_moved_events.push_back(event);
+            detail::process_manager::mouse_moved_events.push_back(event);
         });
         _window.on_mouse_pressed([](const detail::mouse_pressed_event& event) {
-            detail::context::mouse_pressed_events.push_back(event);
+            detail::process_manager::mouse_pressed_events.push_back(event);
         });
         _window.on_mouse_up([](const detail::mouse_up_event& event) {
-            detail::context::mouse_up_events.push_back(event);
+            detail::process_manager::mouse_up_events.push_back(event);
         });
         _window.on_window_resized([&_renderer](const detail::window_resized_event& event) {
-            detail::context::window_resized_events.push_back(event);
+            detail::process_manager::window_resized_events.push_back(event);
             _renderer.process_window_resized_event(event);
         });
         _window.on_sdl_event([&_renderer](const SDL_Event* event) { // TOUJOURS CA MAIS FAUT REMOVE IMGUI PR CLEAN

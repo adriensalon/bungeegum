@@ -31,7 +31,7 @@ struct window_resized_interaction {
 private:
     detail::window_resized_event _event;
     friend struct interact_command;
-    friend struct detail::context;
+    friend struct detail::process_manager;
 };
 
 /// @brief
@@ -48,7 +48,7 @@ struct mouse_moved_interaction {
 private:
     detail::mouse_moved_event _event;
     friend struct interact_command;
-    friend struct detail::context;
+    friend struct detail::process_manager;
 };
 
 /// @brief
@@ -70,7 +70,7 @@ struct mouse_down_interaction {
 private:
     detail::mouse_down_event _event;
     friend struct interact_command;
-    friend struct detail::context;
+    friend struct detail::process_manager;
 };
 
 /// @brief
@@ -83,7 +83,7 @@ struct mouse_up_interaction {
 private:
     detail::mouse_up_event _event;
     friend struct interact_command;
-    friend struct detail::context;
+    friend struct detail::process_manager;
 };
 
 /// @brief
@@ -96,7 +96,7 @@ struct mouse_pressed_interaction {
 private:
     detail::mouse_pressed_event _event;
     friend struct interact_command;
-    friend struct detail::context;
+    friend struct detail::process_manager;
 };
 
 /// @brief
@@ -132,7 +132,7 @@ struct interact_command {
 
 private:
     detail::interact_command_data _data;
-    friend struct detail::context;
+    friend struct detail::process_manager;
 };
 
 /// @brief

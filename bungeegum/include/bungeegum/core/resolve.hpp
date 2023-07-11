@@ -32,7 +32,7 @@ struct resolve_command {
 
 private:
     detail::resolve_command_data _data;
-    friend struct detail::context;
+    friend struct detail::process_manager;
 };
 
 /// @brief

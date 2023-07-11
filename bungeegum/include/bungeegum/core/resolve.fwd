@@ -13,7 +13,7 @@ struct runtime_widget;
 
 namespace detail {
 
-    struct context;
+    struct process_manager;
 
     struct resolve_constraint_data {
         bool is_blocked = false;

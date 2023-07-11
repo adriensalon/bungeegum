@@ -115,7 +115,7 @@ struct draw_command {
 
 private:
     detail::draw_command_data _data;
-    friend struct detail::context;
+    friend struct detail::process_manager;
     friend struct resolve_command;
 };
 

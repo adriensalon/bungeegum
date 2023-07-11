@@ -14,7 +14,7 @@ struct runtime_widget;
 
 namespace detail {
 
-    struct context;
+    struct process_manager;
 
     struct interact_command_data {
         bool is_blocked = false;

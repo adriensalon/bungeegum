@@ -15,7 +15,7 @@
 namespace bungeegum {
 namespace detail {
 
-    void context::execute_interact()
+    void process_manager::execute_interact()
     {
 #define traverse_interact_impl(interaction_name)                                                                           \
     for (const interaction_name##_event& _event : interaction_name##_events) {                                             \
@@ -43,7 +43,7 @@ namespace detail {
 #undef traverse_interact_impl
     }
 
-    void context::execute_resolve()
+    void process_manager::execute_resolve()
     {
         bool _resolve_done = false;
         while (!_resolve_done) {
@@ -85,7 +85,7 @@ namespace detail {
         }
     }
 
-    void context::execute_draw(ImDrawList* imgui_drawlist, const bool heads_start)
+    void process_manager::execute_draw(ImDrawList* imgui_drawlist, const bool heads_start)
     {
         bool _draw_done = false;
         if (heads_start) {
@@ -176,7 +176,7 @@ namespace detail {
         // debug only !
 
         // context::execute_interact();
-        context::execute_resolve();
+        process_manager::execute_resolve();
         return (has_userspace_thrown() || !global_manager::widgets().drawables.empty());
         // return true;
     }
@@ -184,7 +184,7 @@ namespace detail {
     void draw(const bool heads_start)
     {
         draw_overlay([heads_start](ImDrawList* imgui_drawlist) {
-            context::execute_draw(imgui_drawlist, heads_start);
+            process_manager::execute_draw(imgui_drawlist, heads_start);
         });
     }
 }
