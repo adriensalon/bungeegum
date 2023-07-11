@@ -54,16 +54,11 @@ namespace detail {
     //     return _updatables.insert_or_assign(_root);
     // }
 
-    runtime_widget widgets_manager::get_runtime_widget(widget_update_data& widget_data)
+    runtime_widget widgets_manager::create_runtime_widget(widget_update_data& widget_data)
     {
         runtime_widget _runtime_widget;
         _runtime_widget._data.raw_widget = widget_data.raw_widget;
         return _runtime_widget;
-    }
-
-    widget_update_data& widgets_manager::get_widget_data(const runtime_widget& widget)
-    {
-        return _updatables[widget._data.raw_widget];
     }
 
     void widgets_manager::traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback)
@@ -77,29 +72,29 @@ namespace detail {
         _iterate(iterate_root);
     }
 
-    void widgets_manager::save_widgets(const std::filesystem::path& archive_path)
-    {
-        reloaded_saver _archiver(archive_path);
-        widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
-        global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
-            if (_widget_data.saver) {
-                _widget_data.saver(_archiver);
-            }
-            return true;
-        });
-    }
+    // void widgets_manager::save_widgets(const std::filesystem::path& archive_path)
+    // {
+    //     reloaded_saver _archiver(archive_path);
+    //     widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
+    //     global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
+    //         if (_widget_data.saver) {
+    //             _widget_data.saver(_archiver);
+    //         }
+    //         return true;
+    //     });
+    // }
 
-    void widgets_manager::load_widgets(const std::filesystem::path& archive_path)
-    {
-        reloaded_loader _archiver(archive_path);
-        widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
-        global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
-            if (_widget_data.loader) {
-                _widget_data.loader(_archiver);
-            }
-            return true;
-        });
-    }
+    // void widgets_manager::load_widgets(const std::filesystem::path& archive_path)
+    // {
+    //     reloaded_loader _archiver(archive_path);
+    //     widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
+    //     global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
+    //         if (_widget_data.loader) {
+    //             _widget_data.loader(_archiver);
+    //         }
+    //         return true;
+    //     });
+    // }
 }
 
 runtime_widget::runtime_widget()
@@ -158,7 +153,7 @@ runtime_widget get_parent(const runtime_widget& widget)
         throw_error("Error TODO");
     }
     detail::widget_update_data& _parent_widget_data = _widget_data.parent.value();
-    runtime_widget _parent_widget = detail::global_manager::widgets().get_runtime_widget(_parent_widget_data);
+    runtime_widget _parent_widget = detail::global_manager::widgets().create_runtime_widget(_parent_widget_data);
     return _parent_widget;
 }
 

@@ -5,11 +5,10 @@
 #include <bungeegum/core/global.fwd>
 
 namespace bungeegum {
-
 namespace detail {
 
     template <typename widget_t>
-    reference_widget<widget_t> widgets_manager::create_widget(detail::value_type_t<widget_t>& reference)
+    reference_widget<widget_t> widgets_manager::create_reference_widget(detail::value_type_t<widget_t>& reference)
     {
         return reference_widget<widget_t>(reference);
     }
@@ -30,7 +29,6 @@ namespace detail {
         static_assert(traits::is_reloadable_v<widget_t>, "TODO");
         widget._bungeegum_object_reference = raw_widget;
     }
-
 }
 
 struct access {
@@ -78,7 +76,7 @@ struct access {
                 } else {
                     float2 _max_size = zero<float2>;
                     for (detail::widget_update_data& _child_widget_data : _widget_data.children) {
-                        runtime_widget _child_widget = detail::global_manager::widgets().get_runtime_widget(_child_widget_data);
+                        runtime_widget _child_widget = detail::global_manager::widgets().create_runtime_widget(_child_widget_data);
                         float2 _child_size = command.resolve_child(_child_widget, command.min_size(), command.max_size());
                         _max_size = glm::max(_max_size, _child_size);
                         command.position_child(_child_widget, zero<float2>);
@@ -94,7 +92,6 @@ struct access {
     {
         const std::uintptr_t _raw_widget = detail::global_manager::widgets().raw(widget.get());
         detail::widget_update_data& _widget_data = detail::global_manager::widgets()[_raw_widget];
-        _widget_data.resolver_command = resolve_command();
         if constexpr (detail::traits::has_load_function_v<widget_t>) {
             _widget_data.loader = [widget](detail::reloaded_loader& archiver) {
                 archiver.load(widget);
@@ -107,7 +104,6 @@ struct access {
     {
         const std::uintptr_t _raw_widget = detail::global_manager::widgets().raw(widget.get());
         detail::widget_update_data& _widget_data = detail::global_manager::widgets()[_raw_widget];
-        _widget_data.resolver_command = resolve_command();
         if constexpr (detail::traits::has_save_function_v<widget_t>) {
             _widget_data.saver = [widget](detail::reloaded_saver& archiver) {
                 archiver.save(widget);
@@ -175,7 +171,7 @@ reference_widget<widget_t> make_reference()
         _widget_ptr = &(detail::global_manager::widgets().widgets.create_component<detail::value_type_t<widget_t>>(_entity));
         _raw_widget = detail::global_manager::widgets().raw<widget_t>(*_widget_ptr);
     }
-    reference_widget<widget_t> _reference = detail::global_manager::widgets().create_widget<widget_t>(*_widget_ptr);
+    reference_widget<widget_t> _reference = detail::global_manager::widgets().create_reference_widget<widget_t>(*_widget_ptr);
 
     detail::widget_update_data& _update_data = detail::global_manager::widgets()[_raw_widget];
     _update_data.raw_widget = _raw_widget;
