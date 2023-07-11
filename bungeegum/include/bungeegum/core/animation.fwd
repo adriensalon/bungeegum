@@ -64,7 +64,5 @@ namespace detail {
         std::unordered_map<std::uintptr_t, animation_update_data> _tickables = {};
         std::vector<std::uintptr_t> _tickables_to_erase = {};
     };
-
-    // inline animations_manager global_animations_manager;
 }
 }

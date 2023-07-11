@@ -12,7 +12,7 @@ namespace bungeegum {
 namespace detail {
 
     struct backend_manager {
-        uint2 viewport_size = zero<float2>; // we global this so we can
+        uint2 viewport_size = zero<float2>;
 
 #if BUNGEEGUM_USE_HOTRELOAD
         std::unique_ptr<reloader> reload_manager = nullptr;
@@ -23,7 +23,5 @@ namespace detail {
         std::list<std::filesystem::path> reload_force_compiled_source_files = {};
 #endif
     };
-
-    // inline backend_manager global_backend_manager = {};
 }
 }

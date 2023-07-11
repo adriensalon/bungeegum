@@ -11,7 +11,7 @@ struct ImDrawList;
 namespace bungeegum {
 namespace detail {
 
-    // go mettre tt ca dans le global_widget_container
+    // go mettre tt ca dans le process_manager
     struct context {
         inline static std::vector<window_resized_event> window_resized_events = {};
         inline static std::vector<mouse_moved_event> mouse_moved_events = {};

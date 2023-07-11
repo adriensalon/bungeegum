@@ -54,7 +54,5 @@ namespace detail {
         std::unordered_map<std::uintptr_t, event_update_data> _tickables = {};
         std::vector<std::uintptr_t> _tickables_to_erase = {};
     };
-
-    // inline events_manager global_events_manager;
 }
 }
