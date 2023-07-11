@@ -48,7 +48,7 @@ namespace widgets {
         float ff3 = 56.f;
         float ff4 = 56.f;
 
-        HOTRELOAD_CLASS(ColoredBox, ii, ff, ff2, ff3)
+        HOTRELOAD_CLASS(ColoredBox, ii, ff, ff2, ff3, ff4)
     };
 }
 }

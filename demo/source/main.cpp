@@ -51,7 +51,7 @@ struct Composed {
     HOTRELOAD_METHOD Composed& build()
     {
         bungeegum::adopt(this, _box.get());
-        bungeegum::reference_widget<ColoredBox> _box3 = std::move(_box2);
+        bungeegum::widget_reference<ColoredBox> _box3 = std::move(_box2);
         _box2 = std::move(_box3);
         bungeegum::adopt(_box.get(), _box2.get());
         return *this;
@@ -72,13 +72,14 @@ struct Composed {
         _box.get().color(0xFF8899FF);
         _box2.get().color(0xFF8899AA);
 
+        float& okok = bungeegum::make_property<float>(this);
         // std::cout << "color box  = " << 44.f << std::endl;
     }
 
     // ColoredBox _box;
     // ColoredBox _box2;
-    bungeegum::reference_widget<ColoredBox> _box = bungeegum::make_reference<ColoredBox>();
-    bungeegum::reference_widget<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>();
+    bungeegum::widget_reference<ColoredBox> _box = bungeegum::make_reference<ColoredBox>();
+    bungeegum::widget_reference<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>();
 };
 
 int main()
@@ -103,10 +104,10 @@ int main()
     // bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum/include/");
-    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/bungeegum/Debug/bungeegum.lib");
-    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
-    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
-    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
+    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/bungeegum/Release/bungeegum.lib");
+    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Release/hscpp.lib");
+    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Release/hscpp-mem.lib");
+    bungeegum::hotreload_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Release/imgui.lib");
 
     bungeegum::hotreload_include_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/include/");
     bungeegum::hotreload_source_directories().push_back("C:/Users/adri/dev/bungeegum/bungeegum_widgets/source/widgets/");

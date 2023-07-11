@@ -18,6 +18,10 @@ namespace detail {
 
     struct draw_command_data {
 
+        void draw(ImDrawList* imgui_drawlist);
+
+        void draw();
+
         struct clip_data {
             float2 first_point = zero<float2>;
             float2 second_point = infinity<float2>;
@@ -29,10 +33,6 @@ namespace detail {
         float2 resolved_size = zero<float2>;
         std::vector<std::function<void(ImDrawList*)>> commands = {};
         std::optional<clip_data> clipping = std::nullopt;
-
-        void draw(ImDrawList* imgui_drawlist);
-
-        void draw();
     };
 }
 }

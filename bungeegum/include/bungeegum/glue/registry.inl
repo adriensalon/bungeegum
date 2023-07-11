@@ -5,27 +5,6 @@
 namespace bungeegum {
 namespace detail {
 
-    // template <typename component_t>
-    // registry_entity registry::get_entity(component_t& component)
-    // {
-    //     // maintain an std::unordered_set ?
-    //     return entt::to_entity(_registry, component);
-    // }
-
-    // template <typename component_t>
-    // std::optional<registry_entity> registry::try_get_entity(component_t& component)
-    // {
-    //     // maintain an std::unordered_set ?
-    //     std::optional<registry_entity> _retval = std::nullopt;
-    //     iterate_with_entities<component_t>([this, &component, &_retval](registry_entity _entity, component_t& _component) {
-    //         if (&_component == &component)
-    //             _retval = _entity;
-    //     });
-    //     return _retval;
-    // }
-
-    // TODO has component
-
     template <typename entity_t>
     entity_t registry<entity_t>::create_entity()
     {

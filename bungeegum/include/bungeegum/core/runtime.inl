@@ -6,8 +6,6 @@
 
 namespace bungeegum {
 
-// runtime_widget
-
 template <typename widget_t>
 runtime_widget::runtime_widget(widget_t* widget)
 {
@@ -28,7 +26,15 @@ runtime_widget::runtime_widget(widget_t& widget)
     _data.raw_widget = _raw_widget;
 }
 
-// free
+template <typename widget_t>
+runtime_widget::runtime_widget(widget_reference<widget_t>& widget)
+{
+    std::uintptr_t _raw_widget = detail::global_manager::widgets().raw<widget_t>(widget.get());
+    if (!detail::global_manager::widgets().contains(_raw_widget)) {
+        //throw
+    }
+    _data.raw_widget = _raw_widget;
+}
 
 template <template <typename, typename> typename container_t, typename allocator_t>
 void get_children(

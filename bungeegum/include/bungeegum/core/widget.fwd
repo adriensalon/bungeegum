@@ -20,7 +20,10 @@ namespace bungeegum {
 struct runtime_widget;
 
 template <typename widget_t>
-struct reference_widget;
+struct widget_reference;
+
+template <typename property_t>
+struct property_reference;
 
 namespace detail {
 
@@ -47,7 +50,8 @@ namespace detail {
     }
 
     struct widget_update_data {
-        std::uintptr_t raw_widget = 0u;
+        registry_entity entity = {};
+        std::uintptr_t raw_widget = {};
         std::unique_ptr<std::type_index> kind = nullptr;
         std::string kind_debug = ""; // to show type in debugger TODO REMOVE
         std::optional<std::reference_wrapper<widget_update_data>> parent = std::nullopt;
@@ -75,7 +79,10 @@ namespace detail {
         [[nodiscard]] bool contains(const std::uintptr_t raw_widget) const;
 
         template <typename widget_t>
-        [[nodiscard]] reference_widget<widget_t> create_reference_widget(detail::value_type_t<widget_t>& reference);
+        [[nodiscard]] widget_reference<widget_t> create_reference_widget(detail::value_type_t<widget_t>& reference);
+
+        template <typename property_t>
+        [[nodiscard]] property_reference<property_t> create_property_reference(detail::value_type_t<property_t>& reference);
 
         runtime_widget create_runtime_widget(widget_update_data& widget_data);
 

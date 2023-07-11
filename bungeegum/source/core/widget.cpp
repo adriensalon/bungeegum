@@ -56,9 +56,7 @@ namespace detail {
 
     runtime_widget widgets_manager::create_runtime_widget(widget_update_data& widget_data)
     {
-        runtime_widget _runtime_widget;
-        _runtime_widget._data.raw_widget = widget_data.raw_widget;
-        return _runtime_widget;
+        return runtime_widget(detail::runtime_widget_data { widget_data.raw_widget });
     }
 
     void widgets_manager::traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback)
@@ -114,7 +112,8 @@ namespace detail {
     // }
 }
 
-runtime_widget::runtime_widget()
+runtime_widget::runtime_widget(const detail::runtime_widget_data& data)
+    : _data(data)
 {
 }
 

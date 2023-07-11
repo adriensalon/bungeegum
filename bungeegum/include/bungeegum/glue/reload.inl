@@ -19,7 +19,7 @@ namespace detail {
             _names.push_back(_substr);
         }
         std::tuple<fields_t&...> _tuple((fields)...);
-        constexpr size_t _count = std::variant_size_v<std::variant<fields_t...>>;
+        constexpr std::size_t _count = std::variant_size_v<std::variant<fields_t...>>;
         bungeegum::detail::constexpr_for<0, _count, 1>([&](auto _index) {
             using field_type_t = std::variant_alternative_t<_index, std::variant<fields_t...>>;
 
@@ -35,8 +35,6 @@ namespace detail {
             }
         });
     }
-
-    // reloaded
 
     template <typename value_t>
     reloaded<value_t>::reloaded(const reloaded<value_t>& other)
@@ -72,19 +70,11 @@ namespace detail {
         return *(_ref.operator->());
     }
 
-    // template <typename value_t>
-    // const value_t& reloaded<value_t>::get() const
-    // {
-    //     return *(_ref.operator->());
-    // }
-
     template <typename value_t>
     reloaded<value_t>::reloaded(hscpp::mem::UniqueRef<value_t>&& ref)
         : _ref(std::move(ref))
     {
     }
-
-    // reloader
 
     template <typename value_t>
     reloaded<value_t> reloader::allocate()

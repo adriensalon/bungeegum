@@ -37,6 +37,7 @@ namespace mem {
 /// @details
 #define HOTRELOAD_CLASS(classname, ...)                                                                                                                                                             \
     friend class cereal::access;                                                                                                                                                                    \
+    friend struct bungeegum::access;                                                                                                                                                                \
     template <typename value_t>                                                                                                                                                                     \
     friend struct bungeegum::detail::value_wrapper;                                                                                                                                                 \
     friend struct bungeegum::detail::widgets_manager;                                                                                                                                               \
@@ -76,9 +77,6 @@ namespace detail {
 
         /// @brief
         value_t& get() const;
-
-        /// @brief
-        // const value_t& get() const;
 
     private:
         hscpp::mem::UniqueRef<value_t> _ref;

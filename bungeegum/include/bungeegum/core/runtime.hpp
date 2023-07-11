@@ -5,23 +5,34 @@
 namespace bungeegum {
 
 /// @brief Opaque untyped
+/// @details Instances of this type can be copied (shallow copy) and moved.
 struct runtime_widget {
-
-    template <typename widget_t>
-    runtime_widget(widget_t* widget);
-
-    template <typename widget_t>
-    runtime_widget(widget_t& widget);
-
+    runtime_widget() = delete;
     runtime_widget(const runtime_widget& other) = default;
     runtime_widget& operator=(const runtime_widget& other) = default;
     runtime_widget(runtime_widget&& other) = default;
     runtime_widget& operator=(runtime_widget&& other) = default;
 
+    /// @brief
+    /// @tparam widget_t
+    template <typename widget_t>
+    runtime_widget(widget_t* widget);
+
+    /// @brief
+    /// @tparam widget_t
+    template <typename widget_t>
+    runtime_widget(widget_t& widget);
+
+    /// @brief
+    /// @tparam widget_t
+    template <typename widget_t>
+    runtime_widget(widget_reference<widget_t>& widget);
+
 private:
+    runtime_widget(const detail::runtime_widget_data& data);
+
     friend struct detail::widgets_manager;
     detail::runtime_widget_data _data;
-    runtime_widget();
 };
 
 /// @brief Destroys a widget created with the make_reference function. References to it will no longer
