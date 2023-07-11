@@ -63,11 +63,28 @@ namespace detail {
 
     void widgets_manager::traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback)
     {
-        std::function<void(widget_update_data&)> _iterate = [&](widget_update_data& _widget_data) {
-            bool _continue = iterate_callback(_widget_data);
-            if (_continue)
-                for (auto& _child : _widget_data.children)
+        std::function<void(widget_update_data&)> _iterate = [&](widget_update_data& _update_data) {
+            bool _continue = iterate_callback(_update_data);
+            if (_continue) {
+                for (auto& _child : _update_data.children) {
                     _iterate(_child.get());
+                }
+            }
+        };
+        _iterate(iterate_root);
+    }
+
+    void widgets_manager::traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback,
+        const std::function<void(widget_update_data&)>& tail_iterate_callback)
+    {
+        std::function<void(widget_update_data&)> _iterate = [&](widget_update_data& _update_data) {
+            bool _continue = iterate_callback(_update_data);
+            if (_continue) {
+                for (auto& _child : _update_data.children) {
+                    _iterate(_child.get());
+                }
+            }
+            tail_iterate_callback(_update_data);
         };
         _iterate(iterate_root);
     }
@@ -76,9 +93,9 @@ namespace detail {
     // {
     //     reloaded_saver _archiver(archive_path);
     //     widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
-    //     global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
-    //         if (_widget_data.saver) {
-    //             _widget_data.saver(_archiver);
+    //     global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _update_data) {
+    //         if (_update_data.saver) {
+    //             _update_data.saver(_archiver);
     //         }
     //         return true;
     //     });
@@ -88,9 +105,9 @@ namespace detail {
     // {
     //     reloaded_loader _archiver(archive_path);
     //     widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
-    //     global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
-    //         if (_widget_data.loader) {
-    //             _widget_data.loader(_archiver);
+    //     global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _update_data) {
+    //         if (_update_data.loader) {
+    //             _update_data.loader(_archiver);
     //         }
     //         return true;
     //     });
@@ -120,21 +137,21 @@ void destroy(const runtime_widget& widget)
 
 void adopt(const runtime_widget& widget, const runtime_widget& child_widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
-    detail::widget_update_data& _child_widget_data = detail::global_manager::widgets()[child_widget];
-    _child_widget_data.parent = _widget_data;
-    _widget_data.children.emplace_back(_child_widget_data);
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
+    detail::widget_update_data& _child_update_data = detail::global_manager::widgets()[child_widget];
+    _child_update_data.parent = _update_data;
+    _update_data.children.emplace_back(_child_update_data);
 }
 
 void abandon(const runtime_widget& parent_widget, const runtime_widget& child_widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[parent_widget];
-    detail::widget_update_data& _child_widget_data = detail::global_manager::widgets()[child_widget];
-    _child_widget_data.parent = std::nullopt;
-    for (int1 _k = 0; _k < _widget_data.children.size(); _k++) {
-        detail::widget_update_data& _loop_child_widget_data = _widget_data.children[_k].get();
-        if (_loop_child_widget_data.raw_widget == _child_widget_data.raw_widget) {
-            _widget_data.children.erase(_widget_data.children.begin() + _k);
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[parent_widget];
+    detail::widget_update_data& _child_update_data = detail::global_manager::widgets()[child_widget];
+    _child_update_data.parent = std::nullopt;
+    for (int1 _k = 0; _k < _update_data.children.size(); _k++) {
+        detail::widget_update_data& _loop_child_update_data = _update_data.children[_k].get();
+        if (_loop_child_update_data.raw_widget == _child_update_data.raw_widget) {
+            _update_data.children.erase(_update_data.children.begin() + _k);
             break;
         }
     }
@@ -142,54 +159,54 @@ void abandon(const runtime_widget& parent_widget, const runtime_widget& child_wi
 
 bool has_parent(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
-    return _widget_data.parent.has_value();
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
+    return _update_data.parent.has_value();
 }
 
 runtime_widget get_parent(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
-    if (!_widget_data.parent.has_value()) {
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
+    if (!_update_data.parent.has_value()) {
         throw_error("Error TODO");
     }
-    detail::widget_update_data& _parent_widget_data = _widget_data.parent.value();
-    runtime_widget _parent_widget = detail::global_manager::widgets().create_runtime_widget(_parent_widget_data);
+    detail::widget_update_data& _parent_update_data = _update_data.parent.value();
+    runtime_widget _parent_widget = detail::global_manager::widgets().create_runtime_widget(_parent_update_data);
     return _parent_widget;
 }
 
 resolve_command& get_resolve_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
-    return _widget_data.resolver_command;
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
+    return _update_data.resolver_command;
 }
 
 bool has_interact_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
-    return _widget_data.interactor_command.has_value();
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
+    return _update_data.interactor_command.has_value();
 }
 
 interact_command& get_interact_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
-    if (!_widget_data.interactor_command.has_value()) {
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
+    if (!_update_data.interactor_command.has_value()) {
         throw_error("Error TODO");
     }
-    return _widget_data.interactor_command.value();
+    return _update_data.interactor_command.value();
 }
 
 bool has_draw_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
-    return _widget_data.drawer_command.has_value();
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
+    return _update_data.drawer_command.has_value();
 }
 
 draw_command& get_draw_command(const runtime_widget& widget)
 {
-    detail::widget_update_data& _widget_data = detail::global_manager::widgets()[widget];
-    if (!_widget_data.drawer_command.has_value()) {
+    detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
+    if (!_update_data.drawer_command.has_value()) {
         throw_error("Error TODO");
     }
-    return _widget_data.drawer_command.value();
+    return _update_data.drawer_command.value();
 }
 }

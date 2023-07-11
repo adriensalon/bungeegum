@@ -125,6 +125,9 @@ namespace detail {
 
         void traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback);
 
+        void traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback,
+            const std::function<void(widget_update_data&)>& tail_iterate_callback);
+
         registry<registry_entity> widgets = {};
         std::vector<std::uintptr_t> resolvables = {};
         std::vector<std::uintptr_t> interactables = {};
