@@ -37,7 +37,7 @@ namespace widgets {
     private:
         friend struct access;
         void resolve(resolve_command& command);
-        HOTRELOAD_METHOD void draw(draw_command& command);
+        HOTSWAP_METHOD void draw(draw_command& command);
 
         Color _color = { 0xFF000000 };
         std::optional<runtime_widget> _childWidget = std::nullopt;
@@ -48,7 +48,7 @@ namespace widgets {
         float ff3 = 56.f;
         float ff4 = 56.f;
 
-        HOTRELOAD_CLASS(ColoredBox, ii, ff, ff2, ff3, ff4)
+        HOTSWAP_CLASS(ColoredBox, ii, ff, ff2, ff3, ff4)
     };
 }
 }

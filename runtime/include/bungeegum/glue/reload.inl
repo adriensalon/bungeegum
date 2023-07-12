@@ -37,6 +37,12 @@ namespace detail {
     }
 
     template <typename value_t>
+    reloaded<value_t>::reloaded()
+    {
+        static_assert(traits::is_reloadable_v<value_t>, "ERROR TODO");
+    }
+
+    template <typename value_t>
     reloaded<value_t>::reloaded(const reloaded<value_t>& other)
     {
         _ref.m_Id = other._ref.m_Id;

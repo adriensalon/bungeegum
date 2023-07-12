@@ -3,7 +3,7 @@
 #include <bungeegum/glue/config.hpp>
 #include <bungeegum/glue/toolchain.hpp>
 
-/// @brief Defines if we use hotreload.
+/// @brief Defines if we use reload functionnality.
 #if !defined(BUNGEEGUM_USE_HOTSWAP)
 #define BUNGEEGUM_USE_HOTSWAP (BUNGEEGUM_ENABLE_HOTSWAP && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_LINUX))
 #endif
@@ -13,14 +13,14 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
-
-#include <cereal/access.hpp>
-#include <cereal/archives/json.hpp>
-#include <cereal/cereal.hpp>
+#include <list>
 
 #define HSCPP_CXX_STANDARD 17
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
+#include <cereal/access.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/cereal.hpp>
 
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/foreach.hpp>
@@ -33,9 +33,10 @@ namespace mem {
 }
 }
 
-/// @brief
-/// @details
-#define HOTRELOAD_CLASS(classname, ...)                                                                                                                                                             \
+/// @brief Implements hotswapping functionnality to structs that use this macro among public or
+/// private fields. Variadic parameters are fields of this struct that we want to be serialized
+/// between recompilations.
+#define HOTSWAP_CLASS(classname, ...)                                                                                                                                                               \
     friend class cereal::access;                                                                                                                                                                    \
     friend struct bungeegum::access;                                                                                                                                                                \
     template <typename value_t>                                                                                                                                                                     \
@@ -52,30 +53,34 @@ namespace mem {
         bungeegum::detail::serialize_fields<cereal::JSONOutputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__); \
     }
 
-/// @brief
-/// @details
-#define HOTRELOAD_METHOD hscpp_virtual
+/// @brief Implements hotswapping functionnality to methods of struct that already use the
+/// HOTSWAP_CLASS macro. As these methods need to be virtual to be hotswapped they can not be
+/// templated.
+#define HOTSWAP_METHOD virtual
 
 namespace bungeegum {
 namespace detail {
 
-    /// @brief
-    /// @tparam archive_t
-    /// @tparam ...fields_t
+    /// @brief Serializes with cereal a struct that implements the HOTSWAP_CLASS macro with fields.
+    /// @tparam archive_t is the cereal archive type. This allows us to use the same function for
+    /// both load and save.
+    /// @tparam ...fields_t are the fields types of this struct.
     template <typename archive_t, typename... fields_t>
     void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields);
 
-    /// @brief
-    /// @tparam value_t
+    /// @brief Instances of this struct wrap values so they can be accessed between recompilations
+    /// and method calls can be updated too.
+    /// @details Instances of this struct can be both copied (shallow copy) and moved.
+    /// @tparam value_t is the type to use as value.
     template <typename value_t>
     struct reloaded {
-        reloaded() = delete;
+        reloaded();
         reloaded(const reloaded& other);
         reloaded& operator=(const reloaded& other);
         reloaded(reloaded&& other);
         reloaded& operator=(reloaded&& other);
 
-        /// @brief
+        /// @brief Gets a non-const reference to the underlying value.
         value_t& get() const;
 
     private:
@@ -103,7 +108,8 @@ namespace detail {
         reloader(reloader&& other) = default;
         reloader& operator=(reloader&& other) = default;
 
-        /// @brief
+        /// @brief Creates an instance from a std::wstreambuf and writes an initialization
+        /// message to it.
         reloader(std::wstreambuf* buffer);
 
         /// @brief Allocates a new object that can be hotswapped, taking no argument.
@@ -112,19 +118,19 @@ namespace detail {
         template <typename value_t>
         reloaded<value_t> allocate();
 
-        /// @brief
+        /// @brief Gets a modifiable list of the preprocessor definitions for recompilation.
         std::list<std::string>& defines();
 
-        /// @brief
+        /// @brief Gets a modifiable list of the include directories for recompilation.
         std::list<std::filesystem::path>& include_directories();
 
-        /// @brief
+        /// @brief Gets a modifiable list of the source directories for recompilation.
         std::list<std::filesystem::path>& source_directories();
 
-        /// @brief
+        /// @brief Gets a modifiable list of the force compiled source files for recompilation.
         std::list<std::filesystem::path>& force_compiled_source_files();
 
-        /// @brief
+        /// @brief Gets a modifiable list of the libraries for recompilation.
         std::list<std::filesystem::path>& libraries();
 
         /// @brief Gets the amount of memory blocks currently allocated.
@@ -134,22 +140,23 @@ namespace detail {
         void force_update();
 
         /// @brief Asynchronously waits for changes in the provided files and folders, triggers
-        /// recompilation when needed and hotswaps allocated objects.
-        /// @param buffer is a wide std::streambuf to be filled with what would go to std::wcout
-        /// othewrise
+        /// recompilation when needed and hotswaps allocated objects. It takes a std::wstreambuf
+        /// to be filled with what would go to std::wcout otherwise.
         reload_state update(std::wstreambuf* buffer);
 
     private:
-        std::list<std::string> _defines = {};
-        std::list<std::filesystem::path> _include_directories = {};
-        std::list<std::filesystem::path> _source_directories = {};
-        std::list<std::filesystem::path> _force_compiled_source_files = {};
-        std::list<std::filesystem::path> _libraries = {};
+        std::pair<std::size_t, std::list<std::string>> _defines = { false, {} };
+        std::pair<std::size_t, std::list<std::filesystem::path>> _include_directories = { false, {} };
+        std::pair<std::size_t, std::list<std::filesystem::path>> _source_directories = { false, {} };
+        std::pair<std::size_t, std::list<std::filesystem::path>> _force_compiled_source_files = { false, {} };
+        std::pair<std::size_t, std::list<std::filesystem::path>> _libraries = { false, {} };
         std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
     };
 
-    /// @brief
+    /// @brief Instances of this struct represent a cereal JSON input archive to load data agter
+    /// recompilation.
+    /// @details Instances of this struct can only be moved.
     struct reloaded_loader {
         reloaded_loader() = delete;
         reloaded_loader(const reloaded_loader& other) = delete;
@@ -157,11 +164,11 @@ namespace detail {
         reloaded_loader(reloaded_loader&& other) = default;
         reloaded_loader& operator=(reloaded_loader&& other) = default;
 
-        /// @brief
+        /// @brief Creates an instance of this struct from a file path.
         reloaded_loader(const std::filesystem::path& archive_path);
 
-        /// @brief
-        /// @tparam reloaded_value_t
+        /// @brief Loads a a reloaded values.
+        /// @tparam reloaded_value_t must be reloaded<value_t> (WEIRD HSCPP BUG WITH TEMPLATE TEMPLATE)
         template <typename reloaded_value_t>
         void load(reloaded_value_t& value);
 
@@ -170,7 +177,9 @@ namespace detail {
         cereal::JSONInputArchive _archive;
     };
 
-    /// @brief
+    /// @brief Instances of this struct represent a cereal JSON output archive to save data after
+    /// recompilation.
+    /// @details Instances of this struct can only be moved.
     struct reloaded_saver {
         reloaded_saver() = delete;
         reloaded_saver(const reloaded_saver& other) = delete;
@@ -178,11 +187,11 @@ namespace detail {
         reloaded_saver(reloaded_saver&& other) = default;
         reloaded_saver& operator=(reloaded_saver&& other) = default;
 
-        /// @brief
+        /// @brief Creates an instance of this struct from a file path.
         reloaded_saver(const std::filesystem::path& archive_path);
 
-        /// @brief
-        /// @tparam reloaded_value_t
+        /// @brief Saves a a reloaded values.
+        /// @tparam reloaded_value_t must be reloaded<value_t> (WEIRD HSCPP BUG WITH TEMPLATE TEMPLATE)
         template <typename reloaded_value_t>
         void save(reloaded_value_t& value);
 
@@ -195,12 +204,10 @@ namespace detail {
 
 #else
 
-/// @brief
-/// @details
+/// @brief Does nothing as hotswap is unused. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
 #define HOTRELOAD_CLASS(classname, ...)
 
-/// @brief
-/// @details
+/// @brief Does nothing as hotswap is unused. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
 #define HOTRELOAD_METHOD
 
 #endif
@@ -222,6 +229,7 @@ namespace detail {
         template <typename value_t>
         constexpr bool has_save_function_v = detail::is_detected_exact_v<void, detected_save_function, value_t>;
 
+        /// @brief True if value_t uses the HOTSWAP_CLASS macro.
         template <typename value_t>
         constexpr bool is_reloadable_v = (has_load_function_v<value_t> && has_save_function_v<value_t>);
 
@@ -247,13 +255,11 @@ namespace detail {
         using type = reloaded<value_t>;
     };
 
-    /// @brief
-    /// @tparam value_t
+    /// @brief Equals to reloaded<value_t> if value_t is reloadable, and to value_t otherwise.
     template <typename value_t>
     using value_type_t = typename value_type<value_t>::type;
 
-    /// @brief
-    /// @tparam value_t
+    /// @brief Equals to reloaded<value_t> if value_t is reloadable, and to value_t& otherwise.
     template <typename value_t>
     using reference_type_t = typename reference_type<value_t>::type;
 }

@@ -46,9 +46,9 @@ struct multiDelegateTest {
 
 struct Composed {
 
-    HOTRELOAD_CLASS(Composed)
+    HOTSWAP_CLASS(Composed)
 
-    HOTRELOAD_METHOD Composed& build()
+    HOTSWAP_METHOD Composed& build()
     {
         bungeegum::adopt(this, _box.get());
         bungeegum::widget_reference<ColoredBox> _box3 = std::move(_box2);
@@ -63,7 +63,7 @@ struct Composed {
     //     bungeegum::adopt(_box, _box2.get().color(0xFF8899AA));
     // }
 
-    HOTRELOAD_METHOD void draw(bungeegum::draw_command& command)
+    HOTSWAP_METHOD void draw(bungeegum::draw_command& command)
     {
         // bungeegum::float2 _min_point = bungeegum::float2 { 500.f, 500.f };
         // bungeegum::float2 _max_point = _min_point + bungeegum::float2 { 500.f, 500.f };
