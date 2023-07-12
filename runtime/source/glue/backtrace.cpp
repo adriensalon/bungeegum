@@ -1,4 +1,5 @@
 #include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/console.hpp>
 
 #if BUNGEEGUM_USE_BACKTRACE
 #include <backward.hpp>
@@ -29,13 +30,19 @@ namespace detail {
 
     backtraced_exception::backtraced_exception(const std::string& what, const std::size_t tracing_size)
     {
+        _what = widen(what);
+        emplace_traces(tracing, tracing_size);
+    }
+
+    backtraced_exception::backtraced_exception(const std::wstring& what, const std::size_t tracing_size)
+    {
         _what = what;
         emplace_traces(tracing, tracing_size);
     }
 
     backtraced_exception::backtraced_exception(const std::exception& existing, const std::size_t tracing_size)
     {
-        _what = std::string(existing.what());
+        _what = widen(existing.what());
         emplace_traces(tracing, tracing_size);
     }
 
@@ -51,9 +58,9 @@ namespace detail {
         return *this;
     }
 
-    const char* backtraced_exception::what() const
+    std::wstring backtraced_exception::wide_what() const
     {
-        return _what.c_str();
+        return _what;
     }
 }
 }

@@ -11,23 +11,46 @@
 namespace bungeegum {
 namespace detail {
 
+    namespace {
+
+        void log_error_to_console(backtraced_exception&& exception)
+        {
+            console_log("Fatal error ", console_color::yellow);
+            console_log(L"[" + exception.wide_what() + L"]", console_color::default);
+            console_log(" occured outside userspace with trace : \n", console_color::yellow);
+            for (const backtraced_result& _result : exception.tracing) {
+                std::string _trace_location = "[" + _result.primary.file.generic_string();
+                _trace_location += ", Ln " + std::to_string(_result.primary.line);
+                _trace_location += ", Col " + std::to_string(_result.primary.column) + "]";
+                console_log(_trace_location, console_color::default);
+                console_log(_result.primary.function + "\n", console_color::default);
+            }
+        }
+
+    }
+
     void logs_manager::protect_library(const std::function<void()>& try_callback)
     {
-        // try_catch_nullptr(
-        //     [&]() {
         try {
             try_callback();
-            // } catch (library_bad_implementation_exception& _exception) {
-            //     // std::cout << "BAD IMPL 2 \n";
-            //     // bad implementation exception (traced)
-            //     for (auto& _trace : _exception.tracing)
-            //         console_log(_trace.primary.function, console_color::green);
-            // } catch (const std::exception& _exception) {
-            //     // std::cout << "UNKNOWN 2\n";
-            //     // std::cout << _exception.what() << std::endl;
-            //     (void)_exception;
-            // bad implementation exception (non traced)
+
+        } catch (detail::backtraced_exception&& _exception) {
+            log_error_to_console(std::move(_exception));
+
+        } catch (const char* _what) {
+            log_error_to_console(detail::backtraced_exception(std::string(_what)));
+
+        } catch (const std::string& _what) {
+            log_error_to_console(detail::backtraced_exception(_what));
+
+        } catch (const std::wstring& _what) {
+            log_error_to_console(detail::backtraced_exception(_what));
+
+        } catch (std::exception& _exception) {
+            log_error_to_console(detail::backtraced_exception(_exception.what()));
+
         } catch (...) {
+            log_error_to_console(detail::backtraced_exception("Unknown exception occured."));
         }
     }
 
@@ -39,14 +62,17 @@ namespace detail {
         } catch (detail::backtraced_exception&& _exception) {
             detail::global_manager::logs().userspace_errors.push_back(std::move(_exception));
 
-        } catch (std::exception& _exception) {
-            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(_exception.what()));
+        } catch (const char* _what) {
+            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(std::string(_what)));
 
         } catch (const std::string& _what) {
             detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(_what));
 
-        } catch (const char* _what) {
-            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(std::string(_what)));
+        } catch (const std::wstring& _what) {
+            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(_what));
+
+        } catch (std::exception& _exception) {
+            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(_exception.what()));
 
         } catch (...) {
             detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception("Unknown exception occured."));
