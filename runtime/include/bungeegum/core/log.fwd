@@ -22,8 +22,8 @@ namespace detail {
         void protect_userspace(const std::function<void()>& try_callback);
 
         std::vector<backtraced_exception> userspace_errors = {};
-        std::vector<std::string> userspace_warnings = {};
-        std::vector<std::string> userspace_messages = {};
+        std::vector<backtraced_exception> userspace_warnings = {};
+        std::vector<backtraced_exception> userspace_messages = {};
     };
 }
 }

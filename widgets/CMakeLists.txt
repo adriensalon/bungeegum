@@ -40,4 +40,4 @@ else()
 	target_compile_options(bungeegum_widgets PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
-target_link_libraries(bungeegum_widgets bungeegum)
+target_link_libraries(bungeegum_widgets bungeegum_runtime)

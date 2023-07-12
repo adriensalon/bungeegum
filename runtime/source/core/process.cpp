@@ -1,7 +1,4 @@
 #include <execution>
-#include <iostream>
-
-#include <SDL.h>
 
 #include <bungeegum/backend/backend.fwd>
 #include <bungeegum/core/animation.hpp>

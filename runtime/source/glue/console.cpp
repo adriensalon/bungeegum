@@ -53,29 +53,5 @@ namespace detail {
         else if constexpr (is_platform_linux || is_platform_macos)
             std::cout << "\033[0m";
     }
-
-    std::vector<console_command> console_args(int argc, char* argv[])
-    {
-        auto _result = std::vector<console_command>();
-        auto _raw_options = std::vector<std::string>(argv + 1, argv + argc);
-        if constexpr (is_platform_emscripten) {
-            // todo
-        } else {
-            for (auto& raw_option : _raw_options) {
-                if (!raw_option.empty()) {
-                    if (raw_option[0] != '-') {
-                        if (_result.empty())
-                            return {};
-                        _result.back().args.emplace_back(raw_option);
-                    } else {
-                        console_command cmd;
-                        cmd.name = raw_option;
-                        _result.emplace_back(cmd);
-                    }
-                }
-            }
-        }
-        return _result;
-    }
 }
 }
