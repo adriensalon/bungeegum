@@ -6,7 +6,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/imguarded.fwd>
 

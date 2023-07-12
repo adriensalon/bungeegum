@@ -19,8 +19,8 @@
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/draw.hpp>
 #include <bungeegum/core/event.hpp>
-#include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/interact.hpp>
+#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/property.hpp>
 #include <bungeegum/core/resolve.hpp>
 #include <bungeegum/core/runtime.hpp>

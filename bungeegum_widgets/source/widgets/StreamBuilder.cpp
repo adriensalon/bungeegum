@@ -24,7 +24,7 @@ namespace widgets {
         _customBuffer = StreamBuilderBuffer(stream, buffer_size);
         _customBuffer.value().flushCallback = [this](const std::string& buffer) {
             if (!_flushCallback) {
-                throw_error("Error in StreamBuilder.cpp : _flushCallback is nullptr");
+                log_error("Error in StreamBuilder.cpp : _flushCallback is nullptr");
             }
             if (_childWidget.has_value())
                 abandon(this, _childWidget.value());
@@ -92,7 +92,7 @@ namespace widgets {
     {
         if (_sink.get() && character != traits_type::eof()) {
             if (!std::less_equal<char_type*>()(pptr(), epptr())) {
-                throw_error("Error in StreamBuilder.cpp : StreamBuilderBuffer overflow");
+                log_error("Error in StreamBuilder.cpp : StreamBuilderBuffer overflow");
             }
             *pptr() = static_cast<char_type>(character);
             pbump(1);
@@ -129,7 +129,7 @@ namespace widgets {
         _customBuffer = WideStreamBuilderBuffer(stream, buffer_size);
         _customBuffer.value().flushCallback = [this](const std::wstring& buffer) {
             if (!_flushCallback) {
-                throw_error("Error in StreamBuilder.cpp : _flushCallback is nullptr");
+                log_error("Error in StreamBuilder.cpp : _flushCallback is nullptr");
             }
             if (_childWidget.has_value())
                 abandon(this, _childWidget.value());
@@ -197,7 +197,7 @@ namespace widgets {
     {
         if (_sink.get() && character != traits_type::eof()) {
             if (!std::less_equal<char_type*>()(pptr(), epptr())) {
-                throw_error("Error in StreamBuilder.cpp : WideStreamBuilderBuffer overflow");
+                log_error("Error in StreamBuilder.cpp : WideStreamBuilderBuffer overflow");
             }
             *pptr() = static_cast<char_type>(character);
             pbump(1);

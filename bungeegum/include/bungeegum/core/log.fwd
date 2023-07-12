@@ -1,0 +1,29 @@
+#pragma once
+
+#include <functional>
+#include <optional>
+#include <string>
+#include <vector>
+
+#include <bungeegum/glue/backtrace.hpp>
+
+namespace bungeegum {
+namespace detail {
+
+    struct logs_manager {
+        logs_manager() = default;
+        logs_manager(const logs_manager& other) = delete;
+        logs_manager& operator=(const logs_manager& other) = delete;
+        logs_manager(logs_manager&& other) = delete;
+        logs_manager& operator=(logs_manager&& other) = delete;
+
+        void protect_library(const std::function<void()>& try_callback);
+
+        void protect_userspace(const std::function<void()>& try_callback);
+
+        std::vector<backtraced_exception> userspace_errors = {};
+        std::vector<std::string> userspace_warnings = {};
+        std::vector<std::string> userspace_messages = {};
+    };
+}
+}

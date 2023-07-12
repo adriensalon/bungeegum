@@ -4,6 +4,7 @@
 #include <bungeegum/core/animation.fwd>
 #include <bungeegum/core/event.fwd>
 #include <bungeegum/core/global.fwd>
+#include <bungeegum/core/log.fwd>
 #include <bungeegum/core/process.fwd>
 #include <bungeegum/core/widget.fwd>
 
@@ -16,6 +17,7 @@ namespace detail {
         events_manager events = {};
         widgets_manager widgets = {};
         process_manager process = {};
+        logs_manager logs = {};
         // embedded_manager embedded = {};
         standalone_manager standalone = {};
     };
@@ -45,6 +47,11 @@ namespace detail {
     process_manager& global_manager::process()
     {
         return _managers.process;
+    }
+
+    logs_manager& global_manager::logs()
+    {
+        return _managers.logs;
     }
 
     //     embedded_manager& global_manager::embedded()

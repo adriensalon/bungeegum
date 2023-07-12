@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/process.fwd>
 

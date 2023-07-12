@@ -6,10 +6,10 @@ namespace widgets {
     void CustomSingleChildLayout::resolve(resolve_command& command)
     {
         if (!_delegate.untyped.has_value()) {
-            throw_error("Error");
+            log_error("Error");
         }
         if (!_childWidget.has_value()) {
-            throw_error("Error");
+            log_error("Error");
         }
         BoxConstraints _constraints(command);
         Size _size = _delegate.getSize(_constraints);

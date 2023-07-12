@@ -1,4 +1,4 @@
-#include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/resolve.hpp>
 #include <bungeegum/core/runtime.hpp>
 #include <bungeegum/core/widget.hpp>
@@ -26,7 +26,7 @@ float2 resolve_command::resolve_child(const runtime_widget& child_widget, const 
     _child_resolve_command._data.constraint.min_size = min_size;
     _child_resolve_command._data.constraint.max_size = max_size;
     detail::widget_update_data& _child_untyped_widget = detail::global_manager::widgets()[child_widget];
-    detail::protect_userspace([&_child_untyped_widget, &_child_resolve_command]() {
+    detail::global_manager::logs().protect_userspace([&_child_untyped_widget, &_child_resolve_command]() {
         _child_untyped_widget.resolver(_child_resolve_command);
     });
     return _child_resolve_command._data.resolved_size;

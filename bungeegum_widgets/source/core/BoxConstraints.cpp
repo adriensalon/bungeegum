@@ -134,10 +134,10 @@ namespace widgets {
         float1 _width = size.width();
         float1 _height = size.height();
         if (_width <= 0.f) {
-            throw_error("Error TODO");
+            log_error("Error TODO");
         }
         if (_height <= 0.f) {
-            throw_error("Error TODO");
+            log_error("Error TODO");
         }
         float1 _aspectRatio = _width / _height;
         if (_width > _maxSize.x) {

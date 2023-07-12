@@ -6,8 +6,8 @@
 #include <bungeegum/backend/backend.fwd>
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/event.hpp>
-#include <bungeegum/core/exceptions.fwd>
 #include <bungeegum/core/global.fwd>
+#include <bungeegum/core/log.fwd>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/process.fwd>
 #include <bungeegum/core/widget.hpp>
@@ -23,7 +23,7 @@ namespace detail {
             if (_widget_data.interactor_command.has_value()) {                                                             \
                 _widget_data.interactor_command.value()._data.is_blocked = false;                                          \
                 _widget_data.interactor_command.value()._data.command_data = _event;                                       \
-                protect_userspace([&_widget_data]() {                                                                      \
+                global_manager::logs().protect_userspace([&_widget_data]() {                                               \
                     _widget_data.interactor(_widget_data.interactor_command.value());                                      \
                 });                                                                                                        \
                 bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                                \
@@ -64,7 +64,7 @@ namespace detail {
                         _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
                         _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
                     }
-                    protect_userspace([&_widget_data]() {
+                    global_manager::logs().protect_userspace([&_widget_data]() {
                         _widget_data.resolver(_widget_data.resolver_command);
                     });
                 });
@@ -101,7 +101,7 @@ namespace detail {
                             _widget_drawer_command._data.resolved_size = _widget_resolver_command._data.resolved_size;
                             _widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
                             _widget_drawer_command._data.commands.clear();
-                            protect_userspace([&_widget_data, &_widget_drawer_command]() {
+                            global_manager::logs().protect_userspace([&_widget_data, &_widget_drawer_command]() {
                                 _widget_data.drawer(_widget_drawer_command);
                             });
                             _widget_drawer_command._data.draw(imgui_drawlist);
@@ -131,7 +131,8 @@ namespace detail {
 
         // context::_process_interact();
         _process_resolve();
-        return (has_userspace_thrown() || !global_manager::widgets().drawables.empty());
+        // return (has_userspace_thrown() || !global_manager::widgets().drawables.empty());
+        return !global_manager::widgets().drawables.empty();
         // return true;
     }
 

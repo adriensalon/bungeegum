@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/core/exceptions.hpp>
+#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/runtime.hpp>
 #include <bungeegum/core/widget.hpp>
 
@@ -166,7 +166,7 @@ runtime_widget get_parent(const runtime_widget& widget)
 {
     detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
     if (!_update_data.parent.has_value()) {
-        throw_error("Error TODO");
+        log_error("Error TODO");
     }
     detail::widget_update_data& _parent_update_data = _update_data.parent.value();
     runtime_widget _parent_widget = detail::global_manager::widgets().create_runtime_widget(_parent_update_data);
@@ -189,7 +189,7 @@ interact_command& get_interact_command(const runtime_widget& widget)
 {
     detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
     if (!_update_data.interactor_command.has_value()) {
-        throw_error("Error TODO");
+        log_error("Error TODO");
     }
     return _update_data.interactor_command.value();
 }
@@ -204,7 +204,7 @@ draw_command& get_draw_command(const runtime_widget& widget)
 {
     detail::widget_update_data& _update_data = detail::global_manager::widgets()[widget];
     if (!_update_data.drawer_command.has_value()) {
-        throw_error("Error TODO");
+        log_error("Error TODO");
     }
     return _update_data.drawer_command.value();
 }

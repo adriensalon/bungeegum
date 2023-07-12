@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bungeegum/backend/standalone.hpp>
-#include <bungeegum/core/exceptions.hpp>
 #include <bungeegum/core/global.fwd>
+#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/process.fwd>
 #include <bungeegum/core/runtime.hpp>
@@ -54,7 +54,7 @@ float2 standalone_app::viewport()
 
 void launch(const runtime_widget& widget)
 {
-    detail::protect_library([&]() {
+    detail::global_manager::logs().protect_library([&]() {
         detail::global_manager::widgets().root() = detail::global_manager::widgets().raw(widget);
         detail::stopwatch _stopwatch;
         detail::window _window;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bungeegum/backend/backend.fwd>
-#include <bungeegum/core/exceptions.fwd>
 #include <bungeegum/core/global.fwd>
+#include <bungeegum/core/log.fwd>
 
 namespace bungeegum {
 

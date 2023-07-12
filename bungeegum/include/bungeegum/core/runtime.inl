@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bungeegum/backend/backend.fwd>
-#include <bungeegum/core/exceptions.fwd>
 #include <bungeegum/core/global.fwd>
+#include <bungeegum/core/log.hpp>
 
 namespace bungeegum {
 
@@ -11,7 +11,7 @@ runtime_widget::runtime_widget(widget_t* widget)
 {
     std::uintptr_t _raw_widget = detail::global_manager::widgets().raw<widget_t>(*widget);
     if (!detail::global_manager::widgets().contains(_raw_widget)) {
-        //throw
+        log_error("Errorlol");
     }
     _data.raw_widget = _raw_widget;
 }
