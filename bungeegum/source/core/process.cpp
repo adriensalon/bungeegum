@@ -3,7 +3,7 @@
 
 #include <SDL.h>
 
-#include <bungeegum/backend/common.fwd>
+#include <bungeegum/backend/backend.fwd>
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/exceptions.fwd>

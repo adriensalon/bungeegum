@@ -34,7 +34,8 @@ set(bungeegum_source
 	"source/core/overlay/compressed/inter_extrabold.cpp"
 	"source/core/overlay/compressed/inter_regular.cpp"
 
-	"source/backend/common.cpp"
+	"source/backend/backend.cpp"
+	"source/backend/embedded.cpp"
 	"source/backend/standalone.cpp"
 )
 

@@ -9,40 +9,50 @@
 #include <bungeegum/glue/renderer.hpp>
 #include <bungeegum/glue/time.hpp>
 
+#if BUNGEEGUM_USE_STANDALONE
+
 namespace bungeegum {
 namespace detail {
 
-    void update_desired_data(window& current_window)
+    void standalone_manager::app_color(const float4 rgba_color)
     {
-        if (detail::is_desired_app_color_changed) {
-            // todo bizarre
-            detail::is_desired_app_color_changed = false;
+        _app_color = rgba_color;
+    }
+
+    void standalone_manager::app_title(const std::string& description)
+    {
+        _app_title = description;
+    }
+
+    void standalone_manager::update(window& current_window)
+    {
+        if (_app_color.has_value()) {
+            // todo in window ?
+            _app_color = std::nullopt;
         }
-        if (detail::is_desired_app_title_changed) {
-            current_window.set_title(desired_app_title);
-            detail::is_desired_app_title_changed = false;
+        if (_app_title.has_value()) {
+            current_window.set_title(_app_title.value());
+            _app_title = std::nullopt;
         }
     }
 }
 
-void bungeegum_app::color(const float4 rgba)
+void standalone_app::color(const float4 rgba)
 {
-    detail::is_desired_app_color_changed = true;
-    detail::desired_app_color = rgba;
+    detail::global_manager::standalone().app_color(rgba);
 }
 
-void bungeegum_app::title(const std::string& description)
+void standalone_app::title(const std::string& description)
 {
-    detail::is_desired_app_title_changed = true;
-    detail::desired_app_title = description;
+    detail::global_manager::standalone().app_title(description);
 }
 
-float2 bungeegum_app::viewport()
+float2 standalone_app::viewport()
 {
     return detail::global_manager::backend().viewport_size;
 }
 
-void launch(const runtime_widget& widget, const std::function<void()>& on_renderer_started)
+void launch(const runtime_widget& widget)
 {
     detail::protect_library([&]() {
         detail::global_manager::widgets().root() = detail::global_manager::widgets().raw(widget);
@@ -76,8 +86,6 @@ void launch(const runtime_widget& widget, const std::function<void()>& on_render
         detail::setup_overlay();
 #endif
 
-        if (on_renderer_started)
-            on_renderer_started();
         _renderer.rebuild_fonts();
 
         //
@@ -105,7 +113,7 @@ void launch(const runtime_widget& widget, const std::function<void()>& on_render
         //
 
         _window.on_update([&_window, &_renderer, &_stopwatch]() {
-            detail::update_desired_data(_window);
+            detail::global_manager::standalone().update(_window);
             detail::global_manager::backend().viewport_size = _window.get_size();
             // std::cout << "OK viewport size = " << detail::viewport_size.x << ", " << detail::viewport_size.y << std::endl;
 
@@ -136,3 +144,5 @@ void launch(const runtime_widget& widget, const std::function<void()>& on_render
     });
 }
 }
+
+#endif

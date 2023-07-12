@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/backend/common.fwd>
+#include <bungeegum/backend/backend.fwd>
 
 namespace bungeegum {
 

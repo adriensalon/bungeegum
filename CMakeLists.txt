@@ -3,7 +3,7 @@ project(bungeegum_all)
 
 option(BUNGEEGUM_BUILD_WIDGETS "Build widgets library" ON)
 option(BUNGEEGUM_BUILD_DEMO "Build demo executable" ON)
-option(BUNGEEGUM_BUILD_DOC "Build doxygen documentation" OFF)
+option(BUNGEEGUM_BUILD_DOC "Build doxygen documentation" ON)
 option(BUNGEEGUM_BUILD_TEST "Build gtest executable" OFF)
 
 add_subdirectory("external")

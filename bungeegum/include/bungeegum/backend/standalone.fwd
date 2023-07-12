@@ -1,9 +1,11 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 
-#include <bungeegum/backend/common.fwd>
+#include <bungeegum/backend/backend.fwd>
 #include <bungeegum/glue/config.hpp>
+#include <bungeegum/glue/window.hpp>
 
 #if !defined(BUNGEEGUM_USE_STANDALONE)
 #define BUNGEEGUM_USE_STANDALONE BUNGEEGUM_ENABLE_STANDALONE
@@ -13,7 +15,7 @@ namespace bungeegum {
 
 struct runtime_widget;
 
-namespace details {
+namespace detail {
 
     struct standalone_manager {
         standalone_manager() = default;
@@ -22,12 +24,17 @@ namespace details {
         standalone_manager(standalone_manager&& other) = delete;
         standalone_manager& operator=(standalone_manager&& other) = delete;
 
-// #if BUNGEEGUM_USE_STANDALONE
-        bool is_desired_app_color_changed = false;
-        float4 desired_app_color = { 1.f, 1.f, 1.f, 1.f };
-        bool is_desired_app_title_changed = false;
-        std::string desired_app_title = "Bungeegum App";		
-// #endif
+#if BUNGEEGUM_USE_STANDALONE
+        void app_color(const float4 rgba_color);
+
+        void app_title(const std::string& description);
+
+        void update(window& current_window);
+
+    private:
+        std::optional<float4> _app_color = std::nullopt;
+        std::optional<std::string> _app_title = std::nullopt;
+#endif
     };
 }
 }

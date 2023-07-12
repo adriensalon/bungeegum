@@ -7,12 +7,12 @@
 namespace bungeegum {
 
 /// @brief
-struct bungeegum_app {
-    bungeegum_app() = delete;
-    bungeegum_app(const bungeegum_app& other) = delete;
-    bungeegum_app& operator=(const bungeegum_app& other) = delete;
-    bungeegum_app(bungeegum_app&& other) = delete;
-    bungeegum_app& operator=(bungeegum_app&& other) = delete;
+struct standalone_app {
+    standalone_app() = delete;
+    standalone_app(const standalone_app& other) = delete;
+    standalone_app& operator=(const standalone_app& other) = delete;
+    standalone_app(standalone_app&& other) = delete;
+    standalone_app& operator=(standalone_app&& other) = delete;
 
     /// @brief
     static void color(const float4 rgba);
@@ -25,9 +25,7 @@ struct bungeegum_app {
 };
 
 /// @brief Starts an infinite loop
-void launch(const runtime_widget& widget, const std::function<void()>& on_renderer_started = nullptr);
+void launch(const runtime_widget& widget);
 }
-
-#include <bungeegum/backend/standalone.inl>
 
 #endif

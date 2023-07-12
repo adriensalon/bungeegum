@@ -26,6 +26,6 @@
 #include <bungeegum/core/runtime.hpp>
 #include <bungeegum/core/widget.hpp>
 
-#include <bungeegum/backend/common.hpp>
+#include <bungeegum/backend/backend.hpp>
 #include <bungeegum/backend/embedded.hpp>
 #include <bungeegum/backend/standalone.hpp>

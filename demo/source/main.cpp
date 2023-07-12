@@ -194,12 +194,7 @@ int main()
                                              ))
 
         //   )
-        ,
-        [&]() {
-            // bungeegum::must_resolve();
-            // bungeegum::must_draw();
-            // rendre officiel j'imagine
-        });
+    );
 
     return 0;
 }

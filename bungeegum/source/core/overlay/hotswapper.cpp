@@ -3,7 +3,7 @@
 #include <implot.h>
 #include <iostream>
 
-#include <bungeegum/backend/common.fwd>
+#include <bungeegum/backend/backend.fwd>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/glue/imguarded.fwd>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/backend/common.fwd>
+#include <bungeegum/backend/backend.fwd>
 #include <bungeegum/core/exceptions.fwd>
 #include <bungeegum/core/global.fwd>
 

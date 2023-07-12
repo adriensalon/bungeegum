@@ -1,4 +1,4 @@
-#include <bungeegum/backend/common.fwd>
+#include <bungeegum/backend/backend.fwd>
 #include <bungeegum/backend/embedded.fwd>
 #include <bungeegum/backend/standalone.fwd>
 #include <bungeegum/core/animation.fwd>
@@ -17,7 +17,7 @@ namespace detail {
         widgets_manager widgets = {};
         process_manager process = {};
         // embedded_manager embedded = {};
-        // standalone_manager standalone = {};
+        standalone_manager standalone = {};
     };
 
     static all_managers _managers = {};
@@ -52,9 +52,9 @@ namespace detail {
     //         return _managers.embedded;
     //     }
 
-    // standalone_manager& global_manager::standalone()
-    // {
-    //     return _managers.standalone;
-    // }
+    standalone_manager& global_manager::standalone()
+    {
+        return _managers.standalone;
+    }
 }
 }

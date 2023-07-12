@@ -12,6 +12,12 @@ namespace bungeegum {
 namespace detail {
 
     struct backend_manager {
+        backend_manager() = default;
+        backend_manager(const backend_manager& other) = delete;
+        backend_manager& operator=(const backend_manager& other) = delete;
+        backend_manager(backend_manager&& other) = delete;
+        backend_manager& operator=(backend_manager&& other) = delete;
+
         uint2 viewport_size = zero<float2>;
 
 #if BUNGEEGUM_USE_HOTRELOAD
