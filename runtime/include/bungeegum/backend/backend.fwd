@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <list>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -20,13 +21,11 @@ namespace detail {
 
         uint2 viewport_size = zero<float2>;
 
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
+        void setup_if_required();
+
         std::unique_ptr<reloader> reload_manager = nullptr;
-        std::list<std::string> reload_defines = {};
-        std::list<std::filesystem::path> reload_include_directories = {};
-        std::list<std::filesystem::path> reload_libraries = {};
-        std::list<std::filesystem::path> reload_source_directories = {};
-        std::list<std::filesystem::path> reload_force_compiled_source_files = {};
+        std::wstring reload_initialization_message = {};
 #endif
     };
 }

@@ -61,8 +61,8 @@ namespace detail {
         void update(const std::chrono::milliseconds& delta_time);
 
     private:
-        std::unordered_map<std::uintptr_t, animation_update_data> _tickables = {};
-        std::vector<std::uintptr_t> _tickables_to_erase = {};
+        std::unordered_map<std::uintptr_t, animation_update_data> _updatables = {};
+        std::vector<std::uintptr_t> _updatables_to_erase = {};
     };
 }
 }

@@ -1,45 +1,51 @@
+#include <sstream>
+
 #include <bungeegum/backend/backend.hpp>
 #include <bungeegum/core/global.fwd>
 
 namespace bungeegum {
+namespace detail {
 
-std::list<std::string>& hotreload_defines()
-{
-    if (!detail::global_manager::backend().reload_manager) {
-        detail::global_manager::backend().reload_manager = std::make_unique<detail::reloader>();
+    void backend_manager::setup_if_required()
+    {
+        if (!reload_manager) {
+            std::wstringstream _create_reload_manager_message;
+            reload_manager = std::make_unique<detail::reloader>(_create_reload_manager_message.rdbuf());
+            reload_initialization_message = _create_reload_manager_message.str();
+        }
     }
-    return detail::global_manager::backend().reload_defines;
 }
 
-std::list<std::filesystem::path>& hotreload_include_directories()
-{
-    if (!detail::global_manager::backend().reload_manager) {
-        detail::global_manager::backend().reload_manager = std::make_unique<detail::reloader>();
-    }
-    return detail::global_manager::backend().reload_include_directories;
-}
+namespace hotswap {
 
-std::list<std::filesystem::path>& hotreload_libraries()
-{
-    if (!detail::global_manager::backend().reload_manager) {
-        detail::global_manager::backend().reload_manager = std::make_unique<detail::reloader>();
+    std::list<std::string>& defines()
+    {
+        detail::global_manager::backend().setup_if_required();
+        return detail::global_manager::backend().reload_manager->defines();
     }
-    return detail::global_manager::backend().reload_libraries;
-}
 
-std::list<std::filesystem::path>& hotreload_source_directories()
-{
-    if (!detail::global_manager::backend().reload_manager) {
-        detail::global_manager::backend().reload_manager = std::make_unique<detail::reloader>();
+    std::list<std::filesystem::path>& include_directories()
+    {
+        detail::global_manager::backend().setup_if_required();
+        return detail::global_manager::backend().reload_manager->include_directories();
     }
-    return detail::global_manager::backend().reload_source_directories;
-}
 
-std::list<std::filesystem::path>& hotreload_force_compiled_source_files()
-{
-    if (!detail::global_manager::backend().reload_manager) {
-        detail::global_manager::backend().reload_manager = std::make_unique<detail::reloader>();
+    std::list<std::filesystem::path>& libraries()
+    {
+        detail::global_manager::backend().setup_if_required();
+        return detail::global_manager::backend().reload_manager->libraries();
     }
-    return detail::global_manager::backend().reload_force_compiled_source_files;
+
+    std::list<std::filesystem::path>& source_directories()
+    {
+        detail::global_manager::backend().setup_if_required();
+        return detail::global_manager::backend().reload_manager->source_directories();
+    }
+
+    std::list<std::filesystem::path>& force_compiled_source_files()
+    {
+        detail::global_manager::backend().setup_if_required();
+        return detail::global_manager::backend().reload_manager->force_compiled_source_files();
+    }
 }
 }

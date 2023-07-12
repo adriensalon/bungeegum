@@ -61,25 +61,8 @@ void launch(const runtime_widget& widget)
         detail::global_manager::backend().viewport_size = _window.get_size();
         detail::renderer _renderer(_window);
 
-#if BUNGEEGUM_USE_HOTRELOAD
-        if (!detail::global_manager::backend().reload_manager) {
-            detail::global_manager::backend().reload_manager = std::make_unique<detail::reloader>();
-        }
-        for (const std::string& _define : detail::global_manager::backend().reload_defines) {
-            detail::global_manager::backend().reload_manager->add_define(_define);
-        }
-        for (const std::filesystem::path& _include_directory : detail::global_manager::backend().reload_include_directories) {
-            detail::global_manager::backend().reload_manager->add_include_directory(_include_directory);
-        }
-        for (const std::filesystem::path& _library : detail::global_manager::backend().reload_libraries) {
-            detail::global_manager::backend().reload_manager->add_library(_library);
-        }
-        for (const std::filesystem::path& _source_directory : detail::global_manager::backend().reload_source_directories) {
-            detail::global_manager::backend().reload_manager->add_source_directory(_source_directory);
-        }
-        for (const std::filesystem::path& _force_compiled_source_file : detail::global_manager::backend().reload_force_compiled_source_files) {
-            detail::global_manager::backend().reload_manager->add_force_compiled_source_file(_force_compiled_source_file);
-        }
+#if BUNGEEGUM_USE_HOTSWAP
+        detail::global_manager::backend().setup_if_required();
 #endif
 
 #if BUNGEEGUM_USE_OVERLAY
@@ -129,9 +112,10 @@ void launch(const runtime_widget& widget)
                 _renderer.present();
             }
 
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
             // FAIRE PAREIL AVANT / APRES FORCE UPDATE
-            detail::reload_state _reload_result = detail::global_manager::backend().reload_manager->update();
+            std::wstringstream _sstream;
+            detail::reload_state _reload_result = detail::global_manager::backend().reload_manager->update(_sstream.rdbuf());
             if (_reload_result == detail::reload_state::started_compiling) {
                 detail::global_manager::widgets().save_widgets("C:/Users/adri/desktop/ok.json");
             } else if (_reload_result == detail::reload_state::performed_swap) {

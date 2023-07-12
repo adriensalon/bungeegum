@@ -3,24 +3,21 @@
 #include <bungeegum/backend/backend.fwd>
 
 namespace bungeegum {
+namespace hotswap {
 
-/// @brief
-/// @return
-std::list<std::string>& hotreload_defines();
+    /// @brief
+    std::list<std::string>& defines();
 
-/// @brief
-/// @return
-std::list<std::filesystem::path>& hotreload_include_directories();
+    /// @brief
+    std::list<std::filesystem::path>& include_directories();
 
-/// @brief
-/// @return
-std::list<std::filesystem::path>& hotreload_libraries();
+    /// @brief
+    std::list<std::filesystem::path>& libraries();
 
-/// @brief
-/// @return
-std::list<std::filesystem::path>& hotreload_source_directories();
+    /// @brief
+    std::list<std::filesystem::path>& source_directories();
 
-/// @brief
-/// @return
-std::list<std::filesystem::path>& hotreload_force_compiled_source_files();
+    /// @brief
+    std::list<std::filesystem::path>& force_compiled_source_files();
+}
 }

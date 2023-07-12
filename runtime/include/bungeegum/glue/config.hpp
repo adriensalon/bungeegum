@@ -17,8 +17,8 @@
 #endif
 
 // hotreload
-#if !defined(BUNGEEGUM_ENABLE_HOTRELOAD)
-#define BUNGEEGUM_ENABLE_HOTRELOAD 1
+#if !defined(BUNGEEGUM_ENABLE_HOTSWAP)
+#define BUNGEEGUM_ENABLE_HOTSWAP 1
 #endif
 
 // backend

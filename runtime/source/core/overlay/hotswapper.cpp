@@ -12,6 +12,7 @@ namespace detail {
 
     void draw_hotswapper_overlay()
     {
+#if BUNGEEGUM_USE_HOTSWAP
         ImGui::SetNextWindowSize({ 300.f, 450.f }, ImGuiCond_Once);
         if (ImGui::Begin("hotswapper##__bungeegum_window_hotswapper_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
 
@@ -21,6 +22,7 @@ namespace detail {
             }
         }
         ImGui::End();
+#endif
     }
 }
 }

@@ -4,11 +4,11 @@
 #include <bungeegum/glue/toolchain.hpp>
 
 /// @brief Defines if we use hotreload.
-#if !defined(BUNGEEGUM_USE_HOTRELOAD)
-#define BUNGEEGUM_USE_HOTRELOAD (BUNGEEGUM_ENABLE_HOTRELOAD && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_LINUX))
+#if !defined(BUNGEEGUM_USE_HOTSWAP)
+#define BUNGEEGUM_USE_HOTSWAP (BUNGEEGUM_ENABLE_HOTSWAP && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_LINUX))
 #endif
 
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
 
 #include <cstddef>
 #include <filesystem>
@@ -97,11 +97,14 @@ namespace detail {
     /// compilation and manage the files and directories to provide to the compiler.
     /// @details Instances of this struct can only be moved.
     struct reloader {
-        reloader();
+        reloader() = delete;
         reloader(const reloader& other) = delete;
         reloader& operator=(const reloader& other) = delete;
         reloader(reloader&& other) = default;
         reloader& operator=(reloader&& other) = default;
+
+        /// @brief
+        reloader(std::wstreambuf* buffer);
 
         /// @brief Allocates a new object that can be hotswapped, taking no argument.
         /// @exception Throws a compile-time exception if the widget type is not default-
@@ -109,35 +112,39 @@ namespace detail {
         template <typename value_t>
         reloaded<value_t> allocate();
 
-        /// @brief Gets the amount of memory blocks currently allocated.
-        std::size_t allocated_blocks_count();
+        /// @brief
+        std::list<std::string>& defines();
 
         /// @brief
-        void add_define(const std::string& define);
+        std::list<std::filesystem::path>& include_directories();
 
-        /// @brief Emplaces an include directory for recompilation.
-        void add_include_directory(const std::filesystem::path& directory);
+        /// @brief
+        std::list<std::filesystem::path>& source_directories();
 
-        /// @brief Emplaces a static library for recompilation.
-        void add_library(const std::filesystem::path& file);
+        /// @brief
+        std::list<std::filesystem::path>& force_compiled_source_files();
 
-        /// @brief Emplaces a source directory for recompilation.
-        void add_source_directory(const std::filesystem::path& directory);
+        /// @brief
+        std::list<std::filesystem::path>& libraries();
 
-        /// @brief Emplaces a source file that will be recompiled each time.
-        void add_force_compiled_source_file(const std::filesystem::path& file);
-
-        /// @brief Clears all files and directories provided for recompilation.
-        void clear();
+        /// @brief Gets the amount of memory blocks currently allocated.
+        std::size_t allocated_blocks_count();
 
         /// @brief Forces an update, blocking the thread until recompilation has finished.
         void force_update();
 
         /// @brief Asynchronously waits for changes in the provided files and folders, triggers
         /// recompilation when needed and hotswaps allocated objects.
-        reload_state update();
+        /// @param buffer is a wide std::streambuf to be filled with what would go to std::wcout
+        /// othewrise
+        reload_state update(std::wstreambuf* buffer);
 
     private:
+        std::list<std::string> _defines = {};
+        std::list<std::filesystem::path> _include_directories = {};
+        std::list<std::filesystem::path> _source_directories = {};
+        std::list<std::filesystem::path> _force_compiled_source_files = {};
+        std::list<std::filesystem::path> _libraries = {};
         std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
     };

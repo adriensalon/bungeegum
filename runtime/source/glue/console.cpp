@@ -1,4 +1,6 @@
 #include <iostream>
+#include <locale>
+#include <vector>
 
 #include <bungeegum/glue/console.hpp>
 #include <bungeegum/glue/toolchain.hpp>
@@ -9,6 +11,33 @@
 
 namespace bungeegum {
 namespace detail {
+
+    std::wstring widen(const std::string& str)
+    {
+        std::vector<wchar_t> _buffer(str.size());
+        std::use_facet<std::ctype<wchar_t>>(std::locale()).widen(str.data(), str.data() + str.size(), _buffer.data());
+        return std::wstring(_buffer.data(), _buffer.size());
+    }
+
+    console_redirect::console_redirect(std::streambuf* buffer)
+        : _captured_cout(std::cout.rdbuf(buffer))
+    {
+    }
+
+    console_redirect::~console_redirect()
+    {
+        std::cout.rdbuf(_captured_cout);
+    }
+
+    console_redirect_wide::console_redirect_wide(std::wstreambuf* buffer)
+        : _captured_wcout(std::wcout.rdbuf(buffer))
+    {
+    }
+
+    console_redirect_wide::~console_redirect_wide()
+    {
+        std::wcout.rdbuf(_captured_wcout);
+    }
 
     void console_log(const std::string& message, const console_color color)
     {

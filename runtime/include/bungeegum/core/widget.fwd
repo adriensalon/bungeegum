@@ -63,9 +63,11 @@ namespace detail {
         std::optional<draw_command> drawer_command = std::nullopt;
         std::function<void(draw_command&)> drawer = nullptr;
 
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
         std::function<void(reloaded_loader&)> loader = nullptr;
+        std::unordered_map<std::uintptr_t, std::function<void(reloaded_loader&)>> property_loaders = {};
         std::function<void(reloaded_saver&)> saver = nullptr;
+        std::unordered_map<std::uintptr_t, std::function<void(reloaded_saver&)>> property_savers = {};
 #endif
     };
 
@@ -94,6 +96,7 @@ namespace detail {
                 if (_widget_data.loader) {
                     _widget_data.loader(_archiver);
                 }
+                // load properties
                 return true;
             });
         }
