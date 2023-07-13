@@ -3,6 +3,15 @@
 namespace bungeegum {
 namespace widgets {
 
+    ColoredBox& ColoredBox::child(const runtime_widget& value)
+    {
+        if (_childWidget.has_value())
+            abandon(this, _childWidget.value());
+        _childWidget = value;
+        adopt(this, _childWidget.value());
+        return *this;
+    }
+
     ColoredBox& ColoredBox::color(const Color value)
     {
         _color = value;
@@ -11,6 +20,14 @@ namespace widgets {
 
     void ColoredBox::resolve(resolve_command& command)
     {
+        // std::cout << bungeegum::detail::animations_manager::stat_test++ << std::endl;
+        // std::cout << bungeegum::detail::global().animations.stat_test++ << std::endl;
+
+        // auto gg = bungeegum::runtime_widget(this);
+        // (void)gg;
+        // std::cout << "has parent = " << std::to_string(bungeegum::has_parent(this)) << std::endl;
+        // std::cout << "ok n";
+
         if (_childWidget.has_value()) {
             float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
             command.position_child(_childWidget.value(), zero<float2>);

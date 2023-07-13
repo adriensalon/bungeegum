@@ -134,6 +134,11 @@ namespace detail {
         // load widgets
     }
 
+    void reloader::set_global_data(void* data_ptr)
+    {
+        _swapper->SetGlobalUserData(data_ptr);
+    }
+
     reloaded_loader::reloaded_loader(const std::filesystem::path& archive_path)
         : _fstream(archive_path)
         , _archive(_fstream)

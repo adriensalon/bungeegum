@@ -73,8 +73,8 @@ struct Composed {
         _box2.get().color(0xFF8899AA);
 
         // bungeegum::log_error("lolol");
-        volatile int* pInt = 0x00000000;
-        *pInt = 20;
+        // volatile int* pInt = 0x00000000;
+        // *pInt = 20;
         // throw "lolol";
 
         // float& okok = bungeegum::make_property<float>(this);
@@ -90,6 +90,9 @@ struct Composed {
 int main()
 {
 
+#if BUNGEEGUM_USE_HOTSWAP
+    bungeegum::detail::setup_global();
+#endif
     constexpr auto ii = bungeegum::is_finite<bungeegum::float2>({ 44.f, 0.f });
     std::wostringstream _osstream2;
 

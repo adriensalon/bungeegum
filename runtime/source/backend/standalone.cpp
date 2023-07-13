@@ -35,6 +35,30 @@ namespace detail {
             _app_title = std::nullopt;
         }
     }
+
+    void save_widgets(const std::filesystem::path& archive_path)
+    {
+        reloaded_saver _archiver(archive_path);
+        widget_update_data& _root_update_data = global().widgets.root_update_data();
+        global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
+            if (_update_data.saver) {
+                _update_data.saver(_archiver);
+            }
+            return true;
+        });
+    }
+
+    void load_widgets(const std::filesystem::path& archive_path)
+    {
+        reloaded_loader _archiver(archive_path);
+        widget_update_data& _root_update_data = global().widgets.root_update_data();
+        global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
+            if (_update_data.loader) {
+                _update_data.loader(_archiver);
+            }
+            return true;
+        });
+    }
 }
 
 #endif
@@ -42,21 +66,21 @@ namespace detail {
 void standalone_app::color(const float4 rgba)
 {
 #if BUNGEEGUM_USE_STANDALONE
-    detail::global_manager::standalone().app_color(rgba);
+    detail::global().standalone.app_color(rgba);
 #endif
 }
 
 void standalone_app::title(const std::string& description)
 {
 #if BUNGEEGUM_USE_STANDALONE
-    detail::global_manager::standalone().app_title(description);
+    detail::global().standalone.app_title(description);
 #endif
 }
 
 float2 standalone_app::viewport()
 {
 #if BUNGEEGUM_USE_STANDALONE
-    return detail::global_manager::backend().viewport_size;
+    return detail::global().backend.viewport_size;
 #else
     return float2 {};
 #endif
@@ -66,15 +90,20 @@ float2 standalone_app::viewport()
 
 void launch(const runtime_widget& widget)
 {
-    detail::global_manager::logs().protect_library([&]() {
-        detail::global_manager::widgets().root() = detail::global_manager::widgets().raw(widget);
+
+    // #if BUNGEEGUM_USE_HOTSWAP
+    //     detail::setup_global_manager();
+    // #endif
+
+    detail::global().logs.protect_library([&]() {
+        detail::global().widgets.root() = detail::global().widgets.raw(widget);
         detail::stopwatch _stopwatch;
         detail::window _window;
-        detail::global_manager::backend().viewport_size = _window.get_size();
+        detail::global().backend.viewport_size = _window.get_size();
         detail::renderer _renderer(_window);
 
 #if BUNGEEGUM_USE_HOTSWAP
-        detail::global_manager::backend().setup_if_required();
+        detail::global().backend.setup_if_required();
 #endif
 
 #if BUNGEEGUM_USE_OVERLAY
@@ -86,19 +115,19 @@ void launch(const runtime_widget& widget)
         //
         // web events
         _window.on_mouse_down([](const detail::mouse_down_event& event) {
-            detail::global_manager::process().mouse_down_events.push_back(event);
+            detail::global().process.mouse_down_events.push_back(event);
         });
         _window.on_mouse_moved([](const detail::mouse_moved_event& event) {
-            detail::global_manager::process().mouse_moved_events.push_back(event);
+            detail::global().process.mouse_moved_events.push_back(event);
         });
         _window.on_mouse_pressed([](const detail::mouse_pressed_event& event) {
-            detail::global_manager::process().mouse_pressed_events.push_back(event);
+            detail::global().process.mouse_pressed_events.push_back(event);
         });
         _window.on_mouse_up([](const detail::mouse_up_event& event) {
-            detail::global_manager::process().mouse_up_events.push_back(event);
+            detail::global().process.mouse_up_events.push_back(event);
         });
         _window.on_window_resized([&_renderer](const detail::window_resized_event& event) {
-            detail::global_manager::process().window_resized_events.push_back(event);
+            detail::global().process.window_resized_events.push_back(event);
             _renderer.process_window_resized_event(event);
         });
         _window.on_sdl_event([&_renderer](const SDL_Event* event) { // TOUJOURS CA MAIS FAUT REMOVE IMGUI PR CLEAN
@@ -108,8 +137,8 @@ void launch(const runtime_widget& widget)
         //
 
         _window.on_update([&_window, &_renderer, &_stopwatch]() {
-            detail::global_manager::standalone().update(_window);
-            detail::global_manager::backend().viewport_size = _window.get_size();
+            detail::global().standalone.update(_window);
+            detail::global().backend.viewport_size = _window.get_size();
             // std::cout << "OK viewport size = " << detail::viewport_size.x << ", " << detail::viewport_size.y << std::endl;
 
             std::chrono::microseconds _max_fps_period_microseconds = std::chrono::microseconds(static_cast<unsigned int>(std::floorf(1000000.f / 60.f /* MAX FPS !!!*/)));
@@ -117,21 +146,21 @@ void launch(const runtime_widget& widget)
             std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
             bool _has_polled = _window.poll();
             (void)_has_polled;
-            bool _has_ticked = detail::global_manager::process().update(_delta_milliseconds);
+            bool _has_ticked = detail::global().process.update(_delta_milliseconds);
             if (_has_ticked) {
                 _renderer.new_frame();
-                detail::global_manager::process().render();
+                detail::global().process.render();
                 _renderer.present();
             }
 
 #if BUNGEEGUM_USE_HOTSWAP
             // FAIRE PAREIL AVANT / APRES FORCE UPDATE
             std::wstringstream _sstream;
-            detail::reload_state _reload_result = detail::global_manager::backend().reload_manager->update(_sstream.rdbuf());
+            detail::reload_state _reload_result = detail::global().backend.reload_manager->update(_sstream.rdbuf());
             if (_reload_result == detail::reload_state::started_compiling) {
-                detail::global_manager::widgets().save_widgets("C:/Users/adri/desktop/ok.json");
+                detail::save_widgets("C:/Users/adri/desktop/ok.json");
             } else if (_reload_result == detail::reload_state::performed_swap) {
-                detail::global_manager::widgets().load_widgets("C:/Users/adri/desktop/ok.json");
+                detail::load_widgets("C:/Users/adri/desktop/ok.json");
             }
 #endif
         });

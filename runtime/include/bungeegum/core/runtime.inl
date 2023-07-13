@@ -9,9 +9,9 @@ namespace bungeegum {
 template <typename widget_t>
 runtime_widget::runtime_widget(widget_t* widget)
 {
-    std::uintptr_t _raw_widget = detail::global_manager::widgets().raw<widget_t>(*widget);
-    if (!detail::global_manager::widgets().contains(_raw_widget)) {
-        log_error("Errorlol");
+    std::uintptr_t _raw_widget = detail::global().widgets.raw<widget_t>(*widget);
+    if (!detail::global().widgets.contains(_raw_widget)) {
+        throw detail::backtraced_exception("Errorlol");
     }
     _data.raw_widget = _raw_widget;
 }
@@ -19,8 +19,8 @@ runtime_widget::runtime_widget(widget_t* widget)
 template <typename widget_t>
 runtime_widget::runtime_widget(widget_t& widget)
 {
-    std::uintptr_t _raw_widget = detail::global_manager::widgets().raw<widget_t>(widget);
-    if (!detail::global_manager::widgets().contains(_raw_widget)) {
+    std::uintptr_t _raw_widget = detail::global().widgets.raw<widget_t>(widget);
+    if (!detail::global().widgets.contains(_raw_widget)) {
         //throw
     }
     _data.raw_widget = _raw_widget;
@@ -29,8 +29,8 @@ runtime_widget::runtime_widget(widget_t& widget)
 template <typename widget_t>
 runtime_widget::runtime_widget(widget_reference<widget_t>& widget)
 {
-    std::uintptr_t _raw_widget = detail::global_manager::widgets().raw<widget_t>(widget.get());
-    if (!detail::global_manager::widgets().contains(_raw_widget)) {
+    std::uintptr_t _raw_widget = detail::global().widgets.raw<widget_t>(widget.get());
+    if (!detail::global().widgets.contains(_raw_widget)) {
         //throw
     }
     _data.raw_widget = _raw_widget;

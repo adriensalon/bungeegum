@@ -3,7 +3,7 @@
 #include <array>
 #include <chrono>
 
-#include <bungeegum/core/event.hpp>
+#include <bungeegum/core/event.fwd>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/curve.hpp>
 

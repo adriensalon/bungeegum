@@ -159,7 +159,7 @@ void log_error(const std::wstring& what)
 void log_warning(const std::string& what)
 {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global_manager::logs().userspace_warnings.push_back(detail::backtraced_exception(what, 1u));
+    detail::global().logs.userspace_warnings.push_back(detail::backtraced_exception(what, 1u));
 #else
     detail::console_log_warning(detail::backtraced_exception(what, 1u));
 #endif
@@ -168,7 +168,7 @@ void log_warning(const std::string& what)
 void log_warning(const std::wstring& what)
 {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global_manager::logs().userspace_warnings.push_back(detail::backtraced_exception(what, 1u));
+    detail::global().logs.userspace_warnings.push_back(detail::backtraced_exception(what, 1u));
 #else
     detail::console_log_warning(detail::backtraced_exception(what, 1u));
 #endif
@@ -177,7 +177,7 @@ void log_warning(const std::wstring& what)
 void log_message(const std::string& what)
 {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global_manager::logs().userspace_messages.push_back(detail::backtraced_exception(what, 1u));
+    detail::global().logs.userspace_messages.push_back(detail::backtraced_exception(what, 1u));
 #else
     detail::console_log_message(detail::backtraced_exception(what, 1u));
 #endif
@@ -186,7 +186,7 @@ void log_message(const std::string& what)
 void log_message(const std::wstring& what)
 {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global_manager::logs().userspace_messages.push_back(detail::backtraced_exception(what, 1u));
+    detail::global().logs.userspace_messages.push_back(detail::backtraced_exception(what, 1u));
 #else
     detail::console_log_message(detail::backtraced_exception(what, 1u));
 #endif

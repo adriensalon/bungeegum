@@ -5,7 +5,7 @@
 #include <typeindex>
 
 #include <bungeegum/core/draw.hpp>
-#include <bungeegum/core/global.fwd>
+// #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/interact.hpp>
 #include <bungeegum/core/resolve.hpp>
 #include <bungeegum/glue/detection.hpp>
@@ -88,18 +88,19 @@ namespace detail {
 
         runtime_widget create_runtime_widget(widget_update_data& widget_data);
 
-        inline void load_widgets(const std::filesystem::path& archive_path) // IF COMPILED CAUSES WEIRD HSCPP BUG
-        {
-            reloaded_loader _archiver(archive_path);
-            widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
-            global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
-                if (_widget_data.loader) {
-                    _widget_data.loader(_archiver);
-                }
-                // load properties
-                return true;
-            });
-        }
+        // inline void load_widgets(const std::filesystem::path& archive_path) // IF COMPILED CAUSES WEIRD HSCPP BUG
+        // {
+        //     // (void)archive_path;
+        //     reloaded_loader _archiver(archive_path);
+        //     widget_update_data& _root_update_data = global().widgets().root_update_data();
+        //     global().widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
+        //         if (_widget_data.loader) {
+        //             _widget_data.loader(_archiver);
+        //         }
+        //         // load properties
+        //         return true;
+        //     });
+        // }
 
         void notify_erase(const std::uintptr_t raw_widget);
 
@@ -121,17 +122,18 @@ namespace detail {
 
         [[nodiscard]] widget_update_data& root_update_data();
 
-        inline void save_widgets(const std::filesystem::path& archive_path) // IF COMPILED CAUSES WEIRD HSCPP BUG
-        {
-            reloaded_saver _archiver(archive_path);
-            widget_update_data& _root_update_data = global_manager::widgets().root_update_data();
-            global_manager::widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
-                if (_widget_data.saver) {
-                    _widget_data.saver(_archiver);
-                }
-                return true;
-            });
-        }
+        // inline void save_widgets(const std::filesystem::path& archive_path) // IF COMPILED CAUSES WEIRD HSCPP BUG
+        // {
+        //     // (void)archive_path;
+        //     reloaded_saver _archiver(archive_path);
+        //     widget_update_data& _root_update_data = global().widgets().root_update_data();
+        //     global().widgets().traverse(_root_update_data, [this, &_archiver](widget_update_data& _widget_data) {
+        //         if (_widget_data.saver) {
+        //             _widget_data.saver(_archiver);
+        //         }
+        //         return true;
+        //     });
+        // }
 
         void traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback);
 
@@ -148,5 +150,14 @@ namespace detail {
         std::vector<std::uintptr_t> _updatables_to_erase = {};
         std::uintptr_t _root = {};
     };
+
+    // inline void load_widgets(const std::filesystem::path& archive_path)
+    // {
+    //     (void)archive_path;
+    // }
+    // inline void save_widgets(const std::filesystem::path& archive_path)
+    // {
+    //     (void)archive_path;
+    // }
 }
 }

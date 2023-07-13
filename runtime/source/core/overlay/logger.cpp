@@ -48,9 +48,9 @@ namespace detail {
 
     void draw_logger_overlay()
     {
-        transfer_to_map(global_manager::logs().userspace_errors, error_logs);
-        transfer_to_map(global_manager::logs().userspace_warnings, warning_logs);
-        transfer_to_map(global_manager::logs().userspace_messages, message_logs);
+        transfer_to_map(global().logs.userspace_errors, error_logs);
+        transfer_to_map(global().logs.userspace_warnings, warning_logs);
+        transfer_to_map(global().logs.userspace_messages, message_logs);
 
         ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
         if (ImGui::Begin("logger##__bungeegum_window_logger_title__", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_Modal)) {

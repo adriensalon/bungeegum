@@ -25,8 +25,8 @@ float2 resolve_command::resolve_child(const runtime_widget& child_widget, const 
     resolve_command& _child_resolve_command = get_resolve_command(child_widget);
     _child_resolve_command._data.constraint.min_size = min_size;
     _child_resolve_command._data.constraint.max_size = max_size;
-    detail::widget_update_data& _child_untyped_widget = detail::global_manager::widgets()[child_widget];
-    detail::global_manager::logs().protect_userspace([&_child_untyped_widget, &_child_resolve_command]() {
+    detail::widget_update_data& _child_untyped_widget = detail::global().widgets[child_widget];
+    detail::global().logs.protect_userspace([&_child_untyped_widget, &_child_resolve_command]() {
         _child_untyped_widget.resolver(_child_resolve_command);
     });
     return _child_resolve_command._data.resolved_size;
@@ -40,13 +40,13 @@ void resolve_command::position_child(const runtime_widget& child_widget, const f
 
 void must_resolve()
 {
-    const std::uintptr_t _root = detail::global_manager::widgets().root();
-    detail::global_manager::widgets().resolvables.push_back(_root);
+    const std::uintptr_t _root = detail::global().widgets.root();
+    detail::global().widgets.resolvables.push_back(_root);
 }
 
 void must_resolve(const runtime_widget& widget)
 {
-    const std::uintptr_t _relative_root = detail::global_manager::widgets().raw(widget);
-    detail::global_manager::widgets().resolvables.push_back(_relative_root);
+    const std::uintptr_t _relative_root = detail::global().widgets.raw(widget);
+    detail::global().widgets.resolvables.push_back(_relative_root);
 }
 }

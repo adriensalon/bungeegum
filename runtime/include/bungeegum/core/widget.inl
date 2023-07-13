@@ -30,6 +30,30 @@ namespace detail {
         static_assert(traits::is_reloadable_v<widget_t>, "TODO");
         widget._bungeegum_object_reference = raw_widget;
     }
+
+    // inline void save_widgets(const std::filesystem::path& archive_path)
+    // {
+    //     reloaded_saver _archiver(archive_path);
+    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
+    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
+    //         if (_update_data.saver) {
+    //             _update_data.saver(_archiver);
+    //         }
+    //         return true;
+    //     });
+    // }
+
+    // inline void load_widgets(const std::filesystem::path& archive_path)
+    // {
+    //     reloaded_loader _archiver(archive_path);
+    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
+    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
+    //         if (_update_data.loader) {
+    //             _update_data.loader(_archiver);
+    //         }
+    //         return true;
+    //     });
+    // }
 }
 
 struct access {
@@ -38,8 +62,8 @@ struct access {
     constexpr static void detect_on_draw(widget_reference<widget_t>& widget)
     {
         if constexpr (detail::traits::has_draw_function_v<widget_t>) {
-            const std::uintptr_t _raw_widget = detail::global_manager::widgets().raw(widget.get());
-            detail::widget_update_data& _widget_data = detail::global_manager::widgets()[_raw_widget];
+            const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
+            detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
             _widget_data.drawer_command = draw_command();
             _widget_data.drawer = [widget](draw_command& command) {
                 widget->draw(command);
@@ -51,8 +75,8 @@ struct access {
     constexpr static void detect_on_interact(widget_reference<widget_t>& widget)
     {
         if constexpr (detail::traits::has_interact_function_v<widget_t>) {
-            const std::uintptr_t _raw_widget = detail::global_manager::widgets().raw(widget.get());
-            detail::widget_update_data& _widget_data = detail::global_manager::widgets()[_raw_widget];
+            const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
+            detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
             _widget_data.interactor_command = interact_command();
             _widget_data.interactor = [widget](interact_command& command) {
                 widget->interact(command);
@@ -63,8 +87,8 @@ struct access {
     template <typename widget_t>
     constexpr static void detect_on_resolve(widget_reference<widget_t>& widget)
     {
-        const std::uintptr_t _raw_widget = detail::global_manager::widgets().raw(widget.get());
-        detail::widget_update_data& _widget_data = detail::global_manager::widgets()[_raw_widget];
+        const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
+        detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
         if constexpr (detail::traits::has_resolve_function_v<widget_t>) {
             _widget_data.resolver = [widget](resolve_command& command) {
                 widget_t& okok = widget.get();
@@ -77,7 +101,7 @@ struct access {
                 } else {
                     float2 _max_size = zero<float2>;
                     for (detail::widget_update_data& _child_widget_data : _widget_data.children) {
-                        runtime_widget _child_widget = detail::global_manager::widgets().create_runtime_widget(_child_widget_data);
+                        runtime_widget _child_widget = detail::global().widgets.create_runtime_widget(_child_widget_data);
                         float2 _child_size = command.resolve_child(_child_widget, command.min_size(), command.max_size());
                         _max_size = glm::max(_max_size, _child_size);
                         command.position_child(_child_widget, zero<float2>);
@@ -91,8 +115,8 @@ struct access {
     template <typename widget_t>
     constexpr static void detect_on_load(widget_reference<widget_t>& widget)
     {
-        const std::uintptr_t _raw_widget = detail::global_manager::widgets().raw(widget.get());
-        detail::widget_update_data& _widget_data = detail::global_manager::widgets()[_raw_widget];
+        const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
+        detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
         if constexpr (detail::traits::has_load_function_v<widget_t>) {
             _widget_data.loader = [widget](detail::reloaded_loader& archiver) {
                 archiver.load(widget);
@@ -103,8 +127,8 @@ struct access {
     template <typename widget_t>
     constexpr static void detect_on_save(widget_reference<widget_t>& widget)
     {
-        const std::uintptr_t _raw_widget = detail::global_manager::widgets().raw(widget.get());
-        detail::widget_update_data& _widget_data = detail::global_manager::widgets()[_raw_widget];
+        const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
+        detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
         if constexpr (detail::traits::has_save_function_v<widget_t>) {
             _widget_data.saver = [widget](detail::reloaded_saver& archiver) {
                 archiver.save(widget);
@@ -138,23 +162,23 @@ widget_reference<widget_t>::widget_reference(detail::value_type_t<widget_t>& ref
 template <typename widget_t>
 widget_reference<widget_t> make_reference()
 {
-    detail::registry_entity _entity = detail::global_manager::widgets().widgets.create_entity();
+    detail::registry_entity _entity = detail::global().widgets.widgets.create_entity();
 
     std::uintptr_t _raw_widget;
     detail::value_type_t<widget_t>* _widget_ptr;
     if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-        _widget_ptr = &(detail::global_manager::widgets().widgets.create_component<detail::value_type_t<widget_t>>(
+        _widget_ptr = &(detail::global().widgets.widgets.create_component<detail::value_type_t<widget_t>>(
             _entity,
-            detail::global_manager::backend().reload_manager->allocate<widget_t>()));
+            detail::global().backend.reload_manager->allocate<widget_t>()));
         _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
-        detail::global_manager::widgets().set_reloadable_raw<widget_t>(_widget_ptr->get(), _raw_widget);
+        detail::global().widgets.set_reloadable_raw<widget_t>(_widget_ptr->get(), _raw_widget);
     } else {
-        _widget_ptr = &(detail::global_manager::widgets().widgets.create_component<detail::value_type_t<widget_t>>(_entity));
-        _raw_widget = detail::global_manager::widgets().raw<widget_t>(*_widget_ptr);
+        _widget_ptr = &(detail::global().widgets.widgets.create_component<detail::value_type_t<widget_t>>(_entity));
+        _raw_widget = detail::global().widgets.raw<widget_t>(*_widget_ptr);
     }
-    widget_reference<widget_t> _reference = detail::global_manager::widgets().create_reference_widget<widget_t>(*_widget_ptr);
+    widget_reference<widget_t> _reference = detail::global().widgets.create_reference_widget<widget_t>(*_widget_ptr);
 
-    detail::widget_update_data& _update_data = detail::global_manager::widgets()[_raw_widget];
+    detail::widget_update_data& _update_data = detail::global().widgets[_raw_widget];
     _update_data.entity = _entity;
     _update_data.raw_widget = _raw_widget;
     _update_data.kind = std::make_unique<std::type_index>(typeid(widget_t));

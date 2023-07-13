@@ -88,6 +88,12 @@ namespace detail {
         return _manager.get()->operator->()->Allocate<value_t>();
     }
 
+    template <typename value_t>
+    value_t& get_global_data()
+    {
+        return *(hscpp::GlobalUserData::GetAs<value_t>());
+    }
+
     template <typename reloaded_value_t>
     struct value_wrapper {
         value_wrapper(reloaded_value_t& value)

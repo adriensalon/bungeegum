@@ -20,32 +20,32 @@ namespace hotswap {
 
     std::list<std::string>& defines()
     {
-        detail::global_manager::backend().setup_if_required();
-        return detail::global_manager::backend().reload_manager->defines();
+        detail::global().backend.setup_if_required();
+        return detail::global().backend.reload_manager->defines();
     }
 
     std::list<std::filesystem::path>& include_directories()
     {
-        detail::global_manager::backend().setup_if_required();
-        return detail::global_manager::backend().reload_manager->include_directories();
+        detail::global().backend.setup_if_required();
+        return detail::global().backend.reload_manager->include_directories();
     }
 
     std::list<std::filesystem::path>& libraries()
     {
-        detail::global_manager::backend().setup_if_required();
-        return detail::global_manager::backend().reload_manager->libraries();
+        detail::global().backend.setup_if_required();
+        return detail::global().backend.reload_manager->libraries();
     }
 
     std::list<std::filesystem::path>& source_directories()
     {
-        detail::global_manager::backend().setup_if_required();
-        return detail::global_manager::backend().reload_manager->source_directories();
+        detail::global().backend.setup_if_required();
+        return detail::global().backend.reload_manager->source_directories();
     }
 
     std::list<std::filesystem::path>& force_compiled_source_files()
     {
-        detail::global_manager::backend().setup_if_required();
-        return detail::global_manager::backend().reload_manager->force_compiled_source_files();
+        detail::global().backend.setup_if_required();
+        return detail::global().backend.reload_manager->force_compiled_source_files();
     }
 }
 }

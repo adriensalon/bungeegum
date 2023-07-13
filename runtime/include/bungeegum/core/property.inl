@@ -36,16 +36,16 @@ property_reference<property_t>::property_reference(detail::value_type_t<property
 template <typename property_t>
 property_reference<property_t> make_property_reference(const runtime_widget& widget)
 {
-    detail::registry_entity _entity = detail::global_manager::widgets()[widget].entity;
+    detail::registry_entity _entity = detail::global().widgets[widget].entity;
     detail::value_type_t<property_t>* _widget_ptr;
     if constexpr (detail::traits::is_reloadable_v<property_t>) {
-        _widget_ptr = &(detail::global_manager::widgets().widgets.create_component<detail::value_type_t<property_t>>(
+        _widget_ptr = &(detail::global().widgets.widgets.create_component<detail::value_type_t<property_t>>(
             _entity,
-            detail::global_manager::backend().reload_manager->allocate<property_t>()));
+            detail::global().backend().reload_manager->allocate<property_t>()));
     } else {
-        _widget_ptr = &(detail::global_manager::widgets().widgets.create_component<detail::value_type_t<property_t>>(_entity));
+        _widget_ptr = &(detail::global().widgets.widgets.create_component<detail::value_type_t<property_t>>(_entity));
     }
-    property_reference<property_t> _reference = detail::global_manager::widgets().create_property_reference<property_t>(*_widget_ptr);
+    property_reference<property_t> _reference = detail::global().widgets.create_property_reference<property_t>(*_widget_ptr);
     return _reference;
 }
 

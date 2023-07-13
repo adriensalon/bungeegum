@@ -21,22 +21,24 @@ namespace widgets {
         }
 
         /// @brief The widget below this widget in the tree.
-        template <typename childWidget_t>
-        ColoredBox& child(childWidget_t& value)
-        {
-            if (_childWidget.has_value())
-                abandon(this, _childWidget.value());
-            _childWidget = runtime_widget(value);
-            adopt(this, _childWidget.value());
-            return *this;
-        }
+        // template <typename childWidget_t>
+        // ColoredBox& child(childWidget_t& value)
+        // {
+        //     if (_childWidget.has_value())
+        //         abandon(this, _childWidget.value());
+        //     _childWidget = runtime_widget(value);
+        //     adopt(this, _childWidget.value());
+        //     return *this;
+        // }
+
+        ColoredBox& child(const runtime_widget& value);
 
         /// @brief The color to paint the background area with.
         ColoredBox& color(const Color value);
 
     private:
         friend struct access;
-        void resolve(resolve_command& command);
+        HOTSWAP_METHOD void resolve(resolve_command& command);
         HOTSWAP_METHOD void draw(draw_command& command);
 
         Color _color = { 0xFF000000 };
@@ -47,8 +49,9 @@ namespace widgets {
         float ff2 = 56.f;
         float ff3 = 56.f;
         float ff4 = 56.f;
+        float ff44 = 56.f;
 
-        HOTSWAP_CLASS(ColoredBox, ii, ff, ff2, ff3, ff4)
+        HOTSWAP_CLASS(ColoredBox, ii, ff, ff2, ff3, ff4, ff44)
     };
 }
 }

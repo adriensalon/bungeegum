@@ -16,11 +16,11 @@ namespace detail {
         ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
         if (ImGui::Begin("inspector##__bungeegum_window_inspector_title__", 0, ImGuiWindowFlags_NoCollapse)) {
             int _k = 0;
-            for (const auto& _event_data : global_manager::events()) {
+            for (const auto& _event_data : global().events) {
                 (void)_event_data;
                 ImGui::Text("event future....");
             }
-            for (const auto& _animation_data : global_manager::animations()) {
+            for (const auto& _animation_data : global().animations) {
                 // if (_animation_data.is_playing) {
                 std::string _title = "##StatsGraphTitle" + std::to_string(_k);
                 static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;

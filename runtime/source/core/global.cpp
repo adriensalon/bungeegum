@@ -1,67 +1,25 @@
-#include <bungeegum/backend/backend.fwd>
-#include <bungeegum/backend/embedded.fwd>
-#include <bungeegum/backend/standalone.fwd>
-#include <bungeegum/core/animation.fwd>
-#include <bungeegum/core/event.fwd>
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/core/log.fwd>
-#include <bungeegum/core/process.fwd>
-#include <bungeegum/core/widget.fwd>
 
 namespace bungeegum {
 namespace detail {
 
-    struct all_managers {
-        animations_manager animations = {};
-        backend_manager backend = {};
-        events_manager events = {};
-        widgets_manager widgets = {};
-        process_manager process = {};
-        logs_manager logs = {};
-        // embedded_manager embedded = {};
-        standalone_manager standalone = {};
-    };
+    static global_manager __bungeegum_global_manager = {};
 
-    static all_managers _managers = {};
-
-    animations_manager& global_manager::animations()
+    void setup_global()
     {
-        return _managers.animations;
+#if BUNGEEGUM_USE_HOTSWAP
+        __bungeegum_global_manager.backend.setup_if_required();
+        __bungeegum_global_manager.backend.reload_manager->set_global_data(&__bungeegum_global_manager);
+#endif
     }
 
-    backend_manager& global_manager::backend()
-    {
-        return _managers.backend;
-    }
-
-    events_manager& global_manager::events()
-    {
-        return _managers.events;
-    }
-
-    widgets_manager& global_manager::widgets()
-    {
-        return _managers.widgets;
-    }
-
-    process_manager& global_manager::process()
-    {
-        return _managers.process;
-    }
-
-    logs_manager& global_manager::logs()
-    {
-        return _managers.logs;
-    }
-
-    //     embedded_manager& global_manager::embedded()
+    //     global_manager& global()
     //     {
-    //         return _managers.embedded;
+    // #if BUNGEEGUM_USE_HOTSWAP
+    //         return get_global_data<global_manager>();
+    // #else
+    //         return __bungeegum_global_manager;
+    // #endif
     //     }
-
-    standalone_manager& global_manager::standalone()
-    {
-        return _managers.standalone;
-    }
 }
 }

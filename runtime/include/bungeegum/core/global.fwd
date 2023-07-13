@@ -1,33 +1,42 @@
 #pragma once
 
+#include <bungeegum/backend/backend.fwd>
+#include <bungeegum/backend/embedded.fwd>
+#include <bungeegum/backend/standalone.fwd>
+#include <bungeegum/core/animation.fwd>
+#include <bungeegum/core/log.fwd>
+#include <bungeegum/core/process.fwd>
+#include <bungeegum/core/widget.fwd>
+
 namespace bungeegum {
 namespace detail {
 
-    struct animations_manager;
-    struct backend_manager;
-    struct events_manager;
-    struct process_manager;
-    struct logs_manager;
-    // struct embedded_manager;
-    struct standalone_manager;
-    struct widgets_manager;
-
     struct global_manager {
-        global_manager() = delete;
+        global_manager() = default;
         global_manager(const global_manager& other) = delete;
         global_manager& operator=(const global_manager& other) = delete;
         global_manager(global_manager&& other) = delete;
         global_manager& operator=(global_manager&& other) = delete;
 
-        static events_manager& events();
-        static animations_manager& animations();
-        static widgets_manager& widgets();
-        static backend_manager& backend();
-        static process_manager& process();
-        static logs_manager& logs();
-        // static embedded_manager& embedded();
-        static standalone_manager& standalone();
+        backend_manager backend = {};
+        animations_manager animations = {};
+        events_manager events = {};
+        widgets_manager widgets = {};
+        process_manager process = {};
+        logs_manager logs = {};
+        // embedded_manager embedded = {};
+        standalone_manager standalone = {};
     };
 
+    void setup_global();
+
+    // #if BUNGEEGUM_USE_HOTSWAP
+    inline global_manager& global()
+    {
+        return get_global_data<global_manager>();
+    }
+    // #else
+    // global_manager& global();
+    // #endif
 }
 }

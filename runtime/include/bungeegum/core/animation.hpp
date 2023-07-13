@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bungeegum/core/animation.fwd>
+#include <bungeegum/core/event.hpp>
 
 namespace bungeegum {
 

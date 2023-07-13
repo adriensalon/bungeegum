@@ -124,7 +124,7 @@ void draw_command::draw_rect_filled(
 
 void must_draw()
 {
-    const std::uintptr_t _root = detail::global_manager::widgets().root();
-    detail::global_manager::widgets().drawables.push_back(_root);
+    const std::uintptr_t _root = detail::global().widgets.root();
+    detail::global().widgets.drawables.push_back(_root);
 }
 }

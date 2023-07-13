@@ -144,6 +144,9 @@ namespace detail {
         /// to be filled with what would go to std::wcout otherwise.
         reload_state update(std::wstreambuf* buffer);
 
+        /// @brief
+        void set_global_data(void* data_ptr);
+
     private:
         std::pair<std::size_t, std::list<std::string>> _defines = { false, {} };
         std::pair<std::size_t, std::list<std::filesystem::path>> _include_directories = { false, {} };
@@ -153,6 +156,11 @@ namespace detail {
         std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
     };
+
+    /// @brief
+    /// @tparam value_t
+    template <typename value_t>
+    value_t& get_global_data();
 
     /// @brief Instances of this struct represent a cereal JSON input archive to load data agter
     /// recompilation.

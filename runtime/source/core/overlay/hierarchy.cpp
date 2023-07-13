@@ -82,7 +82,7 @@ namespace detail {
                 }
             };
 
-            _tf(global_manager::widgets().root_update_data());
+            _tf(global().widgets.root_update_data());
         }
         ImGui::End();
     }
