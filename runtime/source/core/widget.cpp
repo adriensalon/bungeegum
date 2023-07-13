@@ -86,30 +86,6 @@ namespace detail {
         };
         _iterate(iterate_root);
     }
-
-    // void save_widgets(const std::filesystem::path& archive_path)
-    // {
-    //     reloaded_saver _archiver(archive_path);
-    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
-    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-    //         if (_update_data.saver) {
-    //             _update_data.saver(_archiver);
-    //         }
-    //         return true;
-    //     });
-    // }
-
-    // void load_widgets(const std::filesystem::path& archive_path)
-    // {
-    //     reloaded_loader _archiver(archive_path);
-    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
-    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-    //         if (_update_data.loader) {
-    //             _update_data.loader(_archiver);
-    //         }
-    //         return true;
-    //     });
-    // }
 }
 
 runtime_widget::runtime_widget(const detail::runtime_widget_data& data)

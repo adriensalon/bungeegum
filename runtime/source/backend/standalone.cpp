@@ -36,29 +36,29 @@ namespace detail {
         }
     }
 
-    void save_widgets(const std::filesystem::path& archive_path)
-    {
-        reloaded_saver _archiver(archive_path);
-        widget_update_data& _root_update_data = global().widgets.root_update_data();
-        global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-            if (_update_data.saver) {
-                _update_data.saver(_archiver);
-            }
-            return true;
-        });
-    }
+    // void save_widgets(const std::filesystem::path& archive_path)
+    // {
+    //     reloaded_saver _archiver(archive_path);
+    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
+    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
+    //         if (_update_data.saver) {
+    //             _update_data.saver(_archiver);
+    //         }
+    //         return true;
+    //     });
+    // }
 
-    void load_widgets(const std::filesystem::path& archive_path)
-    {
-        reloaded_loader _archiver(archive_path);
-        widget_update_data& _root_update_data = global().widgets.root_update_data();
-        global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-            if (_update_data.loader) {
-                _update_data.loader(_archiver);
-            }
-            return true;
-        });
-    }
+    // void load_widgets(const std::filesystem::path& archive_path)
+    // {
+    //     reloaded_loader _archiver(archive_path);
+    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
+    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
+    //         if (_update_data.loader) {
+    //             _update_data.loader(_archiver);
+    //         }
+    //         return true;
+    //     });
+    // }
 }
 
 #endif
@@ -161,9 +161,9 @@ void launch(const runtime_widget& widget)
             std::wstringstream _sstream;
             detail::reload_state _reload_result = detail::global().backend.reload_manager->update(_sstream.rdbuf());
             if (_reload_result == detail::reload_state::started_compiling) {
-                detail::save_widgets("C:/Users/adri/desktop/ok.json");
+                detail::global().backend.save_widgets("C:/Users/adri/desktop/ok.json");
             } else if (_reload_result == detail::reload_state::performed_swap) {
-                detail::load_widgets("C:/Users/adri/desktop/ok.json");
+                detail::global().backend.load_widgets("C:/Users/adri/desktop/ok.json");
             }
 #endif
         });

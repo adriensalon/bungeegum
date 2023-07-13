@@ -28,7 +28,7 @@ namespace widgets {
         std::cout << "has parent = " << std::to_string(bungeegum::has_parent(this)) << std::endl;
         // std::cout << "ok n";
 
-        // bungeegum::adopt(this, bungeegum::make<float>());
+        bungeegum::adopt(this, bungeegum::make<float>());
 
         if (_childWidget.has_value()) {
             float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());

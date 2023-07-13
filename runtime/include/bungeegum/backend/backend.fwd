@@ -22,6 +22,10 @@ namespace detail {
 #if BUNGEEGUM_USE_HOTSWAP
         void setup_if_required();
 
+        void save_widgets(const std::filesystem::path& archive_path);
+
+        void load_widgets(const std::filesystem::path& archive_path);
+
         std::unique_ptr<reloader> reload_manager = nullptr;
         std::wstring reload_initialization_message = {};
 #endif

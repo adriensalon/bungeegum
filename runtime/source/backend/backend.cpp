@@ -6,6 +6,7 @@
 namespace bungeegum {
 namespace detail {
 
+#if BUNGEEGUM_USE_STANDALONE
     void backend_manager::setup_if_required()
     {
         if (!reload_manager) {
@@ -14,6 +15,31 @@ namespace detail {
             reload_initialization_message = _create_reload_manager_message.str();
         }
     }
+
+    void backend_manager::save_widgets(const std::filesystem::path& archive_path)
+    {
+        reloaded_saver _archiver(archive_path);
+        widget_update_data& _root_update_data = global().widgets.root_update_data();
+        global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
+            if (_update_data.saver) {
+                _update_data.saver(_archiver);
+            }
+            return true;
+        });
+    }
+
+    void backend_manager::load_widgets(const std::filesystem::path& archive_path)
+    {
+        reloaded_loader _archiver(archive_path);
+        widget_update_data& _root_update_data = global().widgets.root_update_data();
+        global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
+            if (_update_data.loader) {
+                _update_data.loader(_archiver);
+            }
+            return true;
+        });
+    }
+#endif
 }
 
 namespace hotswap {

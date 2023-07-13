@@ -30,30 +30,6 @@ namespace detail {
         static_assert(traits::is_reloadable_v<widget_t>, "TODO");
         widget._bungeegum_object_reference = raw_widget;
     }
-
-    // inline void save_widgets(const std::filesystem::path& archive_path)
-    // {
-    //     reloaded_saver _archiver(archive_path);
-    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
-    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-    //         if (_update_data.saver) {
-    //             _update_data.saver(_archiver);
-    //         }
-    //         return true;
-    //     });
-    // }
-
-    // inline void load_widgets(const std::filesystem::path& archive_path)
-    // {
-    //     reloaded_loader _archiver(archive_path);
-    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
-    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-    //         if (_update_data.loader) {
-    //             _update_data.loader(_archiver);
-    //         }
-    //         return true;
-    //     });
-    // }
 }
 
 struct access {
