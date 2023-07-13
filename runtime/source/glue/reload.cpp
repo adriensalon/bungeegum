@@ -70,8 +70,8 @@ namespace detail {
 
     reloader::reloader(std::wstreambuf* buffer)
     {
-        // (void)buffer;
-        console_redirect_wide _redirect(buffer);
+        (void)buffer;
+        // console_redirect_wide _redirect(buffer);
         _swapper = std::make_shared<hscpp::Hotswapper>();
         _manager = std::make_shared<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>>(hscpp::mem::MemoryManager::Create());
         _swapper->SetAllocator((_manager.get()->operator->()));
@@ -116,8 +116,8 @@ namespace detail {
         update_compilation_source_directories(_swapper.get(), _source_directories);
         update_compilation_force_compiled_source_files(_swapper.get(), _force_compiled_source_files);
         update_compilation_libraries(_swapper.get(), _libraries);
-        console_redirect_wide _redirect(buffer);
-        // (void)buffer;
+        // console_redirect_wide _redirect(buffer);
+        (void)buffer;
         return static_cast<reload_state>(_swapper->Update());
     }
 

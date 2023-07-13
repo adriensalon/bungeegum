@@ -8,12 +8,12 @@
 namespace bungeegum {
 namespace detail {
 
-    void emplace_traces(std::vector<backtraced_result>& tracing, const std::size_t tracing_size)
+    void emplace_traces(std::vector<backtraced_result>& tracing, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
 #if BUNGEEGUM_USE_BACKTRACE
         backward::StackTrace _stack_trace;
         backward::TraceResolver _trace_resolver;
-        std::size_t _offset = 3U; // escape backwardcpp calls
+        std::size_t _offset = 3u + tracing_offset; // Escape backwardcpp calls + optionnaly defined count
         _stack_trace.load_here(tracing_size + _offset);
         _trace_resolver.load_stacktrace(_stack_trace);
         tracing.resize(tracing_size);
@@ -25,25 +25,30 @@ namespace detail {
                 tracing[_i].inliners.emplace_back(backtraced_source { _inliner.filename, _inliner.function, _inliner.line, _inliner.col });
             }
         }
+        (void)tracing_offset;
+#else
+        (void)tracing;
+        (void)tracing_offset;
+        (void)tracing_size;
 #endif
     }
 
-    backtraced_exception::backtraced_exception(const std::string& what, const std::size_t tracing_size)
+    backtraced_exception::backtraced_exception(const std::string& what, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
         _what = widen(what);
-        emplace_traces(tracing, tracing_size);
+        emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
-    backtraced_exception::backtraced_exception(const std::wstring& what, const std::size_t tracing_size)
+    backtraced_exception::backtraced_exception(const std::wstring& what, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
         _what = what;
-        emplace_traces(tracing, tracing_size);
+        emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
-    backtraced_exception::backtraced_exception(const std::exception& existing, const std::size_t tracing_size)
+    backtraced_exception::backtraced_exception(const std::exception& existing, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
         _what = widen(existing.what());
-        emplace_traces(tracing, tracing_size);
+        emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
     backtraced_exception::backtraced_exception(backtraced_exception&& other)

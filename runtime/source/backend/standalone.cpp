@@ -37,20 +37,32 @@ namespace detail {
     }
 }
 
+#endif
+
 void standalone_app::color(const float4 rgba)
 {
+#if BUNGEEGUM_USE_STANDALONE
     detail::global_manager::standalone().app_color(rgba);
+#endif
 }
 
 void standalone_app::title(const std::string& description)
 {
+#if BUNGEEGUM_USE_STANDALONE
     detail::global_manager::standalone().app_title(description);
+#endif
 }
 
 float2 standalone_app::viewport()
 {
+#if BUNGEEGUM_USE_STANDALONE
     return detail::global_manager::backend().viewport_size;
+#else
+    return float2 {};
+#endif
 }
+
+#if BUNGEEGUM_USE_STANDALONE
 
 void launch(const runtime_widget& widget)
 {
@@ -127,6 +139,6 @@ void launch(const runtime_widget& widget)
         _window.run_loop();
     });
 }
-}
 
 #endif
+}

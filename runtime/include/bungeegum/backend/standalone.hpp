@@ -2,8 +2,6 @@
 
 #include <bungeegum/backend/standalone.fwd>
 
-#if BUNGEEGUM_USE_STANDALONE
-
 namespace bungeegum {
 
 /// @brief
@@ -24,8 +22,10 @@ struct standalone_app {
     static float2 viewport();
 };
 
+#if BUNGEEGUM_USE_STANDALONE
+
 /// @brief Starts an infinite loop
 void launch(const runtime_widget& widget);
-}
 
 #endif
+}

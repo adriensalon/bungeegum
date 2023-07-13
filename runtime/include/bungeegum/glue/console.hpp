@@ -12,7 +12,7 @@ namespace detail {
 
     /// @brief
     enum struct console_color {
-        default,
+        black_or_white,
         blue,
         green,
         cyan,
@@ -22,10 +22,10 @@ namespace detail {
     };
 
     /// @brief
-    void console_log(const std::string& message, const console_color color = console_color::default);
+    void console_log(const std::string& message, const console_color color = console_color::black_or_white);
 
     /// @brief
-    void console_log(const std::wstring& message, const console_color color = console_color::default);
+    void console_log(const std::wstring& message, const console_color color = console_color::black_or_white);
 
     /// @brief
     /// @details Instances of this struct can not be copied or moved.

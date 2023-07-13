@@ -1,9 +1,8 @@
 #pragma once
 
-#include <optional>
-
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/console.hpp>
@@ -13,20 +12,56 @@ namespace detail {
 
     namespace {
 
-        void log_error_to_console(backtraced_exception&& exception)
+        void console_log_exception(backtraced_exception&& exception, const console_color color)
         {
-            console_log("Fatal error ", console_color::yellow);
-            console_log(L"[" + exception.wide_what() + L"]", console_color::default);
-            console_log(" occured outside userspace with trace : \n", console_color::yellow);
-            for (const backtraced_result& _result : exception.tracing) {
-                std::string _trace_location = "[" + _result.primary.file.generic_string();
-                _trace_location += ", Ln " + std::to_string(_result.primary.line);
-                _trace_location += ", Col " + std::to_string(_result.primary.column) + "]";
-                console_log(_trace_location, console_color::default);
-                console_log(_result.primary.function + "\n", console_color::default);
+            console_log(L"\"" + exception.wide_what() + L"\"", console_color::black_or_white);
+            console_log(" occured", color);
+#if BUNGEEGUM_USE_BACKTRACE
+            if (exception.tracing.empty()) {
+                console_log(". \n", color);
+            } else {
+                console_log(" with trace : \n", color);
+                for (const backtraced_result& _result : exception.tracing) {
+                    std::string _trace_location = "[" + _result.primary.file.generic_string();
+                    _trace_location += ", Ln " + std::to_string(_result.primary.line);
+                    _trace_location += ", Col " + std::to_string(_result.primary.column) + "]";
+                    console_log(_trace_location, console_color::black_or_white);
+                    console_log(_result.primary.function + "\n", console_color::black_or_white);
+                }
             }
+
+#else
+            console_log(". \n", console_color::color);
+#endif
         }
 
+        void console_log_error_or_push_back(backtraced_exception&& exception, std::vector<backtraced_exception>& container)
+        {
+#if BUNGEEGUM_USE_OVERLAY
+            container.push_back(std::move(exception));
+#else
+            console_log_error(std::move(exception));
+            (void)container;
+#endif
+        }
+    }
+
+    void console_log_error(backtraced_exception&& exception)
+    {
+        console_log("Error ", console_color::red);
+        console_log_exception(std::move(exception), console_color::red);
+    }
+
+    void console_log_warning(backtraced_exception&& exception)
+    {
+        console_log("Warning ", console_color::yellow);
+        console_log_exception(std::move(exception), console_color::yellow);
+    }
+
+    void console_log_message(backtraced_exception&& exception)
+    {
+        console_log("Message ", console_color::blue);
+        console_log_exception(std::move(exception), console_color::blue);
     }
 
     void logs_manager::protect_library(const std::function<void()>& try_callback)
@@ -35,22 +70,22 @@ namespace detail {
             try_callback();
 
         } catch (detail::backtraced_exception&& _exception) {
-            log_error_to_console(std::move(_exception));
+            console_log_error(std::move(_exception));
 
         } catch (const char* _what) {
-            log_error_to_console(detail::backtraced_exception(std::string(_what)));
+            console_log_error(detail::backtraced_exception(std::string(_what, 0u, 0u)));
 
         } catch (const std::string& _what) {
-            log_error_to_console(detail::backtraced_exception(_what));
+            console_log_error(detail::backtraced_exception(_what, 0u, 0u));
 
         } catch (const std::wstring& _what) {
-            log_error_to_console(detail::backtraced_exception(_what));
+            console_log_error(detail::backtraced_exception(_what, 0u, 0u));
 
         } catch (std::exception& _exception) {
-            log_error_to_console(detail::backtraced_exception(_exception.what()));
+            console_log_error(detail::backtraced_exception(_exception.what(), 0u, 0u));
 
         } catch (...) {
-            log_error_to_console(detail::backtraced_exception("Unknown exception occured."));
+            console_log_error(detail::backtraced_exception("Unknown exception occured.", 0u, 0u));
         }
     }
 
@@ -60,39 +95,71 @@ namespace detail {
             try_callback();
 
         } catch (detail::backtraced_exception&& _exception) {
-            detail::global_manager::logs().userspace_errors.push_back(std::move(_exception));
+            console_log_error_or_push_back(std::move(_exception), userspace_errors);
+            // console_log_error(std::move(_exception));
 
         } catch (const char* _what) {
-            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(std::string(_what)));
+            console_log_error_or_push_back(detail::backtraced_exception(std::string(_what), 0u, 0u), userspace_errors);
+            // console_log_error(detail::backtraced_exception(std::string(_what), 0u, 0u));
 
         } catch (const std::string& _what) {
-            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(_what));
+            console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
 
         } catch (const std::wstring& _what) {
-            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(_what));
+            console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
 
         } catch (std::exception& _exception) {
-            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception(_exception.what()));
+            console_log_error_or_push_back(detail::backtraced_exception(_exception.what(), 0u, 0u), userspace_errors);
 
         } catch (...) {
-            detail::global_manager::logs().userspace_errors.push_back(detail::backtraced_exception("Unknown exception occured."));
+            console_log_error_or_push_back(detail::backtraced_exception("Unknown exception occured.", 0u, 0u), userspace_errors);
         }
     }
 }
 
 void log_error(const std::string& what)
 {
-    throw detail::backtraced_exception(what);
+    throw detail::backtraced_exception(what, 1u);
+}
+
+void log_error(const std::wstring& what)
+{
+    throw detail::backtraced_exception(what, 1u);
 }
 
 void log_warning(const std::string& what)
 {
-    detail::global_manager::logs().userspace_warnings.push_back(what);
+#if BUNGEEGUM_USE_OVERLAY
+    detail::global_manager::logs().userspace_warnings.push_back(detail::backtraced_exception(what, 1u));
+#else
+    detail::console_log_warning(detail::backtraced_exception(what, 1u));
+#endif
+}
+
+void log_warning(const std::wstring& what)
+{
+#if BUNGEEGUM_USE_OVERLAY
+    detail::global_manager::logs().userspace_warnings.push_back(detail::backtraced_exception(what, 1u));
+#else
+    detail::console_log_warning(detail::backtraced_exception(what, 1u));
+#endif
 }
 
 void log_message(const std::string& what)
 {
-    detail::global_manager::logs().userspace_messages.push_back(what);
+#if BUNGEEGUM_USE_OVERLAY
+    detail::global_manager::logs().userspace_messages.push_back(detail::backtraced_exception(what, 1u));
+#else
+    detail::console_log_message(detail::backtraced_exception(what, 1u));
+#endif
 }
 
+void log_message(const std::wstring& what)
+{
+#if BUNGEEGUM_USE_OVERLAY
+    detail::global_manager::logs().userspace_messages.push_back(detail::backtraced_exception(what, 1u));
+#else
+    detail::console_log_message(detail::backtraced_exception(what, 1u));
+#endif
+}
 }
