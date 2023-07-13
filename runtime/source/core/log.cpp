@@ -14,7 +14,7 @@ namespace detail {
 
         void console_log_exception(backtraced_exception&& exception, const console_color color)
         {
-            console_log(L"\"" + exception.wide_what() + L"\"", console_color::black_or_white);
+            console_log("\"" + std::string(exception.what()) + "\"", console_color::black_or_white);
             console_log(" occured", color);
 #if BUNGEEGUM_USE_BACKTRACE
             if (exception.tracing.empty()) {

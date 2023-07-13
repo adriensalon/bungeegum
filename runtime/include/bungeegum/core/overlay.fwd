@@ -35,7 +35,7 @@ namespace detail {
 
     void draw_profiler_overlay();
 
-    void draw_report_overlay();
+    void draw_logger_overlay();
 
     void draw_wireframe_overlay();
 

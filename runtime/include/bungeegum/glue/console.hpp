@@ -11,6 +11,10 @@ namespace detail {
     std::wstring widen(const std::string& str);
 
     /// @brief
+    /// @param wstr
+    std::string narrow(const std::wstring& wstr);
+
+    /// @brief
     enum struct console_color {
         black_or_white,
         blue,

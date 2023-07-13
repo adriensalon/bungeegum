@@ -35,19 +35,19 @@ namespace detail {
 
     backtraced_exception::backtraced_exception(const std::string& what, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
-        _what = widen(what);
+        _what = what;
         emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
     backtraced_exception::backtraced_exception(const std::wstring& what, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
-        _what = what;
+        _what = narrow(what);
         emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
     backtraced_exception::backtraced_exception(const std::exception& existing, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
-        _what = widen(existing.what());
+        _what = existing.what();
         emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
@@ -63,9 +63,9 @@ namespace detail {
         return *this;
     }
 
-    std::wstring backtraced_exception::wide_what() const
+    const char* backtraced_exception::what() const
     {
-        return _what;
+        return _what.c_str();
     }
 }
 }

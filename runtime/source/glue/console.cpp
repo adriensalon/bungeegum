@@ -64,12 +64,6 @@ namespace detail {
             else if constexpr (is_platform_linux || is_platform_macos)
                 std::cout << "\033[0m";
         }
-
-        // template <>
-        // void console_print<std::string>(const std::string& message, const console_color color);
-
-        // template <>
-        // void console_print<std::wstring>(const std::wstring& message, const console_color color);
     }
 
     std::wstring widen(const std::string& str)
@@ -77,6 +71,13 @@ namespace detail {
         std::vector<wchar_t> _buffer(str.size());
         std::use_facet<std::ctype<wchar_t>>(std::locale()).widen(str.data(), str.data() + str.size(), _buffer.data());
         return std::wstring(_buffer.data(), _buffer.size());
+    }
+
+    std::string narrow(const std::wstring& wstr)
+    {
+        std::vector<char> _buffer(wstr.size());
+        std::use_facet<std::ctype<wchar_t>>(std::locale()).narrow(wstr.data(), wstr.data() + wstr.size(), '0', _buffer.data());
+        return std::string(_buffer.data(), _buffer.size());
     }
 
     console_redirect::console_redirect(std::streambuf* buffer)

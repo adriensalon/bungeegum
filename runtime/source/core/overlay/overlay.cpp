@@ -10,7 +10,6 @@
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/imguarded.fwd>
 
-
 #include "compressed/fa4.cpp"
 #include "compressed/fa4.hpp"
 #include "compressed/inter_extrabold.cpp"
@@ -29,6 +28,7 @@ namespace detail {
         static bool show_profiler = false;
         static bool show_wireframe = false;
         static bool show_hotswapper = false;
+        static bool show_logger = false;
     }
 
     void setup_overlay()
@@ -131,6 +131,24 @@ namespace detail {
                 _fg2.release();
                 ImGui::SameLine();
 
+                font_guard _fg_hotswapper;
+                if (show_hotswapper)
+                    _fg_hotswapper.set(extrabold_font);
+                if (ImGui::Button("hotswapper##__bungeegum_footer_hotswapper_button__")) {
+                    show_hotswapper = !show_hotswapper;
+                }
+                _fg_hotswapper.release();
+                ImGui::SameLine();
+
+                font_guard _fg_logger;
+                if (show_logger)
+                    _fg_logger.set(extrabold_font);
+                if (ImGui::Button("logger##__bungeegum_footer_logger_button__")) {
+                    show_logger = !show_logger;
+                }
+                _fg_logger.release();
+                ImGui::SameLine();
+
                 font_guard _fg3;
                 if (show_wireframe)
                     _fg3.set(extrabold_font);
@@ -138,15 +156,8 @@ namespace detail {
                     show_wireframe = !show_wireframe;
                 }
                 _fg3.release();
-                font_guard _fg4;
-                if (show_hotswapper)
-                    _fg4.set(extrabold_font);
-                if (ImGui::Button("hotswapper##__bungeegum_footer_wireframe_button__")) {
-                    show_hotswapper = !show_hotswapper;
-                }
-                _fg4.release();
-
                 ImGui::SameLine();
+
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (footer_height - ImGui::GetFrameHeight()) / 2.f);
                 std::string _metrics_text_1(std::to_string(vertices_count) + " vertices, " + std::to_string(indices_count) + " indices,");
                 std::string _metrics_text_2(std::to_string(commands_count) + " draw calls");
@@ -157,7 +168,7 @@ namespace detail {
                 ImGui::Text(_metrics_text_1.c_str());
                 ImGui::SetCursorPosY(_cursor_pos_mem.y);
                 {
-                    font_guard _fg5(extrabold_font);
+                    font_guard _fglast(extrabold_font);
                     ImGui::Text(_metrics_text_2.c_str());
                 }
                 ImGui::EndMenuBar();
@@ -171,9 +182,11 @@ namespace detail {
 #if !defined(BUNGEEGUM_ENABLE_OVERLAY)
         draw_commands(ImGui::GetForegroundDrawList());
 #else
+        // ImGui::ShowDemoWindow();
         font_guard _fg0(regular_font);
 
         color_guard _cg0(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 1.f });
+        color_guard _cg_scrollbar_bg(ImGuiCol_ScrollbarBg, { 0.878f, 0.878f, 0.878f, 1.f });
         color_guard _cg1(ImGuiCol_TitleBg, { 0.627f, 0.627f, 0.627f, 1.f });
         color_guard _cg2(ImGuiCol_TitleBgActive, { 0.627f, 0.627f, 0.627f, 1.f });
         color_guard _cg3(ImGuiCol_Text, { 0.023f, 0.023f, 0.023f, 1.f });
@@ -224,16 +237,21 @@ namespace detail {
 
         style_guard _sg11(ImGuiStyleVar_FramePadding, { 4.f, 4.f });
 
-        if (show_hierarchy)
+        if (show_hierarchy) {
             draw_hierarchy_overlay();
-        if (show_inspector)
+        }
+        if (show_inspector) {
             draw_inspector_overlay();
-        if (show_profiler)
+        }
+        if (show_profiler) {
             draw_profiler_overlay();
-        if (show_hotswapper)
+        }
+        if (show_hotswapper) {
             draw_hotswapper_overlay();
-
-        draw_report_overlay();
+        }
+        if (show_logger) {
+            draw_logger_overlay();
+        }
 
         // ImGui::ShowDemoWindow();
 #endif

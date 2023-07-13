@@ -54,10 +54,12 @@ namespace detail {
                 _id++;
                 std::string _clean_typename = clean_typename(_widget_data.kind->name());
                 std::string _clean_id_typename = _clean_typename + "###__hierarchy__" + std::to_string(_id);
-                ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow;
+                // ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow ;
+                ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_Framed;
                 if (_widget_data.children.empty())
                     _node_flags |= ImGuiTreeNodeFlags_Leaf;
                 font_guard _fg0(extrabold_font);
+				
                 if (ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags)) {
                     _fg0.release();
                     // if (_widget_data.resolver)
