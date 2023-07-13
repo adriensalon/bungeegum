@@ -9,7 +9,7 @@
 #include <bungeegum/glue/simd.hpp>
 
 #define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGE_LENGTH 300u
-#define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGES 1000u
+#define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGES 999u
 
 namespace bungeegum {
 namespace detail {

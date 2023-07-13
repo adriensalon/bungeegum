@@ -34,7 +34,7 @@ void log_warning(const std::wstring& what);
 /// message will include stack trace information.
 void log_message(const std::string& what);
 
-/// @brief Logs a message exits userspace without crashing the program.
+/// @brief Logs a message and exits userspace without crashing the program.
 /// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the message will be sent to the overlay,
 /// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
 /// message will include stack trace information.

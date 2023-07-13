@@ -72,7 +72,9 @@ struct Composed {
         _box.get().color(0xFF8899FF);
         _box2.get().color(0xFF8899AA);
 
-        bungeegum::log_error("lolol");
+        // bungeegum::log_error("lolol");
+        volatile int* pInt = 0x00000000;
+        *pInt = 20;
         // throw "lolol";
 
         // float& okok = bungeegum::make_property<float>(this);

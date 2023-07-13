@@ -2,6 +2,7 @@
 
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/config.hpp>
+#include <bungeegum/glue/console.hpp>
 #include <bungeegum/glue/curve.hpp>
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/foreach.hpp>

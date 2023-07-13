@@ -6,11 +6,30 @@
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/console.hpp>
+#include <bungeegum/glue/toolchain.hpp>
+
+#if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
+#include <Windows.h>
+#endif
 
 namespace bungeegum {
 namespace detail {
 
     namespace {
+
+        void protect_seh(const std::function<void()>& try_callback, const std::function<void()>& catch_callback)
+        {
+#if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
+            __try {
+                try_callback();
+            } __except (EXCEPTION_EXECUTE_HANDLER) {
+                catch_callback();
+            }
+#else
+            try_callback();
+            (void)catch_callback;
+#endif
+        }
 
         void console_log_exception(backtraced_exception&& exception, const console_color color)
         {
@@ -66,54 +85,64 @@ namespace detail {
 
     void logs_manager::protect_library(const std::function<void()>& try_callback)
     {
-        try {
-            try_callback();
+        protect_seh(
+            [&try_callback]() {
+                try {
+                    try_callback();
 
-        } catch (detail::backtraced_exception&& _exception) {
-            console_log_error(std::move(_exception));
+                } catch (detail::backtraced_exception&& _exception) {
+                    console_log_error(std::move(_exception));
 
-        } catch (const char* _what) {
-            console_log_error(detail::backtraced_exception(std::string(_what, 0u, 0u)));
+                } catch (const char* _what) {
+                    console_log_error(detail::backtraced_exception(std::string(_what, 0u, 0u)));
 
-        } catch (const std::string& _what) {
-            console_log_error(detail::backtraced_exception(_what, 0u, 0u));
+                } catch (const std::string& _what) {
+                    console_log_error(detail::backtraced_exception(_what, 0u, 0u));
 
-        } catch (const std::wstring& _what) {
-            console_log_error(detail::backtraced_exception(_what, 0u, 0u));
+                } catch (const std::wstring& _what) {
+                    console_log_error(detail::backtraced_exception(_what, 0u, 0u));
 
-        } catch (std::exception& _exception) {
-            console_log_error(detail::backtraced_exception(_exception.what(), 0u, 0u));
+                } catch (std::exception& _exception) {
+                    console_log_error(detail::backtraced_exception(_exception.what(), 0u, 0u));
 
-        } catch (...) {
-            console_log_error(detail::backtraced_exception("Unknown exception occured.", 0u, 0u));
-        }
+                } catch (...) {
+                    console_log_error(detail::backtraced_exception("Unknown exception occured.", 0u, 0u));
+                }
+            },
+            []() {
+                console_log_error(detail::backtraced_exception("Unknown Windows SEH occured.", 0u, 0u));
+            });
     }
 
     void logs_manager::protect_userspace(const std::function<void()>& try_callback)
     {
-        try {
-            try_callback();
+        protect_seh(
+            [this, &try_callback]() {
+                try {
+                    try_callback();
 
-        } catch (detail::backtraced_exception&& _exception) {
-            console_log_error_or_push_back(std::move(_exception), userspace_errors);
-            // console_log_error(std::move(_exception));
+                } catch (detail::backtraced_exception&& _exception) {
+                    console_log_error_or_push_back(std::move(_exception), userspace_errors);
 
-        } catch (const char* _what) {
-            console_log_error_or_push_back(detail::backtraced_exception(std::string(_what), 0u, 0u), userspace_errors);
-            // console_log_error(detail::backtraced_exception(std::string(_what), 0u, 0u));
+                } catch (const char* _what) {
+                    console_log_error_or_push_back(detail::backtraced_exception(std::string(_what), 0u, 0u), userspace_errors);
 
-        } catch (const std::string& _what) {
-            console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
+                } catch (const std::string& _what) {
+                    console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
 
-        } catch (const std::wstring& _what) {
-            console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
+                } catch (const std::wstring& _what) {
+                    console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
 
-        } catch (std::exception& _exception) {
-            console_log_error_or_push_back(detail::backtraced_exception(_exception.what(), 0u, 0u), userspace_errors);
+                } catch (std::exception& _exception) {
+                    console_log_error_or_push_back(detail::backtraced_exception(_exception.what(), 0u, 0u), userspace_errors);
 
-        } catch (...) {
-            console_log_error_or_push_back(detail::backtraced_exception("Unknown exception occured.", 0u, 0u), userspace_errors);
-        }
+                } catch (...) {
+                    console_log_error_or_push_back(detail::backtraced_exception("Unknown exception occured.", 0u, 0u), userspace_errors);
+                }
+            },
+            [this]() {
+                console_log_error_or_push_back(detail::backtraced_exception("Unknown Windows SEH occured.", 0u, 0u), userspace_errors);
+            });
     }
 }
 
