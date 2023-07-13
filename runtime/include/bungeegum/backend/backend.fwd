@@ -19,14 +19,14 @@ namespace detail {
         backend_manager(backend_manager&& other) = delete;
         backend_manager& operator=(backend_manager&& other) = delete;
 
-        uint2 viewport_size = zero<float2>;
-
 #if BUNGEEGUM_USE_HOTSWAP
         void setup_if_required();
 
         std::unique_ptr<reloader> reload_manager = nullptr;
         std::wstring reload_initialization_message = {};
 #endif
+
+        uint2 viewport_size = zero<float2>;
     };
 }
 }

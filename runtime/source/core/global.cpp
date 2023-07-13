@@ -5,7 +5,7 @@ namespace detail {
 
     static global_manager __bungeegum_global_manager = {};
 
-    void setup_global()
+    void setup_global_if_required()
     {
 #if BUNGEEGUM_USE_HOTSWAP
         __bungeegum_global_manager.backend.setup_if_required();
@@ -13,13 +13,11 @@ namespace detail {
 #endif
     }
 
-    //     global_manager& global()
-    //     {
-    // #if BUNGEEGUM_USE_HOTSWAP
-    //         return get_global_data<global_manager>();
-    // #else
-    //         return __bungeegum_global_manager;
-    // #endif
-    //     }
+#if !BUNGEEGUM_USE_HOTSWAP
+    global_manager& global()
+    {
+        return __bungeegum_global_manager;
+    }
+#endif
 }
 }

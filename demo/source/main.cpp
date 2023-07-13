@@ -90,9 +90,9 @@ struct Composed {
 int main()
 {
 
-#if BUNGEEGUM_USE_HOTSWAP
-    bungeegum::detail::setup_global();
-#endif
+    // #if BUNGEEGUM_USE_HOTSWAP
+    //     bungeegum::detail::setup_global();
+    // #endif
     constexpr auto ii = bungeegum::is_finite<bungeegum::float2>({ 44.f, 0.f });
     std::wostringstream _osstream2;
 

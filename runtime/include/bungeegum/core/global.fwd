@@ -19,24 +19,24 @@ namespace detail {
         global_manager& operator=(global_manager&& other) = delete;
 
         backend_manager backend = {};
-        animations_manager animations = {};
-        events_manager events = {};
-        widgets_manager widgets = {};
-        process_manager process = {};
-        logs_manager logs = {};
         // embedded_manager embedded = {};
         standalone_manager standalone = {};
+        animations_manager animations = {};
+        events_manager events = {};
+        logs_manager logs = {};
+        process_manager process = {};
+        widgets_manager widgets = {};
     };
 
-    void setup_global();
+    void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)
 
-    // #if BUNGEEGUM_USE_HOTSWAP
-    inline global_manager& global()
+#if BUNGEEGUM_USE_HOTSWAP
+    inline global_manager& global() // This has to be inline for reload (?)
     {
         return get_global_data<global_manager>();
     }
-    // #else
-    // global_manager& global();
-    // #endif
+#else
+    global_manager& global();
+#endif
 }
 }

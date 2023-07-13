@@ -90,10 +90,13 @@ float2 standalone_app::viewport()
 
 void launch(const runtime_widget& widget)
 {
-
-    // #if BUNGEEGUM_USE_HOTSWAP
-    //     detail::setup_global_manager();
-    // #endif
+    ///
+    ///
+    ///
+    detail::setup_global_if_required();
+    ///
+    ///
+    ///
 
     detail::global().logs.protect_library([&]() {
         detail::global().widgets.root() = detail::global().widgets.raw(widget);
