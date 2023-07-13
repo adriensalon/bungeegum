@@ -73,7 +73,7 @@ struct Composed {
         _box2.get().color(0xFF8899AA);
 
         // bungeegum::log_error("lolol");
-        throw "lolol";
+        // throw "lolol";
 
         // float& okok = bungeegum::make_property<float>(this);
         // std::cout << "color box  = " << 44.f << std::endl;

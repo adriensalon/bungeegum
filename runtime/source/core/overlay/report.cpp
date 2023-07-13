@@ -23,7 +23,7 @@ namespace detail {
             //         ImGui::TextColored(ImVec4(0.1f, 0.1f, 0.8f, 1.f), _trace.primary.function.c_str());
             //     }
             // }
-            ImGui::End();
+            // ImGui::End();
         }
     }
 
