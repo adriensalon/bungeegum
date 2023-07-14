@@ -6,7 +6,7 @@
 namespace bungeegum {
 namespace detail {
 
-#if BUNGEEGUM_USE_STANDALONE
+#if BUNGEEGUM_USE_HOTSWAP
     void backend_manager::setup_if_required()
     {
         if (!reload_manager) {
@@ -24,6 +24,7 @@ namespace detail {
             if (_update_data.saver) {
                 _update_data.saver(_archiver);
             }
+            // TODO for loop on properties
             return true;
         });
     }
@@ -36,42 +37,42 @@ namespace detail {
             if (_update_data.loader) {
                 _update_data.loader(_archiver);
             }
+            // TODO for loop on properties
             return true;
         });
     }
 #endif
 }
 
-namespace hotswap {
-
-    std::list<std::string>& defines()
-    {
-        detail::setup_global_if_required();
-        return detail::global().backend.reload_manager->defines();
-    }
-
-    std::list<std::filesystem::path>& include_directories()
-    {
-        detail::setup_global_if_required();
-        return detail::global().backend.reload_manager->include_directories();
-    }
-
-    std::list<std::filesystem::path>& libraries()
-    {
-        detail::setup_global_if_required();
-        return detail::global().backend.reload_manager->libraries();
-    }
-
-    std::list<std::filesystem::path>& source_directories()
-    {
-        detail::setup_global_if_required();
-        return detail::global().backend.reload_manager->source_directories();
-    }
-
-    std::list<std::filesystem::path>& force_compiled_source_files()
-    {
-        detail::setup_global_if_required();
-        return detail::global().backend.reload_manager->force_compiled_source_files();
-    }
+#if BUNGEEGUM_USE_HOTSWAP
+std::list<std::string>& defines()
+{
+    detail::setup_global_if_required();
+    return detail::global().backend.reload_manager->defines();
 }
+
+std::list<std::filesystem::path>& include_directories()
+{
+    detail::setup_global_if_required();
+    return detail::global().backend.reload_manager->include_directories();
+}
+
+std::list<std::filesystem::path>& libraries()
+{
+    detail::setup_global_if_required();
+    return detail::global().backend.reload_manager->libraries();
+}
+
+std::list<std::filesystem::path>& source_directories()
+{
+    detail::setup_global_if_required();
+    return detail::global().backend.reload_manager->source_directories();
+}
+
+std::list<std::filesystem::path>& force_compiled_source_files()
+{
+    detail::setup_global_if_required();
+    return detail::global().backend.reload_manager->force_compiled_source_files();
+}
+#endif
 }

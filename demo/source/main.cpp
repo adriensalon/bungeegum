@@ -89,6 +89,7 @@ struct Composed {
 
 int main()
 {
+    bungeegum::detail::chronometer<30u> _chrono;
 
     // #if BUNGEEGUM_USE_HOTSWAP
     //     bungeegum::detail::setup_global();
@@ -107,27 +108,27 @@ int main()
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_STANDALONE 1");
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
 
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/runtime/include/");
+    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
+    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
+    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
+    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
+    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
+    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/runtime/include/");
 
-    // bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Release/bungeegum_runtime.lib");
-    // bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Release/hscpp.lib");
-    // bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Release/hscpp-mem.lib");
-    // bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Release/imgui.lib");
+    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Release/bungeegum_runtime.lib");
+    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Release/hscpp.lib");
+    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Release/hscpp-mem.lib");
+    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Release/imgui.lib");
 
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Debug/bungeegum_runtime.lib");
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
+    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Debug/bungeegum_runtime.lib");
+    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
+    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
+    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
 
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/include/");
-    bungeegum::hotswap::source_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/");
-    bungeegum::hotswap::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
-    bungeegum::hotswap::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
+    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/include/");
+    bungeegum::source_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/");
+    bungeegum::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
+    bungeegum::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
 
     bungeegum::launch(bungeegum::make<Title>()
 

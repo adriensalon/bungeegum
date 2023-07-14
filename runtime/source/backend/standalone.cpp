@@ -9,11 +9,10 @@
 #include <bungeegum/glue/renderer.hpp>
 #include <bungeegum/glue/time.hpp>
 
-#if BUNGEEGUM_USE_STANDALONE
-
 namespace bungeegum {
 namespace detail {
 
+#if BUNGEEGUM_USE_STANDALONE
     void standalone_manager::app_color(const float4 rgba_color)
     {
         _app_color = rgba_color;
@@ -35,33 +34,8 @@ namespace detail {
             _app_title = std::nullopt;
         }
     }
-
-    // void save_widgets(const std::filesystem::path& archive_path)
-    // {
-    //     reloaded_saver _archiver(archive_path);
-    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
-    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-    //         if (_update_data.saver) {
-    //             _update_data.saver(_archiver);
-    //         }
-    //         return true;
-    //     });
-    // }
-
-    // void load_widgets(const std::filesystem::path& archive_path)
-    // {
-    //     reloaded_loader _archiver(archive_path);
-    //     widget_update_data& _root_update_data = global().widgets.root_update_data();
-    //     global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-    //         if (_update_data.loader) {
-    //             _update_data.loader(_archiver);
-    //         }
-    //         return true;
-    //     });
-    // }
-}
-
 #endif
+}
 
 void standalone_app::color(const float4 rgba)
 {
@@ -87,7 +61,6 @@ float2 standalone_app::viewport()
 }
 
 #if BUNGEEGUM_USE_STANDALONE
-
 void launch(const runtime_widget& widget)
 {
     ///
@@ -149,12 +122,18 @@ void launch(const runtime_widget& widget)
             std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
             bool _has_polled = _window.poll();
             (void)_has_polled;
+
+            detail::global().backend.profiler_chronometer.new_frame();
+            detail::global().backend.profiler_chronometer.begin_task("main task");
+
             bool _has_ticked = detail::global().process.update(_delta_milliseconds);
             if (_has_ticked) {
                 _renderer.new_frame();
                 detail::global().process.render();
                 _renderer.present();
             }
+
+            detail::global().backend.profiler_chronometer.end_task("main task");
 
 #if BUNGEEGUM_USE_HOTSWAP
             // FAIRE PAREIL AVANT / APRES FORCE UPDATE
@@ -171,6 +150,5 @@ void launch(const runtime_widget& widget)
         _window.run_loop();
     });
 }
-
 #endif
 }

@@ -2,6 +2,7 @@
 #include <implot.h>
 #include <iostream>
 
+#include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
 
 namespace bungeegum {
@@ -35,29 +36,38 @@ namespace detail {
         }
     };
 
-    static unsigned int _count = 0;
+    static std::size_t _count = 0;
     static std::vector<std::string> _names;
-    // static std::vector<unsigned int> _indices;
+    //
+    //
+    static std::vector<std::size_t> _indices;
+    //
+    //
     static std::vector<ScrollingBuffer> _buffers;
     static float _delta_time = 0.f;
     static float _max = 0.f;
 
     void setup_profiler_overlay()
     {
-        // context.frames_chronometer.on_new_task([&](const std::string& _name, const unsigned int _index) {
-        //     _count++;
-        //     _names.push_back(_name);
-        //     // _indices.push_back(_index);
-        //     _buffers.emplace_back(ScrollingBuffer());
-        // });
-        // context.frames_chronometer.on_new_frame([&]() {
-        //     _delta_time += ImGui::GetIO().DeltaTime;
-        //     for (unsigned int _k = 0; _k < _count; _k++) {
-        //         float _ratio = context.frames_chronometer.get_frames().back().ratios[_k];
-        //         _buffers[_k].AddPoint(_delta_time, _ratio);
-        //         _max = std::fmax(_max, 1.1f * _ratio);
-        //     }
-        // });
+        frames_chronometer& _chronometer = global().backend.profiler_chronometer;
+        _chronometer.on_new_task([&](const std::string& _name, const std::size_t _index) {
+            _count++;
+            _names.push_back(_name);
+            //
+            //
+            _indices.push_back(_index);
+            //
+            //
+            _buffers.emplace_back(ScrollingBuffer());
+        });
+        _chronometer.on_new_frame([&]() {
+            _delta_time += ImGui::GetIO().DeltaTime;
+            for (std::size_t _k = 0; _k < _count; _k++) {
+                float _ratio = static_cast<float>(_chronometer.get_frames().back().durations[_k]);
+                _buffers[_k].AddPoint(_delta_time, _ratio);
+                _max = std::fmax(_max, 1.1f * _ratio);
+            }
+        });
     }
 
     void draw_profiler_overlay()
@@ -74,13 +84,13 @@ namespace detail {
                 ImPlot::SetupAxisLimits(ImAxis_X1, _delta_time - history, _delta_time, ImGuiCond_Always);
                 ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, _max);
                 ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-                for (unsigned int _k = 0; _k < _count; _k++)
+                for (std::size_t _k = 0; _k < _count; _k++)
                     if (!_buffers[_k].Data.empty())
                         ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
 
-                // ImPlot::PlotShaded(_names[0].c_str(), &(_buffers[0].Data[0].x), &(_buffers[0].Data[0].y), _buffers[0].Data.size(), -INFINITY, 0, _buffers[0].Offset, 2 * sizeof(float));
-                // for (unsigned int _k = 1; _k < _count; _k++)
-                //     ImPlot::PlotShaded(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), _buffers[_k - 1].Data[0].y, 0, _buffers[_k].Offset, 2 * sizeof(float));
+                ImPlot::PlotShaded(_names[0].c_str(), &(_buffers[0].Data[0].x), &(_buffers[0].Data[0].y), _buffers[0].Data.size(), -INFINITY, 0, _buffers[0].Offset, 2 * sizeof(float));
+                for (std::size_t _k = 1; _k < _count; _k++)
+                    ImPlot::PlotShaded(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), _buffers[_k - 1].Data[0].y, 0, _buffers[_k].Offset, 2 * sizeof(float));
 
                 ImPlot::EndPlot();
             }

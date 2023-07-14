@@ -1,7 +1,11 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>
 #include <ctime>
+#include <functional>
+#include <unordered_map>
+#include <vector>
 
 namespace bungeegum {
 namespace detail {
@@ -57,37 +61,57 @@ namespace detail {
         std::chrono::system_clock::time_point _last;
     };
 
-    // template <unsigned int count_t, typename unit_t = std::chrono::milliseconds>
-    // struct chronometer {
-    //     struct frame {
-    //         std::vector<unsigned int> indices;
-    //         std::vector<float> ratios;
-    //     };
+    /// @brief
+    /// @tparam unit_t
+    /// @tparam count_t
+    template <std::size_t count_t, typename unit_t = std::chrono::milliseconds>
+    struct chronometer {
 
-    //     struct task {
-    //         stopwatch watch;
-    //         unit_t duration;
-    //         unsigned int count = 0;
-    //     };
+        /// @brief
+        struct frame {
+            std::vector<std::size_t> indices;
+            std::vector<std::size_t> durations;
+        };
 
-    //     void new_frame();
-    //     void begin(const std::string& name);
-    //     void end(const std::string& name);
-    //     const task& get_task(const std::string& name);
-    //     const std::vector<task>& get_tasks();
-    //     const std::array<frame, count_t>& get_frames();
-    //     void on_new_task(const std::function<void(const std::string&, unsigned int)>& new_task_callback);
-    //     void on_new_frame(const std::function<void()>& new_frame_callback);
+        /// @brief
+        struct task {
+            stopwatch watch;
+            unit_t duration;
+            std::size_t instances = 0;
+        };
 
-    // private:
-    //     unit_t _frame_duration;
-    //     std::vector<std::function<void(const std::string&, unsigned int)>> _new_task_callbacks;
-    //     std::vector<std::function<void()>> _new_frame_callbacks;
-    //     std::vector<task> _tasks;
-    //     std::array<frame, count_t> _frames;
-    //     std::unordered_map<std::string, unsigned int> _task_names;
-    // };
+        /// @brief
+        void new_frame();
 
+        /// @brief
+        void begin_task(const std::string& name);
+
+        /// @brief
+        void end_task(const std::string& name);
+
+        /// @brief
+        const task& get_task(const std::string& name);
+
+        /// @brief
+        const std::vector<task>& get_tasks();
+
+        /// @brief
+        const std::array<frame, count_t>& get_frames();
+
+        /// @brief
+        void on_new_task(const std::function<void(const std::string&, std::size_t)>& new_task_callback);
+
+        /// @brief
+        void on_new_frame(const std::function<void()>& new_frame_callback);
+
+    private:
+        unit_t _frame_duration;
+        std::vector<std::function<void(const std::string&, std::size_t)>> _new_task_callbacks;
+        std::vector<std::function<void()>> _new_frame_callbacks;
+        std::vector<task> _tasks;
+        std::array<frame, count_t> _frames;
+        std::unordered_map<std::string, std::size_t> _task_names;
+    };
 }
 }
 

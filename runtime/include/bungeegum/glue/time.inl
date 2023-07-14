@@ -31,85 +31,77 @@ namespace detail {
         return _duration;
     }
 
-    // template <unsigned int count_t, typename unit_t>
-    // void chronometer<count_t, unit_t>::new_frame()
-    // {
-    //     if constexpr (is_build_debug) {
+    template <std::size_t count_t, typename unit_t>
+    void chronometer<count_t, unit_t>::new_frame()
+    {
+        for (std::size_t _k = 0; _k < _tasks.size(); _k++) {
+            task& _task = _tasks[_k];
+            _frames[count_t - 1].indices.push_back(_k);
+            _frames[count_t - 1].durations.push_back(_task.duration.count());
+        }
+        for (std::function<void()>& _callback : _new_frame_callbacks)
+            _callback();
+        for (std::size_t _k = 0; _k < _tasks.size(); _k++) {
+            task& _task = _tasks[_k];
+            _task.instances = 0;
+            _task.duration = unit_t(0);
+        }
+        std::iter_swap(_frames.data(), _frames.data() + count_t - 1);
+        _frames[count_t - 1].indices.clear();
+        _frames[count_t - 1].durations.clear();
+    }
 
-    //         for (auto _k = 0; _k < _tasks.size(); _k++) {
-    //             task& _task = _tasks[_k];
-    //             _frames[count_t - 1].indices.push_back(_k);
-    //             _frames[count_t - 1].ratios.push_back(static_cast<float>(_task.duration.count()));
-    //         }
-    //         for (auto& _callback : _new_frame_callbacks)
-    //             _callback();
-    //         for (auto _k = 0; _k < _tasks.size(); _k++) {
-    //             task& _task = _tasks[_k];
-    //             _task.count = 0;
-    //             _task.duration = unit_t(0);
-    //         }
-    //         std::iter_swap(_frames.data(), _frames.data() + count_t - 1);
-    //         _frames[count_t - 1].indices.clear();
-    //         _frames[count_t - 1].ratios.clear();
-    //     }
-    // }
+    template <std::size_t count_t, typename unit_t>
+    void chronometer<count_t, unit_t>::begin_task(const std::string& name)
+    {
+        if (_task_names.find(name) == _task_names.end()) {
+            _task_names.emplace(name, static_cast<std::size_t>(_tasks.size()));
+            _tasks.emplace_back();
+            for (std::function<void(const std::string&, size_t)>& _callback : _new_task_callbacks)
+                _callback(name, static_cast<std::size_t>(_tasks.size()) - 1);
+        }
+        task& _task = _tasks[_task_names[name]];
+        _task.watch.lap<unit_t>();
+        _task.instances++;
+    }
 
-    // template <unsigned int count_t, typename unit_t>
-    // void chronometer<count_t, unit_t>::begin(const std::string& name)
-    // {
-    //     if constexpr (is_build_debug) {
-    //         if (_task_names.find(name) == _task_names.end()) {
-    //             _task_names.emplace(name, static_cast<unsigned int>(_tasks.size()));
-    //             _tasks.emplace_back();
-    //             for (auto& _callback : _new_task_callbacks)
-    //                 _callback(name, static_cast<unsigned int>(_tasks.size()) - 1);
-    //         }
-    //         task& _task = _tasks[_task_names[name]];
-    //         _task.watch.lap<unit_t>();
-    //         _task.count++;
-    //     }
-    // }
+    template <std::size_t count_t, typename unit_t>
+    void chronometer<count_t, unit_t>::end_task(const std::string& name)
+    {
+        task& _task = _tasks[_task_names[name]];
+        unit_t _duration = _task.watch.lap<unit_t>();
+        _task.duration += _duration;
+        _frame_duration += _duration;
+    }
 
-    // template <unsigned int count_t, typename unit_t>
-    // void chronometer<count_t, unit_t>::end(const std::string& name)
-    // {
-    //     if constexpr (is_build_debug) {
-    //         task& _task = _tasks[_task_names[name]];
-    //         auto _duration = _task.watch.lap<unit_t>();
-    //         _task.duration += _duration;
-    //         _frame_duration += _duration;
-    //     }
-    // }
+    template <std::size_t count_t, typename unit_t>
+    const typename chronometer<count_t, unit_t>::task& chronometer<count_t, unit_t>::get_task(const std::string& name)
+    {
+        return _tasks[_task_names[name]];
+    }
 
-    // template <unsigned int count_t, typename unit_t>
-    // const typename chronometer<count_t, unit_t>::task& chronometer<count_t, unit_t>::get_task(const std::string& name)
-    // {
-    //     return _tasks[_task_names[name]];
-    // }
+    template <std::size_t count_t, typename unit_t>
+    const std::vector<typename chronometer<count_t, unit_t>::task>& chronometer<count_t, unit_t>::get_tasks()
+    {
+        return _tasks;
+    }
 
-    // template <unsigned int count_t, typename unit_t>
-    // const std::vector<typename chronometer<count_t, unit_t>::task>& chronometer<count_t, unit_t>::get_tasks()
-    // {
-    //     return _tasks;
-    // }
+    template <std::size_t count_t, typename unit_t>
+    const std::array<typename chronometer<count_t, unit_t>::frame, count_t>& chronometer<count_t, unit_t>::get_frames()
+    {
+        return _frames;
+    }
 
-    // template <unsigned int count_t, typename unit_t>
-    // const std::array<typename chronometer<count_t, unit_t>::frame, count_t>& chronometer<count_t, unit_t>::get_frames()
-    // {
-    //     return _frames;
-    // }
+    template <std::size_t count_t, typename unit_t>
+    void chronometer<count_t, unit_t>::on_new_task(const std::function<void(const std::string&, std::size_t)>& new_task_callback)
+    {
+        _new_task_callbacks.push_back(new_task_callback);
+    }
 
-    // template <unsigned int count_t, typename unit_t>
-    // void chronometer<count_t, unit_t>::on_new_task(const std::function<void(const std::string&, unsigned int)>& new_task_callback)
-    // {
-    //     _new_task_callbacks.push_back(new_task_callback);
-    // }
-
-    // template <unsigned int count_t, typename unit_t>
-    // void chronometer<count_t, unit_t>::on_new_frame(const std::function<void()>& new_frame_callback)
-    // {
-    //     _new_frame_callbacks.push_back(new_frame_callback);
-    // }
-
+    template <std::size_t count_t, typename unit_t>
+    void chronometer<count_t, unit_t>::on_new_frame(const std::function<void()>& new_frame_callback)
+    {
+        _new_frame_callbacks.push_back(new_frame_callback);
+    }
 }
 }

@@ -2,15 +2,26 @@
 
 #include <filesystem>
 #include <list>
-#include <map>
 #include <memory>
 #include <string>
 
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/reload.hpp>
 #include <bungeegum/glue/simd.hpp>
+#include <bungeegum/glue/time.hpp>
+
+#if BUNGEEGUM_USE_OVERLAY && !defined(BUNGEEGUM_USE_OVERLAY_PROFILER_FRAMES_COUNT)
+#define BUNGEEGUM_USE_OVERLAY_PROFILER_FRAMES_COUNT 30u
+#endif
+
+#if BUNGEEGUM_USE_OVERLAY && !defined(BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT)
+#define BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT std::chrono::milliseconds
+#endif
 
 namespace bungeegum {
 namespace detail {
+
+    using frames_chronometer = chronometer<BUNGEEGUM_USE_OVERLAY_PROFILER_FRAMES_COUNT, BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT>;
 
     struct backend_manager {
         backend_manager() = default;
@@ -27,7 +38,11 @@ namespace detail {
         void load_widgets(const std::filesystem::path& archive_path);
 
         std::unique_ptr<reloader> reload_manager = nullptr;
-        std::wstring reload_initialization_message = {};
+        std::wstring reload_initialization_message = {}; // Degager ptetre direct submit dans standalone.cpp
+#endif
+
+#if BUNGEEGUM_USE_OVERLAY
+        frames_chronometer profiler_chronometer = {};
 #endif
 
         uint2 viewport_size = zero<float2>;

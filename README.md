@@ -193,6 +193,7 @@ __Layout__ (Sliver)
 - 📕 SliverToBoxAdapter
 
 __Painting__
+- 📗 ColoredBox
 - 📕 CustomPainter
 - 📕 DecoratedBox
 - 📕 FractionalTranslation
