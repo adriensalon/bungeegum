@@ -124,16 +124,16 @@ void launch(const runtime_widget& widget)
             (void)_has_polled;
 
             detail::global().backend.profiler_chronometer.new_frame();
-            detail::global().backend.profiler_chronometer.begin_task("main task");
 
             bool _has_ticked = detail::global().process.update(_delta_milliseconds);
             if (_has_ticked) {
+
+                detail::global().backend.profiler_chronometer.begin_task("draw");
                 _renderer.new_frame();
                 detail::global().process.render();
                 _renderer.present();
+                detail::global().backend.profiler_chronometer.end_task("draw");
             }
-
-            detail::global().backend.profiler_chronometer.end_task("main task");
 
 #if BUNGEEGUM_USE_HOTSWAP
             // FAIRE PAREIL AVANT / APRES FORCE UPDATE

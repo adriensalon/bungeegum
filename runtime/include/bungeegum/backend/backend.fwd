@@ -10,18 +10,10 @@
 #include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/time.hpp>
 
-#if BUNGEEGUM_USE_OVERLAY && !defined(BUNGEEGUM_USE_OVERLAY_PROFILER_FRAMES_COUNT)
-#define BUNGEEGUM_USE_OVERLAY_PROFILER_FRAMES_COUNT 30u
-#endif
-
-#if BUNGEEGUM_USE_OVERLAY && !defined(BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT)
-#define BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT std::chrono::milliseconds
-#endif
-
 namespace bungeegum {
 namespace detail {
 
-    using frames_chronometer = chronometer<BUNGEEGUM_USE_OVERLAY_PROFILER_FRAMES_COUNT, BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT>;
+    using frames_chronometer = chronometer<1u, BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT>;
 
     struct backend_manager {
         backend_manager() = default;

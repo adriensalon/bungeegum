@@ -63,9 +63,9 @@ namespace detail {
         _chronometer.on_new_frame([&]() {
             _delta_time += ImGui::GetIO().DeltaTime;
             for (std::size_t _k = 0; _k < _count; _k++) {
-                float _ratio = static_cast<float>(_chronometer.get_frames().back().durations[_k]);
-                _buffers[_k].AddPoint(_delta_time, _ratio);
-                _max = std::fmax(_max, 1.1f * _ratio);
+                float _milliseconds = static_cast<float>(_chronometer.get_frames().back().durations[_k]);
+                _buffers[_k].AddPoint(_delta_time, _milliseconds);
+                _max = std::fmax(_max, 1.1f * _milliseconds);
             }
         });
     }
@@ -88,9 +88,9 @@ namespace detail {
                     if (!_buffers[_k].Data.empty())
                         ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
 
-                ImPlot::PlotShaded(_names[0].c_str(), &(_buffers[0].Data[0].x), &(_buffers[0].Data[0].y), _buffers[0].Data.size(), -INFINITY, 0, _buffers[0].Offset, 2 * sizeof(float));
-                for (std::size_t _k = 1; _k < _count; _k++)
-                    ImPlot::PlotShaded(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), _buffers[_k - 1].Data[0].y, 0, _buffers[_k].Offset, 2 * sizeof(float));
+                // ImPlot::PlotShaded(_names[0].c_str(), &(_buffers[0].Data[0].x), &(_buffers[0].Data[0].y), _buffers[0].Data.size(), -INFINITY, 0, _buffers[0].Offset, 2 * sizeof(float));
+                // for (std::size_t _k = 1; _k < _count; _k++)
+                //     ImPlot::PlotShaded(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), _buffers[_k - 1].Data[0].y, 0, _buffers[_k].Offset, 2 * sizeof(float));
 
                 ImPlot::EndPlot();
             }

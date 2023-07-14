@@ -14,6 +14,7 @@ namespace detail {
 
     void process_manager::_process_interact()
     {
+        detail::global().backend.profiler_chronometer.begin_task("interact");
 #define traverse_interact_impl(interaction_name)                                                                           \
     for (const interaction_name##_event& _event : interaction_name##_events) {                                             \
         global_widgets_manager.traverse(global_widgets_manager.root.value(), [&_event](widget_update_data& _widget_data) { \
@@ -38,10 +39,12 @@ namespace detail {
         // traverse_interact_impl(mouse_pressed);
 
 #undef traverse_interact_impl
+        detail::global().backend.profiler_chronometer.end_task("interact");
     }
 
     void process_manager::_process_resolve()
     {
+        detail::global().backend.profiler_chronometer.begin_task("resolve");
         bool _resolve_done = false;
         while (!_resolve_done) {
             std::for_each(
@@ -70,6 +73,7 @@ namespace detail {
                 global().widgets.resolvables.end());
             _resolve_done = global().widgets.resolvables.empty();
         }
+        detail::global().backend.profiler_chronometer.end_task("resolve");
     }
 
     void process_manager::_process_draw(ImDrawList* imgui_drawlist)
@@ -115,8 +119,12 @@ namespace detail {
 
     bool process_manager::update(const std::chrono::milliseconds& delta_time)
     {
+        detail::global().backend.profiler_chronometer.begin_task("animations");
         global().animations.update(delta_time);
+        detail::global().backend.profiler_chronometer.end_task("animations");
+        detail::global().backend.profiler_chronometer.begin_task("events");
         global().events.update();
+        detail::global().backend.profiler_chronometer.end_task("events");
         ////
         ////
         ////

@@ -25,10 +25,11 @@ namespace widgets {
 
         // auto gg = bungeegum::runtime_widget(this);
         // (void)gg;
-        std::cout << "has parent = " << std::to_string(bungeegum::has_parent(this)) << std::endl;
+        // std::cout << "has parent = " << std::to_string(bungeegum::has_parent(this)) << std::endl;
         // std::cout << "ok n";
 
         // bungeegum::adopt(this, bungeegum::make<float>());
+        std::this_thread::sleep_for(std::chrono::milliseconds(6));
 
         if (_childWidget.has_value()) {
             float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
@@ -43,6 +44,8 @@ namespace widgets {
         float2 _min_point = command.resolved_position();
         float2 _max_point = _min_point + command.resolved_size();
         command.draw_rect_filled(_min_point, _max_point, _color);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         ff += 0.0001f;
         // std::cout << "color box  = " << ff << std::endl;
