@@ -41,9 +41,9 @@ namespace detail {
             } else {
                 console_log(" with trace : \n", color);
                 for (const backtraced_result& _result : exception.tracing) {
-                    std::string _trace_location = "[" + _result.primary.file.generic_string();
+                    std::string _trace_location = "[" + _result.primary.file.filename().generic_string();
                     _trace_location += ", Ln " + std::to_string(_result.primary.line);
-                    _trace_location += ", Col " + std::to_string(_result.primary.column) + "]";
+                    _trace_location += ", Col " + std::to_string(_result.primary.column) + "] ";
                     console_log(_trace_location, console_color::black_or_white);
                     console_log(_result.primary.function + "\n", console_color::black_or_white);
                 }

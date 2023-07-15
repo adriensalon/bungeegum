@@ -194,6 +194,9 @@ namespace detail {
         color_guard _cg5(ImGuiCol_TabUnfocusedActive, { 0.878f, 0.878f, 0.878f, 1.f });
         color_guard _cg6(ImGuiCol_FrameBg, { 0.980f, 0.980f, 0.980f, 1.f });
         color_guard _cg7(ImGuiCol_PopupBg, { 0.980f, 0.980f, 0.980f, 1.f });
+        color_guard _cg8(ImGuiCol_TableHeaderBg, { 0.f, 0.f, 0.f, 0.f });
+        color_guard _cg9(ImGuiCol_TableBorderStrong, { 0.f, 0.f, 0.f, 0.f });
+        color_guard _cg_border(ImGuiCol_Border, { 0.627f, 0.627f, 0.627f, 1.f });
 
         // border
         style_guard _sg0(ImGuiStyleVar_WindowBorderSize, 0.f);
@@ -236,6 +239,7 @@ namespace detail {
         draw_footer();
 
         style_guard _sg11(ImGuiStyleVar_FramePadding, { 4.f, 4.f });
+        style_guard _sg_window_border_size(ImGuiStyleVar_WindowBorderSize, 1.5f);
 
         if (show_hierarchy) {
             draw_hierarchy_overlay();

@@ -55,6 +55,40 @@ namespace detail {
         ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
         if (ImGui::Begin("logger##__bungeegum_window_logger_title__", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_Modal)) {
 
+            static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
+
+            // When using ScrollX or ScrollY we need to specify a size for our table container!
+            // Otherwise by default the table will fit all available space, like a BeginChild() call.
+            ImVec2 outer_size = ImVec2(0.0f, ImGui::GetContentRegionAvail().y);
+            if (ImGui::BeginTable("table_scrolly", 4, flags, outer_size)) {
+                // ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+                // ImGui::TableSetupColumn("One");
+                // ImGui::TableSetupColumn("Two");
+                // ImGui::TableSetupColumn("Three");
+                // ImGui::TableHeadersRow();
+
+                // Demonstrate using clipper for large vertical lists
+                ImGuiListClipper clipper;
+                clipper.Begin(1000);
+                while (clipper.Step()) {
+                    for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
+                        ImGui::TableNextRow();
+                        // for (int column = 0; column < 3; column++) {
+                        ImGui::TableSetColumnIndex(0);
+                        // static bool _iss = false;
+                        ImGui::Selectable("overlay.cpp", false, ImGuiSelectableFlags_SpanAllColumns);
+                        ImGui::TableSetColumnIndex(1);
+                        ImGui::Text("Ln 254");
+                        ImGui::TableSetColumnIndex(2);
+                        ImGui::Text("Col 0");
+                        ImGui::TableSetColumnIndex(3);
+                        ImGui::Text("bungeegum::detail::draw_overlay");
+                        // }
+                    }
+                }
+                ImGui::EndTable();
+            }
+
             for (auto& _log : error_logs) {
                 ImGui::Text(std::to_string(_log.second.first).c_str());
                 ImGui::SameLine();

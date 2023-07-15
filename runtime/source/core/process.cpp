@@ -121,9 +121,11 @@ namespace detail {
     {
         detail::global().backend.profiler_chronometer.begin_task("animations");
         global().animations.update(delta_time);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
         detail::global().backend.profiler_chronometer.end_task("animations");
         detail::global().backend.profiler_chronometer.begin_task("events");
         global().events.update();
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
         detail::global().backend.profiler_chronometer.end_task("events");
         ////
         ////

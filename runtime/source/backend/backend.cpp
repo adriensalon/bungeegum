@@ -41,6 +41,21 @@ namespace detail {
             return true;
         });
     }
+
+    // std::optional<rapidjson::Value> inspect_reloadable_widget(const widget_update_data& update_data)
+    // {
+    //     std::stringstream _output_stream;
+    //     reloaded_saver _archiver(_output_stream);
+    //     if (update_data.saver) {
+    //         update_data.saver(_archiver);
+    //         std::cout << _output_stream.str() << std::endl;
+    //         // rapidjson::Document _document;
+    //         // _document.ParseInsitu(_output_stream.str().c_str());
+
+    //     } else {
+    //         return std::nullopt;
+    //     }
+    // }
 #endif
 }
 

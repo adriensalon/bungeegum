@@ -14,6 +14,8 @@
 #include <filesystem>
 #include <fstream>
 #include <list>
+#include <optional>
+#include <sstream>
 
 #define HSCPP_CXX_STANDARD 17
 #include <hscpp/mem/Ref.h>
@@ -198,13 +200,18 @@ namespace detail {
         /// @brief Creates an instance of this struct from a file path.
         reloaded_saver(const std::filesystem::path& archive_path);
 
-        /// @brief Saves a a reloaded values.
+        /// @brief Creates an instance of this struct from a stringstream.
+        reloaded_saver(std::stringstream& archive_stream);
+
+        /// @brief Saves a reloaded value. Can be used multiple times to save many values to the
+        /// same file.
         /// @tparam reloaded_value_t must be reloaded<value_t> (WEIRD HSCPP BUG WITH TEMPLATE TEMPLATE)
         template <typename reloaded_value_t>
         void save(reloaded_value_t& value);
 
     private:
-        std::ofstream _fstream;
+        std::optional<std::reference_wrapper<std::stringstream>> _sstream = std::nullopt;
+        std::optional<std::ofstream> _fstream = std::nullopt;
         cereal::JSONOutputArchive _archive;
     };
 }

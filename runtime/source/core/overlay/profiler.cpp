@@ -1,5 +1,6 @@
 #include <imgui.h>
 #include <implot.h>
+#include <implot_internal.h>
 #include <iostream>
 
 #include <bungeegum/core/global.fwd>
@@ -64,6 +65,9 @@ namespace detail {
             _delta_time += ImGui::GetIO().DeltaTime;
             for (std::size_t _k = 0; _k < _count; _k++) {
                 float _milliseconds = static_cast<float>(_chronometer.get_frames().back().durations[_k]);
+                if (_k > 0) {
+                    _milliseconds += _buffers[_k - 1].Data.front().y; // we add the last task so that if we stack all we get total time
+                }
                 _buffers[_k].AddPoint(_delta_time, _milliseconds);
                 _max = std::fmax(_max, 1.1f * _milliseconds);
             }
@@ -72,6 +76,7 @@ namespace detail {
 
     void draw_profiler_overlay()
     {
+        ImGui::ShowDemoWindow();
         ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
         if (ImGui::Begin("profiler##__bungeegum_window_profiler_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
             static float history = 10.0f;
@@ -79,14 +84,28 @@ namespace detail {
             static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
             // ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 1.f, 1.f, 0.f, 1.f });
             ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
-            if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, -1))) {
+            if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, -1), ImPlotFlags_NoMenus)) {
+                ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_NoButtons);
                 ImPlot::SetupAxes(NULL, NULL, flags, flags);
                 ImPlot::SetupAxisLimits(ImAxis_X1, _delta_time - history, _delta_time, ImGuiCond_Always);
                 ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, _max);
                 ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-                for (std::size_t _k = 0; _k < _count; _k++)
-                    if (!_buffers[_k].Data.empty())
-                        ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
+                for (int _k = static_cast<int>(_count) - 1; _k >= 0; --_k) {
+                    if (!_buffers[_k].Data.empty()) {
+                        ImPlot::PlotShaded(
+                            _names[_k].c_str(), // label id
+                            &(_buffers[_k].Data[0].x), // xs
+                            &(_buffers[_k].Data[0].y), //xy
+                            _buffers[_k].Data.size(), // count
+                            0.f, // yref
+                            0, // flags
+                            _buffers[_k].Offset,
+                            2 * sizeof(float));
+                    }
+                }
+                // for (std::size_t _k = 0; _k < _count; _k++)
+                //     if (!_buffers[_k].Data.empty())
+                //         ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
 
                 // ImPlot::PlotShaded(_names[0].c_str(), &(_buffers[0].Data[0].x), &(_buffers[0].Data[0].y), _buffers[0].Data.size(), -INFINITY, 0, _buffers[0].Offset, 2 * sizeof(float));
                 // for (std::size_t _k = 1; _k < _count; _k++)

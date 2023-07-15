@@ -6,6 +6,7 @@
 #include <string>
 
 #include <bungeegum/core/overlay.fwd>
+#include <bungeegum/core/widget.fwd>
 #include <bungeegum/glue/reload.hpp>
 #include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/time.hpp>
@@ -28,6 +29,8 @@ namespace detail {
         void save_widgets(const std::filesystem::path& archive_path);
 
         void load_widgets(const std::filesystem::path& archive_path);
+
+        // std::optional<rapidjson::Value> inspect_reloadable_widget(const widget_update_data& update_data);
 
         std::unique_ptr<reloader> reload_manager = nullptr;
         std::wstring reload_initialization_message = {}; // Degager ptetre direct submit dans standalone.cpp

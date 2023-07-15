@@ -102,14 +102,14 @@ namespace detail {
         void on_new_task(const std::function<void(const std::string&, std::size_t)>& new_task_callback);
 
         /// @brief
-        void on_new_frame(const std::function<void()>& new_frame_callback);
+        void on_new_frame(const std::function<void()>& new_frame_callback); // devrait prendre en arg 1 seul frame
 
     private:
         unit_t _frame_duration;
         std::vector<std::function<void(const std::string&, std::size_t)>> _new_task_callbacks;
         std::vector<std::function<void()>> _new_frame_callbacks;
         std::vector<task> _tasks;
-        std::array<frame, count_t> _frames;
+        std::array<frame, count_t> _frames; // 1seul frame en fait
         std::unordered_map<std::string, std::size_t> _task_names;
     };
 }
