@@ -8,6 +8,7 @@ set(bungeegum_source
 
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"
+	"source/glue/dialog.cpp"
 	"source/glue/curve.cpp"
 	"source/glue/imguarded.cpp"
 	"source/glue/reload.cpp"
@@ -70,6 +71,10 @@ target_link_libraries(bungeegum_runtime tinysplinecxx)
 target_link_libraries(bungeegum_runtime EnTT)
 target_link_libraries(bungeegum_runtime hscpp)
 target_link_libraries(bungeegum_runtime hscpp-mem)
+
+if(BUNGEEGUM_ENABLE_OVERLAY)
+	target_link_libraries(bungeegum_runtime nfd)
+endif()
 
 if(BUNGEEGUM_ENABLE_STANDALONE)
 	target_link_libraries(bungeegum_runtime SDL2-static)

@@ -6,6 +6,10 @@ add_subdirectory("entt")
 add_subdirectory("backwardcpp")
 add_subdirectory("cereal")
 
+set(NFD_INSTALL ON CACHE BOOL "" FORCE)
+add_subdirectory("nfdext")
+set_target_properties(nfd PROPERTIES LINKER_LANGUAGE CXX)
+
 add_subdirectory("hscpp")
 set(HSCPP_EXAMPLES OFF)
 set(HSCPP_TEST OFF)

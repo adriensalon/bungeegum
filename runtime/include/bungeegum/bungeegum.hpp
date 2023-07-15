@@ -5,6 +5,7 @@
 #include <bungeegum/glue/console.hpp>
 #include <bungeegum/glue/curve.hpp>
 #include <bungeegum/glue/detection.hpp>
+#include <bungeegum/glue/dialog.hpp>
 #include <bungeegum/glue/foreach.hpp>
 #include <bungeegum/glue/lerp.hpp>
 #include <bungeegum/glue/raw.hpp>

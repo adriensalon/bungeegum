@@ -29,7 +29,7 @@ namespace detail {
 
         std::string tag(const std::string& name)
         {
-            return "##__bungeegum_overlay_logger_" + name + "__";
+            return "###__bungeegum_overlay_logger_" + name + "__";
         }
 
         std::string truncate_to_key(
@@ -64,55 +64,40 @@ namespace detail {
 
                 // When using ScrollX or ScrollY we need to specify a size for our table container!
                 // Otherwise by default the table will fit all available space, like a BeginChild() call.
-                ImVec2 outer_size = ImVec2(
-                    0.0f,
-                    ImGui::GetContentRegionAvail().y - ImGui::GetStyle().WindowPadding.y - ImGui::GetFrameHeight());
+                ImVec2 outer_size = ImVec2(0.0f, ImGui::GetContentRegionAvail().y - ImGui::GetStyle().WindowPadding.y - ImGui::GetFrameHeight());
 
-                if (ImGui::BeginTable(tag(name + "_table").c_str(), 4, flags, outer_size)) {
+                if (ImGui::BeginTable(tag(name + "_table").c_str(), 5, flags, outer_size)) {
 
-                    // Demonstrate using clipper for large vertical lists
-                    // ImGuiListClipper clipper;
-                    // clipper.Begin(1000);
-                    // while (clipper.Step()) {
-                    //     for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
-                    //         ImGui::TableNextRow();
-                    //         // for (int column = 0; column < 3; column++) {
-                    //         ImGui::TableSetColumnIndex(0);
-                    //         // static bool _iss = false;
-                    //         // ImGui::Selectable("overlay.cpp", false, ImGuiSelectableFlags_SpanAllColumns);
-                    //         ImGui::Text("overlay.cpp");
-                    //         ImGui::TableSetColumnIndex(1);
-                    //         ImGui::Text("Ln 254");
-                    //         ImGui::TableSetColumnIndex(2);
-                    //         ImGui::Text("Col 0");
-                    //         ImGui::TableSetColumnIndex(3);
-                    //         ImGui::Text("bungeegum::detail::draw_overlay");
-                    //         // }
-                    //     }
-                    // }
-
-                    for (auto& _log : map) {
+                    for (std::pair<const std::string, counted_backtraced_results>& _log : map) {
                         const std::string& _log_description = _log.first;
-                        // std::size_t _log_count = _log.second.first;
+                        std::size_t& _log_count = _log.second.first;
                         const std::vector<backtraced_result>& _results = _log.second.second;
 
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
+                        bool _is_selected = false;
+                        ImGui::Selectable((std::to_string(_log_count) + tag("_log_description")).c_str(), &_is_selected, ImGuiSelectableFlags_SpanAllColumns);
+                        if (_is_selected) {
+                            _log_count = 1;
+                        }
+
+                        ImGui::TableSetColumnIndex(1);
                         ImGui::Text(_log_description.c_str());
                         if (!_results.empty()) {
                             const backtraced_result& _last_result = _results.front();
-                            ImGui::TableSetColumnIndex(1);
-                            ImGui::Text(_last_result.primary.file.filename().generic_string().c_str());
                             ImGui::TableSetColumnIndex(2);
-                            ImGui::Text(("Ln " + std::to_string(_last_result.primary.line)).c_str());
+                            ImGui::Text(_last_result.primary.file.filename().generic_string().c_str());
                             ImGui::TableSetColumnIndex(3);
+                            ImGui::Text(("Ln " + std::to_string(_last_result.primary.line)).c_str());
+                            ImGui::TableSetColumnIndex(4);
                             ImGui::Text(("Col " + std::to_string(_last_result.primary.column)).c_str());
                         } else {
-                            ImGui::TableSetColumnIndex(1);
-                            ImGui::Text("unknown file");
+
                             ImGui::TableSetColumnIndex(2);
-                            ImGui::Text("Ln ??");
+                            ImGui::Text("unknown file");
                             ImGui::TableSetColumnIndex(3);
+                            ImGui::Text("Ln ??");
+                            ImGui::TableSetColumnIndex(4);
                             ImGui::Text("Col ??");
                         }
                     }
@@ -121,16 +106,11 @@ namespace detail {
                 }
                 ImGui::EndTabItem();
             }
-
-            (void)map;
         }
     }
 
     void draw_logger_overlay()
     {
-        transfer_to_map(global().logs.userspace_errors, error_logs);
-        transfer_to_map(global().logs.userspace_warnings, warning_logs);
-        transfer_to_map(global().logs.userspace_messages, message_logs);
 
         ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
         if (ImGui::Begin(("logger" + tag("window")).c_str(), 0, ImGuiWindowFlags_NoCollapse)) {
@@ -181,6 +161,10 @@ namespace detail {
             // }
         }
         ImGui::End();
+
+        transfer_to_map(global().logs.userspace_errors, error_logs);
+        transfer_to_map(global().logs.userspace_warnings, warning_logs);
+        transfer_to_map(global().logs.userspace_messages, message_logs);
     }
 }
 }
