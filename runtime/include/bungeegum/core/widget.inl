@@ -111,6 +111,38 @@ struct access {
             };
         }
     }
+
+    template <typename widget_t>
+    constexpr static void detect_on_sizeof(widget_reference<widget_t>& widget)
+    {
+        const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
+        detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
+        if constexpr (detail::traits::is_reloadable_v<widget_t>) {
+            _widget_data.true_sizeof = [widget]() {
+                return widget.get()._bungeegum_sizeof();
+            };
+        } else {
+            _widget_data.true_sizeof = [widget]() {
+                return sizeof(widget_t);
+            };
+        }
+    }
+
+    template <typename widget_t>
+    constexpr static void detect_on_this(widget_reference<widget_t>& widget)
+    {
+        const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
+        detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
+        if constexpr (detail::traits::is_reloadable_v<widget_t>) {
+            _widget_data.true_ptr = [widget]() {
+                return widget.get()._bungeegum_this();
+            };
+        } else {
+            _widget_data.true_ptr = [widget]() {
+                return detail::raw_cast<widget_t>(widget.get());
+            };
+        }
+    }
 };
 
 template <typename widget_t>
@@ -164,6 +196,9 @@ widget_reference<widget_t> make_reference()
     bungeegum::access::detect_on_draw(_reference);
     bungeegum::access::detect_on_load(_reference);
     bungeegum::access::detect_on_save(_reference);
+
+    bungeegum::access::detect_on_sizeof(_reference);
+    bungeegum::access::detect_on_this(_reference);
 
     return _reference;
 }

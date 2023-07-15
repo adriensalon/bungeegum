@@ -48,6 +48,14 @@ namespace mem {
     friend struct bungeegum::detail::widgets_manager;                                                                                                                                               \
     HSCPP_TRACK(classname, #classname)                                                                                                                                                              \
     std::uintptr_t _bungeegum_object_reference = 0;                                                                                                                                                 \
+    hscpp_virtual std::uintptr_t _bungeegum_this()                                                                                                                                                  \
+    {                                                                                                                                                                                               \
+        return bungeegum::detail::raw_cast<classname>(this);                                                                                                                                        \
+    }                                                                                                                                                                                               \
+    hscpp_virtual std::size_t _bungeegum_sizeof()                                                                                                                                                   \
+    {                                                                                                                                                                                               \
+        return sizeof(classname);                                                                                                                                                                   \
+    }                                                                                                                                                                                               \
     hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                                                                                                           \
     {                                                                                                                                                                                               \
         bungeegum::detail::serialize_fields<cereal::JSONInputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__);  \
@@ -166,6 +174,9 @@ namespace detail {
     template <typename value_t>
     value_t& get_global_data();
 
+    template <typename reloaded_value_t>
+    std::size_t get_this(reloaded_value_t& value);
+
     /// @brief Instances of this struct represent a cereal JSON input archive to load data agter
     /// recompilation.
     /// @details Instances of this struct can only be moved.
@@ -264,7 +275,7 @@ namespace detail {
 
     template <typename value_t, typename = void>
     struct reference_type {
-        using type = value_t&;
+        using type = std::reference_wrapper<value_t>;
     };
 
     template <typename value_t>
@@ -279,6 +290,26 @@ namespace detail {
     /// @brief Equals to reloaded<value_t> if value_t is reloadable, and to value_t& otherwise.
     template <typename value_t>
     using reference_type_t = typename reference_type<value_t>::type;
+
+    template <typename value_t>
+    std::uintptr_t get_sizeof(reference_type_t<value_t>& reference)
+    {
+        if constexpr (traits::is_reloadable_v<value_t>) {
+            return reference.get().__bungeegum_sizeof();
+        } else {
+            return sizeof(value_t);
+        }
+    }
+
+    template <typename value_t>
+    std::uintptr_t get_this(reference_type_t<value_t>& reference)
+    {
+        if constexpr (traits::is_reloadable_v<value_t>) {
+            return reference.get().__bungeegum_this();
+        } else {
+            return detail::raw_cast<value_t>(reference);
+        }
+    }
 }
 }
 

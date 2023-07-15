@@ -7,6 +7,7 @@
 #include <bungeegum/core/draw.hpp>
 // #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/interact.hpp>
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/resolve.hpp>
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/raw.hpp>
@@ -68,6 +69,11 @@ namespace detail {
         std::unordered_map<std::uintptr_t, std::function<void(reloaded_loader&)>> property_loaders = {};
         std::function<void(reloaded_saver&)> saver = nullptr;
         std::unordered_map<std::uintptr_t, std::function<void(reloaded_saver&)>> property_savers = {};
+#endif
+
+#if BUNGEEGUM_USE_OVERLAY
+        std::function<std::uintptr_t()> true_ptr = nullptr;
+        std::function<std::size_t()> true_sizeof = nullptr;
 #endif
     };
 

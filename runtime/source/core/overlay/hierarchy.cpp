@@ -69,6 +69,8 @@ namespace detail {
                     if (ImGui::Button("print")) {
                         global().backend.inspect_reloadable_widget(_widget_data);
                     }
+                    ImGui::Text(("sizeof =" + std::to_string(_widget_data.true_sizeof())).c_str());
+                    ImGui::Text(("raw =" + std::to_string(_widget_data.true_ptr())).c_str());
                     ImGui::Text("Constraints");
                     ImGui::Text(("min_size = " + size_to_string(_widget_data.resolver_command.min_size())).c_str());
                     ImGui::Text(("max_size = " + size_to_string(_widget_data.resolver_command.max_size())).c_str());
