@@ -97,7 +97,6 @@ namespace detail {
         ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
         style_guard _sg0(ImGuiStyleVar_FramePadding, { ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y });
         color_guard _cg1(ImGuiCol_MenuBarBg, { 0.878f, 0.878f, 0.878f, 1.f });
-        color_guard _cg2(ImGuiCol_Button, { 0.878f, 0.878f, 0.878f, 1.f });
         if (ImGui::BeginViewportSideBar("##MainFooterBar", _viewport, ImGuiDir_Down, footer_height, _window_flags)) {
 
             if (ImGui::BeginMenuBar()) {
@@ -190,13 +189,15 @@ namespace detail {
         color_guard _cg1(ImGuiCol_TitleBg, { 0.627f, 0.627f, 0.627f, 1.f });
         color_guard _cg2(ImGuiCol_TitleBgActive, { 0.627f, 0.627f, 0.627f, 1.f });
         color_guard _cg3(ImGuiCol_Text, { 0.023f, 0.023f, 0.023f, 1.f });
-        color_guard _cg4(ImGuiCol_Tab, { 0.878f, 0.878f, 0.878f, 1.f });
-        color_guard _cg5(ImGuiCol_TabUnfocusedActive, { 0.878f, 0.878f, 0.878f, 1.f });
         color_guard _cg6(ImGuiCol_FrameBg, { 0.980f, 0.980f, 0.980f, 1.f });
         color_guard _cg7(ImGuiCol_PopupBg, { 0.980f, 0.980f, 0.980f, 1.f });
         color_guard _cg8(ImGuiCol_TableHeaderBg, { 0.f, 0.f, 0.f, 0.f });
         color_guard _cg9(ImGuiCol_TableBorderStrong, { 0.f, 0.f, 0.f, 0.f });
         color_guard _cg_border(ImGuiCol_Border, { 0.627f, 0.627f, 0.627f, 1.f });
+        color_guard _cg_tab(ImGuiCol_Tab, { 0.58f, 0.58f, 0.58f, 0.40f });
+        color_guard _cg_tab_active(ImGuiCol_TabActive, { 0.627f, 0.627f, 0.627f, 1.f });
+        color_guard _cg_tab_unfocused_active(ImGuiCol_TabUnfocusedActive, { 0.627f, 0.627f, 0.627f, 1.f });
+        color_guard _cg_button(ImGuiCol_Button, { 0.878f, 0.878f, 0.878f, 1.f });
 
         // border
         style_guard _sg0(ImGuiStyleVar_WindowBorderSize, 0.f);

@@ -2,10 +2,12 @@
 
 #include <imgui.h>
 #include <implot.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/overlay.fwd>
+#include <bungeegum/glue/imguarded.fwd>
 #include <bungeegum/glue/simd.hpp>
 
 #define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGE_LENGTH 300u
@@ -18,9 +20,17 @@ namespace detail {
         using backtraced_results = std::vector<backtraced_result>;
         using counted_backtraced_results = std::pair<std::size_t, backtraced_results>;
 
-        std::unordered_map<std::string, counted_backtraced_results> error_logs = {};
-        std::unordered_map<std::string, counted_backtraced_results> warning_logs = {};
-        std::unordered_map<std::string, counted_backtraced_results> message_logs = {};
+        static std::unordered_map<std::string, counted_backtraced_results> error_logs = {};
+        static std::unordered_map<std::string, counted_backtraced_results> warning_logs = {};
+        static std::unordered_map<std::string, counted_backtraced_results> message_logs = {};
+
+        static std::string filter_text = "";
+        static bool filter_enabled = true;
+
+        std::string tag(const std::string& name)
+        {
+            return "##__bungeegum_overlay_logger_" + name + "__";
+        }
 
         std::string truncate_to_key(
             const std::string str,
@@ -44,6 +54,67 @@ namespace detail {
             }
             from.clear();
         }
+
+        void draw_map(const std::string& name, const std::size_t count, std::unordered_map<std::string, counted_backtraced_results>& map)
+        {
+            std::string _title = name + " (" + std::to_string(count) + ")" + tag(name + "_tab");
+            if (ImGui::BeginTabItem(_title.c_str())) {
+
+                static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
+
+                // When using ScrollX or ScrollY we need to specify a size for our table container!
+                // Otherwise by default the table will fit all available space, like a BeginChild() call.
+                ImVec2 outer_size = ImVec2(
+                    0.0f,
+                    ImGui::GetContentRegionAvail().y - ImGui::GetStyle().WindowPadding.y - ImGui::GetFrameHeight());
+
+                if (ImGui::BeginTable(tag(name + "_table").c_str(), 4, flags, outer_size)) {
+
+                    // Demonstrate using clipper for large vertical lists
+                    // ImGuiListClipper clipper;
+                    // clipper.Begin(1000);
+                    // while (clipper.Step()) {
+                    //     for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
+                    //         ImGui::TableNextRow();
+                    //         // for (int column = 0; column < 3; column++) {
+                    //         ImGui::TableSetColumnIndex(0);
+                    //         // static bool _iss = false;
+                    //         // ImGui::Selectable("overlay.cpp", false, ImGuiSelectableFlags_SpanAllColumns);
+                    //         ImGui::Text("overlay.cpp");
+                    //         ImGui::TableSetColumnIndex(1);
+                    //         ImGui::Text("Ln 254");
+                    //         ImGui::TableSetColumnIndex(2);
+                    //         ImGui::Text("Col 0");
+                    //         ImGui::TableSetColumnIndex(3);
+                    //         ImGui::Text("bungeegum::detail::draw_overlay");
+                    //         // }
+                    //     }
+                    // }
+
+                    for (auto& _log : map) {
+                        const std::string& _log_description = _log.first;
+                        // std::size_t _log_count = _log.second.first;
+                        const std::vector<backtraced_result>& _results = _log.second.second;
+                        const backtraced_result& _last_result = _results.front();
+
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
+                        ImGui::Text(_log_description.c_str());
+                        ImGui::TableSetColumnIndex(1);
+                        ImGui::Text(_last_result.primary.file.filename().generic_string().c_str());
+                        ImGui::TableSetColumnIndex(2);
+                        ImGui::Text(("Ln " + std::to_string(_last_result.primary.line)).c_str());
+                        ImGui::TableSetColumnIndex(3);
+                        ImGui::Text(("Col " + std::to_string(_last_result.primary.column)).c_str());
+                    }
+
+                    ImGui::EndTable();
+                }
+                ImGui::EndTabItem();
+            }
+
+            (void)map;
+        }
     }
 
     void draw_logger_overlay()
@@ -53,62 +124,54 @@ namespace detail {
         transfer_to_map(global().logs.userspace_messages, message_logs);
 
         ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
-        if (ImGui::Begin("logger##__bungeegum_window_logger_title__", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_Modal)) {
+        if (ImGui::Begin(("logger" + tag("window")).c_str(), 0, ImGuiWindowFlags_NoCollapse)) {
 
-            static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
-
-            // When using ScrollX or ScrollY we need to specify a size for our table container!
-            // Otherwise by default the table will fit all available space, like a BeginChild() call.
-            ImVec2 outer_size = ImVec2(0.0f, ImGui::GetContentRegionAvail().y);
-            if (ImGui::BeginTable("table_scrolly", 4, flags, outer_size)) {
-                // ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
-                // ImGui::TableSetupColumn("One");
-                // ImGui::TableSetupColumn("Two");
-                // ImGui::TableSetupColumn("Three");
-                // ImGui::TableHeadersRow();
-
-                // Demonstrate using clipper for large vertical lists
-                ImGuiListClipper clipper;
-                clipper.Begin(1000);
-                while (clipper.Step()) {
-                    for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
-                        ImGui::TableNextRow();
-                        // for (int column = 0; column < 3; column++) {
-                        ImGui::TableSetColumnIndex(0);
-                        // static bool _iss = false;
-                        ImGui::Selectable("overlay.cpp", false, ImGuiSelectableFlags_SpanAllColumns);
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::Text("Ln 254");
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::Text("Col 0");
-                        ImGui::TableSetColumnIndex(3);
-                        ImGui::Text("bungeegum::detail::draw_overlay");
-                        // }
-                    }
-                }
-                ImGui::EndTable();
+            ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+            if (ImGui::BeginTabBar(tag("tab_bar").c_str(), tab_bar_flags)) {
+                draw_map("errors", error_logs.size(), error_logs);
+                draw_map("warnings", warning_logs.size(), warning_logs);
+                draw_map("messages", message_logs.size(), message_logs);
             }
+            ImGui::EndTabBar();
 
-            for (auto& _log : error_logs) {
-                ImGui::Text(std::to_string(_log.second.first).c_str());
-                ImGui::SameLine();
-                ImGui::Text(_log.first.c_str());
-            }
+            // for (auto& _log : error_logs) {
+            //     ImGui::Text(std::to_string(_log.second.first).c_str());
+            //     ImGui::SameLine();
+            //     ImGui::Text(_log.first.c_str());
+            // }
 
-            for (auto& _log : warning_logs) {
-                ImGui::Text(std::to_string(_log.second.first).c_str());
-                ImGui::SameLine();
-                ImGui::Text(_log.first.c_str());
-            }
+            // for (auto& _log : warning_logs) {
+            //     ImGui::Text(std::to_string(_log.second.first).c_str());
+            //     ImGui::SameLine();
+            //     ImGui::Text(_log.first.c_str());
+            // }
 
-            for (auto& _log : message_logs) {
-                ImGui::Text(std::to_string(_log.second.first).c_str());
-                ImGui::SameLine();
-                ImGui::Text(_log.first.c_str());
+            // for (auto& _log : message_logs) {
+            //     ImGui::Text(std::to_string(_log.second.first).c_str());
+            //     ImGui::SameLine();
+            //     ImGui::Text(_log.first.c_str());
+            // }
+
+            ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled);
+
+            // float1 _input_width = ImGui::GetContentRegionAvail().x
+            //     - ImGui::CalcTextSize("filter").x
+            //     - 2.f * ImGui::GetStyle().FramePadding.x
+            //     - ImGui::GetStyle().ItemSpacing.x;
+
+            // ImGui::InputTextWithHint()
+
+            ImGui::SameLine();
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+            if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here description to match with regex...", &filter_text)) {
             }
+            ImGui::PopItemWidth();
+            // ImGui::SameLine();
+            // if (ImGui::Button(("filter" + tag("filter_button")).c_str())) {
+            //     filter_enabled = !filter_enabled;
+            // }
         }
         ImGui::End();
     }
-
 }
 }

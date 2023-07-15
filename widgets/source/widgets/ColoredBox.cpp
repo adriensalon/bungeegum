@@ -28,6 +28,8 @@ namespace widgets {
         // std::cout << "has parent = " << std::to_string(bungeegum::has_parent(this)) << std::endl;
         // std::cout << "ok n";
 
+        log_message("hey this is a message");
+
         // bungeegum::adopt(this, bungeegum::make<float>());
         std::this_thread::sleep_for(std::chrono::milliseconds(6));
 

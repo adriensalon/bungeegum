@@ -8,6 +8,8 @@ set(imgui_source
 	"imgui_draw.cpp"
 	"imgui_demo.cpp"
 
+	"misc/cpp/imgui_stdlib.cpp"
+
 	"backends/imgui_impl_sdl.cpp"
 )
 

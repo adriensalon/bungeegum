@@ -9,7 +9,7 @@ namespace widgets {
     /// @brief A widget that describes this app in the operating system.
     struct Title {
 
-        HOTSWAP_CLASS(Title);
+        // HOTSWAP_CLASS(Title);
 
         /// @brief The widget below this widget in the tree.
         template <typename childWidget_t>
@@ -31,6 +31,8 @@ namespace widgets {
     private:
         friend struct access;
         void resolve(resolve_command& command);
+
+        const char* okok = "heyyyyaaa";
 
         std::optional<runtime_widget> _childWidget = std::nullopt;
     };

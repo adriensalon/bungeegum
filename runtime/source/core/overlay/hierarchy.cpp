@@ -4,12 +4,23 @@
 #include <unordered_map>
 
 #include <imgui.h>
+#include <imgui_memory_editor.h>
 #include <implot.h>
 #include <iostream>
 
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/imguarded.fwd>
+
+template <typename T>
+std::string int_to_hex(T i)
+{
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill('0') << std::setw(sizeof(T) * 2)
+           << std::hex << i;
+    return stream.str();
+}
 
 namespace bungeegum {
 namespace detail {
@@ -70,7 +81,11 @@ namespace detail {
                         global().backend.inspect_reloadable_widget(_widget_data);
                     }
                     ImGui::Text(("sizeof =" + std::to_string(_widget_data.true_sizeof())).c_str());
-                    ImGui::Text(("raw =" + std::to_string(_widget_data.true_ptr())).c_str());
+                    ImGui::Text(("raw =" + int_to_hex(_widget_data.true_ptr())).c_str());
+
+                    static MemoryEditor mem_edit_2;
+                    mem_edit_2.DrawContents((void*)_widget_data.true_ptr(), _widget_data.true_sizeof(), _widget_data.true_ptr());
+
                     ImGui::Text("Constraints");
                     ImGui::Text(("min_size = " + size_to_string(_widget_data.resolver_command.min_size())).c_str());
                     ImGui::Text(("max_size = " + size_to_string(_widget_data.resolver_command.max_size())).c_str());
