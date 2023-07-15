@@ -25,7 +25,6 @@ namespace detail {
                 tracing[_i].inliners.emplace_back(backtraced_source { _inliner.filename, _inliner.function, _inliner.line, _inliner.col });
             }
         }
-        (void)tracing_offset;
 #else
         (void)tracing;
         (void)tracing_offset;
