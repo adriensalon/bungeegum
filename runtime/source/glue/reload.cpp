@@ -11,7 +11,7 @@ namespace detail {
 
     namespace {
 
-        void update_compilation_defines(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::list<std::string>>& defines)
+        void update_compilation_defines(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::string>>& defines)
         {
             if (defines.second.size() != defines.first) {
                 hotswapper->ClearPreprocessorDefinitions();
@@ -22,7 +22,7 @@ namespace detail {
             }
         }
 
-        void update_compilation_include_directories(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::list<std::filesystem::path>>& include_directories)
+        void update_compilation_include_directories(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& include_directories)
         {
             if (include_directories.second.size() != include_directories.first) {
                 hotswapper->ClearIncludeDirectories();
@@ -33,7 +33,7 @@ namespace detail {
             }
         }
 
-        void update_compilation_source_directories(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::list<std::filesystem::path>>& source_directories)
+        void update_compilation_source_directories(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& source_directories)
         {
             if (source_directories.second.size() != source_directories.first) {
                 hotswapper->ClearSourceDirectories();
@@ -44,7 +44,7 @@ namespace detail {
             }
         }
 
-        void update_compilation_force_compiled_source_files(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::list<std::filesystem::path>>& force_compiled_source_files)
+        void update_compilation_force_compiled_source_files(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& force_compiled_source_files)
         {
             if (force_compiled_source_files.second.size() != force_compiled_source_files.first) {
                 hotswapper->ClearForceCompiledSourceFiles();
@@ -55,7 +55,7 @@ namespace detail {
             }
         }
 
-        void update_compilation_libraries(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::list<std::filesystem::path>>& libraries)
+        void update_compilation_libraries(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& libraries)
         {
             if (libraries.second.size() != libraries.first) {
                 hotswapper->ClearLibraries();
@@ -84,27 +84,27 @@ namespace detail {
         return _manager.get()->operator->()->GetNumBlocks();
     }
 
-    std::list<std::string>& reloader::defines()
+    std::vector<std::string>& reloader::defines()
     {
         return _defines.second;
     }
 
-    std::list<std::filesystem::path>& reloader::include_directories()
+    std::vector<std::filesystem::path>& reloader::include_directories()
     {
         return _include_directories.second;
     }
 
-    std::list<std::filesystem::path>& reloader::source_directories()
+    std::vector<std::filesystem::path>& reloader::source_directories()
     {
         return _source_directories.second;
     }
 
-    std::list<std::filesystem::path>& reloader::force_compiled_source_files()
+    std::vector<std::filesystem::path>& reloader::force_compiled_source_files()
     {
         return _force_compiled_source_files.second;
     }
 
-    std::list<std::filesystem::path>& reloader::libraries()
+    std::vector<std::filesystem::path>& reloader::libraries()
     {
         return _libraries.second;
     }

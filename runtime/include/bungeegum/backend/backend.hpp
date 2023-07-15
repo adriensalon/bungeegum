@@ -6,18 +6,18 @@
 namespace bungeegum {
 
 /// @brief
-std::list<std::string>& defines();
+std::vector<std::string>& defines();
 
 /// @brief
-std::list<std::filesystem::path>& include_directories();
+std::vector<std::filesystem::path>& include_directories();
 
 /// @brief
-std::list<std::filesystem::path>& libraries();
+std::vector<std::filesystem::path>& libraries();
 
 /// @brief
-std::list<std::filesystem::path>& source_directories();
+std::vector<std::filesystem::path>& source_directories();
 
 /// @brief
-std::list<std::filesystem::path>& force_compiled_source_files();
+std::vector<std::filesystem::path>& force_compiled_source_files();
 }
 #endif

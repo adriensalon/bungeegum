@@ -95,17 +95,26 @@ namespace detail {
                         const std::string& _log_description = _log.first;
                         // std::size_t _log_count = _log.second.first;
                         const std::vector<backtraced_result>& _results = _log.second.second;
-                        const backtraced_result& _last_result = _results.front();
 
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
                         ImGui::Text(_log_description.c_str());
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::Text(_last_result.primary.file.filename().generic_string().c_str());
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::Text(("Ln " + std::to_string(_last_result.primary.line)).c_str());
-                        ImGui::TableSetColumnIndex(3);
-                        ImGui::Text(("Col " + std::to_string(_last_result.primary.column)).c_str());
+                        if (!_results.empty()) {
+                            const backtraced_result& _last_result = _results.front();
+                            ImGui::TableSetColumnIndex(1);
+                            ImGui::Text(_last_result.primary.file.filename().generic_string().c_str());
+                            ImGui::TableSetColumnIndex(2);
+                            ImGui::Text(("Ln " + std::to_string(_last_result.primary.line)).c_str());
+                            ImGui::TableSetColumnIndex(3);
+                            ImGui::Text(("Col " + std::to_string(_last_result.primary.column)).c_str());
+                        } else {
+                            ImGui::TableSetColumnIndex(1);
+                            ImGui::Text("unknown file");
+                            ImGui::TableSetColumnIndex(2);
+                            ImGui::Text("Ln ??");
+                            ImGui::TableSetColumnIndex(3);
+                            ImGui::Text("Col ??");
+                        }
                     }
 
                     ImGui::EndTable();

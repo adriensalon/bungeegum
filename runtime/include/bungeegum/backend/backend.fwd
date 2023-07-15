@@ -1,9 +1,9 @@
 #pragma once
 
 #include <filesystem>
-#include <list>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.fwd>

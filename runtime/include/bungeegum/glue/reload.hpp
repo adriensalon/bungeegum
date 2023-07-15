@@ -13,9 +13,9 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
-#include <list>
 #include <optional>
 #include <sstream>
+#include <vector>
 
 #define HSCPP_CXX_STANDARD 17
 #include <cereal/access.hpp>
@@ -131,19 +131,19 @@ namespace detail {
         reloaded<value_t> allocate();
 
         /// @brief Gets a modifiable list of the preprocessor definitions for recompilation.
-        std::list<std::string>& defines();
+        std::vector<std::string>& defines();
 
         /// @brief Gets a modifiable list of the include directories for recompilation.
-        std::list<std::filesystem::path>& include_directories();
+        std::vector<std::filesystem::path>& include_directories();
 
         /// @brief Gets a modifiable list of the source directories for recompilation.
-        std::list<std::filesystem::path>& source_directories();
+        std::vector<std::filesystem::path>& source_directories();
 
         /// @brief Gets a modifiable list of the force compiled source files for recompilation.
-        std::list<std::filesystem::path>& force_compiled_source_files();
+        std::vector<std::filesystem::path>& force_compiled_source_files();
 
         /// @brief Gets a modifiable list of the libraries for recompilation.
-        std::list<std::filesystem::path>& libraries();
+        std::vector<std::filesystem::path>& libraries();
 
         /// @brief Gets the amount of memory blocks currently allocated.
         std::size_t allocated_blocks_count();
@@ -160,11 +160,11 @@ namespace detail {
         void set_global_data(void* data_ptr);
 
     private:
-        std::pair<std::size_t, std::list<std::string>> _defines = { false, {} };
-        std::pair<std::size_t, std::list<std::filesystem::path>> _include_directories = { false, {} };
-        std::pair<std::size_t, std::list<std::filesystem::path>> _source_directories = { false, {} };
-        std::pair<std::size_t, std::list<std::filesystem::path>> _force_compiled_source_files = { false, {} };
-        std::pair<std::size_t, std::list<std::filesystem::path>> _libraries = { false, {} };
+        std::pair<std::size_t, std::vector<std::string>> _defines = { false, {} };
+        std::pair<std::size_t, std::vector<std::filesystem::path>> _include_directories = { false, {} };
+        std::pair<std::size_t, std::vector<std::filesystem::path>> _source_directories = { false, {} };
+        std::pair<std::size_t, std::vector<std::filesystem::path>> _force_compiled_source_files = { false, {} };
+        std::pair<std::size_t, std::vector<std::filesystem::path>> _libraries = { false, {} };
         std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
     };
