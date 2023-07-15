@@ -66,6 +66,9 @@ namespace detail {
                     //     ImGui::Text("has advanced resolve");
                     // if (_widget_data.drawer)
                     //     ImGui::Text("has advanced draw");
+                    if (ImGui::Button("print")) {
+                        global().backend.inspect_reloadable_widget(_widget_data);
+                    }
                     ImGui::Text("Constraints");
                     ImGui::Text(("min_size = " + size_to_string(_widget_data.resolver_command.min_size())).c_str());
                     ImGui::Text(("max_size = " + size_to_string(_widget_data.resolver_command.max_size())).c_str());

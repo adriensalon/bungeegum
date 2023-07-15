@@ -18,11 +18,13 @@
 #include <sstream>
 
 #define HSCPP_CXX_STANDARD 17
-#include <hscpp/mem/Ref.h>
-#include <hscpp/module/Tracker.h>
 #include <cereal/access.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
+#include <cereal/external/rapidjson/rapidjson.h>
+#include <hscpp/mem/Ref.h>
+#include <hscpp/module/Tracker.h>
+
 
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/foreach.hpp>
