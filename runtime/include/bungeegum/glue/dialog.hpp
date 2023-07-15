@@ -39,7 +39,9 @@ namespace detail {
         const std::optional<std::filesystem::path>& default_path = std::nullopt,
         const std::optional<std::string>& default_name = std::nullopt);
 
-    // dir open ig
+    /// @brief Blocks the thread and gets a directory path using desktop OS file picker APIs.
+    std::optional<std::filesystem::path> pick_folder_dialog(
+        const std::optional<std::filesystem::path>& default_path = std::nullopt);
 }
 }
 

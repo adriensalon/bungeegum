@@ -1,6 +1,6 @@
 #include <bungeegum/glue/dialog.hpp>
 
-// F*CK C !
+// f*ck C ! (although this code sucks too)
 
 #if BUNGEEGUM_USE_DIALOG
 
@@ -96,6 +96,30 @@ namespace detail {
         }
     }
 
+    std::optional<std::filesystem::path> pick_folder_dialog(
+        const std::optional<std::filesystem::path>& default_path)
+    {
+        // default path
+        std::string _default_path_str;
+        const nfdchar_t* _nfd_default_path = NULL;
+        if (default_path.has_value()) {
+            _default_path_str = default_path.value().generic_string();
+            _nfd_default_path = _default_path_str.c_str();
+        }
+
+        // NFD call
+        nfdchar_t* _nfd_path = NULL;
+        nfdresult_t _nfd_result = NFD_PickFolder(&_nfd_path, _nfd_default_path);
+
+        // result
+        if (_nfd_result == NFD_OKAY) {
+            std::string _result_str(_nfd_path);
+            NFD_FreePath(_nfd_path);
+            return std::filesystem::path(_result_str);
+        } else {
+            return std::nullopt;
+        }
+    }
 }
 }
 
