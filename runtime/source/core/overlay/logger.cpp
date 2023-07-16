@@ -152,7 +152,7 @@ namespace detail {
 
             ImGui::SameLine();
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-            if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here description to match with regex...", &filter_text)) {
+            if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here a description to match with regex...", &filter_text)) {
             }
             ImGui::PopItemWidth();
             // ImGui::SameLine();

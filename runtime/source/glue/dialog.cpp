@@ -105,13 +105,12 @@ namespace detail {
 
             std::optional<std::filesystem::path> process(const nfdresult_t result) const
             {
-                if (result == NFD_OKAY) {
-                    std::string _result_str(_nfd_output);
-                    NFD_FreePath(_nfd_output);
-                    return std::filesystem::path(_result_str);
-                } else {
+                if (result != NFD_OKAY) {
                     return std::nullopt;
                 }
+                std::string _result_str(_nfd_output);
+                NFD_FreePath(_nfd_output);
+                return std::filesystem::path(_result_str);
             }
 
         private:
