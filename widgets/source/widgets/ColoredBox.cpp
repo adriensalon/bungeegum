@@ -47,7 +47,7 @@ namespace widgets {
         float2 _max_point = _min_point + command.resolved_size();
         command.draw_rect_filled(_min_point, _max_point, _color);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
         ff += 0.0001f;
         // std::cout << "color box  = " << ff << std::endl;

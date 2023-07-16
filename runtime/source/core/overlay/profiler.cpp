@@ -6,76 +6,107 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
 
+#define BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE 2000
+
 namespace bungeegum {
 namespace detail {
 
-    struct ScrollingBuffer {
-        int MaxSize;
-        int Offset;
-        ImVector<ImVec2> Data;
-        ScrollingBuffer(int max_size = 2000)
+    struct scrolling_buffer {
+        scrolling_buffer() = delete;
+        scrolling_buffer(const scrolling_buffer& other) = default;
+        scrolling_buffer& operator=(const scrolling_buffer& other) = default;
+        scrolling_buffer(scrolling_buffer&& other) = default;
+        scrolling_buffer& operator=(scrolling_buffer&& other) = default;
+
+        scrolling_buffer(const std::string& name, int max_size = BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE)
+            : _name(name)
+            , _max_size(max_size)
         {
-            MaxSize = max_size;
-            Offset = 0;
-            Data.reserve(MaxSize);
+            _data.reserve(_max_size);
         }
-        void AddPoint(float x, float y)
+
+        void emplace(const float x, const float y)
         {
-            if (Data.size() < MaxSize)
-                Data.push_back(ImVec2(x, y));
+            if (_data.size() < _max_size)
+                _data.push_back(float2 { x, y });
             else {
-                Data[Offset] = ImVec2(x, y);
-                Offset = (Offset + 1) % MaxSize;
+                _data[_offset] = float2 { x, y };
+                _offset = (_offset + 1) % _max_size;
             }
         }
-        void Erase()
+
+        float back_value() const
         {
-            if (Data.size() > 0) {
-                Data.shrink(0);
-                Offset = 0;
+            if ((_data.size() < _max_size) || (_offset == 0))
+                return _data.back().y;
+            else {
+                return _data[_offset - 1].y;
             }
         }
+
+        const std::string& name() const
+        {
+            return _name;
+        }
+
+        const float* data_x() const
+        {
+            return &(_data[0].x);
+        }
+
+        const float* data_y() const
+        {
+            return &(_data[0].y);
+        }
+
+        bool empty() const
+        {
+            return _data.empty();
+        }
+
+        std::size_t offset() const
+        {
+            return _offset;
+        }
+
+        std::size_t size() const
+        {
+            return _data.size();
+        }
+
+    private:
+        std::string _name = {};
+        std::size_t _max_size = 0;
+        std::size_t _offset = 0;
+        std::vector<float2> _data = {};
     };
 
-    static std::size_t _count = 0;
-    static std::vector<std::string> _names;
-    //
-    //
-    static std::vector<std::size_t> _indices;
-    //
-    //
-    static std::vector<ScrollingBuffer> _buffers;
-    static float _delta_time = 0.f;
-    static float _max = 0.f;
+    static std::vector<scrolling_buffer> buffers = {};
+    static std::unordered_map<std::string, std::size_t> buffer_names = {};
+    static float delta_time = 0.f;
+    static float max_value = 0.f;
 
     void setup_profiler_overlay()
     {
         frames_chronometer& _chronometer = global().backend.profiler_chronometer;
-        _chronometer.on_new_task([&](const std::string& _name, const std::size_t _index) {
-            _count++;
-            _names.push_back(_name);
-            //
-            //
-            _indices.push_back(_index);
-            //
-            //
-            _buffers.emplace_back(ScrollingBuffer());
+        _chronometer.on_new_task([&](const frames_chronometer_task& task) {
+            buffer_names.emplace(task.name, buffers.size());
+            buffers.emplace_back(scrolling_buffer(task.name));
         });
-        _chronometer.on_new_frame([&]() {
-            _delta_time += ImGui::GetIO().DeltaTime;
-            for (std::size_t _k = 0; _k < _count; _k++) {
-                float _milliseconds = static_cast<float>(_chronometer.get_frames().back().durations[_k]);
-                if (_k > 0) {
-                    _milliseconds += _buffers[_k - 1].Data.front().y; // we add the last task so that if we stack all we get total time
-                }
-                _buffers[_k].AddPoint(_delta_time, _milliseconds);
-                _max = std::fmax(_max, 1.1f * _milliseconds);
+        _chronometer.on_new_frame_for_each_task([&](const frames_chronometer_task& task) {
+            std::size_t _index = buffer_names.at(task.name);
+            float _duration = static_cast<float>(task.duration.count());
+            if (_index > 0) {
+                _duration += buffers[_index - 1].back_value();
             }
+            buffers[_index].emplace(delta_time, _duration);
+            max_value = math::max(max_value, 1.1f * _duration);
         });
     }
 
     void draw_profiler_overlay()
     {
+        delta_time += ImGui::GetIO().DeltaTime;
         ImGui::ShowDemoWindow();
         ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
         if (ImGui::Begin("profiler##__bungeegum_window_profiler_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
@@ -85,31 +116,25 @@ namespace detail {
             // ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 1.f, 1.f, 0.f, 1.f });
             ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
             if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, -1), ImPlotFlags_NoMenus)) {
-                ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_NoButtons);
+                // ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_NoButtons);
+                ImPlot::SetupLegend(ImPlotLocation_NorthWest);
                 ImPlot::SetupAxes(NULL, NULL, flags, flags);
-                ImPlot::SetupAxisLimits(ImAxis_X1, _delta_time - history, _delta_time, ImGuiCond_Always);
-                ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, _max);
+                ImPlot::SetupAxisLimits(ImAxis_X1, delta_time - history, delta_time, ImGuiCond_Always);
+                ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, max_value);
                 ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-                for (int _k = static_cast<int>(_count) - 1; _k >= 0; --_k) {
-                    if (!_buffers[_k].Data.empty()) {
+                for (int _k = static_cast<int>(buffers.size()) - 1; _k >= 0; --_k) {
+                    if (!buffers[_k].empty()) {
                         ImPlot::PlotShaded(
-                            _names[_k].c_str(), // label id
-                            &(_buffers[_k].Data[0].x), // xs
-                            &(_buffers[_k].Data[0].y), //xy
-                            _buffers[_k].Data.size(), // count
+                            buffers[_k].name().c_str(), // label id
+                            buffers[_k].data_x(), // xs
+                            buffers[_k].data_y(), //xy
+                            static_cast<int>(buffers[_k].size()), // count
                             0.f, // yref
                             0, // flags
-                            _buffers[_k].Offset,
-                            2 * sizeof(float));
+                            static_cast<int>(buffers[_k].offset()),
+                            static_cast<int>(2 * sizeof(float)));
                     }
                 }
-                // for (std::size_t _k = 0; _k < _count; _k++)
-                //     if (!_buffers[_k].Data.empty())
-                //         ImPlot::PlotLine(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), 0, _buffers[_k].Offset, 2 * sizeof(float));
-
-                // ImPlot::PlotShaded(_names[0].c_str(), &(_buffers[0].Data[0].x), &(_buffers[0].Data[0].y), _buffers[0].Data.size(), -INFINITY, 0, _buffers[0].Offset, 2 * sizeof(float));
-                // for (std::size_t _k = 1; _k < _count; _k++)
-                //     ImPlot::PlotShaded(_names[_k].c_str(), &(_buffers[_k].Data[0].x), &(_buffers[_k].Data[0].y), _buffers[_k].Data.size(), _buffers[_k - 1].Data[0].y, 0, _buffers[_k].Offset, 2 * sizeof(float));
 
                 ImPlot::EndPlot();
             }

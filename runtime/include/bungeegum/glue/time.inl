@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <thread>
 
+#include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/toolchain.hpp>
 
 namespace bungeegum {
@@ -31,77 +32,64 @@ namespace detail {
         return _duration;
     }
 
-    template <std::size_t count_t, typename unit_t>
-    void chronometer<count_t, unit_t>::new_frame()
+    template <typename unit_t>
+    void chronometer<unit_t>::new_frame()
     {
         for (std::size_t _k = 0; _k < _tasks.size(); _k++) {
-            task& _task = _tasks[_k];
-            _frames[count_t - 1].indices.push_back(_k);
-            _frames[count_t - 1].durations.push_back(_task.duration.count());
+            chronometer_task<unit_t>& _task = _tasks[_k];
+            for (const task_callback& _callback : _new_frame_for_each_task_callbacks) {
+                _callback(_task);
+            }
+            _task.duration = unit_t { 0 };
         }
-        for (std::function<void()>& _callback : _new_frame_callbacks)
-            _callback();
-        for (std::size_t _k = 0; _k < _tasks.size(); _k++) {
-            task& _task = _tasks[_k];
-            _task.instances = 0;
-            _task.duration = unit_t(0);
-        }
-        std::iter_swap(_frames.data(), _frames.data() + count_t - 1);
-        _frames[count_t - 1].indices.clear();
-        _frames[count_t - 1].durations.clear();
     }
 
-    template <std::size_t count_t, typename unit_t>
-    void chronometer<count_t, unit_t>::begin_task(const std::string& name)
+    template <typename unit_t>
+    void chronometer<unit_t>::begin_task(const std::string& name)
     {
         if (_task_names.find(name) == _task_names.end()) {
             _task_names.emplace(name, static_cast<std::size_t>(_tasks.size()));
-            _tasks.emplace_back();
-            for (std::function<void(const std::string&, size_t)>& _callback : _new_task_callbacks)
-                _callback(name, static_cast<std::size_t>(_tasks.size()) - 1);
+            chronometer_task<unit_t>& _task = _tasks.emplace_back();
+            _task.name = name;
+            for (const task_callback& _callback : _new_task_callbacks) {
+                _callback(_task);
+            }
+            return;
         }
-        task& _task = _tasks[_task_names[name]];
-        _task.watch.lap<unit_t>();
-        _task.instances++;
+        chronometer_task<unit_t>& _task = _tasks.at(_task_names.at(name));
+        if (_task._is_running) {
+            throw backtraced_exception("This chronometer task has already been started with the "
+                                       "begin_task() method. Please use the end_task() method "
+                                       "before starting it again.");
+        }
+        _task._watch.lap<unit_t>();
+        _task._is_running = true;
     }
 
-    template <std::size_t count_t, typename unit_t>
-    void chronometer<count_t, unit_t>::end_task(const std::string& name)
+    template <typename unit_t>
+    void chronometer<unit_t>::end_task(const std::string& name)
     {
-        task& _task = _tasks[_task_names[name]];
-        unit_t _duration = _task.watch.lap<unit_t>();
+        chronometer_task<unit_t>& _task = _tasks.at(_task_names.at(name));
+        if (!_task._is_running) {
+            throw backtraced_exception("This chronometer task has already been ended with the "
+                                       "end_task() method. Please use the begin_task() method "
+                                       "before ending it again.");
+        }
+        unit_t _duration = _task._watch.lap<unit_t>();
         _task.duration += _duration;
-        _frame_duration += _duration;
+        _task._is_running = false;
     }
 
-    template <std::size_t count_t, typename unit_t>
-    const typename chronometer<count_t, unit_t>::task& chronometer<count_t, unit_t>::get_task(const std::string& name)
-    {
-        return _tasks[_task_names[name]];
-    }
-
-    template <std::size_t count_t, typename unit_t>
-    const std::vector<typename chronometer<count_t, unit_t>::task>& chronometer<count_t, unit_t>::get_tasks()
-    {
-        return _tasks;
-    }
-
-    template <std::size_t count_t, typename unit_t>
-    const std::array<typename chronometer<count_t, unit_t>::frame, count_t>& chronometer<count_t, unit_t>::get_frames()
-    {
-        return _frames;
-    }
-
-    template <std::size_t count_t, typename unit_t>
-    void chronometer<count_t, unit_t>::on_new_task(const std::function<void(const std::string&, std::size_t)>& new_task_callback)
+    template <typename unit_t>
+    void chronometer<unit_t>::on_new_task(const chronometer<unit_t>::task_callback& new_task_callback)
     {
         _new_task_callbacks.push_back(new_task_callback);
     }
 
-    template <std::size_t count_t, typename unit_t>
-    void chronometer<count_t, unit_t>::on_new_frame(const std::function<void()>& new_frame_callback)
+    template <typename unit_t>
+    void chronometer<unit_t>::on_new_frame_for_each_task(const chronometer<unit_t>::task_callback& new_frame_for_each_task_callback)
     {
-        _new_frame_callbacks.push_back(new_frame_callback);
+        _new_frame_for_each_task_callbacks.push_back(new_frame_for_each_task_callback);
     }
 }
 }

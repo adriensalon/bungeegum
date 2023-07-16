@@ -61,56 +61,53 @@ namespace detail {
         std::chrono::system_clock::time_point _last;
     };
 
-    /// @brief
-    /// @tparam unit_t
-    /// @tparam count_t
-    template <std::size_t count_t, typename unit_t = std::chrono::milliseconds>
-    struct chronometer {
-
-        /// @brief
-        struct frame {
-            std::vector<std::size_t> indices;
-            std::vector<std::size_t> durations;
-        };
-
-        /// @brief
-        struct task {
-            stopwatch watch;
-            unit_t duration;
-            std::size_t instances = 0;
-        };
-
-        /// @brief
-        void new_frame();
-
-        /// @brief
-        void begin_task(const std::string& name);
-
-        /// @brief
-        void end_task(const std::string& name);
-
-        /// @brief
-        const task& get_task(const std::string& name);
-
-        /// @brief
-        const std::vector<task>& get_tasks();
-
-        /// @brief
-        const std::array<frame, count_t>& get_frames();
-
-        /// @brief
-        void on_new_task(const std::function<void(const std::string&, std::size_t)>& new_task_callback);
-
-        /// @brief
-        void on_new_frame(const std::function<void()>& new_frame_callback); // devrait prendre en arg 1 seul frame
+    /// @brief Instances of this struct represent a task which duration is measured.
+    /// @details Instances of this struct can be copied (deep copy) or moved.
+    /// @tparam unit_t is the type from std::chrono to use as units.
+    template <typename unit_t = std::chrono::milliseconds>
+    struct chronometer_task {
+        std::string name = {};
+        unit_t duration = unit_t { 0 };
 
     private:
-        unit_t _frame_duration;
-        std::vector<std::function<void(const std::string&, std::size_t)>> _new_task_callbacks;
-        std::vector<std::function<void()>> _new_frame_callbacks;
-        std::vector<task> _tasks;
-        std::array<frame, count_t> _frames; // 1seul frame en fait
-        std::unordered_map<std::string, std::size_t> _task_names;
+        template <typename _unit_t>
+        friend struct chronometer;
+        bool _is_running = true;
+        stopwatch _watch = {};
+    };
+
+    /// @brief Instances of this struct represent an array of tasks that can be started or stopped
+    /// multiple times per frame.
+    /// @details Instances of this struct can be copied (deep copy) or moved.
+    /// @tparam unit_t is the type from std::chrono to use as units.
+    template <typename unit_t = std::chrono::milliseconds>
+    struct chronometer {
+
+        /// @brief Defines the callback type for events.
+        using task_callback = std::function<void(const chronometer_task<unit_t>&)>;
+
+        /// @brief Must be called at the beginning of every frame.
+        void new_frame();
+
+        /// @brief Begins a task with the specified name.
+        /// @exception Throws a backtraced_exception if the task has already been started.
+        void begin_task(const std::string& name);
+
+        /// @brief Ends a task with the specified name.
+        /// @exception Throws a backtraced_exception if the task has already been ended.
+        void end_task(const std::string& name);
+
+        /// @brief Registers a callback to be called each time a new task is created.
+        void on_new_task(const task_callback& new_task_callback);
+
+        /// @brief Registers a callback to be called each frame for each task.
+        void on_new_frame_for_each_task(const task_callback& new_frame_for_task_callback);
+
+    private:
+        std::vector<task_callback> _new_task_callbacks = {};
+        std::vector<task_callback> _new_frame_for_each_task_callbacks = {};
+        std::unordered_map<std::string, std::size_t> _task_names = {};
+        std::vector<chronometer_task<unit_t>> _tasks = {};
     };
 }
 }

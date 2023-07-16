@@ -14,7 +14,8 @@
 namespace bungeegum {
 namespace detail {
 
-    using frames_chronometer = chronometer<1u, BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT>;
+    using frames_chronometer = chronometer<BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT>;
+    using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT>;
 
     struct backend_manager {
         backend_manager() = default;

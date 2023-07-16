@@ -89,7 +89,7 @@ struct Composed {
 
 int main()
 {
-    bungeegum::detail::chronometer<30u> _chrono;
+    // bungeegum::detail::chronometer<30u> _chrono;
 
     // #if BUNGEEGUM_USE_HOTSWAP
     //     bungeegum::detail::setup_global();
