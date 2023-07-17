@@ -14,7 +14,7 @@ namespace detail {
 
     void process_manager::_process_interact()
     {
-        detail::global().backend.profiler_chronometer.begin_task("interact");
+        detail::global().backend.profiler_frame_chronometer.begin_task("interact");
 #define traverse_interact_impl(interaction_name)                                                                           \
     for (const interaction_name##_event& _event : interaction_name##_events) {                                             \
         global_widgets_manager.traverse(global_widgets_manager.root.value(), [&_event](widget_update_data& _widget_data) { \
@@ -39,12 +39,12 @@ namespace detail {
         // traverse_interact_impl(mouse_pressed);
 
 #undef traverse_interact_impl
-        detail::global().backend.profiler_chronometer.end_task("interact");
+        detail::global().backend.profiler_frame_chronometer.end_task("interact");
     }
 
     void process_manager::_process_resolve()
     {
-        detail::global().backend.profiler_chronometer.begin_task("resolve");
+        detail::global().backend.profiler_frame_chronometer.begin_task("resolve");
         bool _resolve_done = false;
         while (!_resolve_done) {
             std::for_each(
@@ -64,16 +64,23 @@ namespace detail {
                         _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
                         _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
                     }
+#if BUNGEEGUM_USE_OVERLAY
+                    std::string _widget_type_name = _widget_data.kind->name();
+                    global().backend.profiler_resolve_chronometer.begin_task(_widget_type_name);
+#endif
                     global().logs.protect_userspace([&_widget_data]() {
                         _widget_data.resolver(_widget_data.resolver_command);
                     });
+#if BUNGEEGUM_USE_OVERLAY
+                    global().backend.profiler_resolve_chronometer.end_task(_widget_type_name);
+#endif
                 });
             global().widgets.resolvables.erase(
                 global().widgets.resolvables.begin(),
                 global().widgets.resolvables.end());
             _resolve_done = global().widgets.resolvables.empty();
         }
-        detail::global().backend.profiler_chronometer.end_task("resolve");
+        detail::global().backend.profiler_frame_chronometer.end_task("resolve");
     }
 
     void process_manager::_process_draw(ImDrawList* imgui_drawlist)
@@ -102,9 +109,16 @@ namespace detail {
                             _widget_drawer_command._data.resolved_size = _widget_resolver_command._data.resolved_size;
                             _widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
                             _widget_drawer_command._data.commands.clear();
+#if BUNGEEGUM_USE_OVERLAY
+                            std::string _widget_type_name = _widget_data.kind->name();
+                            global().backend.profiler_draw_chronometer.begin_task(_widget_type_name);
+#endif
                             global().logs.protect_userspace([&_widget_data, &_widget_drawer_command]() {
                                 _widget_data.drawer(_widget_drawer_command);
                             });
+#if BUNGEEGUM_USE_OVERLAY
+                            global().backend.profiler_draw_chronometer.end_task(_widget_type_name);
+#endif
                             _widget_drawer_command._data.draw(imgui_drawlist);
                         }
                         return true;
@@ -119,14 +133,14 @@ namespace detail {
 
     bool process_manager::update(const std::chrono::milliseconds& delta_time)
     {
-        detail::global().backend.profiler_chronometer.begin_task("animations");
+        detail::global().backend.profiler_frame_chronometer.begin_task("animations");
         global().animations.update(delta_time);
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
-        detail::global().backend.profiler_chronometer.end_task("animations");
-        detail::global().backend.profiler_chronometer.begin_task("events");
+        // std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        detail::global().backend.profiler_frame_chronometer.end_task("animations");
+        detail::global().backend.profiler_frame_chronometer.begin_task("events");
         global().events.update();
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
-        detail::global().backend.profiler_chronometer.end_task("events");
+        // std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        detail::global().backend.profiler_frame_chronometer.end_task("events");
         ////
         ////
         ////
@@ -139,6 +153,11 @@ namespace detail {
         // context::_process_interact();
         _process_resolve();
         // return (has_userspace_thrown() || !global().widgets.drawables.empty());
+
+#if BUNGEEGUM_USE_OVERLAY
+        global().backend.lifetime_duration += delta_time;
+#endif
+
         return !global().widgets.drawables.empty();
         // return true;
     }

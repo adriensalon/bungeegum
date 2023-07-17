@@ -28,7 +28,7 @@ namespace widgets {
         // log_message("has parent = " + std::to_string(bungeegum::has_parent(this)));
         // std::cout << "ok n";
 
-        log_message("hey this is a message");
+        // log_message("hey this is a message");
 
         // bungeegum::adopt(this, bungeegum::make<float>());
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -47,9 +47,9 @@ namespace widgets {
         float2 _max_point = _min_point + command.resolved_size();
         command.draw_rect_filled(_min_point, _max_point, _color);
 
-        // std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-        ff += 0.0001f;
+        // ff += 0.0001f;
         // std::cout << "color box  = " << ff << std::endl;
     }
 

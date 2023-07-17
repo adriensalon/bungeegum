@@ -14,8 +14,8 @@
 namespace bungeegum {
 namespace detail {
 
-    using frames_chronometer = chronometer<BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT>;
-    using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_OVERLAY_PROFILER_UNIT>;
+    using frames_chronometer = chronometer<BUNGEEGUM_USE_TIME_UNIT>;
+    using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_TIME_UNIT>;
 
     struct backend_manager {
         backend_manager() = default;
@@ -38,7 +38,11 @@ namespace detail {
 #endif
 
 #if BUNGEEGUM_USE_OVERLAY
-        frames_chronometer profiler_chronometer = {};
+        BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};
+        frames_chronometer profiler_frame_chronometer = {};
+        frames_chronometer profiler_resolve_chronometer = {};
+        frames_chronometer profiler_interact_chronometer = {};
+        frames_chronometer profiler_draw_chronometer = {};
 #endif
 
         uint2 viewport_size = zero<float2>;

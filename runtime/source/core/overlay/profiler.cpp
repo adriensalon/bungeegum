@@ -11,134 +11,176 @@
 namespace bungeegum {
 namespace detail {
 
-    struct scrolling_buffer {
-        scrolling_buffer() = delete;
-        scrolling_buffer(const scrolling_buffer& other) = default;
-        scrolling_buffer& operator=(const scrolling_buffer& other) = default;
-        scrolling_buffer(scrolling_buffer&& other) = default;
-        scrolling_buffer& operator=(scrolling_buffer&& other) = default;
+    namespace {
 
-        scrolling_buffer(const std::string& name, int max_size = BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE)
-            : _name(name)
-            , _max_size(max_size)
+        std::string tag(const std::string& name)
         {
-            _data.reserve(_max_size);
+            return "###__bungeegum_overlay_profiler_" + name + "__";
         }
 
-        void emplace(const float x, const float y)
+        float backend_lifetime_duration()
         {
-            if (_data.size() < _max_size)
-                _data.push_back(float2 { x, y });
-            else {
-                _data[_offset] = float2 { x, y };
-                _offset = (_offset + 1) % _max_size;
+            return 0.001f * static_cast<float>(global().backend.lifetime_duration.count());
+        }
+
+        struct scrolling_buffer {
+            scrolling_buffer() = delete;
+            scrolling_buffer(const scrolling_buffer& other) = default;
+            scrolling_buffer& operator=(const scrolling_buffer& other) = default;
+            scrolling_buffer(scrolling_buffer&& other) = default;
+            scrolling_buffer& operator=(scrolling_buffer&& other) = default;
+
+            scrolling_buffer(const std::string& name, int max_size = BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE)
+                : _name(name)
+                , _max_size(max_size)
+            {
+                _data.reserve(_max_size);
             }
-        }
 
-        float back_value() const
-        {
-            if ((_data.size() < _max_size) || (_offset == 0))
-                return _data.back().y;
-            else {
-                return _data[_offset - 1].y;
+            void emplace(const float x, const float y)
+            {
+                if (_data.size() < _max_size)
+                    _data.push_back(float2 { x, y });
+                else {
+                    _data[_offset] = float2 { x, y };
+                    _offset = (_offset + 1) % _max_size;
+                }
             }
-        }
 
-        const std::string& name() const
-        {
-            return _name;
-        }
+            float back_value() const
+            {
+                if ((_data.size() < _max_size) || (_offset == 0))
+                    return _data.back().y;
+                else {
+                    return _data[_offset - 1].y;
+                }
+            }
 
-        const float* data_x() const
-        {
-            return &(_data[0].x);
-        }
+            const std::string& name() const
+            {
+                return _name;
+            }
 
-        const float* data_y() const
-        {
-            return &(_data[0].y);
-        }
+            const float* data_x() const
+            {
+                return &(_data[0].x);
+            }
 
-        bool empty() const
-        {
-            return _data.empty();
-        }
+            const float* data_y() const
+            {
+                return &(_data[0].y);
+            }
 
-        std::size_t offset() const
-        {
-            return _offset;
-        }
+            bool empty() const
+            {
+                return _data.empty();
+            }
 
-        std::size_t size() const
-        {
-            return _data.size();
-        }
+            std::size_t offset() const
+            {
+                return _offset;
+            }
 
-    private:
-        std::string _name = {};
-        std::size_t _max_size = 0;
-        std::size_t _offset = 0;
-        std::vector<float2> _data = {};
-    };
+            std::size_t size() const
+            {
+                return _data.size();
+            }
 
-    static std::vector<scrolling_buffer> buffers = {};
-    static std::unordered_map<std::string, std::size_t> buffer_names = {};
-    static float delta_time = 0.f;
-    static float max_value = 0.f;
+        private:
+            std::string _name = {};
+            std::size_t _max_size = 0;
+            std::size_t _offset = 0;
+            std::vector<float2> _data = {};
+        };
+
+        struct scrolling_profiler {
+
+            void setup(const std::string& name, frames_chronometer& chronometer)
+            {
+                _name = name;
+                chronometer.on_new_task([&](const frames_chronometer_task& task) {
+                    _buffer_names.emplace(task.name, _buffers.size());
+                    _buffers.emplace_back(scrolling_buffer(task.name));
+                });
+                chronometer.on_new_frame_for_each_task([&](const frames_chronometer_task& task) {
+                    std::size_t _index = _buffer_names.at(task.name);
+                    float _duration = static_cast<float>(task.duration.count());
+                    if (_index > 0) {
+                        _duration += _buffers[_index - 1].back_value();
+                    }
+                    float _lifetime_duration = backend_lifetime_duration();
+                    _buffers[_index].emplace(_lifetime_duration, _duration);
+                    _max_value = math::max(_max_value, 1.1f * _duration);
+                });
+            }
+
+            void draw(const float history_size_seconds, const ImVec2 size = { -1.f, -1.f })
+            {
+                float _lifetime_duration = backend_lifetime_duration();
+                static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
+                ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
+                if (ImPlot::BeginPlot(tag("scrolling_profiler_" + _name).c_str(), size, ImPlotFlags_NoMenus)) {
+                    // ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_NoButtons);
+                    ImPlot::SetupLegend(ImPlotLocation_NorthWest);
+                    ImPlot::SetupAxes(NULL, NULL, flags, flags);
+                    ImPlot::SetupAxisLimits(ImAxis_X1, _lifetime_duration - history_size_seconds, _lifetime_duration, ImGuiCond_Always);
+                    ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, _max_value);
+                    ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
+                    for (int _k = static_cast<int>(_buffers.size()) - 1; _k >= 0; --_k) {
+                        if (!_buffers[_k].empty()) {
+                            ImPlot::PlotShaded(
+                                _buffers[_k].name().c_str(), // label id
+                                _buffers[_k].data_x(), // xs
+                                _buffers[_k].data_y(), //xy
+                                static_cast<int>(_buffers[_k].size()), // count
+                                0.f, // yref
+                                0, // flags
+                                static_cast<int>(_buffers[_k].offset()),
+                                static_cast<int>(2 * sizeof(float)));
+                        }
+                    }
+
+                    ImPlot::EndPlot();
+                }
+                ImPlot::PopStyleColor();
+            }
+
+        private:
+            std::string _name = "";
+            std::vector<scrolling_buffer> _buffers = {};
+            std::unordered_map<std::string, std::size_t> _buffer_names = {};
+            float _max_value = 0.f;
+        };
+
+        static scrolling_profiler frame = {};
+        static scrolling_profiler resolve = {};
+        static scrolling_profiler interact = {};
+        static scrolling_profiler draw = {};
+    }
 
     void setup_profiler_overlay()
     {
-        frames_chronometer& _chronometer = global().backend.profiler_chronometer;
-        _chronometer.on_new_task([&](const frames_chronometer_task& task) {
-            buffer_names.emplace(task.name, buffers.size());
-            buffers.emplace_back(scrolling_buffer(task.name));
-        });
-        _chronometer.on_new_frame_for_each_task([&](const frames_chronometer_task& task) {
-            std::size_t _index = buffer_names.at(task.name);
-            float _duration = static_cast<float>(task.duration.count());
-            if (_index > 0) {
-                _duration += buffers[_index - 1].back_value();
-            }
-            buffers[_index].emplace(delta_time, _duration);
-            max_value = math::max(max_value, 1.1f * _duration);
-        });
+        frame.setup("frame", global().backend.profiler_frame_chronometer);
+        resolve.setup("resolve", global().backend.profiler_resolve_chronometer);
+        interact.setup("interact", global().backend.profiler_interact_chronometer);
+        draw.setup("draw", global().backend.profiler_draw_chronometer);
     }
 
     void draw_profiler_overlay()
     {
-        delta_time += ImGui::GetIO().DeltaTime;
-        ImGui::ShowDemoWindow();
+        // ImGui::ShowDemoWindow();
         ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
         if (ImGui::Begin("profiler##__bungeegum_window_profiler_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
-            static float history = 10.0f;
-            // ImGui::SliderFloat("History", &history, 1, 30, "%.1f s");
-            static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
-            // ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 1.f, 1.f, 0.f, 1.f });
-            ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
-            if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, -1), ImPlotFlags_NoMenus)) {
-                // ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_NoButtons);
-                ImPlot::SetupLegend(ImPlotLocation_NorthWest);
-                ImPlot::SetupAxes(NULL, NULL, flags, flags);
-                ImPlot::SetupAxisLimits(ImAxis_X1, delta_time - history, delta_time, ImGuiCond_Always);
-                ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, max_value);
-                ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-                for (int _k = static_cast<int>(buffers.size()) - 1; _k >= 0; --_k) {
-                    if (!buffers[_k].empty()) {
-                        ImPlot::PlotShaded(
-                            buffers[_k].name().c_str(), // label id
-                            buffers[_k].data_x(), // xs
-                            buffers[_k].data_y(), //xy
-                            static_cast<int>(buffers[_k].size()), // count
-                            0.f, // yref
-                            0, // flags
-                            static_cast<int>(buffers[_k].offset()),
-                            static_cast<int>(2 * sizeof(float)));
-                    }
-                }
+            static float _history = 10.f;
+            ImGui::SliderFloat("view duration", &_history, 1.f, BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE / 100.f, "%.1f s");
+            // _history = static_cast<std::size_t>(math::ceil(_float_history));
 
-                ImPlot::EndPlot();
-            }
-            ImPlot::PopStyleColor();
+            ImVec2 _available_size = ImGui::GetContentRegionAvail();
+
+            frame.draw(_history, _available_size);
+            resolve.draw(_history, _available_size);
+            interact.draw(_history, _available_size);
+            draw.draw(_history, _available_size);
         }
         ImGui::End();
     }

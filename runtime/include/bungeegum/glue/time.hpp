@@ -7,6 +7,10 @@
 #include <unordered_map>
 #include <vector>
 
+#if !defined(BUNGEEGUM_USE_TIME_UNIT)
+#define BUNGEEGUM_USE_TIME_UNIT std::chrono::milliseconds
+#endif
+
 namespace bungeegum {
 namespace detail {
 
@@ -47,14 +51,14 @@ namespace detail {
 
         /// @brief Gets the duration between now and the last time we retrieved a duration.
         /// @tparam unit_t is the type from std::chrono to use as units.
-        template <typename unit_t = std::chrono::milliseconds>
+        template <typename unit_t = BUNGEEGUM_USE_TIME_UNIT>
         unit_t lap();
 
         /// @brief Gets the duration between now and the last time we retrieved a duration,
         /// blocking the thread until a certain duration has passed since the last time we
         /// retrieved a duration.
         /// @tparam unit_t is the type from std::chrono to use as units.
-        template <typename unit_t = std::chrono::milliseconds>
+        template <typename unit_t = BUNGEEGUM_USE_TIME_UNIT>
         unit_t lap_at_least(const unit_t at_least);
 
     private:
@@ -64,7 +68,7 @@ namespace detail {
     /// @brief Instances of this struct represent a task which duration is measured.
     /// @details Instances of this struct can be copied (deep copy) or moved.
     /// @tparam unit_t is the type from std::chrono to use as units.
-    template <typename unit_t = std::chrono::milliseconds>
+    template <typename unit_t = BUNGEEGUM_USE_TIME_UNIT>
     struct chronometer_task {
         std::string name = {};
         unit_t duration = unit_t { 0 };
@@ -80,7 +84,7 @@ namespace detail {
     /// multiple times per frame.
     /// @details Instances of this struct can be copied (deep copy) or moved.
     /// @tparam unit_t is the type from std::chrono to use as units.
-    template <typename unit_t = std::chrono::milliseconds>
+    template <typename unit_t = BUNGEEGUM_USE_TIME_UNIT>
     struct chronometer {
 
         /// @brief Defines the callback type for events.

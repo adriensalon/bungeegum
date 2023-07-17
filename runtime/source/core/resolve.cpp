@@ -26,9 +26,16 @@ float2 resolve_command::resolve_child(const runtime_widget& child_widget, const 
     _child_resolve_command._data.constraint.min_size = min_size;
     _child_resolve_command._data.constraint.max_size = max_size;
     detail::widget_update_data& _child_untyped_widget = detail::global().widgets[child_widget];
+    // #if BUNGEEGUM_USE_OVERLAY
+    //     std::string _widget_type_name = _widget_data.kind->name();
+    //     global().backend.profiler_draw_chronometer.end_task(_widget_type_name);
+    // #endif
     detail::global().logs.protect_userspace([&_child_untyped_widget, &_child_resolve_command]() {
         _child_untyped_widget.resolver(_child_resolve_command);
     });
+    // #if BUNGEEGUM_USE_OVERLAY
+    //     global().backend.profiler_draw_chronometer.begin_task(_widget_type_name);
+    // #endif
     return _child_resolve_command._data.resolved_size;
 }
 

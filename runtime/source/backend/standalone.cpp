@@ -123,16 +123,19 @@ void launch(const runtime_widget& widget)
             bool _has_polled = _window.poll();
             (void)_has_polled;
 
-            detail::global().backend.profiler_chronometer.new_frame();
+            detail::global().backend.profiler_frame_chronometer.new_frame();
+            detail::global().backend.profiler_resolve_chronometer.new_frame();
+            detail::global().backend.profiler_interact_chronometer.new_frame();
+            detail::global().backend.profiler_draw_chronometer.new_frame();
 
             bool _has_ticked = detail::global().process.update(_delta_milliseconds);
             if (_has_ticked) {
 
-                detail::global().backend.profiler_chronometer.begin_task("draw");
+                detail::global().backend.profiler_frame_chronometer.begin_task("draw");
                 _renderer.new_frame();
                 detail::global().process.render();
                 _renderer.present();
-                detail::global().backend.profiler_chronometer.end_task("draw");
+                detail::global().backend.profiler_frame_chronometer.end_task("draw");
             }
 
 #if BUNGEEGUM_USE_HOTSWAP
