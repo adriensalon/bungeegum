@@ -101,6 +101,9 @@ namespace detail {
         /// @exception Throws a backtraced_exception if the task has already been ended.
         void end_task(const std::string& name);
 
+        ///
+        unit_t frame_duration() const;
+
         /// @brief Registers a callback to be called each time a new task is created.
         void on_new_task(const task_callback& new_task_callback);
 
@@ -108,6 +111,7 @@ namespace detail {
         void on_new_frame_for_each_task(const task_callback& new_frame_for_task_callback);
 
     private:
+        unit_t _frame_duration = {};
         std::vector<task_callback> _new_task_callbacks = {};
         std::vector<task_callback> _new_frame_for_each_task_callbacks = {};
         std::unordered_map<std::string, std::size_t> _task_names = {};

@@ -44,7 +44,7 @@ namespace detail {
 
     void process_manager::_process_resolve()
     {
-        detail::global().backend.profiler_frame_chronometer.begin_task("resolve");
+        detail::global().backend.profiler_frame_chronometer.begin_task("resolve widgets");
         bool _resolve_done = false;
         while (!_resolve_done) {
             std::for_each(
@@ -65,7 +65,7 @@ namespace detail {
                         _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
                     }
 #if BUNGEEGUM_USE_OVERLAY
-                    std::string _widget_type_name = _widget_data.kind->name();
+                    std::string _widget_type_name = clean_typename(_widget_data.kind->name());
                     global().backend.profiler_resolve_chronometer.begin_task(_widget_type_name);
 #endif
                     global().logs.protect_userspace([&_widget_data]() {
@@ -80,7 +80,7 @@ namespace detail {
                 global().widgets.resolvables.end());
             _resolve_done = global().widgets.resolvables.empty();
         }
-        detail::global().backend.profiler_frame_chronometer.end_task("resolve");
+        detail::global().backend.profiler_frame_chronometer.end_task("resolve widgets");
     }
 
     void process_manager::_process_draw(ImDrawList* imgui_drawlist)
@@ -110,7 +110,7 @@ namespace detail {
                             _widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
                             _widget_drawer_command._data.commands.clear();
 #if BUNGEEGUM_USE_OVERLAY
-                            std::string _widget_type_name = _widget_data.kind->name();
+                            std::string _widget_type_name = clean_typename(_widget_data.kind->name());
                             global().backend.profiler_draw_chronometer.begin_task(_widget_type_name);
 #endif
                             global().logs.protect_userspace([&_widget_data, &_widget_drawer_command]() {

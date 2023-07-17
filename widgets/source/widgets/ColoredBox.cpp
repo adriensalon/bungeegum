@@ -31,7 +31,7 @@ namespace widgets {
         // log_message("hey this is a message");
 
         // bungeegum::adopt(this, bungeegum::make<float>());
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         if (_childWidget.has_value()) {
             float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());

@@ -35,11 +35,13 @@ namespace detail {
     template <typename unit_t>
     void chronometer<unit_t>::new_frame()
     {
+        _frame_duration = { 0 };
         for (std::size_t _k = 0; _k < _tasks.size(); _k++) {
             chronometer_task<unit_t>& _task = _tasks[_k];
             for (const task_callback& _callback : _new_frame_for_each_task_callbacks) {
                 _callback(_task);
             }
+            _frame_duration += _task.duration;
             _task.duration = unit_t { 0 };
         }
     }
@@ -78,6 +80,12 @@ namespace detail {
         unit_t _duration = _task._watch.lap<unit_t>();
         _task.duration += _duration;
         _task._is_running = false;
+    }
+
+    template <typename unit_t>
+    unit_t chronometer<unit_t>::frame_duration() const
+    {
+        return _frame_duration;
     }
 
     template <typename unit_t>

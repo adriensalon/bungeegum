@@ -62,6 +62,23 @@ namespace detail {
         }
     }
 #endif
+
+#if BUNGEEGUM_USE_OVERLAY
+    std::string clean_typename(const std::string& raw_typename)
+    {
+        std::size_t _last_space = raw_typename.find_last_of(' ');
+        if (_last_space == raw_typename.npos) {
+            _last_space = 0;
+        }
+        std::size_t _last_column = raw_typename.find_last_of(':');
+        if (_last_column == raw_typename.npos) {
+            _last_column = 0;
+        }
+        std::size_t _offset = std::max(_last_space, _last_column) + 1;
+        std::size_t _length = raw_typename.length() - _offset;
+        return raw_typename.substr(_offset, _length);
+    }
+#endif
 }
 
 #if BUNGEEGUM_USE_HOTSWAP

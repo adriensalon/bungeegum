@@ -47,5 +47,9 @@ namespace detail {
 
         uint2 viewport_size = zero<float2>;
     };
+
+#if BUNGEEGUM_USE_OVERLAY
+    std::string clean_typename(const std::string& raw_typename);
+#endif
 }
 }

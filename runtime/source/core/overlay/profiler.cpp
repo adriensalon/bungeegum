@@ -1,7 +1,10 @@
+#include <iostream>
+
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <implot.h>
 #include <implot_internal.h>
-#include <iostream>
+#include <misc/cpp/imgui_stdlib.h>
 
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
@@ -145,6 +148,11 @@ namespace detail {
                 ImPlot::PopStyleColor();
             }
 
+            const std::string& name() const
+            {
+                return _name;
+            }
+
         private:
             std::string _name = "";
             std::vector<scrolling_buffer> _buffers = {};
@@ -156,31 +164,65 @@ namespace detail {
         static scrolling_profiler resolve = {};
         static scrolling_profiler interact = {};
         static scrolling_profiler draw = {};
+        static std::string filter_text = "";
+        static bool filter_enabled = true;
+    }
+
+    void draw_profiler_tab(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
+    {
+        const std::size_t _duration_ms = chronometer.frame_duration().count();
+        std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
+        if (ImGui::BeginTabItem(_title.c_str())) {
+            ImVec2 _available_size = ImGui::GetContentRegionAvail();
+            _available_size.y -= ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y;
+            profiler.draw(history_size_seconds, _available_size);
+            ImGui::EndTabItem();
+        }
+    }
+
+    void draw_profiler_tab_with_regex(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
+    {
+        const std::size_t _duration_ms = chronometer.frame_duration().count();
+        std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
+        if (ImGui::BeginTabItem(_title.c_str())) {
+            ImVec2 _available_size = ImGui::GetContentRegionAvail();
+            _available_size.y -= 2.f * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y);
+            profiler.draw(history_size_seconds, _available_size);
+            ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled);
+            ImGui::SameLine();
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+            if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here a widget type to match with regex...", &filter_text)) {
+                // todo
+            }
+            ImGui::PopItemWidth();
+            ImGui::EndTabItem();
+        }
     }
 
     void setup_profiler_overlay()
     {
         frame.setup("frame", global().backend.profiler_frame_chronometer);
-        resolve.setup("resolve", global().backend.profiler_resolve_chronometer);
-        interact.setup("interact", global().backend.profiler_interact_chronometer);
-        draw.setup("draw", global().backend.profiler_draw_chronometer);
+        resolve.setup("resolve widgets", global().backend.profiler_resolve_chronometer);
+        interact.setup("interact widgets", global().backend.profiler_interact_chronometer);
+        draw.setup("draw widgets", global().backend.profiler_draw_chronometer);
     }
 
     void draw_profiler_overlay()
     {
-        // ImGui::ShowDemoWindow();
         ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
-        if (ImGui::Begin("profiler##__bungeegum_window_profiler_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
+        if (ImGui::Begin(("profiler" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             static float _history = 10.f;
-            ImGui::SliderFloat("view duration", &_history, 1.f, BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE / 100.f, "%.1f s");
-            // _history = static_cast<std::size_t>(math::ceil(_float_history));
-
-            ImVec2 _available_size = ImGui::GetContentRegionAvail();
-
-            frame.draw(_history, _available_size);
-            resolve.draw(_history, _available_size);
-            interact.draw(_history, _available_size);
-            draw.draw(_history, _available_size);
+            ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+            if (ImGui::BeginTabBar(tag("tab_bar").c_str(), tab_bar_flags)) {
+                draw_profiler_tab(global().backend.profiler_frame_chronometer, frame, _history);
+                draw_profiler_tab_with_regex(global().backend.profiler_resolve_chronometer, resolve, _history);
+                draw_profiler_tab_with_regex(global().backend.profiler_interact_chronometer, interact, _history);
+                draw_profiler_tab_with_regex(global().backend.profiler_draw_chronometer, draw, _history);
+            }
+            ImGui::EndTabBar();
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+            ImGui::DragFloat(tag("history_drag").c_str(), &_history, 0.1f, 1.f, BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE / 100.f, "%.1f seconds");
+            ImGui::PopItemWidth();
         }
         ImGui::End();
     }

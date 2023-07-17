@@ -131,11 +131,11 @@ void launch(const runtime_widget& widget)
             bool _has_ticked = detail::global().process.update(_delta_milliseconds);
             if (_has_ticked) {
 
-                detail::global().backend.profiler_frame_chronometer.begin_task("draw");
+                detail::global().backend.profiler_frame_chronometer.begin_task("draw widgets");
                 _renderer.new_frame();
                 detail::global().process.render();
                 _renderer.present();
-                detail::global().backend.profiler_frame_chronometer.end_task("draw");
+                detail::global().backend.profiler_frame_chronometer.end_task("draw widgets");
             }
 
 #if BUNGEEGUM_USE_HOTSWAP

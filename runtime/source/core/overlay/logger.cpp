@@ -123,42 +123,14 @@ namespace detail {
             }
             ImGui::EndTabBar();
 
-            // for (auto& _log : error_logs) {
-            //     ImGui::Text(std::to_string(_log.second.first).c_str());
-            //     ImGui::SameLine();
-            //     ImGui::Text(_log.first.c_str());
-            // }
-
-            // for (auto& _log : warning_logs) {
-            //     ImGui::Text(std::to_string(_log.second.first).c_str());
-            //     ImGui::SameLine();
-            //     ImGui::Text(_log.first.c_str());
-            // }
-
-            // for (auto& _log : message_logs) {
-            //     ImGui::Text(std::to_string(_log.second.first).c_str());
-            //     ImGui::SameLine();
-            //     ImGui::Text(_log.first.c_str());
-            // }
-
             ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled);
-
-            // float1 _input_width = ImGui::GetContentRegionAvail().x
-            //     - ImGui::CalcTextSize("filter").x
-            //     - 2.f * ImGui::GetStyle().FramePadding.x
-            //     - ImGui::GetStyle().ItemSpacing.x;
-
-            // ImGui::InputTextWithHint()
 
             ImGui::SameLine();
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
             if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here a description to match with regex...", &filter_text)) {
+                // todo
             }
             ImGui::PopItemWidth();
-            // ImGui::SameLine();
-            // if (ImGui::Button(("filter" + tag("filter_button")).c_str())) {
-            //     filter_enabled = !filter_enabled;
-            // }
         }
         ImGui::End();
 
