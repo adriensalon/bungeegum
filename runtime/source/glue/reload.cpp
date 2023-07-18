@@ -20,6 +20,16 @@ namespace detail {
                 }
                 defines.first = defines.second.size();
             }
+            bool _found = false;
+            hotswapper->EnumeratePreprocessorDefinitions([&_found](int handle, const std::string& definition) {
+                if (definition == "__HOTRELOADING__") {
+                    _found = true;
+                }
+                (void)handle;
+            });
+            if (!_found) {
+                hotswapper->AddPreprocessorDefinition("__HOTRELOADING__");
+            }
         }
 
         void update_compilation_include_directories(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& include_directories)

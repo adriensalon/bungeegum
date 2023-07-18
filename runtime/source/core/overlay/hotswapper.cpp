@@ -138,7 +138,11 @@ namespace detail {
             ImGui::InputTextMultiline(tag("defines_value_input").c_str(), &_value_str, ImVec2(_available_width, multiline_text_input_height));
             float _button_width = 0.5f * (_available_width - ImGui::GetStyle().ItemSpacing.x);
             if (ImGui::Button("add definition", ImVec2(_button_width, 0.f))) {
-                defines.push_back(_name_str + " " + _value_str);
+                std::string _definition = _name_str;
+                if (!_value_str.empty()) {
+                    _definition += "=" + _name_str;
+                }
+                defines.push_back(_definition);
             }
             ImGui::SameLine();
             bool _disabled = selected_count == 0;

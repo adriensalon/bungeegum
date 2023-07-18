@@ -23,6 +23,10 @@ namespace widgets {
 
     void ColoredBox::resolve(resolve_command& command)
     {
+
+#if defined(__HOTRELOADING__)
+        // std::cout << "oui" << std::endl;
+#endif
         // std::cout << bungeegum::detail::animations_manager::stat_test++ << std::endl;
         // std::cout << bungeegum::detail::global().animations.stat_test++ << std::endl;
 
@@ -32,6 +36,9 @@ namespace widgets {
         // std::cout << "ok n";
 
         // log_message("hey this is a message");
+
+        // auto& pp = bungeegum::make<Padding>();
+        // must_resolve(pp);
 
         // bungeegum::adopt(this, bungeegum::make<Padding>().padding(EdgeInsets::fromLTRB(0.f, 0.f, 0.f, 0.f)));
         // bungeegum::adopt(this, bungeegum::make<int>());
