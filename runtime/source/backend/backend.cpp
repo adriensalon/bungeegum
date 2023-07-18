@@ -78,6 +78,11 @@ namespace detail {
         std::size_t _length = raw_typename.length() - _offset;
         return raw_typename.substr(_offset, _length);
     }
+
+    // void backend_manager::set_clean_typename(widget_update_data& update_data)
+    // {
+    //     update_data.resolver_command._data.clean_typename = clean_typename(update_data.kind->name());
+    // }
 #endif
 }
 

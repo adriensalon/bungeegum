@@ -76,7 +76,7 @@ namespace detail {
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
                         bool _is_selected = false;
-                        ImGui::Selectable((std::to_string(_log_count) + tag("_log_description")).c_str(), &_is_selected, ImGuiSelectableFlags_SpanAllColumns);
+                        ImGui::Selectable((std::to_string(_log_count) + tag("_log_description_" + _log_description)).c_str(), &_is_selected, ImGuiSelectableFlags_SpanAllColumns);
                         if (_is_selected) {
                             _log_count = 1;
                         }

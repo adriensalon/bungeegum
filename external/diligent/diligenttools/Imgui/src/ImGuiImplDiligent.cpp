@@ -46,7 +46,7 @@ ImGuiImplDiligent::ImGuiImplDiligent(IRenderDevice* pDevice,
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.IniFilename = nullptr;
     m_pRenderer.reset(new ImGuiDiligentRenderer(pDevice, BackBufferFmt, DepthBufferFmt, InitialVertexBufferSize, InitialIndexBufferSize));
 }

@@ -1,4 +1,7 @@
+#include <bungeegum_widgets/core/Offset.hpp>
+#include <bungeegum_widgets/core/Size.hpp>
 #include <bungeegum_widgets/widgets/ColoredBox.hpp>
+#include <bungeegum_widgets/widgets/Padding.hpp>
 
 namespace bungeegum {
 namespace widgets {
@@ -30,8 +33,8 @@ namespace widgets {
 
         // log_message("hey this is a message");
 
-        // bungeegum::adopt(this, bungeegum::make<float>());
-        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        // bungeegum::adopt(this, bungeegum::make<Padding>().padding(EdgeInsets::fromLTRB(0.f, 0.f, 0.f, 0.f)));
+        // bungeegum::adopt(this, bungeegum::make<int>());
 
         if (_childWidget.has_value()) {
             float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
@@ -39,6 +42,8 @@ namespace widgets {
             command.resize(_childSize);
         } else
             command.resize(command.max_size());
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));
     }
 
     void ColoredBox::draw(draw_command& command)

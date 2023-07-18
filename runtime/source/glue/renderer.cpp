@@ -6,7 +6,7 @@
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 // imgui emscripten ?
 #else
-#include <imgui_impl_sdl.h>
+#include <imgui_impl_sdl2.h>
 #endif
 #include <implot.h>
 

@@ -17,6 +17,7 @@ namespace widgets {
 
     void Title::resolve(resolve_command& command)
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));
         if (_childWidget.has_value()) {
             float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
             command.position_child(_childWidget.value(), zero<float2>);

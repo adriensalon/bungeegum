@@ -58,21 +58,19 @@ namespace detail {
                         _resolve_command._data.constraint.min_size = global().backend.viewport_size;
                         _resolve_command._data.constraint.max_size = global().backend.viewport_size;
                     } else {
-                        widget_update_data* _parent_widget_data_ptr = &_widget_data.parent.value().get();
-
-                        resolve_command& _parent_resolve_command = _parent_widget_data_ptr->resolver_command;
+                        widget_update_data& _parent_widget_data_ptr = _widget_data.parent.value().get();
+                        resolve_command& _parent_resolve_command = _parent_widget_data_ptr.resolver_command;
                         _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
                         _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
                     }
 #if BUNGEEGUM_USE_OVERLAY
-                    std::string _widget_type_name = clean_typename(_widget_data.kind->name());
-                    global().backend.profiler_resolve_chronometer.begin_task(_widget_type_name);
+                    global().backend.profiler_resolve_chronometer.begin_task(_widget_data.resolver_command._data.clean_typename);
 #endif
                     global().logs.protect_userspace([&_widget_data]() {
                         _widget_data.resolver(_widget_data.resolver_command);
                     });
 #if BUNGEEGUM_USE_OVERLAY
-                    global().backend.profiler_resolve_chronometer.end_task(_widget_type_name);
+                    global().backend.profiler_resolve_chronometer.end_task(_widget_data.resolver_command._data.clean_typename);
 #endif
                 });
             global().widgets.resolvables.erase(
@@ -110,14 +108,14 @@ namespace detail {
                             _widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
                             _widget_drawer_command._data.commands.clear();
 #if BUNGEEGUM_USE_OVERLAY
-                            std::string _widget_type_name = clean_typename(_widget_data.kind->name());
-                            global().backend.profiler_draw_chronometer.begin_task(_widget_type_name);
+                            std::string _clean_typename = clean_typename(_widget_data.kind->name());
+                            global().backend.profiler_draw_chronometer.begin_task(_clean_typename);
 #endif
                             global().logs.protect_userspace([&_widget_data, &_widget_drawer_command]() {
                                 _widget_data.drawer(_widget_drawer_command);
                             });
 #if BUNGEEGUM_USE_OVERLAY
-                            global().backend.profiler_draw_chronometer.end_task(_widget_type_name);
+                            global().backend.profiler_draw_chronometer.end_task(_clean_typename);
 #endif
                             _widget_drawer_command._data.draw(imgui_drawlist);
                         }

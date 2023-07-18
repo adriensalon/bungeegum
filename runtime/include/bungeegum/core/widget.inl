@@ -191,6 +191,9 @@ widget_reference<widget_t> make_reference()
     _update_data.raw_widget = _raw_widget;
     _update_data.kind = std::make_unique<std::type_index>(typeid(widget_t));
     _update_data.kind_debug = std::string(_update_data.kind->name());
+#if BUNGEEGUM_USE_OVERLAY
+    detail::global().backend.set_clean_typename(_update_data);
+#endif
     bungeegum::access::detect_on_interact(_reference);
     bungeegum::access::detect_on_resolve(_reference);
     bungeegum::access::detect_on_draw(_reference);

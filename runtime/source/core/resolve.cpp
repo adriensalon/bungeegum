@@ -1,3 +1,4 @@
+#include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/resolve.hpp>
 #include <bungeegum/core/runtime.hpp>
@@ -26,16 +27,23 @@ float2 resolve_command::resolve_child(const runtime_widget& child_widget, const 
     _child_resolve_command._data.constraint.min_size = min_size;
     _child_resolve_command._data.constraint.max_size = max_size;
     detail::widget_update_data& _child_untyped_widget = detail::global().widgets[child_widget];
-    // #if BUNGEEGUM_USE_OVERLAY
-    //     std::string _widget_type_name = _widget_data.kind->name();
-    //     global().backend.profiler_draw_chronometer.end_task(_widget_type_name);
-    // #endif
+#if BUNGEEGUM_USE_OVERLAY
+    // if (_data.parent_clean_typename.has_value()) {
+    //     detail::global().backend.profiler_resolve_chronometer.end_task(_data.parent_clean_typename.value());
+    // }
+    detail::global().backend.profiler_resolve_chronometer.end_task(_data.clean_typename);
+    detail::global().backend.profiler_resolve_chronometer.begin_task(_child_resolve_command._data.clean_typename);
+#endif
     detail::global().logs.protect_userspace([&_child_untyped_widget, &_child_resolve_command]() {
         _child_untyped_widget.resolver(_child_resolve_command);
     });
-    // #if BUNGEEGUM_USE_OVERLAY
-    //     global().backend.profiler_draw_chronometer.begin_task(_widget_type_name);
-    // #endif
+#if BUNGEEGUM_USE_OVERLAY
+    detail::global().backend.profiler_resolve_chronometer.end_task(_child_resolve_command._data.clean_typename);
+    detail::global().backend.profiler_resolve_chronometer.begin_task(_data.clean_typename);
+    // if (_data.parent_clean_typename.has_value()) {
+    //     detail::global().backend.profiler_resolve_chronometer.begin_task(_data.parent_clean_typename.value());
+    // }
+#endif
     return _child_resolve_command._data.resolved_size;
 }
 

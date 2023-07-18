@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/simd.hpp>
 
 namespace bungeegum {
@@ -9,6 +10,8 @@ namespace bungeegum {
 struct runtime_widget;
 
 namespace detail {
+
+    struct backend_manager;
 
     struct process_manager;
 
@@ -23,6 +26,10 @@ namespace detail {
         float2 resolved_size = zero<float2>;
         float2 resolved_position = zero<float2>;
         float2 accumulated_position = zero<float2>;
+
+#if BUNGEEGUM_USE_OVERLAY
+        std::string clean_typename;
+#endif
     };
 
 }

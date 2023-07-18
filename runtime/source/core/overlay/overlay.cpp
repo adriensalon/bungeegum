@@ -1,7 +1,4 @@
 #include <imgui.h>
-#ifndef IMGUI_DEFINE_MATH_OPERATORS
-#define IMGUI_DEFINE_MATH_OPERATORS
-#endif
 #include <imgui_internal.h>
 #include <implot.h>
 #include <iostream>
@@ -61,34 +58,35 @@ namespace detail {
 
     void draw_dockspace(const std::function<void(ImDrawList*)>& draw_commands)
     {
-        static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
-        ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(viewport->Pos);
-        ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - footer_height });
-        ImGui::SetNextWindowViewport(viewport->ID);
-        {
-            style_guard _sg0(ImGuiStyleVar_WindowRounding, 0.f);
-            style_guard _sg1(ImGuiStyleVar_WindowBorderSize, 0.f);
-            window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-            if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-                window_flags |= ImGuiWindowFlags_NoBackground;
-            style_guard _sg2(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
-            ImGui::Begin("Viewport", nullptr, window_flags);
-        }
-        draw_commands(ImGui::GetWindowDrawList());
+        // static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+        // ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+        // ImGuiViewport* viewport = ImGui::GetMainViewport();
+        // ImGui::SetNextWindowPos(viewport->Pos);
+        // ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - footer_height });
+        // ImGui::SetNextWindowViewport(viewport->ID);
+        // {
+        //     style_guard _sg0(ImGuiStyleVar_WindowRounding, 0.f);
+        //     style_guard _sg1(ImGuiStyleVar_WindowBorderSize, 0.f);
+        //     window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        //     window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        //     if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+        //         window_flags |= ImGuiWindowFlags_NoBackground;
+        //     style_guard _sg2(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
+        //     ImGui::Begin("Viewport", nullptr, window_flags);
+        // }
+        // draw_commands(ImGui::GetWindowDrawList());
+        draw_commands(ImGui::GetBackgroundDrawList());
         if (show_wireframe)
             draw_wireframe_overlay();
-        ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-        static auto first_time = true;
-        if (first_time) {
-            first_time = false;
-            ImGui::DockBuilderSetNodeSize(dockspace_id, { viewport->Size.x, viewport->Size.y - footer_height });
-            ImGui::DockBuilderFinish(dockspace_id);
-        }
-        ImGui::End();
+        // ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+        // ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+        // static auto first_time = true;
+        // if (first_time) {
+        //     first_time = false;
+        //     ImGui::DockBuilderSetNodeSize(dockspace_id, { viewport->Size.x, viewport->Size.y - footer_height });
+        //     ImGui::DockBuilderFinish(dockspace_id);
+        // }
+        // ImGui::End();
     }
 
     void draw_footer()

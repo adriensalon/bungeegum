@@ -10,7 +10,7 @@ set(imgui_source
 
 	"misc/cpp/imgui_stdlib.cpp"
 
-	"backends/imgui_impl_sdl.cpp"
+	"backends/imgui_impl_sdl2.cpp"
 )
 
 # includes

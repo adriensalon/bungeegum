@@ -32,6 +32,7 @@ struct resolve_command {
 
 private:
     detail::resolve_command_data _data;
+    friend struct detail::backend_manager;
     friend struct detail::process_manager;
 };
 

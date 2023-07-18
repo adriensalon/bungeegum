@@ -116,6 +116,7 @@ int main()
     bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/runtime/include/");
 
     bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Release/bungeegum_runtime.lib");
+    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Release/bungeegum_widgets.lib");
     bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Release/hscpp.lib");
     bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Release/hscpp-mem.lib");
     bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Release/imgui.lib");
@@ -168,8 +169,8 @@ int main()
                                                                                .minHeight(10.f)
                                                                                .maxWidth(500.f)
                                                                                .minWidth(500.f)
-                                                                               .child(bungeegum::make<Composed>()
-                                                                                          .build()
+                                                                               .child(bungeegum::make<ColoredBox>()
+                                                                                          .color(0xFF6611FF)
                                                                                    //   .okok()
                                                                                );
                                                                        })

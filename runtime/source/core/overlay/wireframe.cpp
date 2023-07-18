@@ -2,9 +2,6 @@
 #include <unordered_map>
 
 #include <imgui.h>
-#ifndef IMGUI_DEFINE_MATH_OPERATORS
-#define IMGUI_DEFINE_MATH_OPERATORS
-#endif
 #include <imgui_internal.h>
 #include <implot.h>
 #include <iostream>
@@ -51,13 +48,14 @@ namespace detail {
             drawlist_count += g.Viewports[viewport_i]->DrawDataBuilder.GetDrawListCount();
         for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++) {
             ImGuiViewportP* viewport = g.Viewports[viewport_i];
-            for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport->DrawDataBuilder.Layers); layer_i++)
-                for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++) {
-                    if (std::string(viewport->DrawDataBuilder.Layers[layer_i][draw_list_i]->_OwnerName) == "Viewport") {
-                        ImDrawList* _draw_list = viewport->DrawDataBuilder.Layers[layer_i][draw_list_i];
-                        DebugNodeDrawList(viewport, _draw_list);
-                    }
-                }
+            DebugNodeDrawList(viewport, ImGui::GetBackgroundDrawList(viewport));
+            // for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport->DrawDataBuilder.Layers); layer_i++)
+            //     for (int draw_list_i = 0; draw_list_i < viewport->DrawDataBuilder.Layers[layer_i].Size; draw_list_i++) {
+            //         if (std::string(viewport->DrawDataBuilder.Layers[layer_i][draw_list_i]->_OwnerName) == "Viewport") {
+            //             ImDrawList* _draw_list = viewport->DrawDataBuilder.Layers[layer_i][draw_list_i];
+            //             DebugNodeDrawList(viewport, _draw_list);
+            //         }
+            //     }
         }
     }
 }

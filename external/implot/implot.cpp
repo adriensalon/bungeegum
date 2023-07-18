@@ -1802,12 +1802,12 @@ bool UpdateInput(ImPlotPlot& plot) {
 
     // BUTTON STATE -----------------------------------------------------------
 
-    const ImGuiButtonFlags plot_button_flags = ImGuiButtonFlags_AllowItemOverlap
-                                             | ImGuiButtonFlags_PressedOnClick
-                                             | ImGuiButtonFlags_PressedOnDoubleClick
-                                             | ImGuiButtonFlags_MouseButtonLeft
-                                             | ImGuiButtonFlags_MouseButtonRight
-                                             | ImGuiButtonFlags_MouseButtonMiddle;
+    const ImGuiButtonFlags plot_button_flags = ImGuiButtonFlags_AllowOverlap
+        | ImGuiButtonFlags_PressedOnClick
+        | ImGuiButtonFlags_PressedOnDoubleClick
+        | ImGuiButtonFlags_MouseButtonLeft
+        | ImGuiButtonFlags_MouseButtonRight
+        | ImGuiButtonFlags_MouseButtonMiddle;
     const ImGuiButtonFlags axis_button_flags = ImGuiButtonFlags_FlattenChildren
                                              | plot_button_flags;
 
@@ -3378,7 +3378,7 @@ bool BeginSubplots(const char* title, int rows, int cols, const ImVec2& size, Im
             ImGui::KeepAliveID(sep_id);
             const ImRect sep_bb = ImRect(subplot.GridRect.Min.x, ypos-SUBPLOT_SPLITTER_HALF_THICKNESS, subplot.GridRect.Max.x, ypos+SUBPLOT_SPLITTER_HALF_THICKNESS);
             bool sep_hov = false, sep_hld = false;
-            const bool sep_clk = ImGui::ButtonBehavior(sep_bb, sep_id, &sep_hov, &sep_hld, ImGuiButtonFlags_FlattenChildren | ImGuiButtonFlags_AllowItemOverlap | ImGuiButtonFlags_PressedOnClick | ImGuiButtonFlags_PressedOnDoubleClick);
+            const bool sep_clk = ImGui::ButtonBehavior(sep_bb, sep_id, &sep_hov, &sep_hld, ImGuiButtonFlags_FlattenChildren | ImGuiButtonFlags_AllowOverlap | ImGuiButtonFlags_PressedOnClick | ImGuiButtonFlags_PressedOnDoubleClick);
             if ((sep_hov && G.HoveredIdTimer > SUBPLOT_SPLITTER_FEEDBACK_TIMER) || sep_hld) {
                 if (sep_clk && ImGui::IsMouseDoubleClicked(0)) {
                     float p = (subplot.RowRatios[r] + subplot.RowRatios[r+1])/2;
@@ -3408,7 +3408,7 @@ bool BeginSubplots(const char* title, int rows, int cols, const ImVec2& size, Im
             ImGui::KeepAliveID(sep_id);
             const ImRect sep_bb = ImRect(xpos-SUBPLOT_SPLITTER_HALF_THICKNESS, subplot.GridRect.Min.y, xpos+SUBPLOT_SPLITTER_HALF_THICKNESS, subplot.GridRect.Max.y);
             bool sep_hov = false, sep_hld = false;
-            const bool sep_clk = ImGui::ButtonBehavior(sep_bb, sep_id, &sep_hov, &sep_hld, ImGuiButtonFlags_FlattenChildren | ImGuiButtonFlags_AllowItemOverlap | ImGuiButtonFlags_PressedOnClick | ImGuiButtonFlags_PressedOnDoubleClick);
+            const bool sep_clk = ImGui::ButtonBehavior(sep_bb, sep_id, &sep_hov, &sep_hld, ImGuiButtonFlags_FlattenChildren | ImGuiButtonFlags_AllowOverlap | ImGuiButtonFlags_PressedOnClick | ImGuiButtonFlags_PressedOnDoubleClick);
             if ((sep_hov && G.HoveredIdTimer > SUBPLOT_SPLITTER_FEEDBACK_TIMER) || sep_hld) {
                 if (sep_clk && ImGui::IsMouseDoubleClicked(0)) {
                     float p = (subplot.ColRatios[c] + subplot.ColRatios[c+1])/2;
