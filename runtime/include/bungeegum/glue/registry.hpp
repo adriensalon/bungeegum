@@ -54,6 +54,9 @@ namespace detail {
         template <typename component_t>
         component_t& get_component(const entity_t entity);
 
+        template <typename component_t>
+        component_t& get__or_create_component(const entity_t entity);
+
         /// @brief Gets an existing const component from the specified entity.
         /// @tparam component_t is the component type to get.
         /// @exception Throws an entt exception if the specified entity is not contained by the
@@ -61,6 +64,9 @@ namespace detail {
         /// @tparam component_t is the component type to get.
         template <typename component_t>
         const component_t& get_component(const entity_t entity) const;
+
+        template <typename component_t>
+        const component_t& get_or_create_component(const entity_t entity) const;
 
         /// @brief Iterate over components in the registry.
         /// @tparam ...components_t are the component types to select for iteration.
@@ -71,6 +77,9 @@ namespace detail {
         /// @tparam ...components_t are the component types to select for iteration.
         template <typename... components_t> // exclude filter with strong_typelist
         void iterate_with_entities(const std::function<void(entity_t, components_t&...)>& iterate_function);
+
+        template <typename component_t>
+        std::optional<entity_t> try_get_entity(const component_t& component);
 
     private:
         entt::basic_registry<entity_t> _registry;

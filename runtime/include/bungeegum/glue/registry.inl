@@ -58,5 +58,16 @@ namespace detail {
         });
     }
 
+    template <typename entity_t>
+    template <typename component_t>
+    std::optional<entity_t> registry<entity_t>::try_get_entity(const component_t& component)
+    {
+        entity_t _entity = entt::to_entity(_registry, component);
+        if (_entity != entt::null) {
+            return _entity;
+        } else {
+            return std::nullopt;
+        };
+    }
 }
 }

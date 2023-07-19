@@ -10,15 +10,21 @@ namespace widgets {
     /// top of that color.
     struct ColoredBox {
 
-        inline ColoredBox()
-        {
-            std::cout << " create ColorBox \n";
-        }
+        // inline ColoredBox()
+        // {
+        //     std::cout << " create ColorBox \n"
+        //               << bungeegum::detail::raw_cast(this) << std::endl;
+        //     // #if !defined(__HOTRELOADING__)
 
-        inline ColoredBox(int ok)
-        {
-            std::cout << ok << " create ColorBox \n";
-        }
+        //     // adopt(this, make<float>());
+        //     // std::cout << "oui" << std::endl;
+        //     // #endif
+        // }
+
+        // inline ColoredBox(int ok)
+        // {
+        //     std::cout << ok << " create ColorBox \n";
+        // }
 
         /// @brief The widget below this widget in the tree.
         // template <typename childWidget_t>
