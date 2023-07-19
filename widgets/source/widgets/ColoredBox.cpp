@@ -24,9 +24,7 @@ namespace widgets {
     void ColoredBox::resolve(resolve_command& command)
     {
 
-#if !defined(__HOTRELOADING__)
-        // std::cout << " createD ColorBox \n"
-        //           << bungeegum::detail::raw_cast(this) << std::endl;
+#if defined(__HOTRELOADING__)
         // std::cout << "oui" << std::endl;
 #endif
         // std::cout << bungeegum::detail::animations_manager::stat_test++ << std::endl;

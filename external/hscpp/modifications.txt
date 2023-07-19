@@ -1,4 +1,5 @@
 + dans <hscpp/module/Tracker.hpp>
+Tracker() = default;
 Tracker(Tracker&& rhs) = default;
 Tracker& operator=(Tracker&& rhs) = default;
 
