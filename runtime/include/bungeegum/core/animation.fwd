@@ -58,6 +58,8 @@ namespace detail {
 
         [[nodiscard]] animation_update_data& operator[](const std::uintptr_t raw_animation);
 
+        std::size_t size() const;
+
         void update(const std::chrono::milliseconds& delta_time);
 
     private:

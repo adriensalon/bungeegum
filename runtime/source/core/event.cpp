@@ -28,6 +28,11 @@ namespace detail {
         return _updatables[raw_event];
     }
 
+    std::size_t events_manager::size() const
+    {
+        return _updatables.size();
+    }
+
     void events_manager::update()
     {
         // We cleanup first so that event objects whose lifetimes have expired

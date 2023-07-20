@@ -166,36 +166,36 @@ namespace detail {
         static scrolling_profiler draw = {};
         static std::string filter_text = "";
         static bool filter_enabled = true;
-    }
 
-    void draw_profiler_tab(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
-    {
-        const std::size_t _duration_ms = chronometer.frame_duration().count();
-        std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
-        if (ImGui::BeginTabItem(_title.c_str())) {
-            ImVec2 _available_size = ImGui::GetContentRegionAvail();
-            _available_size.y -= ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y;
-            profiler.draw(history_size_seconds, _available_size);
-            ImGui::EndTabItem();
-        }
-    }
-
-    void draw_profiler_tab_with_regex(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
-    {
-        const std::size_t _duration_ms = chronometer.frame_duration().count();
-        std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
-        if (ImGui::BeginTabItem(_title.c_str())) {
-            ImVec2 _available_size = ImGui::GetContentRegionAvail();
-            _available_size.y -= 2.f * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y);
-            profiler.draw(history_size_seconds, _available_size);
-            ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled);
-            ImGui::SameLine();
-            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-            if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here a widget type to match with regex...", &filter_text)) {
-                // todo
+        void draw_profiler_tab(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
+        {
+            const std::size_t _duration_ms = chronometer.frame_duration().count();
+            std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
+            if (ImGui::BeginTabItem(_title.c_str())) {
+                ImVec2 _available_size = ImGui::GetContentRegionAvail();
+                _available_size.y -= ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y;
+                profiler.draw(history_size_seconds, _available_size);
+                ImGui::EndTabItem();
             }
-            ImGui::PopItemWidth();
-            ImGui::EndTabItem();
+        }
+
+        void draw_profiler_tab_with_regex(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
+        {
+            const std::size_t _duration_ms = chronometer.frame_duration().count();
+            std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
+            if (ImGui::BeginTabItem(_title.c_str())) {
+                ImVec2 _available_size = ImGui::GetContentRegionAvail();
+                _available_size.y -= 2.f * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y);
+                profiler.draw(history_size_seconds, _available_size);
+                ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled);
+                ImGui::SameLine();
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+                if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here a widget type to match with regex...", &filter_text)) {
+                    // todo
+                }
+                ImGui::PopItemWidth();
+                ImGui::EndTabItem();
+            }
         }
     }
 

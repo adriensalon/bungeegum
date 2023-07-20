@@ -27,16 +27,116 @@ namespace detail {
 
     namespace {
 
+        std::string tag(const std::string& name)
+        {
+            return "###__bungeegum_overlay_hierarchy_" + name + "__";
+        }
+
         std::string size_to_string(const float2 size)
         {
             return (std::to_string(size.x) + ", " + std::to_string(size.y));
+        }
+
+        void draw_tree_widgets_tab()
+        {
+            // std::size_t _tree_widgets_count;
+            // std::string _title = "tree widgets (" + std::to_string(_tree_widgets_count) + ")";
+            // if (ImGui::BeginTabItem((_title + tag("tree_widgets_tab")).c_str())) {
+            //     ImVec2 _available_size = ImGui::GetContentRegionAvail();
+            //     //
+            //     //
+            //     //
+            //     //
+            //     ImGui::EndTabItem();
+            // }
+        }
+
+        void draw_orphan_widgets_tab()
+        {
+            // std::size_t _orphan_widgets_count;
+            // std::string _title = "orphan widgets (" + std::to_string(_orphan_widgets_count) + ")";
+            // if (ImGui::BeginTabItem((_title + tag("orphan_widgets_tab")).c_str())) {
+            //     ImVec2 _available_size = ImGui::GetContentRegionAvail();
+            //     //
+            //     //
+            //     //
+            //     //
+            //     ImGui::EndTabItem();
+            // }
+        }
+
+        void draw_async_events_tab()
+        {
+            const events_manager& _manager = global().events;
+            std::string _title = "async events (" + std::to_string(_manager.size()) + ")";
+            if (ImGui::BeginTabItem((_title + tag("async_events_tab")).c_str())) {
+                ImVec2 _available_size = ImGui::GetContentRegionAvail();
+                for (const std::pair<const uintptr_t, event_update_data>& _event_data : _manager) {
+                    (void)_event_data;
+                    ImGui::Text("event future....");
+                }
+                ImGui::EndTabItem();
+            }
+        }
+
+        void draw_running_animations_tab()
+        {
+            animations_manager& _manager = global().animations;
+            std::string _title = "running animations (" + std::to_string(_manager.size()) + ")";
+            if (ImGui::BeginTabItem((_title + tag("running_animations_tab")).c_str())) {
+                ImVec2 _available_size = ImGui::GetContentRegionAvail();
+                int _k = 0;
+                for (const auto& _animation_data : global().animations) {
+                    // if (_animation_data.is_playing) {
+                    static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
+                    ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
+                    if (ImPlot::BeginPlot(("##StatsGraphTitle" + std::to_string(_k)).c_str(), { ImGui::GetContentRegionAvail().x, 90 }, flags)) {
+                        ImPlot::SetupAxes(NULL, NULL, flags, flags);
+                        ImPlot::SetupAxisLimits(ImAxis_X1, 0, 1, ImGuiCond_Always);
+                        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
+                        ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
+                        auto _samples = _animation_data.second.overlay_samples;
+                        auto _point = _animation_data.second.overlay_position;
+                        ImPlot::PlotLine("", _samples.data(), &(_samples[1]), 100, 0, 0, 2 * sizeof(float));
+                        ImPlot::PlotScatter("", _point.data(), _point.data() + 1, 1, 0, 0, 2 * sizeof(float));
+                        ImPlot::EndPlot();
+                    }
+                    ImPlot::PopStyleColor();
+                    // }
+                    _k++;
+                }
+                ImGui::EndTabItem();
+            }
         }
     }
 
     void draw_hierarchy_overlay()
     {
         ImGui::SetNextWindowSize({ 300.f, 450.f }, ImGuiCond_Once);
-        if (ImGui::Begin("hierarchy##__bungeegum_window_hierarchy_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
+        if (ImGui::Begin(("hierarchy" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
+
+            if (ImGui::BeginTabBar(tag("tab_bar").c_str())) {
+                draw_tree_widgets_tab();
+                draw_orphan_widgets_tab();
+                draw_async_events_tab();
+                draw_running_animations_tab();
+            }
+            ImGui::EndTabBar();
+
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+
             unsigned int _depth = 0;
             unsigned int _id = 0;
             std::function<void(const widget_update_data&)> _tf = [&](const widget_update_data& _widget_data) {

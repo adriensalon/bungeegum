@@ -28,6 +28,11 @@ namespace detail {
         return _updatables[raw_animation];
     }
 
+    std::size_t animations_manager::size() const
+    {
+        return _updatables.size();
+    }
+
     void animations_manager::update(const std::chrono::milliseconds& delta_time)
     {
         // We cleanup first so that event objects whose lifetimes have expired

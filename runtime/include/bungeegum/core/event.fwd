@@ -48,6 +48,8 @@ namespace detail {
 
         [[nodiscard]] event_update_data& operator[](const std::uintptr_t raw_event);
 
+        std::size_t size() const;
+
         void update();
 
     private:
