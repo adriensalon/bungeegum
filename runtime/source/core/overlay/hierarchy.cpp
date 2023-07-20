@@ -72,8 +72,12 @@ namespace detail {
             if (ImGui::BeginTabItem((_title + tag("async_events_tab")).c_str())) {
                 ImVec2 _available_size = ImGui::GetContentRegionAvail();
                 for (const std::pair<const uintptr_t, event_update_data>& _event_data : _manager) {
-                    (void)_event_data;
-                    ImGui::Text("event future....");
+                    std::string _clean_typenames = {};
+                    for (const std::type_index& _type : _event_data.second.kinds) {
+                        std::string _clean_typename = backend_manager::to_clean_typename(_type.name());
+                        _clean_typenames += _clean_typename + " ";
+                    }
+                    ImGui::Text(("event <" + _clean_typenames + ">").c_str());
                 }
                 ImGui::EndTabItem();
             }
@@ -81,7 +85,7 @@ namespace detail {
 
         void draw_running_animations_tab()
         {
-            animations_manager& _manager = global().animations;
+            const animations_manager& _manager = global().animations;
             std::string _title = "running animations (" + std::to_string(_manager.size()) + ")";
             if (ImGui::BeginTabItem((_title + tag("running_animations_tab")).c_str())) {
                 ImVec2 _available_size = ImGui::GetContentRegionAvail();

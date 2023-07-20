@@ -47,21 +47,29 @@ namespace detail {
         frames_chronometer profiler_resolve_chronometer = {};
         frames_chronometer profiler_interact_chronometer = {};
         frames_chronometer profiler_draw_chronometer = {};
+        std::optional<std::uintptr_t> inspector_selected = std::nullopt;
+
+                inline static std::string to_clean_typename(const std::string& raw_typename)
+                {
+                    std::size_t _last_space = raw_typename.find_last_of(' ');
+                    if (_last_space == raw_typename.npos) {
+                        _last_space = 0;
+                    }
+                    std::size_t _last_column = raw_typename.find_last_of(':');
+                    if (_last_column == raw_typename.npos) {
+                        _last_column = 0;
+                    }
+                    if (_last_space == 0 && _last_column == 0) {
+                        return raw_typename;
+                    }
+                    std::size_t _offset = std::max(_last_space, _last_column) + 1;
+                    std::size_t _length = raw_typename.length() - _offset;
+                    return raw_typename.substr(_offset, _length);
+        }
 
         inline void set_clean_typename(widget_update_data& update_data)
         {
-            std::string _raw_typename = update_data.kind->name();
-            std::size_t _last_space = _raw_typename.find_last_of(' ');
-            if (_last_space == _raw_typename.npos) {
-                _last_space = 0;
-            }
-            std::size_t _last_column = _raw_typename.find_last_of(':');
-            if (_last_column == _raw_typename.npos) {
-                _last_column = 0;
-            }
-            std::size_t _offset = std::max(_last_space, _last_column) + 1;
-            std::size_t _length = _raw_typename.length() - _offset;
-            std::string _clean_typename = _raw_typename.substr(_offset, _length);
+            std::string _clean_typename = to_clean_typename(update_data.kind->name());
             update_data.resolver_command._data.clean_typename = _clean_typename;
             update_data.clean_typename = _clean_typename;
         }
