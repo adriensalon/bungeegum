@@ -72,6 +72,7 @@ namespace detail {
 #endif
 
 #if BUNGEEGUM_USE_OVERLAY
+        std::string clean_typename = {};
         std::function<std::uintptr_t()> true_ptr = nullptr;
         std::function<std::size_t()> true_sizeof = nullptr;
 #endif

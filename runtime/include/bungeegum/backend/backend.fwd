@@ -61,7 +61,9 @@ namespace detail {
             }
             std::size_t _offset = std::max(_last_space, _last_column) + 1;
             std::size_t _length = _raw_typename.length() - _offset;
-            update_data.resolver_command._data.clean_typename = _raw_typename.substr(_offset, _length);
+            std::string _clean_typename = _raw_typename.substr(_offset, _length);
+            update_data.resolver_command._data.clean_typename = _clean_typename;
+            update_data.clean_typename = _clean_typename;
         }
 #endif
 

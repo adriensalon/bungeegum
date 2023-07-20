@@ -27,31 +27,9 @@ namespace detail {
 
     namespace {
 
-        bool ends_with(std::string_view str, std::string_view suffix)
-        {
-            return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
-        }
-
-        bool starts_with(std::string_view str, std::string_view prefix)
-        {
-            return str.size() >= prefix.size() && 0 == str.compare(0, prefix.size(), prefix);
-        }
-
         std::string size_to_string(const float2 size)
         {
             return (std::to_string(size.x) + ", " + std::to_string(size.y));
-        }
-
-        const std::string& clean_typename(const char* raw_typename)
-        {
-            static std::unordered_map<const char*, std::string> _typenames;
-            if (_typenames.find(raw_typename) == _typenames.end()) {
-                std::string _typename(raw_typename);
-                std::regex _to_remove("struct bungeegum::widgets::");
-                _typename = std::regex_replace(_typename, _to_remove, "");
-                _typenames.emplace(raw_typename, _typename);
-            }
-            return _typenames[raw_typename];
         }
     }
 
@@ -63,8 +41,7 @@ namespace detail {
             unsigned int _id = 0;
             std::function<void(const widget_update_data&)> _tf = [&](const widget_update_data& _widget_data) {
                 _id++;
-                std::string _clean_typename = clean_typename(_widget_data.kind->name());
-                std::string _clean_id_typename = _clean_typename + "###__hierarchy__" + std::to_string(_id);
+                std::string _clean_id_typename = _widget_data.clean_typename + "###__hierarchy__" + std::to_string(_id);
                 // ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow ;
                 ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_Framed;
                 if (_widget_data.children.empty())
