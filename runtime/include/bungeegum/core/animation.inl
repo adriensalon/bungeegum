@@ -61,12 +61,11 @@ animation<value_t>& animation<value_t>::start()
 {
     std::uintptr_t _raw_animation = detail::raw_cast<animation<value_t>>(this);
     if (!detail::global().animations.contains(_raw_animation)) {
-        detail::event_update_data& _update_data = detail::global().animations[_raw_animation];
+        detail::animation_update_data& _update_data = detail::global().animations[_raw_animation];
         _data.raw_animation = _raw_animation;
-        _update_data.kind = std::make_unique<std::type_index>(typeid(values_t));
+        _update_data.kind = std::make_unique<std::type_index>(typeid(value_t));
         detail::assign_ticker(_data, _update_data);
     }
-    _data.futures.push_back(std::move(future_value));
     _data.is_playing = true;
     return *this;
 }

@@ -42,7 +42,7 @@ namespace detail {
         });
     }
 
-    std::optional<rapidjson::Value> backend_manager::inspect_reloadable_widget(const widget_update_data& update_data)
+    std::optional<std::string> backend_manager::inspect_reloadable_widget(const widget_update_data& update_data)
     {
         std::stringstream _output_stream;
         if (update_data.saver) {
@@ -50,15 +50,22 @@ namespace detail {
                 reloaded_saver _archiver(_output_stream);
                 update_data.saver(_archiver);
             }
-            std::cout << _output_stream.str() << std::endl;
-
-            rapidjson::Document _document;
-            _document.Parse(_output_stream.str().c_str());
-
-            // https://stackoverflow.com/questions/30896857/iterate-and-retrieve-nested-object-in-json-using-rapidjson
-            return _document.GetObject();
+            return _output_stream.str();
         } else {
             return std::nullopt;
+        }
+    }
+
+    void backend_manager::update_reloadable_widget(widget_update_data& update_data, const std::string& serialized)
+    {
+        (void)serialized;
+        // std::stringstream _input_stream;
+        if (update_data.loader) {
+            //     {
+            //         reloaded_loader _archiver(_input_stream);
+            //         update_data.loader(_archiver);
+            //     }
+            //     return _output_stream.str();
         }
     }
 #endif

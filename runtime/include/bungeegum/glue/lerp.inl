@@ -53,7 +53,7 @@ namespace detail {
 }
 
 template <typename value_t>
-detail::lerpable_t<value_t> lerp(detail::lerpable_t<value_t>& min_value, detail::lerpable_t<value_t>& max_value, const float t)
+detail::lerpable_t<value_t> lerp(const value_t& min_value, const value_t& max_value, const float t)
 {
     static_assert(detail::has_add_v<value_t>, "This type is not lerpable because it is not arithmetic and doesn't "
                                               "implement the operator+(const value_t&) method.");

@@ -23,7 +23,7 @@ namespace detail {
         std::unique_ptr<value_t> min_value = nullptr;
         std::unique_ptr<value_t> max_value = nullptr;
         event_data<value_t> event;
-        curve eval_curve = { 0.f, 1.f, std::vector<float2> {}, false };
+        curve eval_curve = { 0.f, 1.f, std::vector<float2> {} };
         float1 duration_seconds = 0.f;
         bool1 is_playing = false;
         float1 playing_cursor_seconds = 0.f;

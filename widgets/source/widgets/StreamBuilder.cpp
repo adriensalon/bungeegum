@@ -140,7 +140,9 @@ namespace widgets {
         using _char_type = WideStreamBuilderBuffer::char_type;
         std::wstreambuf* _formerStreambuf = stream.basic_ios<_char_type>::rdbuf(&_customBuffer.value());
         _restoreFormerBuffer = [this, &stream, _formerStreambuf]() {
-            stream.basic_ios<_char_type>::rdbuf(_formerStreambuf);
+            if (&stream != nullptr) {
+                stream.basic_ios<_char_type>::rdbuf(_formerStreambuf);
+            }
         };
         return *this;
     }

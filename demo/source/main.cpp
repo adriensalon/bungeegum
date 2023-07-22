@@ -95,7 +95,7 @@ int main()
     //     bungeegum::detail::setup_global();
     // #endif
     constexpr auto ii = bungeegum::is_finite<bungeegum::float2>({ 44.f, 0.f });
-    std::wostringstream _osstream2;
+    static std::wostringstream _osstream2;
 
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_DIRECTX");
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_BACKTRACE");
@@ -153,17 +153,19 @@ int main()
                                                                std::this_thread::sleep_for(std::chrono::milliseconds(4000));
                                                                return true;
                                                            }))
-                                                           .builder([&_osstream2](const bool value) -> bungeegum::runtime_widget {
+                                                           .builder([](const bool value) -> bungeegum::runtime_widget {
                                                                if (value) {
-                                                                   static auto fff = std::async([&_osstream2]() {
+                                                                   static bungeegum::animation<float> _myanim;
+                                                                   _myanim.duration<std::chrono::seconds>(3).min(0.f).max(88.f).start();
+                                                                   static auto fff = std::async([]() {
                                                                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                                                                        _osstream2 << "Helloooooo4466" << std::endl;
                                                                    });
                                                                    (void)fff;
                                                                    return bungeegum::make<WideStreamBuilder>()
                                                                        .initialData(L"heyyy")
-                                                                       .builder([&_osstream2](const std::wstring& message) -> bungeegum::runtime_widget {
-                                                                           std::wcout << message;
+                                                                       .builder([](const std::wstring& message) -> bungeegum::runtime_widget {
+                                                                           //    std::wcout << message;
 
                                                                            return bungeegum::make<OverflowBox>()
                                                                                .maxHeight(40.f)

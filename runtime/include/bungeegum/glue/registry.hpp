@@ -72,6 +72,8 @@ namespace detail {
         template <typename... components_t> // exclude filter with strong_typelist
         void iterate_with_entities(const std::function<void(entity_t, components_t&...)>& iterate_function);
 
+        std::size_t size() const;
+
     private:
         entt::basic_registry<entity_t> _registry;
     };
