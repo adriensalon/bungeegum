@@ -58,14 +58,13 @@ namespace detail {
 
     void backend_manager::update_reloadable_widget(widget_update_data& update_data, const std::string& serialized)
     {
-        (void)serialized;
-        // std::stringstream _input_stream;
+        std::stringstream _input_stream;
+        _input_stream << serialized;
         if (update_data.loader) {
-            //     {
-            //         reloaded_loader _archiver(_input_stream);
-            //         update_data.loader(_archiver);
-            //     }
-            //     return _output_stream.str();
+            {
+                reloaded_loader _archiver(_input_stream);
+                update_data.loader(_archiver);
+            }
         }
     }
 #endif

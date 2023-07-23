@@ -36,58 +36,58 @@ namespace detail {
             return stream.str();
         }
 
-        void draw_json(const rapidjson::Value& obj, size_t indent = 0)
+        void draw_json(rapidjson::Value& obj)
         {
             if (obj.IsObject()) {
-                for (rapidjson::Value::ConstMemberIterator _iterator = obj.MemberBegin(); _iterator != obj.MemberEnd(); ++_iterator) { //iterate through object
-                    bool _found = false;
-                    std::string _value;
-                    for (size_t _k = 0; _k != indent; ++_k) {
-                        _value += " ";
-                    }
+                for (rapidjson::Value::MemberIterator _iterator = obj.MemberBegin(); _iterator != obj.MemberEnd(); ++_iterator) {
                     std::string _name(_iterator->name.GetString());
                     if (_name != "BUNGEEGUM_OBJECT_REFERENCE") {
-                        _value += _name + std::string(": ");
-                        if (_iterator->value.IsUint()) {
-                            _value += std::to_string(_iterator->value.GetUint());
-                            _found = true;
-                        } else if (_iterator->value.IsString()) {
-                            _value += _iterator->value.GetString();
-                            _found = true;
-                        } else if (_iterator->value.IsInt()) {
-                            _value += std::to_string(_iterator->value.GetInt());
-                            _found = true;
+
+                        if (_iterator->value.IsInt()) {
+                            int1 _int_value = _iterator->value.GetInt();
+                            edit_field<int1>(_name, _int_value);
+                            _iterator->value.SetInt(_int_value);
+
                         } else if (_iterator->value.IsUint()) {
-                            _value += std::to_string(_iterator->value.GetUint());
-                            _found = true;
+                            uint1 _uint_value = _iterator->value.GetUint();
+                            edit_field<uint1>(_name, _uint_value);
+                            _iterator->value.SetUint(_uint_value);
+
                         } else if (_iterator->value.IsInt64()) {
-                            _value += std::to_string(_iterator->value.GetInt64());
-                            _found = true;
+                            std::int64_t _int64_value = _iterator->value.GetInt64();
+                            edit_field<std::int64_t>(_name, _int64_value);
+                            _iterator->value.SetInt64(_int64_value);
+
                         } else if (_iterator->value.IsUint64()) {
-                            _value += std::to_string(_iterator->value.GetUint64());
-                            _found = true;
+                            std::uint64_t _uint64_value = _iterator->value.GetUint64();
+                            edit_field<std::uint64_t>(_name, _uint64_value);
+                            _iterator->value.SetUint64(_uint64_value);
+
                         } else if (_iterator->value.IsFloat()) {
-                            _value += std::to_string(_iterator->value.GetFloat());
-                            _found = true;
-                            float _float_value = _iterator->value.GetFloat();
-                            edit_field(_name, _float_value);
-                            // set
+                            float1 _float_value = _iterator->value.GetFloat();
+                            edit_field<float1>(_name, _float_value);
+                            _iterator->value.SetFloat(_float_value);
+
                         } else if (_iterator->value.IsBool()) {
-                            _value += std::to_string(_iterator->value.GetBool());
-                            _found = true;
+                            bool1 _bool_value = _iterator->value.GetBool();
+                            edit_field<bool1>(_name, _bool_value);
+                            _iterator->value.SetBool(_bool_value);
+
+                        } else if (_iterator->value.IsString()) {
+                            std::string _string_value = _iterator->value.GetString();
+                            edit_field<std::string>(_name, _string_value);
+                            // _iterator->value.SetString(_string_value.c_str());
+
                         } else if (_iterator->value.IsArray()) {
-                            _value += std::to_string(_iterator->value.GetBool());
-                            _found = true;
+                            // _value += std::to_string(_iterator->value.GetBool());
+                            // _found = true;
 
                             // array of obj etc
-                        }
 
-                        if (_found) {
-                            ImGui::Text(_value.c_str());
                         } else if (_iterator->value.IsObject()) {
-                            const rapidjson::Value& objName = obj[_iterator->name.GetString()]; //make object value
+                            rapidjson::Value& objName = obj[_iterator->name.GetString()]; //make object value
                                 // TREE PUSH
-                            draw_json(objName, indent + 1);
+                            draw_json(objName);
                             // TREE POP
                         }
                     }
@@ -131,12 +131,17 @@ namespace detail {
                 widget_update_data& _update_data = _widgets_manager[raw_widget];
 
                 std::optional<std::string> _serialized = _backend_manager.inspect_reloadable_widget(_update_data);
-
                 if (_serialized.has_value()) {
                     rapidjson::Document _document;
                     _document.Parse(_serialized.value().c_str());
-                    const rapidjson::Value& _root_value = _document.GetObject()["value0"];
+                    rapidjson::Value& _root_value = _document.GetObject()["value0"];
                     draw_json(_root_value);
+                    rapidjson::StringBuffer _json_strbuf;
+                    _json_strbuf.Clear();
+                    rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
+                    _document.Accept(_json_writer);
+                    std::string _ownShipRadarString = _json_strbuf.GetString();
+                    _backend_manager.update_reloadable_widget(_update_data, _ownShipRadarString);
                 }
 
                 ImGui::Text(("sizeof =" + std::to_string(_update_data.true_sizeof())).c_str());

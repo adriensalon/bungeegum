@@ -151,7 +151,13 @@ namespace detail {
 
     reloaded_loader::reloaded_loader(const std::filesystem::path& archive_path)
         : _fstream(archive_path)
-        , _archive(_fstream)
+        , _archive(_fstream.value())
+    {
+    }
+
+    reloaded_loader::reloaded_loader(std::stringstream& archive_stream)
+        : _sstream(archive_stream)
+        , _archive(_sstream.value().get())
     {
     }
 

@@ -190,13 +190,16 @@ namespace detail {
         /// @brief Creates an instance of this struct from a file path.
         reloaded_loader(const std::filesystem::path& archive_path);
 
+        reloaded_loader(std::stringstream& archive_stream);
+
         /// @brief Loads a a reloaded values.
         /// @tparam reloaded_value_t must be reloaded<value_t> (WEIRD HSCPP BUG WITH TEMPLATE TEMPLATE)
         template <typename reloaded_value_t>
         void load(reloaded_value_t& value);
 
     private:
-        std::ifstream _fstream;
+        std::optional<std::reference_wrapper<std::stringstream>> _sstream = std::nullopt;
+        std::optional<std::ifstream> _fstream = std::nullopt;
         cereal::JSONInputArchive _archive;
     };
 
