@@ -7,6 +7,7 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
 
+/// @brief
 #define SERIALIZE_FIELDS(...)                                                               \
     friend class cereal::access;                                                            \
     template <typename archive_t>                                                           \
@@ -18,6 +19,7 @@
 namespace bungeegum {
 namespace detail {
 
+    /// @brief
     std::vector<std::string> split_names(const std::string& comma_separated_names);
 
     /// @brief Serializes with cereal a struct that implements the HOTSWAP_CLASS macro with fields.

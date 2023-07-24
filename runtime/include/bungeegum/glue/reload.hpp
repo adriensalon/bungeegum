@@ -25,18 +25,10 @@
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
-
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/foreach.hpp>
 #include <bungeegum/glue/serialize.hpp>
 #include <bungeegum/glue/simd.hpp>
-
-namespace hscpp {
-class Hotswapper;
-namespace mem {
-    class MemoryManager;
-}
-}
 
 /// @brief Implements hotswapping functionnality to structs that use this macro among public or
 /// private fields. Variadic parameters are fields of this struct that we want to be serialized
@@ -69,17 +61,17 @@ namespace mem {
 /// @brief Implements hotswapping functionnality to methods of struct that already use the
 /// HOTSWAP_CLASS macro. As these methods need to be virtual to be hotswapped they can not be
 /// templated.
-#define HOTSWAP_METHOD virtual
+#define HOTSWAP_METHOD hscpp_virtual
+
+namespace hscpp {
+class Hotswapper;
+namespace mem {
+    class MemoryManager;
+}
+}
 
 namespace bungeegum {
 namespace detail {
-
-    /// @brief Serializes with cereal a struct that implements the HOTSWAP_CLASS macro with fields.
-    /// @tparam archive_t is the cereal archive type. This allows us to use the same function for
-    /// both load and save.
-    /// @tparam ...fields_t are the fields types of this struct.
-    // template <typename archive_t, typename... fields_t>
-    // void serialize_fields_from_reloaded(archive_t& archive, const std::string& names, fields_t&&... fields);
 
     /// @brief Instances of this struct wrap values so they can be accessed between recompilations
     /// and method calls can be updated too.
@@ -175,9 +167,6 @@ namespace detail {
     template <typename value_t>
     value_t& get_global_data();
 
-    template <typename reloaded_value_t>
-    std::size_t get_this(reloaded_value_t& value);
-
     /// @brief Instances of this struct represent a cereal JSON input archive to load data agter
     /// recompilation.
     /// @details Instances of this struct can only be moved.
@@ -237,7 +226,7 @@ namespace detail {
 #else
 
 /// @brief Does nothing as hotswap is unused. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
-#define HOTRELOAD_CLASS(classname, ...)
+#define HOTRELOAD_CLASS(classname, ...) SERIALIZE_FIELDS(__VA_ARGS__)
 
 /// @brief Does nothing as hotswap is unused. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
 #define HOTRELOAD_METHOD
@@ -294,26 +283,6 @@ namespace detail {
     /// @brief Equals to reloaded<value_t> if value_t is reloadable, and to value_t& otherwise.
     template <typename value_t>
     using reference_type_t = typename reference_type<value_t>::type;
-
-    template <typename value_t>
-    std::uintptr_t get_sizeof(reference_type_t<value_t>& reference)
-    {
-        if constexpr (traits::is_reloadable_v<value_t>) {
-            return reference.get().__bungeegum_sizeof();
-        } else {
-            return sizeof(value_t);
-        }
-    }
-
-    template <typename value_t>
-    std::uintptr_t get_this(reference_type_t<value_t>& reference)
-    {
-        if constexpr (traits::is_reloadable_v<value_t>) {
-            return reference.get().__bungeegum_this();
-        } else {
-            return detail::raw_cast<value_t>(reference);
-        }
-    }
 }
 }
 
