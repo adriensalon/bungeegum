@@ -36,7 +36,7 @@ namespace detail {
             return stream.str();
         }
 
-        void draw_json(rapidjson::Value& obj)
+        void draw_json(rapidjson::Document& document, rapidjson::Value& obj)
         {
             if (obj.IsObject()) {
                 for (rapidjson::Value::MemberIterator _iterator = obj.MemberBegin(); _iterator != obj.MemberEnd(); ++_iterator) {
@@ -76,7 +76,8 @@ namespace detail {
                         } else if (_iterator->value.IsString()) {
                             std::string _string_value = _iterator->value.GetString();
                             edit_field<std::string>(_name, _string_value);
-                            // _iterator->value.SetString(_string_value.c_str());
+                            rapidjson::SizeType _length = static_cast<rapidjson::SizeType>(_string_value.length());
+                            _iterator->value.SetString(_string_value.c_str(), _length, document.GetAllocator());
 
                         } else if (_iterator->value.IsArray()) {
                             // _value += std::to_string(_iterator->value.GetBool());
@@ -87,7 +88,7 @@ namespace detail {
                         } else if (_iterator->value.IsObject()) {
                             rapidjson::Value& objName = obj[_iterator->name.GetString()]; //make object value
                                 // TREE PUSH
-                            draw_json(objName);
+                            draw_json(document, objName);
                             // TREE POP
                         }
                     }
@@ -135,7 +136,7 @@ namespace detail {
                     rapidjson::Document _document;
                     _document.Parse(_serialized.value().c_str());
                     rapidjson::Value& _root_value = _document.GetObject()["value0"];
-                    draw_json(_root_value);
+                    draw_json(_document, _root_value);
                     rapidjson::StringBuffer _json_strbuf;
                     _json_strbuf.Clear();
                     rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);

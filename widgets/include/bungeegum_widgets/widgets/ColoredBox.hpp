@@ -9,13 +9,13 @@ namespace widgets {
     struct mydata {
 
         std::string _mystr = "okok";
-        // HOTSWAP_CLASS(mydata, _mystr)
+        HOTSWAP_CLASS(mydata, _mystr)
 
-        template <typename archive_t>
-        void serialize(archive_t& archive)
-        {
-            archive(_mystr);
-        }
+        // template <typename archive_t>
+        // void serialize(archive_t& archive)
+        // {
+        //     archive(_mystr);
+        // }
     };
 
     /// @brief A widget that paints its area with a specified Color and then draws its child on

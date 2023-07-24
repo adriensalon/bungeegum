@@ -3,6 +3,7 @@
 #include <type_traits>
 
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 #include <bungeegum/glue/simd.hpp>
 
@@ -14,6 +15,12 @@ namespace detail {
     {
         (value);
         ImGui::Text(name.c_str());
+    }
+
+    template <>
+    void edit_field<std::string>(const std::string& name, std::string& value)
+    {
+        ImGui::InputText(name.c_str(), &value);
     }
 
     template <>
