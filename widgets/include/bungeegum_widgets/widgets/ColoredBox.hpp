@@ -6,6 +6,18 @@
 namespace bungeegum {
 namespace widgets {
 
+    struct mydata {
+
+        std::string _mystr = "okok";
+        // HOTSWAP_CLASS(mydata, _mystr)
+
+        template <typename archive_t>
+        void serialize(archive_t& archive)
+        {
+            archive(_mystr);
+        }
+    };
+
     /// @brief A widget that paints its area with a specified Color and then draws its child on
     /// top of that color.
     struct ColoredBox {
@@ -50,8 +62,9 @@ namespace widgets {
         float ff3 = 56.f;
         float ff4 = 56.f;
         float ff44 = 56.f;
+        mydata _md;
 
-        HOTSWAP_CLASS(ColoredBox, ii, ff, ff2, ff3)
+        HOTSWAP_CLASS(ColoredBox, ii, ff, ff2, ff3, _md)
     };
 }
 }
