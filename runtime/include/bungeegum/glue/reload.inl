@@ -5,37 +5,6 @@
 namespace bungeegum {
 namespace detail {
 
-    template <typename archive_t, typename... fields_t>
-    void serialize_fields_from_reloaded(archive_t& archive, const std::string& names, fields_t&&... fields)
-    {
-        std::vector<std::string> _names;
-        std::stringstream _sstream(names);
-        while (_sstream.good()) {
-            std::string _substr;
-            std::getline(_sstream, _substr, ',');
-            if (_substr[0] == ' ') {
-                _substr = _substr.substr(1, _substr.length() - 1);
-            }
-            _names.push_back(_substr);
-        }
-        std::tuple<fields_t&...> _tuple((fields)...);
-        constexpr std::size_t _count = std::variant_size_v<std::variant<fields_t...>>;
-        bungeegum::detail::constexpr_for<0, _count, 1>([&](auto _index) {
-            using field_type_t = std::variant_alternative_t<_index, std::variant<fields_t...>>;
-
-            //
-            // static assert field not const :)
-            //
-
-            field_type_t& _field = std::get<_index>(_tuple);
-            try {
-                archive(cereal::make_nvp(_names[_index].c_str(), _field));
-            } catch (...) {
-                std::cout << "error detected :) \n";
-            }
-        });
-    }
-
     template <typename value_t>
     reloaded<value_t>::reloaded()
     {

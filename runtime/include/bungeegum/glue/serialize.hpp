@@ -20,6 +20,10 @@ namespace detail {
 
     std::vector<std::string> split_names(const std::string& comma_separated_names);
 
+    /// @brief Serializes with cereal a struct that implements the HOTSWAP_CLASS macro with fields.
+    /// @tparam archive_t is the cereal archive type. This allows us to use the same function for
+    /// both load and save.
+    /// @tparam ...fields_t are the fields types of this struct.
     template <typename archive_t, typename... fields_t>
     void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields);
 
