@@ -48,6 +48,9 @@ namespace detail {
             //
 
             field_type_t& _field = std::get<_index>(_tuple);
+
+
+			
             try {
                 archive(cereal::make_nvp(_names[_index].c_str(), _field));
             } catch (...) {

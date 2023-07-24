@@ -18,10 +18,6 @@
 #include <vector>
 
 #define HSCPP_CXX_STANDARD 17
-#include <cereal/access.hpp>
-#include <cereal/archives/json.hpp>
-#include <cereal/cereal.hpp>
-#include <cereal/external/rapidjson/rapidjson.h>
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
@@ -225,7 +221,7 @@ namespace detail {
 
 #else
 
-/// @brief Does nothing as hotswap is unused. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
+/// @brief Only serializes fields for overlay. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
 #define HOTRELOAD_CLASS(classname, ...) SERIALIZE_FIELDS(__VA_ARGS__)
 
 /// @brief Does nothing as hotswap is unused. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
