@@ -9,7 +9,8 @@ namespace widgets {
     struct mydata {
 
         std::string _mystr = "okok";
-        HOTSWAP_CLASS(mydata, _mystr)
+
+        SERIALIZE_FIELDS(_mystr)
 
         // template <typename archive_t>
         // void serialize(archive_t& archive)

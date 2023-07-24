@@ -6,7 +6,7 @@ namespace bungeegum {
 namespace detail {
 
     template <typename archive_t, typename... fields_t>
-    void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields)
+    void serialize_fields_from_reloaded(archive_t& archive, const std::string& names, fields_t&&... fields)
     {
         std::vector<std::string> _names;
         std::stringstream _sstream(names);

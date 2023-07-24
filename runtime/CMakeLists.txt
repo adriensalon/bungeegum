@@ -12,6 +12,7 @@ set(bungeegum_source
 	"source/glue/curve.cpp"
 	"source/glue/imguarded.cpp"
 	"source/glue/reload.cpp"
+	"source/glue/serialize.cpp"
 	"source/glue/time.cpp"
 
 	"source/core/animation.cpp"

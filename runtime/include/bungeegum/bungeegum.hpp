@@ -12,6 +12,7 @@
 #include <bungeegum/glue/registry.hpp>
 #include <bungeegum/glue/reload.hpp>
 #include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/glue/serialize.hpp>
 #include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/time.hpp>
 #include <bungeegum/glue/toolchain.hpp>

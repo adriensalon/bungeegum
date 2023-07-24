@@ -28,6 +28,7 @@
 
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/foreach.hpp>
+#include <bungeegum/glue/serialize.hpp>
 #include <bungeegum/glue/simd.hpp>
 
 namespace hscpp {
@@ -40,29 +41,29 @@ namespace mem {
 /// @brief Implements hotswapping functionnality to structs that use this macro among public or
 /// private fields. Variadic parameters are fields of this struct that we want to be serialized
 /// between recompilations.
-#define HOTSWAP_CLASS(classname, ...)                                                                                                                                                               \
-    friend class cereal::access;                                                                                                                                                                    \
-    friend struct bungeegum::access;                                                                                                                                                                \
-    template <typename value_t>                                                                                                                                                                     \
-    friend struct bungeegum::detail::value_wrapper;                                                                                                                                                 \
-    friend struct bungeegum::detail::widgets_manager;                                                                                                                                               \
-    HSCPP_TRACK(classname, #classname)                                                                                                                                                              \
-    std::uintptr_t _bungeegum_object_reference = 0;                                                                                                                                                 \
-    hscpp_virtual std::uintptr_t _bungeegum_this()                                                                                                                                                  \
-    {                                                                                                                                                                                               \
-        return bungeegum::detail::raw_cast<classname>(this);                                                                                                                                        \
-    }                                                                                                                                                                                               \
-    hscpp_virtual std::size_t _bungeegum_sizeof()                                                                                                                                                   \
-    {                                                                                                                                                                                               \
-        return sizeof(classname);                                                                                                                                                                   \
-    }                                                                                                                                                                                               \
-    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                                                                                                           \
-    {                                                                                                                                                                                               \
-        bungeegum::detail::serialize_fields<cereal::JSONInputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__);  \
-    }                                                                                                                                                                                               \
-    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                                                                                                          \
-    {                                                                                                                                                                                               \
-        bungeegum::detail::serialize_fields<cereal::JSONOutputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__); \
+#define HOTSWAP_CLASS(classname, ...)                                                                                                                                                                             \
+    friend class cereal::access;                                                                                                                                                                                  \
+    friend struct bungeegum::access;                                                                                                                                                                              \
+    template <typename value_t>                                                                                                                                                                                   \
+    friend struct bungeegum::detail::value_wrapper;                                                                                                                                                               \
+    friend struct bungeegum::detail::widgets_manager;                                                                                                                                                             \
+    HSCPP_TRACK(classname, #classname)                                                                                                                                                                            \
+    std::uintptr_t _bungeegum_object_reference = 0;                                                                                                                                                               \
+    hscpp_virtual std::uintptr_t _bungeegum_this()                                                                                                                                                                \
+    {                                                                                                                                                                                                             \
+        return bungeegum::detail::raw_cast<classname>(this);                                                                                                                                                      \
+    }                                                                                                                                                                                                             \
+    hscpp_virtual std::size_t _bungeegum_sizeof()                                                                                                                                                                 \
+    {                                                                                                                                                                                                             \
+        return sizeof(classname);                                                                                                                                                                                 \
+    }                                                                                                                                                                                                             \
+    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                                                                                                                         \
+    {                                                                                                                                                                                                             \
+        bungeegum::detail::serialize_fields_from_reloaded<cereal::JSONInputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__);  \
+    }                                                                                                                                                                                                             \
+    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                                                                                                                        \
+    {                                                                                                                                                                                                             \
+        bungeegum::detail::serialize_fields_from_reloaded<cereal::JSONOutputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__); \
     }
 
 /// @brief Implements hotswapping functionnality to methods of struct that already use the
@@ -78,7 +79,7 @@ namespace detail {
     /// both load and save.
     /// @tparam ...fields_t are the fields types of this struct.
     template <typename archive_t, typename... fields_t>
-    void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields);
+    void serialize_fields_from_reloaded(archive_t& archive, const std::string& names, fields_t&&... fields);
 
     /// @brief Instances of this struct wrap values so they can be accessed between recompilations
     /// and method calls can be updated too.
