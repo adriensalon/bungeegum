@@ -93,9 +93,9 @@ struct access {
     {
         const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
         detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
-        if constexpr (detail::traits::has_load_function_v<widget_t>) {
+        if constexpr (detail::traits::is_reloadable_v<widget_t>) {
             _widget_data.loader = [widget](detail::reloaded_loader& archiver) {
-                archiver.load(widget);
+                archiver.load<widget_t>(const_cast<detail::reloaded<widget_t>&>(widget._data));
             };
         }
     }
@@ -105,9 +105,9 @@ struct access {
     {
         const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
         detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
-        if constexpr (detail::traits::has_save_function_v<widget_t>) {
+        if constexpr (detail::traits::is_reloadable_v<widget_t>) {
             _widget_data.saver = [widget](detail::reloaded_saver& archiver) {
-                archiver.save(widget);
+                archiver.save<widget_t>(const_cast<detail::reloaded<widget_t>&>(widget._data));
             };
         }
     }

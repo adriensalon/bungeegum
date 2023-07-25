@@ -33,7 +33,7 @@
     friend class cereal::access;                                                                                                                                                                    \
     friend struct bungeegum::access;                                                                                                                                                                \
     template <typename value_t>                                                                                                                                                                     \
-    friend struct bungeegum::detail::value_wrapper;                                                                                                                                                 \
+    friend struct bungeegum::detail::reloaded_wrapper;                                                                                                                                              \
     friend struct bungeegum::detail::widgets_manager;                                                                                                                                               \
     HSCPP_TRACK(classname, #classname)                                                                                                                                                              \
     std::uintptr_t _bungeegum_object_reference = 0;                                                                                                                                                 \
@@ -145,7 +145,9 @@ namespace detail {
         /// to be filled with what would go to std::wcout otherwise.
         reload_state update(std::wstreambuf* buffer);
 
-        /// @brief
+        /// @brief Sets an instance of any object as the global data. This instance will be shared
+        /// with the hotswapped modules, and can be accessed anywhere with the get_global_data()
+        /// function.
         void set_global_data(void* data_ptr);
 
     private:
@@ -158,7 +160,7 @@ namespace detail {
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
     };
 
-    /// @brief
+    /// @brief Gets
     /// @tparam value_t
     template <typename value_t>
     value_t& get_global_data();
@@ -176,12 +178,14 @@ namespace detail {
         /// @brief Creates an instance of this struct from a file path.
         reloaded_loader(const std::filesystem::path& archive_path);
 
+        /// @brief Creates an instance of this struct from a stringstream.
         reloaded_loader(std::stringstream& archive_stream);
 
-        /// @brief Loads a a reloaded values.
-        /// @tparam reloaded_value_t must be reloaded<value_t> (WEIRD HSCPP BUG WITH TEMPLATE TEMPLATE)
-        template <typename reloaded_value_t>
-        void load(reloaded_value_t& value);
+        /// @brief Loads a reloaded value. Can be used multiple times to load many values from
+        /// the same file.
+        /// @tparam value_t is the type to use as value.
+        template <typename value_t>
+        void load(reloaded<value_t>& value);
 
     private:
         std::optional<std::reference_wrapper<std::stringstream>> _sstream = std::nullopt;
@@ -207,9 +211,9 @@ namespace detail {
 
         /// @brief Saves a reloaded value. Can be used multiple times to save many values to the
         /// same file.
-        /// @tparam reloaded_value_t must be reloaded<value_t> (WEIRD HSCPP BUG WITH TEMPLATE TEMPLATE)
-        template <typename reloaded_value_t>
-        void save(reloaded_value_t& value);
+        /// @tparam value_t is the type to use as value.
+        template <typename value_t>
+        void save(reloaded<value_t>& value);
 
     private:
         std::optional<std::reference_wrapper<std::stringstream>> _sstream = std::nullopt;

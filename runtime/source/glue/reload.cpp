@@ -86,7 +86,6 @@ namespace detail {
         _manager = std::make_shared<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>>(hscpp::mem::MemoryManager::Create());
         _swapper->SetAllocator((_manager.get()->operator->()));
         // _swapper->EnableFeature(hscpp::Feature::ManualCompilationOnly);
-        // _swapper->SetGlobalUserData(&(global_widgets_manager));
     }
 
     std::size_t reloader::allocated_blocks_count()

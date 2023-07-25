@@ -116,7 +116,32 @@ namespace widgets {
         Color& operator=(Color&& other) = default;
 
     private:
+        template <typename archive_t>
+        void load(archive_t& archive)
+        {
+            int1 _red, _green, _blue, _alpha;
+            archive(_red);
+            archive(_green);
+            archive(_blue);
+            archive(_alpha);
+            *this = fromARGB(
+                static_cast<uint1>(math::clamp<int1>(_alpha, 0, 255)),
+                static_cast<uint1>(math::clamp<int1>(_red, 0, 255)),
+                static_cast<uint1>(math::clamp<int1>(_green, 0, 255)),
+                static_cast<uint1>(math::clamp<int1>(_blue, 0, 255)));
+        }
+
+        template <typename archive_t>
+        void save(archive_t& archive) const
+        {
+            archive(cereal::make_nvp("red", math::clamp<uint1>(red(), 0u, 255u)));
+            archive(cereal::make_nvp("green", math::clamp<uint1>(green(), 0u, 255u)));
+            archive(cereal::make_nvp("blue", math::clamp<uint1>(blue(), 0u, 255u)));
+            archive(cereal::make_nvp("alpha", math::clamp<uint1>(alpha(), 0u, 255u)));
+        }
+
         uint32_t _value = zero<uint32_t>;
+        friend class cereal::access;
     };
 }
 

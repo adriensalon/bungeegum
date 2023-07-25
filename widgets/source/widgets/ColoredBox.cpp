@@ -23,7 +23,7 @@ namespace widgets {
 
     void ColoredBox::resolve(resolve_command& command)
     {
-        _color = Color(0xFF8888FF);
+        // _color = Color(0xFF8888FF);
 
 #if defined(__HOTRELOADING__)
         // std::cout << "oui" << std::endl;

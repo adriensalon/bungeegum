@@ -24,6 +24,7 @@ struct widget_reference {
 private:
     widget_reference(detail::value_type_t<widget_t>& data);
 
+    friend struct access;
     friend struct detail::widgets_manager;
     detail::reference_type_t<widget_t> _data;
 };

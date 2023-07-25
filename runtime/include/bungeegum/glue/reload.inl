@@ -63,9 +63,9 @@ namespace detail {
         return *(hscpp::GlobalUserData::GetAs<value_t>());
     }
 
-    template <typename reloaded_value_t>
-    struct value_wrapper {
-        value_wrapper(reloaded_value_t& value)
+    template <typename value_t>
+    struct reloaded_wrapper {
+        reloaded_wrapper(reloaded<value_t>& value)
             : _ref(value)
         {
         }
@@ -82,20 +82,20 @@ namespace detail {
             _ref.get()._bungeegum_save(archive);
         }
 
-        reloaded_value_t& _ref;
+        reloaded<value_t>& _ref;
     };
 
-    template <typename reloaded_value_t>
-    void reloaded_loader::load(reloaded_value_t& value)
+    template <typename value_t>
+    void reloaded_loader::load(reloaded<value_t>& value)
     {
-        value_wrapper<reloaded_value_t> _wrapper(value);
+        reloaded_wrapper<value_t> _wrapper(value);
         _archive(_wrapper);
     }
 
-    template <typename reloaded_value_t>
-    void reloaded_saver::save(reloaded_value_t& value)
+    template <typename value_t>
+    void reloaded_saver::save(reloaded<value_t>& value)
     {
-        value_wrapper<reloaded_value_t> _wrapper(value);
+        reloaded_wrapper<value_t> _wrapper(value);
         _archive(_wrapper);
     }
 }

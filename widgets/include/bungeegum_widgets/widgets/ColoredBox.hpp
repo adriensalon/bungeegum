@@ -66,7 +66,7 @@ namespace widgets {
         float ff44 = 56.f;
         mydata _md;
 
-        HOTSWAP_CLASS(ColoredBox, ii, ff, ff2, ff3, _md)
+        HOTSWAP_CLASS(ColoredBox, ii, ff, ff2, ff3, _md, _color)
     };
 }
 }
