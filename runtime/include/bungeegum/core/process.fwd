@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <bungeegum/core/interact.hpp>
+#include <bungeegum/core/overlay.fwd>
 
 struct ImDrawList;
 

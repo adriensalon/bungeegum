@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/simd.hpp>
 
 struct ImDrawList;
@@ -15,6 +16,10 @@ struct runtime_widget;
 namespace detail {
 
     struct process_manager;
+
+#if BUNGEEGUM_USE_OVERLAY
+    struct widget_inspector;
+#endif
 
     struct draw_command_data {
 
@@ -33,6 +38,9 @@ namespace detail {
         float2 resolved_size = zero<float2>;
         std::vector<std::function<void(ImDrawList*)>> commands = {};
         std::optional<clip_data> clipping = std::nullopt;
+#if BUNGEEGUM_USE_OVERLAY
+        std::vector<std::string> commands_infos = {};
+#endif
     };
 }
 }

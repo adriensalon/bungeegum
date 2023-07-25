@@ -15,6 +15,10 @@ namespace detail {
 
     struct process_manager;
 
+#if BUNGEEGUM_USE_OVERLAY
+    struct widget_inspector;
+#endif
+
     struct resolve_constraint_data {
         bool is_blocked = false;
         float2 min_size = zero<float2>;

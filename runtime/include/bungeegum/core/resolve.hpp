@@ -32,8 +32,11 @@ struct resolve_command {
 
 private:
     detail::resolve_command_data _data;
-    friend struct detail::backend_manager;
     friend struct detail::process_manager;
+#if BUNGEEGUM_USE_OVERLAY
+    friend struct detail::backend_manager; // to set clean typename
+    friend struct detail::widget_inspector;
+#endif
 };
 
 /// @brief

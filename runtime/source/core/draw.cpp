@@ -93,6 +93,13 @@ void draw_command::draw_line(
     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
         _drawlist->AddLine(_first_point, _second_point, _color, thickness);
     });
+#if BUNGEEGUM_USE_OVERLAY
+    _data.commands_infos.push_back("draw_line("
+        + to_string<float2>(first_point) + ", "
+        + to_string<float2>(second_point) + ", "
+        + to_string<float4>(color) + ", "
+        + std::to_string(thickness) + ")");
+#endif
 }
 
 void draw_command::draw_rect(
@@ -120,6 +127,13 @@ void draw_command::draw_rect_filled(
     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
         _drawlist->AddRectFilled(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All);
     });
+#if BUNGEEGUM_USE_OVERLAY
+    _data.commands_infos.push_back("draw_rect_filled("
+        + to_string<float2>(min_point) + ", "
+        + to_string<float2>(max_point) + ", "
+        + to_string<float4>(color) + ", "
+        + std::to_string(rounding) + ")");
+#endif
 }
 
 void must_draw()

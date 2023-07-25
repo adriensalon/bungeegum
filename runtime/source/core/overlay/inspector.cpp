@@ -14,6 +14,27 @@
 namespace bungeegum {
 namespace detail {
 
+    struct widget_inspector {
+        widget_inspector() = delete;
+        widget_inspector(const widget_inspector&) = delete;
+        widget_inspector& operator=(const widget_inspector&) = delete;
+        widget_inspector(widget_inspector&&) = delete;
+        widget_inspector& operator=(widget_inspector&&) = delete;
+
+        static resolve_command_data& access_resolve(resolve_command& command)
+        {
+            return command._data;
+        }
+        static interact_command_data& access_interact(interact_command& command)
+        {
+            return command._data;
+        }
+        static draw_command_data& access_draw(draw_command& command)
+        {
+            return command._data;
+        }
+    };
+
     namespace {
 
         std::string tag(const std::string& name)
@@ -124,15 +145,31 @@ namespace detail {
             }
         }
 
-        bool draw_inspected_widget(const std::uintptr_t raw_widget)
+        void draw_inspected_widget_memory_tab(widget_update_data& update_data)
         {
-            widgets_manager& _widgets_manager = global().widgets;
-            backend_manager& _backend_manager = global().backend;
-            if (_widgets_manager.contains(raw_widget)) {
-                widget_update_data& _update_data = _widgets_manager[raw_widget];
+            std::string _title = "memory" + tag("widget_memory_tab");
+            if (ImGui::BeginTabItem(_title.c_str())) {
 
-                std::optional<std::string> _serialized = _backend_manager.inspect_reloadable_widget(_update_data);
-                if (_serialized.has_value()) {
+                static MemoryEditor _memory_editor;
+                void* _void_ptr = reinterpret_cast<void*>(update_data.true_ptr());
+                std::size_t _raw_size = update_data.true_sizeof();
+                std::size_t _display_address = static_cast<std::size_t>(update_data.true_ptr());
+                _memory_editor.DrawContents(_void_ptr, _raw_size, _display_address);
+
+                // ImGui::Text(("sizeof =" + std::to_string(update_data.true_sizeof())).c_str());
+                // ImGui::Text(("raw =" + int_to_hex(update_data.true_ptr())).c_str());
+
+                ImGui::EndTabItem();
+            }
+        }
+
+        void draw_inspected_widget_serialized_tab(widget_update_data& update_data)
+        {
+            backend_manager& _backend_manager = global().backend;
+            std::optional<std::string> _serialized = _backend_manager.inspect_reloadable_widget(update_data);
+            if (_serialized.has_value()) {
+                std::string _title = "serialized" + tag("widget_serialized_tab");
+                if (ImGui::BeginTabItem(_title.c_str())) {
                     rapidjson::Document _document;
                     _document.Parse(_serialized.value().c_str());
                     rapidjson::Value& _root_value = _document.GetObject()["value0"];
@@ -141,22 +178,64 @@ namespace detail {
                     _json_strbuf.Clear();
                     rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
                     _document.Accept(_json_writer);
-                    std::string _ownShipRadarString = _json_strbuf.GetString();
-                    _backend_manager.update_reloadable_widget(_update_data, _ownShipRadarString);
+                    std::string _modified = _json_strbuf.GetString();
+                    _backend_manager.update_reloadable_widget(update_data, _modified);
+                    ImGui::EndTabItem();
                 }
+            }
+        }
 
-                ImGui::Text(("sizeof =" + std::to_string(_update_data.true_sizeof())).c_str());
-                ImGui::Text(("raw =" + int_to_hex(_update_data.true_ptr())).c_str());
-
-                static MemoryEditor mem_edit_2;
-                mem_edit_2.DrawContents((void*)_update_data.true_ptr(), _update_data.true_sizeof(), _update_data.true_ptr());
-
+        void draw_inspected_widget_resolve_tab(const widget_update_data& update_data)
+        {
+            std::string _title = "resolve" + tag("widget_resolve_tab");
+            if (ImGui::BeginTabItem(_title.c_str())) {
                 ImGui::Text("Constraints");
-                ImGui::Text(("min_size = " + size_to_string(_update_data.resolver_command.min_size())).c_str());
-                ImGui::Text(("max_size = " + size_to_string(_update_data.resolver_command.max_size())).c_str());
+                ImGui::Text(("min_size = " + size_to_string(update_data.resolver_command.min_size())).c_str());
+                ImGui::Text(("max_size = " + size_to_string(update_data.resolver_command.max_size())).c_str());
 
-                if (!_update_data.children.empty())
-                    ImGui::Text((std::to_string(_update_data.children.size()) + " children :").c_str());
+                ImGui::EndTabItem();
+            }
+        }
+
+        void draw_inspected_widget_interact_tab(const widget_update_data& update_data)
+        {
+            if (update_data.interactor_command.has_value()) {
+                std::string _title = "interact" + tag("widget_interact_tab");
+                if (ImGui::BeginTabItem(_title.c_str())) {
+
+                    ImGui::EndTabItem();
+                }
+            }
+        }
+
+        void draw_inspected_widget_draw_tab(widget_update_data& update_data)
+        {
+            // widgets_manager& _widgets_manager = global().widgets;
+            if (update_data.drawer_command.has_value()) {
+                std::string _title = "draw" + tag("widget_draw_tab");
+                if (ImGui::BeginTabItem(_title.c_str())) {
+                    detail::draw_command_data& _data = widget_inspector::access_draw(update_data.drawer_command.value());
+                    for (const std::string& _info : _data.commands_infos) {
+                        ImGui::Text(_info.c_str());
+                    }
+                    ImGui::EndTabItem();
+                }
+            }
+        }
+
+        bool draw_inspected_widget(const std::uintptr_t raw_widget)
+        {
+            widgets_manager& _widgets_manager = global().widgets;
+            if (_widgets_manager.contains(raw_widget)) {
+                widget_update_data& _update_data = _widgets_manager[raw_widget];
+                if (ImGui::BeginTabBar(tag("widget_tabs").c_str())) {
+                    draw_inspected_widget_memory_tab(_update_data);
+                    draw_inspected_widget_serialized_tab(_update_data);
+                    draw_inspected_widget_resolve_tab(_update_data);
+                    draw_inspected_widget_interact_tab(_update_data);
+                    draw_inspected_widget_draw_tab(_update_data);
+                }
+                ImGui::EndTabBar();
                 return true;
             }
             return false;
@@ -189,7 +268,7 @@ namespace detail {
 
     void draw_inspector_overlay()
     {
-        ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
+        // ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
         if (ImGui::Begin(("inspector" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             backend_manager& _manager = global().backend;
             if (!_manager.inspector_selected.has_value()) {

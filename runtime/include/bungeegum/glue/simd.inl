@@ -50,6 +50,18 @@ constexpr inline bool1 is_finite<float3>(const float3 value)
     return ((value.x != infinity<float>)&&(value.y != infinity<float>)&&(value.z != infinity<float>));
 }
 
+template <typename value_t>
+std::string to_string(const value_t& value)
+{
+    (void)value;
+    return "not implemented!";
+}
+
+// template <>
+// std::string to_string<float2>(const float2& value)
+// {
+//     return std::to_string
+// }
 }
 
 #include <bungeegum/glue/simd.inl>

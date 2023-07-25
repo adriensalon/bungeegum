@@ -108,6 +108,7 @@ namespace detail {
                             _widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
                             _widget_drawer_command._data.commands.clear();
 #if BUNGEEGUM_USE_OVERLAY
+                            _widget_drawer_command._data.commands_infos.clear();
                             std::string _clean_typename = clean_typename(_widget_data.kind->name());
                             global().backend.profiler_draw_chronometer.begin_task(_clean_typename);
 #endif

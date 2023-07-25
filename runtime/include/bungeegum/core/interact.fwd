@@ -5,6 +5,7 @@
 #include <variant>
 #include <vector>
 
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/window.hpp>
 
@@ -15,6 +16,10 @@ struct runtime_widget;
 namespace detail {
 
     struct process_manager;
+
+#if BUNGEEGUM_USE_OVERLAY
+    struct widget_inspector;
+#endif
 
     struct interact_command_data {
         bool is_blocked = false;

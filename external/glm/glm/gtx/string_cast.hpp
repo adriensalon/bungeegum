@@ -17,8 +17,8 @@
 // Dependency:
 #include "../glm.hpp"
 #include "../gtc/type_precision.hpp"
-#include "../gtc/quaternion.hpp"
-#include "../gtx/dual_quaternion.hpp"
+// #include "../gtc/quaternion.hpp"
+// #include "../gtx/dual_quaternion.hpp"
 #include <string>
 #include <cmath>
 

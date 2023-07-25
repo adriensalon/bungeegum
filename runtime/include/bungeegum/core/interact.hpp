@@ -133,6 +133,9 @@ struct interact_command {
 private:
     detail::interact_command_data _data;
     friend struct detail::process_manager;
+#if BUNGEEGUM_USE_OVERLAY
+    friend struct detail::widget_inspector;
+#endif
 };
 
 /// @brief
