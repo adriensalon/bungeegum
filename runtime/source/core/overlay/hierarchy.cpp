@@ -30,8 +30,6 @@ namespace detail {
             if (ImGui::BeginTabItem((_title + tag("tree_widgets_tab")).c_str())) {
                 // ImVec2 _available_size = ImGui::GetContentRegionAvail();
 
-                ImGui::ShowDemoWindow();
-
                 unsigned int _id = 0;
                 std::function<void(const widget_update_data&)> _tf = [&](const widget_update_data& _widget_data) {
                     _id++;

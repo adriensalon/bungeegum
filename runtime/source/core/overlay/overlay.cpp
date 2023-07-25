@@ -237,7 +237,7 @@ namespace detail {
 
         draw_footer();
 
-        style_guard _sg11(ImGuiStyleVar_FramePadding, { 4.f, 4.f });
+        style_guard _sg11(ImGuiStyleVar_FramePadding, { 4.f, 3.3f });
         style_guard _sg_window_border_size(ImGuiStyleVar_WindowBorderSize, 1.5f);
 
         if (show_hierarchy) {

@@ -10,6 +10,7 @@
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/imedit.hpp>
+#include <bungeegum/glue/imguarded.fwd>
 
 namespace bungeegum {
 namespace detail {
@@ -52,15 +53,40 @@ namespace detail {
             return stream.str();
         }
 
+        std::string clean_fieldname(const std::string& name)
+        {
+            std::size_t _not_underscore_index = name.find_first_not_of('_');
+            std::size_t _length = name.length() - _not_underscore_index;
+            return name.substr(_not_underscore_index, _length);
+        }
+
         void draw_json(rapidjson::Document& document, rapidjson::Value& obj, const std::string& name)
         {
+            style_guard _cell_padding_guard(ImGuiStyleVar_CellPadding, { 4.f, 0.f });
             if (obj.IsObject()) {
                 static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
                 if (ImGui::BeginTable(tag(name + "json_widget_table_").c_str(), 2, _table_flags)) {
                     std::vector<std::string> _objects = {};
+                    rapidjson::SizeType _count = obj.MemberCount();
+                    if (obj.HasMember("BUNGEEGUM_OBJECT_REFERENCE")) {
+                        _count--;
+                    }
+
                     for (rapidjson::Value::MemberIterator _iterator = obj.MemberBegin(); _iterator != obj.MemberEnd(); ++_iterator) {
-                        std::string _name(_iterator->name.GetString());
+                        if (_iterator->value.IsObject()) {
+                            _count--;
+                        }
+                    }
+
+                    std::size_t _index = 0;
+                    for (rapidjson::Value::MemberIterator _iterator = obj.MemberBegin(); _iterator != obj.MemberEnd(); ++_iterator) {
+                        std::string _name = _iterator->name.GetString();
                         if (_name != "BUNGEEGUM_OBJECT_REFERENCE") {
+                            _name = clean_fieldname(_name);
+                            style_guard _no_rounding_guard;
+                            if ((_index > 0) && (_index < _count - 1)) {
+                                _no_rounding_guard.set(ImGuiStyleVar_FrameRounding, 0.f);
+                            }
                             ImGui::TableNextRow();
                             if (_iterator->value.IsInt()) {
                                 ImGui::TableSetColumnIndex(0);
@@ -156,14 +182,17 @@ namespace detail {
                             } else if (_iterator->value.IsObject()) {
                                 _objects.push_back(std::string(_iterator->name.GetString()));
                             }
+                            _index++;
                         }
                     }
                     ImGui::EndTable();
                     for (const std::string& _object : _objects) {
                         rapidjson::Value& objValue = obj[_object.c_str()]; //make object value
-                        // TREE PUSH
-                        draw_json(document, objValue, _object);
-                        // TREE POP
+                        static ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding;
+                        if (ImGui::TreeNodeEx((clean_fieldname(_object) + tag("object_tree_node_" + _object)).c_str(), _node_flags)) {
+                            draw_json(document, objValue, _object);
+                            ImGui::TreePop();
+                        }
                     }
                 }
             }
@@ -172,7 +201,30 @@ namespace detail {
         void draw_inspected_widget_memory_tab(widget_update_data& update_data)
         {
             std::string _title = "memory" + tag("widget_memory_tab");
+
             if (ImGui::BeginTabItem(_title.c_str())) {
+                backend_manager& _backend_manager = global().backend;
+                std::optional<std::string> _serialized = _backend_manager.inspect_reloadable_widget(update_data);
+                if (_serialized.has_value()) {
+                    static ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_CollapsingHeader;
+
+                    if (ImGui::TreeNodeEx(("Serialized" + tag("serialized_tree_node")).c_str(), _node_flags)) {
+
+                        ImGui::Spacing();
+                        rapidjson::Document _document;
+                        _document.Parse(_serialized.value().c_str());
+                        rapidjson::Value& _root_value = _document.GetObject()["value0"];
+                        draw_json(_document, _root_value, "_root");
+                        rapidjson::StringBuffer _json_strbuf;
+                        _json_strbuf.Clear();
+                        rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
+                        _document.Accept(_json_writer);
+                        std::string _modified = _json_strbuf.GetString();
+                        _backend_manager.update_reloadable_widget(update_data, _modified);
+                        ImGui::Spacing();
+                        ImGui::Separator();
+                    }
+                }
 
                 static MemoryEditor _memory_editor;
                 void* _void_ptr = reinterpret_cast<void*>(update_data.true_ptr());
@@ -187,38 +239,40 @@ namespace detail {
             }
         }
 
-        void draw_inspected_widget_serialized_tab(widget_update_data& update_data)
-        {
-            backend_manager& _backend_manager = global().backend;
-            std::optional<std::string> _serialized = _backend_manager.inspect_reloadable_widget(update_data);
-            if (_serialized.has_value()) {
-                std::string _title = "serialized" + tag("widget_serialized_tab");
-                if (ImGui::BeginTabItem(_title.c_str())) {
-                    rapidjson::Document _document;
-                    _document.Parse(_serialized.value().c_str());
-                    rapidjson::Value& _root_value = _document.GetObject()["value0"];
-                    draw_json(_document, _root_value, "_root");
-                    rapidjson::StringBuffer _json_strbuf;
-                    _json_strbuf.Clear();
-                    rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
-                    _document.Accept(_json_writer);
-                    std::string _modified = _json_strbuf.GetString();
-                    _backend_manager.update_reloadable_widget(update_data, _modified);
-                    ImGui::EndTabItem();
-                }
-            }
-        }
+        // void draw_inspected_widget_serialized_tab(widget_update_data& update_data)
+        // {
+
+        //     if (_serialized.has_value()) {
+        //         std::string _title = "serialized" + tag("widget_serialized_tab");
+        //         if (ImGui::BeginTabItem(_title.c_str())) {
+        //             static ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding;
+        //             if (ImGui::TreeNodeEx(("Serialized" + tag("serialized_tree_node")).c_str(), _node_flags)) {
+        //                 rapidjson::Document _document;
+        //                 _document.Parse(_serialized.value().c_str());
+        //                 rapidjson::Value& _root_value = _document.GetObject()["value0"];
+        //                 draw_json(_document, _root_value, "_root");
+        //                 rapidjson::StringBuffer _json_strbuf;
+        //                 _json_strbuf.Clear();
+        //                 rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
+        //                 _document.Accept(_json_writer);
+        //                 std::string _modified = _json_strbuf.GetString();
+        //                 _backend_manager.update_reloadable_widget(update_data, _modified);
+        //                 ImGui::TreePop();
+        //             }
+        //             ImGui::EndTabItem();
+        //         }
+        //     }
+        // }
 
         void draw_inspected_widget_resolve_tab(widget_update_data& update_data)
         {
             std::string _title = "resolve" + tag("widget_resolve_tab");
             if (ImGui::BeginTabItem(_title.c_str())) {
                 const resolve_command_data& _data = widget_inspector::access_resolve(update_data.resolver_command);
-                static ImGuiTableFlags _table_flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
+                static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
 
-                ImVec2 _table_size = ImGui::GetContentRegionAvail();
                 // _table_size.y = 2.f * ImGui::GetFrameHeight();
-                if (ImGui::BeginTable(tag("constraint_widget_resolve_table").c_str(), 2, _table_flags, _table_size)) {
+                if (ImGui::BeginTable(tag("constraint_widget_resolve_table").c_str(), 2, _table_flags)) {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
                     ImGui::Text("constrained min size");
@@ -272,7 +326,7 @@ namespace detail {
                     //
                     //
 
-                    static ImGuiTableFlags _table_flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
+                    static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
                     if (ImGui::BeginTable(tag("widget_draw_table").c_str(), static_cast<int>(_args_count), _table_flags)) {
                         for (const std::pair<std::string, std::vector<std::string>>& _info : _data.commands_infos) {
                             ImGui::TableNextRow();
@@ -302,7 +356,6 @@ namespace detail {
                 widget_update_data& _update_data = _widgets_manager[raw_widget];
                 if (ImGui::BeginTabBar(tag("widget_tabs").c_str())) {
                     draw_inspected_widget_memory_tab(_update_data);
-                    draw_inspected_widget_serialized_tab(_update_data);
                     draw_inspected_widget_resolve_tab(_update_data);
                     draw_inspected_widget_interact_tab(_update_data);
                     draw_inspected_widget_draw_tab(_update_data);
@@ -344,7 +397,7 @@ namespace detail {
         if (ImGui::Begin(("inspector" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             backend_manager& _manager = global().backend;
             if (!_manager.inspector_selected.has_value()) {
-                ImGui::Text("No widget selected.");
+                ImGui::TextWrapped("Nothing selected. Please select a widget or a running animation in the hierarchy window to display additional content here.");
             } else {
                 std::uintptr_t _raw_object = _manager.inspector_selected.value();
                 if (!draw_inspected_widget(_raw_object)) {
