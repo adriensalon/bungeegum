@@ -20,35 +20,6 @@ namespace detail {
     }
 }
 
-// draw_command::draw_command(detail::draw_command_data& data)
-//     : _data(data)
-// {
-//     (void)data;
-// }
-
-// draw_command::draw_command(const draw_command& other)
-//     : _data(other._data)
-// {
-//     (void)other;
-// }
-
-// draw_command& draw_command::operator=(const draw_command& other)
-// {
-//     (void)other;
-//     return *this;
-// }
-
-// draw_command::draw_command(draw_command&& other)
-//     : _data(other._data)
-// {
-// }
-
-// draw_command& draw_command::operator=(draw_command&& other)
-// {
-//     (void)other;
-//     return *this;
-// }
-
 float2 draw_command::resolved_position() const
 {
     return _data.resolved_position;
@@ -66,21 +37,13 @@ void draw_command::clip_rect(const float2 first_point, const float2 second_point
         second_point,
         true
     };
+#if BUNGEEGUM_USE_OVERLAY
+    std::pair<std::string, std::vector<std::string>>& _info = _data.commands_infos.emplace_back();
+    _info.first = "clip rect";
+    _info.second.push_back(to_string<float2>(first_point));
+    _info.second.push_back(to_string<float2>(second_point));
+#endif
 }
-
-// void draw_command::clip_temporary_rect(
-//     const float2 first_point, const float2 second_point,
-//     const bool1 intersect_with_current_clip_rect,
-//     const std::function<void(draw_command&)>& clipped_callback)
-// {
-//     ImVec2 _first_point { first_point.x, first_point.y };
-//     ImVec2 _second_point { second_point.x, second_point.y };
-//     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
-//         _drawlist->PushClipRect(_first_point, _second_point, intersect_with_current_clip_rect);
-//         clipped_callback(*this);
-//         _drawlist->PopClipRect();
-//     });
-// }
 
 void draw_command::draw_line(
     const float2 first_point, const float2 second_point,
@@ -94,11 +57,12 @@ void draw_command::draw_line(
         _drawlist->AddLine(_first_point, _second_point, _color, thickness);
     });
 #if BUNGEEGUM_USE_OVERLAY
-    _data.commands_infos.push_back("draw_line("
-        + to_string<float2>(first_point) + ", "
-        + to_string<float2>(second_point) + ", "
-        + to_string<float4>(color) + ", "
-        + std::to_string(thickness) + ")");
+    std::pair<std::string, std::vector<std::string>>& _info = _data.commands_infos.emplace_back();
+    _info.first = "draw line";
+    _info.second.push_back(to_string<float2>(first_point));
+    _info.second.push_back(to_string<float2>(second_point));
+    _info.second.push_back(to_string<float4>(color));
+    _info.second.push_back(to_string<float1>(thickness));
 #endif
 }
 
@@ -114,6 +78,15 @@ void draw_command::draw_rect(
     _data.commands.emplace_back([=](ImDrawList* _drawlist) {
         _drawlist->AddRect(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All, thickness);
     });
+#if BUNGEEGUM_USE_OVERLAY
+    std::pair<std::string, std::vector<std::string>>& _info = _data.commands_infos.emplace_back();
+    _info.first = "draw rect";
+    _info.second.push_back(to_string<float2>(min_point));
+    _info.second.push_back(to_string<float2>(max_point));
+    _info.second.push_back(to_string<float4>(color));
+    _info.second.push_back(to_string<float1>(rounding));
+    _info.second.push_back(to_string<float1>(thickness));
+#endif
 }
 
 void draw_command::draw_rect_filled(
@@ -128,11 +101,12 @@ void draw_command::draw_rect_filled(
         _drawlist->AddRectFilled(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All);
     });
 #if BUNGEEGUM_USE_OVERLAY
-    _data.commands_infos.push_back("draw_rect_filled("
-        + to_string<float2>(min_point) + ", "
-        + to_string<float2>(max_point) + ", "
-        + to_string<float4>(color) + ", "
-        + std::to_string(rounding) + ")");
+    std::pair<std::string, std::vector<std::string>>& _info = _data.commands_infos.emplace_back();
+    _info.first = "draw rect filled";
+    _info.second.push_back(to_string<float2>(min_point));
+    _info.second.push_back(to_string<float2>(max_point));
+    _info.second.push_back(to_string<float4>(color));
+    _info.second.push_back(to_string<float1>(rounding));
 #endif
 }
 

@@ -42,11 +42,6 @@ namespace detail {
             return "###__bungeegum_overlay_inspector_" + name + "__";
         }
 
-        std::string size_to_string(const float2 size)
-        {
-            return (std::to_string(size.x) + ", " + std::to_string(size.y));
-        }
-
         template <typename T>
         std::string int_to_hex(T i)
         {
@@ -185,14 +180,38 @@ namespace detail {
             }
         }
 
-        void draw_inspected_widget_resolve_tab(const widget_update_data& update_data)
+        void draw_inspected_widget_resolve_tab(widget_update_data& update_data)
         {
             std::string _title = "resolve" + tag("widget_resolve_tab");
             if (ImGui::BeginTabItem(_title.c_str())) {
-                ImGui::Text("Constraints");
-                ImGui::Text(("min_size = " + size_to_string(update_data.resolver_command.min_size())).c_str());
-                ImGui::Text(("max_size = " + size_to_string(update_data.resolver_command.max_size())).c_str());
+                const resolve_command_data& _data = widget_inspector::access_resolve(update_data.resolver_command);
+                static ImGuiTableFlags _table_flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
 
+                ImVec2 _table_size = ImGui::GetContentRegionAvail();
+                // _table_size.y = 2.f * ImGui::GetFrameHeight();
+                if (ImGui::BeginTable(tag("constraint_widget_resolve_table").c_str(), 2, _table_flags, _table_size)) {
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("constrained min size");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text(to_string(_data.constraint.min_size).c_str());
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("constrained max size");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text(to_string(_data.constraint.max_size).c_str());
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("resolved position");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text(to_string(_data.accumulated_position).c_str());
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("resolved size");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text(to_string(_data.resolved_size).c_str());
+                    ImGui::EndTable();
+                }
                 ImGui::EndTabItem();
             }
         }
@@ -210,13 +229,37 @@ namespace detail {
 
         void draw_inspected_widget_draw_tab(widget_update_data& update_data)
         {
-            // widgets_manager& _widgets_manager = global().widgets;
             if (update_data.drawer_command.has_value()) {
                 std::string _title = "draw" + tag("widget_draw_tab");
                 if (ImGui::BeginTabItem(_title.c_str())) {
                     detail::draw_command_data& _data = widget_inspector::access_draw(update_data.drawer_command.value());
-                    for (const std::string& _info : _data.commands_infos) {
-                        ImGui::Text(_info.c_str());
+
+                    // GO ALGORITHM
+                    //
+                    std::size_t _args_count = 0;
+                    for (const std::pair<std::string, std::vector<std::string>>& _info : _data.commands_infos) {
+                        _args_count = std::max(_args_count, _info.second.size());
+                    }
+                    //
+                    //
+
+                    static ImGuiTableFlags _table_flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
+                    if (ImGui::BeginTable(tag("widget_draw_table").c_str(), static_cast<int>(_args_count), _table_flags)) {
+                        for (const std::pair<std::string, std::vector<std::string>>& _info : _data.commands_infos) {
+                            ImGui::TableNextRow();
+                            ImGui::TableSetColumnIndex(0);
+                            ImGui::Text(_info.first.c_str());
+                            std::size_t _this_args_count = _info.second.size();
+                            for (std::size_t _k = 0; _k < _this_args_count - 1; _k++) {
+                                ImGui::TableSetColumnIndex(1 + static_cast<int>(_k));
+                                ImGui::Text(_info.second[_k].c_str());
+                            }
+                            for (std::size_t _k = _this_args_count - 1; _k < _args_count - 1; _k++) {
+                                ImGui::TableSetColumnIndex(1 + static_cast<int>(_k));
+                                ImGui::Text("");
+                            }
+                        }
+                        ImGui::EndTable();
                     }
                     ImGui::EndTabItem();
                 }
@@ -268,7 +311,7 @@ namespace detail {
 
     void draw_inspector_overlay()
     {
-        // ImGui::SetNextWindowSize({ 300, 450 }, ImGuiCond_Once);
+        ImGui::SetNextWindowSize({ 445, 450 }, ImGuiCond_Once);
         if (ImGui::Begin(("inspector" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             backend_manager& _manager = global().backend;
             if (!_manager.inspector_selected.has_value()) {

@@ -39,7 +39,7 @@ namespace detail {
         std::vector<std::function<void(ImDrawList*)>> commands = {};
         std::optional<clip_data> clipping = std::nullopt;
 #if BUNGEEGUM_USE_OVERLAY
-        std::vector<std::string> commands_infos = {};
+        std::vector<std::pair<std::string, std::vector<std::string>>> commands_infos = {};
 #endif
     };
 }

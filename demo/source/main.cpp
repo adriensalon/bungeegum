@@ -156,7 +156,7 @@ int main()
                                                            .builder([](const bool value) -> bungeegum::runtime_widget {
                                                                if (value) {
                                                                    static bungeegum::animation<float> _myanim;
-                                                                   _myanim.duration<std::chrono::seconds>(3).min(0.f).max(88.f).start();
+                                                                   _myanim.duration<std::chrono::seconds>(10).min(0.f).max(88.f).start();
                                                                    static auto fff = std::async([]() {
                                                                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                                                                        _osstream2 << "Helloooooo4466" << std::endl;
