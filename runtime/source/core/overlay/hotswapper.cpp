@@ -63,7 +63,7 @@ namespace detail {
                         _item_str = items[_k].generic_string();
                     }
                     ImGui::SetCursorPos(ImVec2(_cursor_position.x, _cursor_position.y));
-                    ImGui::Selectable(("##" + _item_str).c_str(), false, 0, ImVec2(ImGui::GetContentRegionAvail().x, frame_height_without_padding));
+                    ImGui::Selectable(("##" + _item_str).c_str(), false, ImGuiSelectableFlags_AllowOverlap, ImVec2(ImGui::GetContentRegionAvail().x, frame_height_without_padding));
                     ImGui::SetItemAllowOverlap();
                     if (ImGui::IsItemActive() && !ImGui::IsItemHovered()) {
                         std::size_t _k_next = _k + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
@@ -72,6 +72,7 @@ namespace detail {
                             ImGui::ResetMouseDragDelta();
                         }
                     }
+                    _cursor_position.x += ImGui::GetStyle().FramePadding.x;
                     ImGui::SetCursorPos(_cursor_position);
 
                     //
@@ -79,7 +80,7 @@ namespace detail {
                     //
                     //
                     bool vv = selected_items[_k];
-                    if (ImGui::Checkbox(("##cc" + _item_str).c_str(), &vv)) {
+                    if (ImGui::Checkbox(tag("cc" + _item_str).c_str(), &vv)) {
                         if (vv) {
                             selected_count++;
                         } else {
@@ -87,6 +88,7 @@ namespace detail {
                         }
                     }
                     selected_items[_k] = (vv);
+                    _cursor_position.x -= ImGui::GetStyle().FramePadding.x;
 
                     ImGui::SameLine();
                     ImGui::Text(_item_str.c_str());
@@ -205,6 +207,7 @@ namespace detail {
         {
             std::string _title = "defines (" + std::to_string(defines.size()) + ")" + tag("defines_tab");
             if (ImGui::BeginTabItem(_title.c_str())) {
+                ImGui::Spacing();
                 float _footer_height = multiline_text_input_height + 3.f * ImGui::GetFrameHeightWithSpacing() + ImGui::GetStyle().ItemSpacing.y;
                 draw_items_cards<std::string>("defines", defines, frame_height_without_padding, _footer_height);
                 draw_defines_buttons(defines);
@@ -217,6 +220,7 @@ namespace detail {
         {
             std::string _title = name + " (" + std::to_string(paths.size()) + ")" + tag(name + "_tab");
             if (ImGui::BeginTabItem(_title.c_str())) {
+                ImGui::Spacing();
                 float _footer_height = 2.f * ImGui::GetFrameHeightWithSpacing();
                 // float _footer_height = 2.f * frame_height_without_padding + 3.f * ImGui::GetStyle().FramePadding.y;
                 draw_items_cards<std::filesystem::path>(name, paths, frame_height_without_padding, _footer_height);
@@ -245,7 +249,7 @@ namespace detail {
     void draw_hotswapper_overlay()
     {
 #if BUNGEEGUM_USE_HOTSWAP
-        ImGui::SetNextWindowSize({ 300.f, 450.f }, ImGuiCond_Once);
+        ImGui::SetNextWindowSize({ 450.f, 550.f }, ImGuiCond_Once);
         if (ImGui::Begin("hotswapper##__bungeegum_window_hotswapper_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
 
             color_guard _cg_button(ImGuiCol_Button, { 0.58f, 0.58f, 0.58f, 0.40f });

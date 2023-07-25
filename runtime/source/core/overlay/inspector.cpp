@@ -1,3 +1,4 @@
+#include <cctype>
 #include <string>
 
 #include <imgui.h>
@@ -57,7 +58,9 @@ namespace detail {
         {
             std::size_t _not_underscore_index = name.find_first_not_of('_');
             std::size_t _length = name.length() - _not_underscore_index;
-            return name.substr(_not_underscore_index, _length);
+            std::string _modified = name.substr(_not_underscore_index, _length);
+            _modified[0] = static_cast<char>(std::toupper(static_cast<int>(_modified[0])));
+            return _modified;
         }
 
         void draw_json(rapidjson::Document& document, rapidjson::Value& obj, const std::string& name)
@@ -66,6 +69,8 @@ namespace detail {
             if (obj.IsObject()) {
                 static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
                 if (ImGui::BeginTable(tag(name + "json_widget_table_").c_str(), 2, _table_flags)) {
+                    ImGui::TableSetupColumn(tag("names_column").c_str(), ImGuiTableColumnFlags_WidthStretch, 0.4f);
+                    ImGui::TableSetupColumn(tag("values_column").c_str(), ImGuiTableColumnFlags_WidthStretch, 0.6f);
                     std::vector<std::string> _objects = {};
                     rapidjson::SizeType _count = obj.MemberCount();
                     if (obj.HasMember("BUNGEEGUM_OBJECT_REFERENCE")) {
@@ -203,37 +208,54 @@ namespace detail {
             std::string _title = "memory" + tag("widget_memory_tab");
 
             if (ImGui::BeginTabItem(_title.c_str())) {
-                backend_manager& _backend_manager = global().backend;
-                std::optional<std::string> _serialized = _backend_manager.inspect_reloadable_widget(update_data);
-                if (_serialized.has_value()) {
+
+                static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
+                if (ImGui::BeginTable(tag("info_widget_memory_table").c_str(), 2, _table_flags)) {
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("sizeof");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text(std::to_string(update_data.true_sizeof()).c_str());
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("ptr");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text(int_to_hex(update_data.true_ptr()).c_str());
+                    ImGui::EndTable();
+                }
+                ImGui::Spacing();
+
+                if (ImGui::BeginTabBar(tag("widget_memory_tabs_bar").c_str())) {
+                    if (ImGui::BeginTabItem(("raw" + tag("widget_memory_raw_tab")).c_str())) {
+                        static MemoryEditor _memory_editor;
+                        void* _void_ptr = reinterpret_cast<void*>(update_data.true_ptr());
+                        std::size_t _raw_size = update_data.true_sizeof();
+                        std::size_t _display_address = static_cast<std::size_t>(update_data.true_ptr());
+                        _memory_editor.DrawContents(_void_ptr, _raw_size, _display_address);
+                        ImGui::EndTabItem();
+                    }
+                    backend_manager& _backend_manager = global().backend;
+                    std::optional<std::string> _serialized = _backend_manager.inspect_reloadable_widget(update_data);
                     static ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_CollapsingHeader;
+                    if (_serialized.has_value()) {
 
-                    if (ImGui::TreeNodeEx(("Serialized" + tag("serialized_tree_node")).c_str(), _node_flags)) {
-
-                        ImGui::Spacing();
-                        rapidjson::Document _document;
-                        _document.Parse(_serialized.value().c_str());
-                        rapidjson::Value& _root_value = _document.GetObject()["value0"];
-                        draw_json(_document, _root_value, "_root");
-                        rapidjson::StringBuffer _json_strbuf;
-                        _json_strbuf.Clear();
-                        rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
-                        _document.Accept(_json_writer);
-                        std::string _modified = _json_strbuf.GetString();
-                        _backend_manager.update_reloadable_widget(update_data, _modified);
-                        ImGui::Spacing();
-                        ImGui::Separator();
+                        if (ImGui::BeginTabItem(("serialized" + tag("widget_memory_serialized_tab")).c_str())) {
+                            ImGui::Spacing();
+                            rapidjson::Document _document;
+                            _document.Parse(_serialized.value().c_str());
+                            rapidjson::Value& _root_value = _document.GetObject()["value0"];
+                            draw_json(_document, _root_value, "_root");
+                            rapidjson::StringBuffer _json_strbuf;
+                            _json_strbuf.Clear();
+                            rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
+                            _document.Accept(_json_writer);
+                            std::string _modified = _json_strbuf.GetString();
+                            _backend_manager.update_reloadable_widget(update_data, _modified);
+                            ImGui::EndTabItem();
+                        }
                     }
                 }
-
-                static MemoryEditor _memory_editor;
-                void* _void_ptr = reinterpret_cast<void*>(update_data.true_ptr());
-                std::size_t _raw_size = update_data.true_sizeof();
-                std::size_t _display_address = static_cast<std::size_t>(update_data.true_ptr());
-                _memory_editor.DrawContents(_void_ptr, _raw_size, _display_address);
-
-                // ImGui::Text(("sizeof =" + std::to_string(update_data.true_sizeof())).c_str());
-                // ImGui::Text(("raw =" + int_to_hex(update_data.true_ptr())).c_str());
+                ImGui::EndTabBar();
 
                 ImGui::EndTabItem();
             }
@@ -393,8 +415,10 @@ namespace detail {
 
     void draw_inspector_overlay()
     {
+        static std::optional<std::string> _opt_title = {};
         ImGui::SetNextWindowSize({ 445, 450 }, ImGuiCond_Once);
-        if (ImGui::Begin(("inspector" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
+        std::string _title = "inspector" + (_opt_title.has_value() ? (" - " + _opt_title.value()) : "") + tag("window_title");
+        if (ImGui::Begin(_title.c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             backend_manager& _manager = global().backend;
             if (!_manager.inspector_selected.has_value()) {
                 ImGui::TextWrapped("Nothing selected. Please select a widget or a running animation in the hierarchy window to display additional content here.");
@@ -402,6 +426,11 @@ namespace detail {
                 std::uintptr_t _raw_object = _manager.inspector_selected.value();
                 if (!draw_inspected_widget(_raw_object)) {
                     draw_inspected_animation(_raw_object);
+                    _opt_title = std::nullopt;
+                } else {
+                    widgets_manager& _widgets_manager = global().widgets;
+                    widget_update_data& _update_data = _widgets_manager[_raw_object];
+                    _opt_title = _update_data.clean_typename;
                 }
             }
         }
