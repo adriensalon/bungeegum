@@ -52,91 +52,120 @@ namespace detail {
             return stream.str();
         }
 
-        void draw_json(rapidjson::Document& document, rapidjson::Value& obj)
+        void draw_json(rapidjson::Document& document, rapidjson::Value& obj, const std::string& name)
         {
             if (obj.IsObject()) {
-                for (rapidjson::Value::MemberIterator _iterator = obj.MemberBegin(); _iterator != obj.MemberEnd(); ++_iterator) {
-                    std::string _name(_iterator->name.GetString());
-                    if (_name != "BUNGEEGUM_OBJECT_REFERENCE") {
+                static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
+                if (ImGui::BeginTable(tag(name + "json_widget_table_").c_str(), 2, _table_flags)) {
+                    std::vector<std::string> _objects = {};
+                    for (rapidjson::Value::MemberIterator _iterator = obj.MemberBegin(); _iterator != obj.MemberEnd(); ++_iterator) {
+                        std::string _name(_iterator->name.GetString());
+                        if (_name != "BUNGEEGUM_OBJECT_REFERENCE") {
+                            ImGui::TableNextRow();
+                            if (_iterator->value.IsInt()) {
+                                ImGui::TableSetColumnIndex(0);
+                                ImGui::Text(_name.c_str());
+                                ImGui::TableSetColumnIndex(1);
+                                int1 _int_value = _iterator->value.GetInt();
+                                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                                edit_field<int1>(tag(_name), _int_value);
+                                _iterator->value.SetInt(_int_value);
 
-                        if (_iterator->value.IsInt()) {
-                            int1 _int_value = _iterator->value.GetInt();
-                            edit_field<int1>(_name, _int_value);
-                            _iterator->value.SetInt(_int_value);
+                            } else if (_iterator->value.IsUint()) {
+                                ImGui::TableSetColumnIndex(0);
+                                ImGui::Text(_name.c_str());
+                                ImGui::TableSetColumnIndex(1);
+                                uint1 _uint_value = _iterator->value.GetUint();
+                                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                                edit_field<uint1>(tag(_name), _uint_value);
+                                _iterator->value.SetUint(_uint_value);
 
-                        } else if (_iterator->value.IsUint()) {
-                            uint1 _uint_value = _iterator->value.GetUint();
-                            edit_field<uint1>(_name, _uint_value);
-                            _iterator->value.SetUint(_uint_value);
+                            } else if (_iterator->value.IsInt64()) {
+                                ImGui::TableSetColumnIndex(0);
+                                ImGui::Text(_name.c_str());
+                                ImGui::TableSetColumnIndex(1);
+                                std::int64_t _int64_value = _iterator->value.GetInt64();
+                                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                                edit_field<std::int64_t>(tag(_name), _int64_value);
+                                _iterator->value.SetInt64(_int64_value);
 
-                        } else if (_iterator->value.IsInt64()) {
-                            std::int64_t _int64_value = _iterator->value.GetInt64();
-                            edit_field<std::int64_t>(_name, _int64_value);
-                            _iterator->value.SetInt64(_int64_value);
+                            } else if (_iterator->value.IsUint64()) {
+                                ImGui::TableSetColumnIndex(0);
+                                ImGui::Text(_name.c_str());
+                                ImGui::TableSetColumnIndex(1);
+                                std::uint64_t _uint64_value = _iterator->value.GetUint64();
+                                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                                edit_field<std::uint64_t>(tag(_name), _uint64_value);
+                                _iterator->value.SetUint64(_uint64_value);
 
-                        } else if (_iterator->value.IsUint64()) {
-                            std::uint64_t _uint64_value = _iterator->value.GetUint64();
-                            edit_field<std::uint64_t>(_name, _uint64_value);
-                            _iterator->value.SetUint64(_uint64_value);
+                            } else if (_iterator->value.IsFloat()) {
+                                ImGui::TableSetColumnIndex(0);
+                                ImGui::Text(_name.c_str());
+                                ImGui::TableSetColumnIndex(1);
+                                float1 _float_value = _iterator->value.GetFloat();
+                                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                                edit_field<float1>(tag(_name), _float_value);
+                                _iterator->value.SetFloat(_float_value);
 
-                        } else if (_iterator->value.IsFloat()) {
-                            float1 _float_value = _iterator->value.GetFloat();
-                            edit_field<float1>(_name, _float_value);
-                            _iterator->value.SetFloat(_float_value);
+                            } else if (_iterator->value.IsBool()) {
+                                ImGui::TableSetColumnIndex(0);
+                                ImGui::Text(_name.c_str());
+                                ImGui::TableSetColumnIndex(1);
+                                bool1 _bool_value = _iterator->value.GetBool();
+                                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                                edit_field<bool1>(tag(_name), _bool_value);
+                                _iterator->value.SetBool(_bool_value);
 
-                        } else if (_iterator->value.IsBool()) {
-                            bool1 _bool_value = _iterator->value.GetBool();
-                            edit_field<bool1>(_name, _bool_value);
-                            _iterator->value.SetBool(_bool_value);
+                            } else if (_iterator->value.IsString()) {
+                                ImGui::TableSetColumnIndex(0);
+                                ImGui::Text(_name.c_str());
+                                ImGui::TableSetColumnIndex(1);
+                                std::string _string_value = _iterator->value.GetString();
+                                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                                edit_field<std::string>(tag(_name), _string_value);
+                                rapidjson::SizeType _length = static_cast<rapidjson::SizeType>(_string_value.length());
+                                _iterator->value.SetString(_string_value.c_str(), _length, document.GetAllocator());
 
-                        } else if (_iterator->value.IsString()) {
-                            std::string _string_value = _iterator->value.GetString();
-                            edit_field<std::string>(_name, _string_value);
-                            rapidjson::SizeType _length = static_cast<rapidjson::SizeType>(_string_value.length());
-                            _iterator->value.SetString(_string_value.c_str(), _length, document.GetAllocator());
+                                // } else if (_iterator->value.IsArray()) { //if array
 
-                        } else if (_iterator->value.IsArray()) {
-                            // _value += std::to_string(_iterator->value.GetBool());
-                            // _found = true;
+                                //     for (rapidjson::SizeType i = 0; i < _iterator->value.Size(); i++) {
+                                //         if (_iterator->value[i].IsNumber()) //if array value integer
+                                //             std::cout << _iterator->value[i].GetInt();
 
-                            // array of obj etc
+                                //         else if (_iterator->value[i].IsString()) //if array value string
+                                //             std::cout << _iterator->value[i].GetString();
 
-                        } else if (_iterator->value.IsObject()) {
-                            rapidjson::Value& objName = obj[_iterator->name.GetString()]; //make object value
-                                // TREE PUSH
-                            draw_json(document, objName);
-                            // TREE POP
+                                //         else if (_iterator->value[i].IsBool()) //if array value bool
+                                //             std::cout << _iterator->value[i].GetBool();
+
+                                //         else if (_iterator->value[i].IsObject()) { //if array value object
+                                //             std::cout << "\n  ";
+                                //             const rapidjson::Value& m = _iterator->value[i];
+                                //             for (auto& v : m.GetObject()) { //iterate through array object
+                                //                 if (m[v.name.GetString()].IsString()) //if array object value is string
+                                //                     std::cout << v.name.GetString() << ": " << m[v.name.GetString()].GetString();
+                                //                 else //if array object value is integer
+                                //                     std::cout << v.name.GetString() << ": " << m[v.name.GetString()].GetInt();
+
+                                //                 std::cout << "\t"; //indent
+                                //             }
+                                //         }
+                                //         std::cout << "\t"; //indent
+                                //     }
+
+                            } else if (_iterator->value.IsObject()) {
+                                _objects.push_back(std::string(_iterator->name.GetString()));
+                            }
                         }
                     }
+                    ImGui::EndTable();
+                    for (const std::string& _object : _objects) {
+                        rapidjson::Value& objValue = obj[_object.c_str()]; //make object value
+                        // TREE PUSH
+                        draw_json(document, objValue, _object);
+                        // TREE POP
+                    }
                 }
-
-                // else if (_iterator->value.IsArray()) { //if array
-
-                //     for (rapidjson::SizeType i = 0; i < _iterator->value.Size(); i++) {
-                //         if (_iterator->value[i].IsNumber()) //if array value integer
-                //             std::cout << _iterator->value[i].GetInt();
-
-                //         else if (_iterator->value[i].IsString()) //if array value string
-                //             std::cout << _iterator->value[i].GetString();
-
-                //         else if (_iterator->value[i].IsBool()) //if array value bool
-                //             std::cout << _iterator->value[i].GetBool();
-
-                //         else if (_iterator->value[i].IsObject()) { //if array value object
-                //             std::cout << "\n  ";
-                //             const rapidjson::Value& m = _iterator->value[i];
-                //             for (auto& v : m.GetObject()) { //iterate through array object
-                //                 if (m[v.name.GetString()].IsString()) //if array object value is string
-                //                     std::cout << v.name.GetString() << ": " << m[v.name.GetString()].GetString();
-                //                 else //if array object value is integer
-                //                     std::cout << v.name.GetString() << ": " << m[v.name.GetString()].GetInt();
-
-                //                 std::cout << "\t"; //indent
-                //             }
-                //         }
-                //         std::cout << "\t"; //indent
-                //     }
-                // }
             }
         }
 
@@ -168,7 +197,7 @@ namespace detail {
                     rapidjson::Document _document;
                     _document.Parse(_serialized.value().c_str());
                     rapidjson::Value& _root_value = _document.GetObject()["value0"];
-                    draw_json(_document, _root_value);
+                    draw_json(_document, _root_value, "_root");
                     rapidjson::StringBuffer _json_strbuf;
                     _json_strbuf.Clear();
                     rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
