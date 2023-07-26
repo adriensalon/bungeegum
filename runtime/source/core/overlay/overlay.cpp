@@ -196,6 +196,8 @@ namespace detail {
         color_guard _cg_tab_active(ImGuiCol_TabActive, { 0.627f, 0.627f, 0.627f, 1.f });
         color_guard _cg_tab_unfocused_active(ImGuiCol_TabUnfocusedActive, { 0.627f, 0.627f, 0.627f, 1.f });
         color_guard _cg_button(ImGuiCol_Button, { 0.878f, 0.878f, 0.878f, 1.f });
+        color_guard _invisible_header_hovered(ImGuiCol_HeaderHovered, { 0.f, 0.f, 0.f, 0.f });
+        color_guard _invisible_header_active(ImGuiCol_HeaderActive, { 0.f, 0.f, 0.f, 0.f });
 
         // border
         style_guard _sg0(ImGuiStyleVar_WindowBorderSize, 0.f);

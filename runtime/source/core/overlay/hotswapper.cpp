@@ -28,15 +28,35 @@ namespace detail {
             return "###__bungeegum_overlay_hotswapper_" + name + "__";
         }
 
-        void draw_inner_item_card(const std::string& text)
+        void draw_definition(const std::string& text)
         {
-            (void)text;
+            ImGui::Text(text.c_str());
+        }
+
+        void draw_path(const std::filesystem::path& path)
+        {
+            std::string _pathname = path.generic_string();
+            std::string _filename;
+            if (std::filesystem::is_regular_file(path)) {
+                _filename = path.filename().generic_string();
+            } else {
+                _filename = path.generic_string();
+                if (_filename.back() == '/') {
+                    _filename = _filename.substr(0, _filename.length() - 1);
+                } else {
+                    _pathname += "/";
+                }
+                _filename = std::filesystem::path(_filename).filename().generic_string() + "/";
+            }
+            ImGui::Text(_filename.c_str());
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip(_pathname.c_str());
+            }
         }
 
         template <typename item_t>
         void draw_items_cards(const std::string& name, std::vector<item_t>& items, const float frame_height_without_padding, const float footer_height)
         {
-
             if (name != current_tab) {
                 selected_items.clear();
                 selected_count = 0;
@@ -64,6 +84,7 @@ namespace detail {
                     }
                     ImGui::SetCursorPos(ImVec2(_cursor_position.x, _cursor_position.y));
                     ImGui::Selectable(("##" + _item_str).c_str(), false, ImGuiSelectableFlags_AllowOverlap, ImVec2(ImGui::GetContentRegionAvail().x, frame_height_without_padding));
+
                     ImGui::SetItemAllowOverlap();
                     if (ImGui::IsItemActive() && !ImGui::IsItemHovered()) {
                         std::size_t _k_next = _k + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
@@ -91,7 +112,12 @@ namespace detail {
                     _cursor_position.x -= ImGui::GetStyle().FramePadding.x;
 
                     ImGui::SameLine();
-                    ImGui::Text(_item_str.c_str());
+
+                    if constexpr (std::is_same_v<item_t, std::string>) {
+                        draw_definition(items[_k]);
+                    } else {
+                        draw_path(items[_k]);
+                    }
                     //
                     //
                     //
@@ -142,7 +168,7 @@ namespace detail {
             if (ImGui::Button("add definition", ImVec2(_button_width, 0.f))) {
                 std::string _definition = _name_str;
                 if (!_value_str.empty()) {
-                    _definition += "=" + _name_str;
+                    _definition += "=" + _value_str;
                 }
                 defines.push_back(_definition);
             }

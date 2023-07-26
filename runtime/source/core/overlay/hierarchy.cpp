@@ -12,6 +12,7 @@
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/imguarded.fwd>
+#include <bungeegum/glue/regex.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -41,30 +42,35 @@ namespace detail {
 
                 unsigned int _id = 0;
                 std::function<void(const widget_update_data&)> _tf = [&](const widget_update_data& _widget_data) {
-                    _id++;
-                    std::string _clean_id_typename = _widget_data.clean_typename + "###__hierarchy__" + std::to_string(_id);
-                    // ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow ;
-                    style_guard _indent_guard(ImGuiStyleVar_IndentSpacing, 10.f);
-                    ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow;
-                    if (_widget_data.children.empty())
-                        _node_flags |= ImGuiTreeNodeFlags_Leaf;
-                    font_guard _fg0(extrabold_font);
+                    if (!filter_enabled || (regex_search(_widget_data.clean_typename, filter_text))) {
+                        _id++;
+                        std::string _clean_id_typename = _widget_data.clean_typename + "###__hierarchy__" + std::to_string(_id);
+                        // ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow ;
+                        style_guard _indent_guard(ImGuiStyleVar_IndentSpacing, 10.f);
+                        ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow;
+                        if (_widget_data.children.empty())
+                            _node_flags |= ImGuiTreeNodeFlags_Leaf;
+                        font_guard _fg0(extrabold_font);
 
-                    bool _tree_open = ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags);
-                    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
-                        // // Do stuff on Selectable() double click.
-                        // selected = !selected;
-                        global().backend.inspector_selected = _widget_data.raw_widget;
-                    }
+                        bool _tree_open = ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags);
+                        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+                            // // Do stuff on Selectable() double click.
+                            // selected = !selected;
+                            global().backend.inspector_selected = _widget_data.raw_widget;
+                        }
 
-                    if (_tree_open) {
-                        _fg0.release();
+                        if (_tree_open) {
+                            _fg0.release();
 
-                        // if (!_widget_data.children.empty())
-                        // ImGui::Text((std::to_string(_widget_data.children.size()) + " children :").c_str());
+                            // if (!_widget_data.children.empty())
+                            // ImGui::Text((std::to_string(_widget_data.children.size()) + " children :").c_str());
+                            for (auto& _child_widget_data_ref : _widget_data.children)
+                                _tf(_child_widget_data_ref.get());
+                            ImGui::TreePop();
+                        }
+                    } else {
                         for (auto& _child_widget_data_ref : _widget_data.children)
                             _tf(_child_widget_data_ref.get());
-                        ImGui::TreePop();
                     }
                 };
                 _tf(global().widgets.root_update_data());

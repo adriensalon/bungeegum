@@ -8,6 +8,7 @@
 
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
+#include <bungeegum/glue/regex.hpp>
 
 #define BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE 2000
 
@@ -25,6 +26,9 @@ namespace detail {
         {
             return 0.001f * static_cast<float>(global().backend.lifetime_duration.count());
         }
+
+        static std::string filter_text = "";
+        static bool filter_enabled = true;
 
         struct scrolling_buffer {
             scrolling_buffer() = delete;
@@ -131,15 +135,17 @@ namespace detail {
                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
                     for (int _k = static_cast<int>(_buffers.size()) - 1; _k >= 0; --_k) {
                         if (!_buffers[_k].empty()) {
-                            ImPlot::PlotShaded(
-                                _buffers[_k].name().c_str(), // label id
-                                _buffers[_k].data_x(), // xs
-                                _buffers[_k].data_y(), //xy
-                                static_cast<int>(_buffers[_k].size()), // count
-                                0.f, // yref
-                                0, // flags
-                                static_cast<int>(_buffers[_k].offset()),
-                                static_cast<int>(2 * sizeof(float)));
+                            if (!filter_enabled || (regex_search(_buffers[_k].name(), filter_text))) {
+                                ImPlot::PlotShaded(
+                                    _buffers[_k].name().c_str(), // label id
+                                    _buffers[_k].data_x(), // xs
+                                    _buffers[_k].data_y(), //xy
+                                    static_cast<int>(_buffers[_k].size()), // count
+                                    0.f, // yref
+                                    0, // flags
+                                    static_cast<int>(_buffers[_k].offset()),
+                                    static_cast<int>(2 * sizeof(float)));
+                            }
                         }
                     }
 
@@ -164,8 +170,6 @@ namespace detail {
         static scrolling_profiler resolve = {};
         static scrolling_profiler interact = {};
         static scrolling_profiler draw = {};
-        static std::string filter_text = "";
-        static bool filter_enabled = true;
 
         void draw_profiler_tab(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
         {
