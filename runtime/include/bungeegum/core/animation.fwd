@@ -34,6 +34,7 @@ namespace detail {
         std::function<void(const std::chrono::milliseconds&)> ticker = nullptr;
 
 #if BUNGEEGUM_USE_OVERLAY
+        std::string clean_typename = {};
         std::vector<float1> overlay_samples = {};
         std::array<float1, 2> overlay_position = { 0.f, 0.f };
 #endif

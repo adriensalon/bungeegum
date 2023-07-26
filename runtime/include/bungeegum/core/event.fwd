@@ -4,6 +4,7 @@
 #include <future>
 #include <typeindex>
 
+#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/typelist.hpp>
 
 namespace bungeegum {
@@ -27,6 +28,9 @@ namespace detail {
     struct event_update_data {
         std::vector<std::type_index> kinds = {};
         std::function<void()> ticker = nullptr;
+#if BUNGEEGUM_USE_OVERLAY
+        std::vector<std::string> clean_typenames = {};
+#endif
     };
 
     struct events_manager {

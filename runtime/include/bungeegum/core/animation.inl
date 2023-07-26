@@ -65,6 +65,9 @@ animation<value_t>& animation<value_t>::start()
         _data.raw_animation = _raw_animation;
         _update_data.kind = std::make_unique<std::type_index>(typeid(value_t));
         detail::assign_ticker(_data, _update_data);
+#if BUNGEEGUM_USE_OVERLAY
+        _update_data.clean_typename = detail::backend_manager::to_clean_typename(_update_data.kind->name());
+#endif
     }
     _data.is_playing = true;
     return *this;

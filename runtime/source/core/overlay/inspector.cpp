@@ -261,31 +261,6 @@ namespace detail {
             }
         }
 
-        // void draw_inspected_widget_serialized_tab(widget_update_data& update_data)
-        // {
-
-        //     if (_serialized.has_value()) {
-        //         std::string _title = "serialized" + tag("widget_serialized_tab");
-        //         if (ImGui::BeginTabItem(_title.c_str())) {
-        //             static ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding;
-        //             if (ImGui::TreeNodeEx(("Serialized" + tag("serialized_tree_node")).c_str(), _node_flags)) {
-        //                 rapidjson::Document _document;
-        //                 _document.Parse(_serialized.value().c_str());
-        //                 rapidjson::Value& _root_value = _document.GetObject()["value0"];
-        //                 draw_json(_document, _root_value, "_root");
-        //                 rapidjson::StringBuffer _json_strbuf;
-        //                 _json_strbuf.Clear();
-        //                 rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
-        //                 _document.Accept(_json_writer);
-        //                 std::string _modified = _json_strbuf.GetString();
-        //                 _backend_manager.update_reloadable_widget(update_data, _modified);
-        //                 ImGui::TreePop();
-        //             }
-        //             ImGui::EndTabItem();
-        //         }
-        //     }
-        // }
-
         void draw_inspected_widget_resolve_tab(widget_update_data& update_data)
         {
             std::string _title = "resolve" + tag("widget_resolve_tab");
@@ -387,30 +362,6 @@ namespace detail {
             }
             return false;
         }
-
-        bool draw_inspected_animation(const std::uintptr_t raw_animation)
-        {
-            animations_manager& _manager = global().animations;
-            if (_manager.contains(raw_animation)) {
-                const animation_update_data& _update_data = _manager[raw_animation];
-                static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
-                ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
-                if (ImPlot::BeginPlot(tag("animation_graph").c_str(), { ImGui::GetContentRegionAvail().x, 90 }, flags)) {
-                    ImPlot::SetupAxes(NULL, NULL, flags, flags);
-                    ImPlot::SetupAxisLimits(ImAxis_X1, 0, 1, ImGuiCond_Always);
-                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
-                    ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-                    auto _samples = _update_data.overlay_samples;
-                    auto _point = _update_data.overlay_position;
-                    ImPlot::PlotLine("", _samples.data(), &(_samples[1]), 100, 0, 0, 2 * sizeof(float));
-                    ImPlot::PlotScatter("", _point.data(), _point.data() + 1, 1, 0, 0, 2 * sizeof(float));
-                    ImPlot::EndPlot();
-                }
-                ImPlot::PopStyleColor();
-                return true;
-            }
-            return false;
-        }
     }
 
     void draw_inspector_overlay()
@@ -425,7 +376,6 @@ namespace detail {
             } else {
                 std::uintptr_t _raw_object = _manager.inspector_selected.value();
                 if (!draw_inspected_widget(_raw_object)) {
-                    draw_inspected_animation(_raw_object);
                     _opt_title = std::nullopt;
                 } else {
                     widgets_manager& _widgets_manager = global().widgets;
