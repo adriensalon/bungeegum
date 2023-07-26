@@ -11,6 +11,7 @@ set(bungeegum_source
 	"source/glue/dialog.cpp"
 	"source/glue/curve.cpp"
 	"source/glue/imguarded.cpp"
+	"source/glue/regex.cpp"
 	"source/glue/reload.cpp"
 	"source/glue/serialize.cpp"
 	"source/glue/time.cpp"
