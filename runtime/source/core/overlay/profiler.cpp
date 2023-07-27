@@ -54,6 +54,13 @@ namespace detail {
                 }
             }
 
+            void clear()
+            {
+                for (float2& _point : _data) {
+                    _point.y = 0.f;
+                }
+            }
+
             float back_value() const
             {
                 if ((_data.size() < _max_size) || (_offset == 0))
@@ -93,31 +100,41 @@ namespace detail {
                 return _data.size();
             }
 
+            bool visible = true;
+
         private:
-            std::string _name = {};
-            std::size_t _max_size = 0;
+            const std::string _name;
+            const std::size_t _max_size;
             std::size_t _offset = 0;
             std::vector<float2> _data = {};
         };
 
         struct scrolling_profiler {
 
-            void setup(const std::string& name, frames_chronometer& chronometer)
+            scrolling_profiler(const std::string& name)
+                : _name(name)
             {
-                _name = name;
+            }
+
+            void setup(frames_chronometer& chronometer)
+            {
                 chronometer.on_new_task([&](const frames_chronometer_task& task) {
                     _buffer_names.emplace(task.name, _buffers.size());
                     _buffers.emplace_back(scrolling_buffer(task.name));
                 });
                 chronometer.on_new_frame_for_each_task([&](const frames_chronometer_task& task) {
-                    std::size_t _index = _buffer_names.at(task.name);
-                    float _duration = static_cast<float>(task.duration.count());
-                    if (_index > 0) {
-                        _duration += _buffers[_index - 1].back_value();
-                    }
                     float _lifetime_duration = backend_lifetime_duration();
-                    _buffers[_index].emplace(_lifetime_duration, _duration);
-                    _max_value = math::max(_max_value, 1.1f * _duration);
+                    std::size_t _index = _buffer_names.at(task.name);
+                    if (_buffers[_index].visible) {
+                        float _duration = static_cast<float>(task.duration.count());
+                        if (_index > 0) {
+                            _duration += _buffers[_index - 1].back_value();
+                        }
+                        _buffers[_index].emplace(_lifetime_duration, _duration);
+                        _max_value = math::max(_max_value, 1.1f * _duration);
+                    } else {
+                        _buffers[_index].emplace(_lifetime_duration, 0.f);
+                    }
                 });
             }
 
@@ -127,15 +144,16 @@ namespace detail {
                 static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoHighlight | ImPlotAxisFlags_NoTickMarks;
                 ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
                 if (ImPlot::BeginPlot(tag("scrolling_profiler_" + _name).c_str(), size, ImPlotFlags_NoMenus)) {
-                    // ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_NoButtons);
-                    ImPlot::SetupLegend(ImPlotLocation_NorthWest);
+                    ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_NoButtons);
+                    // ImPlot::SetupLegend(ImPlotLocation_NorthWest);
                     ImPlot::SetupAxes(NULL, NULL, flags, flags);
                     ImPlot::SetupAxisLimits(ImAxis_X1, _lifetime_duration - history_size_seconds, _lifetime_duration, ImGuiCond_Always);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, _max_value);
                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
                     for (int _k = static_cast<int>(_buffers.size()) - 1; _k >= 0; --_k) {
                         if (!_buffers[_k].empty()) {
-                            if (!filter_enabled || (regex_search(_buffers[_k].name(), filter_text))) {
+                            _buffers[_k].visible = (!filter_enabled || (regex_search(_buffers[_k].name(), filter_text)));
+                            if (_buffers[_k].visible) {
                                 ImPlot::PlotShaded(
                                     _buffers[_k].name().c_str(), // label id
                                     _buffers[_k].data_x(), // xs
@@ -154,22 +172,29 @@ namespace detail {
                 ImPlot::PopStyleColor();
             }
 
+            void clear()
+            {
+                for (scrolling_buffer& _buffer : _buffers) {
+                    _buffer.clear();
+                }
+            }
+
             const std::string& name() const
             {
                 return _name;
             }
 
         private:
-            std::string _name = "";
+            const std::string _name;
             std::vector<scrolling_buffer> _buffers = {};
             std::unordered_map<std::string, std::size_t> _buffer_names = {};
             float _max_value = 0.f;
         };
 
-        static scrolling_profiler frame = {};
-        static scrolling_profiler resolve = {};
-        static scrolling_profiler interact = {};
-        static scrolling_profiler draw = {};
+        static scrolling_profiler frame = { "frame" };
+        static scrolling_profiler resolve = { "resolve" };
+        static scrolling_profiler interact = { "interact" };
+        static scrolling_profiler draw = { "draw" };
 
         void draw_profiler_tab(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
         {
@@ -191,11 +216,17 @@ namespace detail {
                 ImVec2 _available_size = ImGui::GetContentRegionAvail();
                 _available_size.y -= 2.f * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y);
                 profiler.draw(history_size_seconds, _available_size);
-                ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled);
+                if (ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled)) {
+                    if (!filter_text.empty()) {
+                        profiler.clear();
+                    }
+                }
                 ImGui::SameLine();
                 ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
                 if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here a widget type to match with regex...", &filter_text)) {
-                    // todo
+                    if (filter_enabled) {
+                        profiler.clear();
+                    }
                 }
                 ImGui::PopItemWidth();
                 ImGui::EndTabItem();
@@ -205,15 +236,15 @@ namespace detail {
 
     void setup_profiler_overlay()
     {
-        frame.setup("frame", global().backend.profiler_frame_chronometer);
-        resolve.setup("resolve widgets", global().backend.profiler_resolve_chronometer);
-        interact.setup("interact widgets", global().backend.profiler_interact_chronometer);
-        draw.setup("draw widgets", global().backend.profiler_draw_chronometer);
+        frame.setup(global().backend.profiler_frame_chronometer);
+        resolve.setup(global().backend.profiler_resolve_chronometer);
+        interact.setup(global().backend.profiler_interact_chronometer);
+        draw.setup(global().backend.profiler_draw_chronometer);
     }
 
     void draw_profiler_overlay()
     {
-        ImGui::SetNextWindowSize({ 800, 250 }, ImGuiCond_Once);
+        ImGui::SetNextWindowSize({ 700, 350 }, ImGuiCond_Once);
         if (ImGui::Begin(("profiler" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             static float _history = 10.f;
             ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
