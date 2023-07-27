@@ -52,3 +52,21 @@ if(BUNGEEGUM_ENABLE_STANDALONE)
 	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
 	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
 endif()
+
+if(BUNGEEGUM_IN_TREE_HEADERS)
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/cereal/include/cereal/"
+		DESTINATION "${CMAKE_CURRENT_LIST_DIR}/../runtime/include/cereal/")
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/entt/src/entt/"
+		DESTINATION "${CMAKE_CURRENT_LIST_DIR}/../runtime/include/entt/")
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/glm/glm/"
+		DESTINATION "${CMAKE_CURRENT_LIST_DIR}/../runtime/include/glm/")
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/hscpp/include/hscpp"
+		DESTINATION "${CMAKE_CURRENT_LIST_DIR}/../runtime/include/hscpp/")
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/hscpp/extensions/mem/include/hscpp/mem/"
+		DESTINATION "${CMAKE_CURRENT_LIST_DIR}/../runtime/include/hscpp/mem/")
+endif()

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(bungeegum_all)
 
+option(BUNGEEGUM_IN_TREE_HEADERS "Copy all required headers to runtime/include/" ON)
 option(BUNGEEGUM_BUILD_WIDGETS "Build widgets library" ON)
 option(BUNGEEGUM_BUILD_DEMO "Build demo executable" ON)
 option(BUNGEEGUM_BUILD_DOC "Build doxygen documentation" ON)
