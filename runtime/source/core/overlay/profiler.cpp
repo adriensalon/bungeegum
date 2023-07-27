@@ -30,6 +30,7 @@ namespace detail {
         static std::string filter_text = "";
         static bool filter_enabled = true;
 
+        template <typename value_t>
         struct scrolling_buffer {
             scrolling_buffer() = delete;
             scrolling_buffer(const scrolling_buffer& other) = default;
@@ -44,29 +45,41 @@ namespace detail {
                 _data.reserve(_max_size);
             }
 
-            void emplace(const float x, const float y)
+            void emplace(const value_t& value)
             {
                 if (_data.size() < _max_size)
-                    _data.push_back(float2 { x, y });
+                    _data.push_back(value);
                 else {
-                    _data[_offset] = float2 { x, y };
+                    _data[_offset] = value;
                     _offset = (_offset + 1) % _max_size;
                 }
             }
 
             void clear()
             {
-                for (float2& _point : _data) {
-                    _point.y = 0.f;
+                if constexpr (std::is_same_v<value_t, float2>) {
+                    for (value_t& _point : _data) {
+                        _point.y = 0.f;
+                    }
                 }
             }
 
-            float back_value() const
+            value_t average() const
+            {
+                value_t _average = {};
+                for (const value_t& _point : _data) {
+                    _average += _point;
+                }
+                _average /= _data.size();
+                return _average;
+            }
+
+            value_t back() const
             {
                 if ((_data.size() < _max_size) || (_offset == 0))
-                    return _data.back().y;
+                    return _data.back();
                 else {
-                    return _data[_offset - 1].y;
+                    return _data[_offset - 1];
                 }
             }
 
@@ -75,14 +88,9 @@ namespace detail {
                 return _name;
             }
 
-            const float* data_x() const
+            const value_t* data() const
             {
-                return &(_data[0].x);
-            }
-
-            const float* data_y() const
-            {
-                return &(_data[0].y);
+                return _data.data();
             }
 
             bool empty() const
@@ -106,7 +114,7 @@ namespace detail {
             const std::string _name;
             const std::size_t _max_size;
             std::size_t _offset = 0;
-            std::vector<float2> _data = {};
+            std::vector<value_t> _data = {};
         };
 
         struct scrolling_profiler {
@@ -120,7 +128,7 @@ namespace detail {
             {
                 chronometer.on_new_task([&](const frames_chronometer_task& task) {
                     _buffer_names.emplace(task.name, _buffers.size());
-                    _buffers.emplace_back(scrolling_buffer(task.name));
+                    _buffers.emplace_back(scrolling_buffer<float2>(task.name));
                 });
                 chronometer.on_new_frame_for_each_task([&](const frames_chronometer_task& task) {
                     float _lifetime_duration = backend_lifetime_duration();
@@ -128,14 +136,20 @@ namespace detail {
                     if (_buffers[_index].visible) {
                         float _duration = static_cast<float>(task.duration.count());
                         if (_index > 0) {
-                            _duration += _buffers[_index - 1].back_value();
+                            _duration += _buffers[_index - 1].back().y;
                         }
-                        _buffers[_index].emplace(_lifetime_duration, _duration);
+                        _buffers[_index].emplace(float2 { _lifetime_duration, _duration });
                         _max_value = math::max(_max_value, 1.1f * _duration);
                     } else {
-                        _buffers[_index].emplace(_lifetime_duration, 0.f);
+                        _buffers[_index].emplace(float2 { _lifetime_duration, 0.f });
                     }
                 });
+            }
+
+            std::size_t update_average_frame_duration(const frames_chronometer& chronometer)
+            {
+                _average_frame_durations.emplace(chronometer.frame_duration().count());
+                return _average_frame_durations.average();
             }
 
             void draw(const float history_size_seconds, const ImVec2 size = { -1.f, -1.f })
@@ -145,7 +159,6 @@ namespace detail {
                 ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 1.f, 1.f, 0.f, 0.f });
                 if (ImPlot::BeginPlot(tag("scrolling_profiler_" + _name).c_str(), size, ImPlotFlags_NoMenus)) {
                     ImPlot::SetupLegend(ImPlotLocation_NorthWest, ImPlotLegendFlags_NoButtons);
-                    // ImPlot::SetupLegend(ImPlotLocation_NorthWest);
                     ImPlot::SetupAxes(NULL, NULL, flags, flags);
                     ImPlot::SetupAxisLimits(ImAxis_X1, _lifetime_duration - history_size_seconds, _lifetime_duration, ImGuiCond_Always);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, -0.1f, _max_value);
@@ -156,8 +169,8 @@ namespace detail {
                             if (_buffers[_k].visible) {
                                 ImPlot::PlotShaded(
                                     _buffers[_k].name().c_str(), // label id
-                                    _buffers[_k].data_x(), // xs
-                                    _buffers[_k].data_y(), //xy
+                                    &(_buffers[_k].data()->x), // xs
+                                    &(_buffers[_k].data()->y), //xy
                                     static_cast<int>(_buffers[_k].size()), // count
                                     0.f, // yref
                                     0, // flags
@@ -174,7 +187,7 @@ namespace detail {
 
             void clear()
             {
-                for (scrolling_buffer& _buffer : _buffers) {
+                for (scrolling_buffer<float2>& _buffer : _buffers) {
                     _buffer.clear();
                 }
             }
@@ -186,9 +199,10 @@ namespace detail {
 
         private:
             const std::string _name;
-            std::vector<scrolling_buffer> _buffers = {};
+            std::vector<scrolling_buffer<float2>> _buffers = {};
             std::unordered_map<std::string, std::size_t> _buffer_names = {};
             float _max_value = 0.f;
+            scrolling_buffer<std::size_t> _average_frame_durations = { "frame_durations", 60 };
         };
 
         static scrolling_profiler frame = { "frame" };
@@ -198,7 +212,10 @@ namespace detail {
 
         void draw_profiler_tab(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
         {
-            const std::size_t _duration_ms = chronometer.frame_duration().count();
+            // SI TOUTES LES FRAMES
+            const std::size_t _duration_ms = profiler.update_average_frame_duration(chronometer);
+            // SINON
+            // const std::size_t _duration_ms = chronometer.frame_duration().count();
             std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
             if (ImGui::BeginTabItem(_title.c_str())) {
                 ImVec2 _available_size = ImGui::GetContentRegionAvail();
@@ -210,7 +227,10 @@ namespace detail {
 
         void draw_profiler_tab_with_regex(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
         {
-            const std::size_t _duration_ms = chronometer.frame_duration().count();
+            // SI TOUTES LES FRAMES
+            const std::size_t _duration_ms = profiler.update_average_frame_duration(chronometer);
+            // SINON
+            // const std::size_t _duration_ms = chronometer.frame_duration().count()
             std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
             if (ImGui::BeginTabItem(_title.c_str())) {
                 ImVec2 _available_size = ImGui::GetContentRegionAvail();

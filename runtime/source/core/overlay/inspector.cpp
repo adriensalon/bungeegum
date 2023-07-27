@@ -367,7 +367,7 @@ namespace detail {
     void draw_inspector_overlay()
     {
         static std::optional<std::string> _opt_title = {};
-        ImGui::SetNextWindowSize({ 445, 450 }, ImGuiCond_Once);
+        ImGui::SetNextWindowSize({ 445, 500 }, ImGuiCond_Once);
         std::string _title = "inspector" + (_opt_title.has_value() ? (" - " + _opt_title.value()) : "") + tag("window_title");
         if (ImGui::Begin(_title.c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             backend_manager& _manager = global().backend;
