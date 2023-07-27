@@ -64,7 +64,7 @@ if(BUNGEEGUM_IN_TREE_HEADERS)
 		COPY "${CMAKE_CURRENT_LIST_DIR}/glm/glm/"
 		DESTINATION "${CMAKE_CURRENT_LIST_DIR}/../runtime/include/glm/")
 	file(
-		COPY "${CMAKE_CURRENT_LIST_DIR}/hscpp/include/hscpp"
+		COPY "${CMAKE_CURRENT_LIST_DIR}/hscpp/include/hscpp/"
 		DESTINATION "${CMAKE_CURRENT_LIST_DIR}/../runtime/include/hscpp/")
 	file(
 		COPY "${CMAKE_CURRENT_LIST_DIR}/hscpp/extensions/mem/include/hscpp/mem/"
