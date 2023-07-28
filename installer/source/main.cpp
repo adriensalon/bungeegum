@@ -6,6 +6,7 @@
 #include <bungeegum/glue/console.hpp>
 #include <bungeegum/glue/git.hpp>
 #include <bungeegum/glue/tool.hpp>
+#include <bungeegum/glue/toolchain.hpp>
 
 constexpr std::string_view bungeegum_github_url = "https://github.com/adriensalon/bungeegum/";
 constexpr std::string_view bungeegum_version = BUNGEEGUM_VERSION;
@@ -57,7 +58,32 @@ namespace detail {
         }
     }
 
-    std::filesystem::path define_parent_directory(int argc, char* argv[])
+    void create_tree_directories(const std::filesystem::path& directory)
+    {
+        std::filesystem::path _toolchain_directory = directory / TOOLCHAIN_PLATFORM_NAME;
+        std::filesystem::path _debug_directory = _toolchain_directory / "debug/";
+        std::filesystem::path _release_directory = _toolchain_directory / "release/";
+        std::filesystem::create_directory(directory);
+        std::filesystem::create_directory(_toolchain_directory);
+        std::filesystem::create_directory(_debug_directory);
+        std::filesystem::create_directory(_release_directory);
+    }
+
+    void create_directories(
+        const std::filesystem::path& root_directory,
+        const std::filesystem::path& repos_directory,
+        const std::filesystem::path& build_directory,
+        const std::filesystem::path& install_directory)
+    {
+        std::filesystem::path _initial_path = root_directory / "bungeegum/";
+        if (std::filesystem::is_directory(_initial_path) && !std::filesystem::is_directory(repos_directory)) {
+            std::filesystem::rename(_initial_path, repos_directory);
+        }
+        create_tree_directories(build_directory);
+        create_tree_directories(install_directory);
+    }
+
+    std::filesystem::path define_root_directory(int argc, char* argv[])
     {
         // todo
         return "C:/users/adri/desktop/bungeelol/";
@@ -73,31 +99,26 @@ namespace detail {
         return _result == 'y';
     }
 
-    std::vector<std::string> draw_options()
+    static bool should_build_widgets = false;
+    static bool should_build_demo = false;
+    static bool should_build_doc = false;
+    static bool should_build_test = false;
+
+    std::vector<std::pair<std::string, bool>> draw_options()
     {
-        std::vector<std::string> _options = {};
-        _options.push_back("-DBUNGEEGUM_IN_TREE_HEADERS=ON");
-        _options.push_back("-DBUNGEEGUM_BUILD_INSTALLER=OFF");
-        if (detail::draw_question("Build widgets library?")) {
-            _options.push_back("-DBUNGEEGUM_BUILD_WIDGETS=ON");
-        } else {
-            _options.push_back("-DBUNGEEGUM_BUILD_WIDGETS=OFF");
-        }
-        if (detail::draw_question("Build demo application?")) {
-            _options.push_back("-DBUNGEEGUM_BUILD_DEMO=ON");
-        } else {
-            _options.push_back("-DBUNGEEGUM_BUILD_DEMO=OFF");
-        }
-        if (detail::draw_question("Build doxygen documentation?")) {
-            _options.push_back("-DBUNGEEGUM_BUILD_DOC=ON");
-        } else {
-            _options.push_back("-DBUNGEEGUM_BUILD_DOC=OFF");
-        }
-        if (detail::draw_question("Build test executable?")) {
-            _options.push_back("-DBUNGEEGUM_BUILD_TEST=ON");
-        } else {
-            _options.push_back("-DBUNGEEGUM_BUILD_TEST=OFF");
-        }
+        std::vector<std::pair<std::string, bool>> _options = {};
+        should_build_widgets = detail::draw_question("Build widgets library?");
+        should_build_demo = detail::draw_question("Build demo application?");
+        should_build_doc = detail::draw_question("Build doxygen documentation?");
+        should_build_test = detail::draw_question("Build test executable?");
+        _options.push_back({ "BUNGEEGUM_IN_TREE_HEADERS", true });
+        _options.push_back({ "BUNGEEGUM_BUILD_INSTALLER", false });
+        _options.push_back({ "BUNGEEGUM_ENABLE_EMBEDDED", true });
+        _options.push_back({ "BUNGEEGUM_ENABLE_STANDALONE", true });
+        _options.push_back({ "BUNGEEGUM_BUILD_WIDGETS", should_build_widgets });
+        _options.push_back({ "BUNGEEGUM_BUILD_DEMO", should_build_demo });
+        _options.push_back({ "BUNGEEGUM_BUILD_DOC", should_build_doc });
+        _options.push_back({ "BUNGEEGUM_BUILD_TEST", should_build_test });
         return _options;
     }
 }
@@ -106,27 +127,64 @@ namespace detail {
 int main(int argc, char* argv[])
 {
     using namespace bungeegum;
+
     detail::draw_banner();
-
     detail::verify_existing_install();
-
     detail::verify_git_version();
     detail::verify_cmake_version();
 
-    std::filesystem::path _source_directory = detail::define_parent_directory(argc, argv);
-
     detail::console_log("\n[process] cloning repository \n");
-    // detail::git_clone(bungeegum_github_url.data(), _source_directory, bungeegum_version.data());
+    std::filesystem::path _root_directory = detail::define_root_directory(argc, argv);
+    // detail::git_clone(bungeegum_github_url.data(), _root_directory, bungeegum_version.data());
+    std::filesystem::path _repos_directory = _root_directory / "repos/";
+    std::filesystem::path _build_directory = _root_directory / "build/";
+    std::filesystem::path _install_directory = _root_directory / "install/";
+    detail::create_directories(_root_directory, _repos_directory, _build_directory, _install_directory);
 
     detail::console_log("\n[process] configuring targets \n");
-    std::vector<std::string> _options = detail::draw_options();
-    detail::cmake_configure(
-        _source_directory,
-        _source_directory.append("build/"),
-        std::nullopt,
-        _options);
+    std::vector<std::pair<std::string, bool>> _configure_options = detail::draw_options();
 
-    detail::console_log("\n[process] building targets \n");
+    detail::console_log("\n[process] configuring debug variant \n");
+    std::filesystem::path _debug_build_directory = _build_directory / TOOLCHAIN_PLATFORM_NAME / "debug/";
+    std::filesystem::path _debug_install_directory = _install_directory / TOOLCHAIN_PLATFORM_NAME / "debug/";
+    detail::cmake_configure(
+        _repos_directory,
+        _debug_build_directory,
+        _debug_install_directory,
+        std::nullopt,
+        _configure_options, true);
+
+    // detail::console_log("\n[process] configuring release variant \n");
+    // std::filesystem::path _release_build_directory = _build_directory / TOOLCHAIN_PLATFORM_NAME / "release/";
+    // std::filesystem::path _release_install_directory = _install_directory / TOOLCHAIN_PLATFORM_NAME / "release/";
+    // detail::cmake_configure(
+    //     _repos_directory,
+    //     _release_build_directory,
+    //     _release_install_directory,
+    //     std::nullopt,
+    //     _configure_options, false);
+
+    detail::console_log("\n[process] building debug variant \n");
+    detail::cmake_build(_debug_build_directory, "bungeegum_runtime");
+    if (detail::should_build_widgets) {
+        detail::console_log("\n[process] building widgets library \n");
+        detail::cmake_build(_debug_build_directory, "bungeegum_widgets");
+    }
+    if (detail::should_build_demo) {
+        detail::console_log("\n[process] building demo executable \n");
+        detail::cmake_build(_debug_build_directory, "bungeegum_demo");
+    }
+    // if (detail::should_build_doc) {
+    // 	   detail::console_log("\n[process] building documentation \n");
+    //     detail::cmake_build(_debug_build_directory, "bungeegum_doc");
+    // }
+    // if (detail::should_build_test) {
+    // 	   detail::console_log("\n[process] building test executable \n");
+    //     detail::cmake_build(_debug_build_directory, "bungeegum_test");
+    // }
+    // detail::cmake_install(_debug_build_directory, _debug_install_directory);
+
+    detail::console_log("\n[process] building release variant \n");
     // build
 
     return 0;

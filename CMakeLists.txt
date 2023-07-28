@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(bungeegum_all)
 
 set(BUNGEEGUM_VERSION "v0.1.0-alpha")
+set(BUNGEEGUM_INSTALL_DIR "")
 
 option(BUNGEEGUM_IN_TREE_HEADERS "Copy all required headers to runtime/include/" ON)
 option(BUNGEEGUM_BUILD_WIDGETS "Build widgets library" ON)

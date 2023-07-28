@@ -106,3 +106,19 @@ if(BUNGEEGUM_ENABLE_STANDALONE)
 		return()
 	endif()
 endif()
+
+string(COMPARE EQUAL "${BUNGEEGUM_INSTALL_DIR}" "" bungeegum_install_dir_undefined)
+
+if(NOT bungeegum_install_dir_undefined)
+	add_custom_command(
+		TARGET bungeegum_runtime POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		"${CMAKE_CURRENT_LIST_DIR}/include/"
+		"${BUNGEEGUM_INSTALL_DIR}/runtime/include/")
+
+	add_custom_command(
+		TARGET bungeegum_runtime POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		$<TARGET_FILE_DIR:bungeegum_runtime>
+		"${BUNGEEGUM_INSTALL_DIR}/runtime/bin/")
+endif()
