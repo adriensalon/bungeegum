@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
 
     detail::console_log("\n[process] cloning repository \n");
     std::filesystem::path _root_directory = detail::define_root_directory(argc, argv);
-    // detail::git_clone(bungeegum_github_url.data(), _root_directory, bungeegum_version.data());
+    detail::git_clone(bungeegum_github_url.data(), _root_directory, bungeegum_version.data());
     std::filesystem::path _repos_directory = _root_directory / "repos/";
     std::filesystem::path _build_directory = _root_directory / "build/";
     std::filesystem::path _install_directory = _root_directory / "install/";

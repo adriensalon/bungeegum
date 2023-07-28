@@ -107,9 +107,7 @@ if(BUNGEEGUM_ENABLE_STANDALONE)
 	endif()
 endif()
 
-string(COMPARE EQUAL "${BUNGEEGUM_INSTALL_DIR}" "" bungeegum_install_dir_undefined)
-
-if(NOT bungeegum_install_dir_undefined)
+if(DEFINED BUNGEEGUM_INSTALL_DIR)
 	add_custom_command(
 		TARGET bungeegum_runtime POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
