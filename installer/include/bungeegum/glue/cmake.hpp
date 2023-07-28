@@ -15,7 +15,7 @@ namespace detail {
     void cmake_configure(
         const std::filesystem::path& source_directory,
         const std::filesystem::path& build_directory,
-        const std::string& generator,
+        const std::optional<std::string>& generator,
         const std::vector<std::string>& definitions);
 
     void cmake_build(const std::filesystem::path& build_directory);
