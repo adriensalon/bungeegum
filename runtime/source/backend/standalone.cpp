@@ -76,7 +76,11 @@ void launch(const runtime_widget& widget)
         detail::stopwatch _stopwatch;
         detail::window _window;
         detail::global().backend.viewport_size = _window.get_size();
-        detail::renderer _renderer(_window);
+
+        // !!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!
+        // !!!!!!!!!!!!!!!!
+        detail::renderer _renderer = detail::renderer::create_directx11(_window);
 
 #if BUNGEEGUM_USE_HOTSWAP
         detail::global().backend.setup_if_required();

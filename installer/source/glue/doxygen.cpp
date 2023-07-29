@@ -2,8 +2,6 @@
 
 #include <process.hpp>
 
-#include <fstream>
-
 #include <bungeegum/glue/console.hpp>
 #include <bungeegum/glue/doxygen.hpp>
 

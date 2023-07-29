@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
+
 project(bungeegum_all)
 
 set(BUNGEEGUM_VERSION "v0.1.0-alpha")

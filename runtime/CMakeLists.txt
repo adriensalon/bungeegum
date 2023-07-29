@@ -1,11 +1,34 @@
 project(bungeegum_runtime)
 
-option(BUNGEEGUM_ENABLE_EMBEDDED "Embedded" ON)
-option(BUNGEEGUM_ENABLE_STANDALONE "Build SDL + Diligent Engine launcher" ON)
-option(BUNGEEGUM_ENABLE_OVERLAY "Enables an overlay diplaying errors etc" ON)
+option(BUNGEEGUM_ENABLE_BACKTRACE "Build stacktrace functionality to inspect the context where exceptions happen." ON)
+option(BUNGEEGUM_ENABLE_HOTSWAP "Build selected user types so that they can be hotswapped on file save." ON)
+option(BUNGEEGUM_ENABLE_OVERLAY "Build a GUI overlay above applications to facilitate development." ON)
+option(BUNGEEGUM_ENABLE_EMBEDDED "Build embedded GUIs on all supported platforms (can not be used with Vulkan renderer)." ON)
+option(BUNGEEGUM_ENABLE_STANDALONE "Build standalone applications on all supported platforms." ON)
 
-set(bungeegum_source
+if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Android")
+	option(BUNGEEGUM_ENABLE_VULKAN "Build Vulkan renderer backend." ON)
+	option(BUNGEEGUM_ENABLE_OPENGL "Build OpenGL renderer backend." ON)
 
+elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "iOS")
+	option(BUNGEEGUM_ENABLE_OPENGL "Build OpenGL renderer backend." ON)
+	option(BUNGEEGUM_ENABLE_METAL "Build Metal renderer backend." ON)
+
+elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+	option(BUNGEEGUM_ENABLE_DIRECTX "Build DirectX renderer backend." ON)
+	option(BUNGEEGUM_ENABLE_VULKAN "Build Vulkan renderer backend." ON)
+	option(BUNGEEGUM_ENABLE_OPENGL "Build OpenGL renderer backend." ON)
+
+elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+	set(BUNGEEGUM_ENABLE_OPENGL ON)
+
+else()
+	message("\n-- Invalid platform : ${CMAKE_SYSTEM_NAME}")
+	message("   Valid platform are [Windows, Darwin, Linux, Android, iOS, Emscripten]")
+	return()
+endif()
+
+set(bungeegum_runtime_source
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"
 	"source/glue/dialog.cpp"
@@ -15,6 +38,8 @@ set(bungeegum_source
 	"source/glue/reload.cpp"
 	"source/glue/serialize.cpp"
 	"source/glue/time.cpp"
+	"source/glue/renderer.cpp"
+	"source/glue/window.cpp"
 
 	"source/core/animation.cpp"
 	"source/core/draw.cpp"
@@ -42,42 +67,16 @@ set(bungeegum_source
 	"source/backend/standalone.cpp"
 )
 
-if(BUNGEEGUM_ENABLE_STANDALONE)
-	set(bungeegum_source ${bungeegum_source}
-		"source/glue/renderer.cpp"
-		"source/glue/window.cpp")
-endif()
+add_library(bungeegum_runtime ${bungeegum_runtime_source})
 
-add_library(bungeegum_runtime "${bungeegum_source}")
-target_include_directories(bungeegum_runtime PUBLIC "include")
+target_include_directories(bungeegum_runtime PUBLIC "include/")
+
 set_property(TARGET bungeegum_runtime PROPERTY CXX_STANDARD 17)
 
-if(BUNGEEGUM_ENABLE_OVERLAY)
-	target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_OVERLAY)
-endif()
-
-target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_BACKTRACE_SIZE=5)
-
-if(MSVC)
-	target_compile_options(bungeegum_runtime PRIVATE /W4 /WX)
-else()
-	target_compile_options(bungeegum_runtime PRIVATE -Wall -Wextra -Wpedantic -Werror)
-endif()
-
 target_link_libraries(bungeegum_runtime glm)
-target_link_libraries(bungeegum_runtime backward)
-target_link_libraries(bungeegum_runtime cereal)
 target_link_libraries(bungeegum_runtime imgui)
-target_link_libraries(bungeegum_runtime implot)
 target_link_libraries(bungeegum_runtime tinysplinecxx)
 target_link_libraries(bungeegum_runtime EnTT)
-target_link_libraries(bungeegum_runtime hscpp)
-target_link_libraries(bungeegum_runtime hscpp-mem)
-
-if(BUNGEEGUM_ENABLE_OVERLAY)
-	target_link_libraries(bungeegum_runtime nfd)
-endif()
-
 target_link_libraries(bungeegum_runtime Diligent-Common)
 target_link_libraries(bungeegum_runtime Diligent-Primitives)
 target_link_libraries(bungeegum_runtime Diligent-GraphicsEngine)
@@ -85,27 +84,61 @@ target_link_libraries(bungeegum_runtime Diligent-GraphicsTools)
 target_link_libraries(bungeegum_runtime Diligent-ShaderTools)
 target_link_libraries(bungeegum_runtime Diligent-Imgui)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Android")
-	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineOpenGL-static)
-	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineVk-static)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "iOS")
-	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineOpenGL-static)
-	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineMetal-static)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineD3D11-static)
-	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineD3D12-static)
+if(BUNGEEGUM_ENABLE_BACKTRACE)
+	target_link_libraries(bungeegum_runtime backward)
+endif()
 
-# target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineVk-static)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineOpenGL-static)
-else()
-	message("\n-- Invalid platform : ${CMAKE_SYSTEM_NAME}")
-	message("   Valid platform are [Windows, Darwin, Linux, Android, iOS, Emscripten]")
-	return()
+if(BUNGEEGUM_ENABLE_OVERLAY)
+	target_link_libraries(bungeegum_runtime implot)
+endif()
+
+if(BUNGEEGUM_ENABLE_OVERLAY OR BUNGEEGUM_ENABLE_HOTSWAP)
+	target_link_libraries(bungeegum_runtime cereal)
+endif()
+
+if(BUNGEEGUM_ENABLE_HOTSWAP)
+	target_link_libraries(bungeegum_runtime hscpp)
+	target_link_libraries(bungeegum_runtime hscpp-mem)
+endif()
+
+if(BUNGEEGUM_ENABLE_HOTSWAP AND BUNGEEGUM_ENABLE_OVERLAY)
+	target_link_libraries(bungeegum_runtime nfd)
 endif()
 
 if(BUNGEEGUM_ENABLE_STANDALONE)
 	target_link_libraries(bungeegum_runtime SDL2-static)
+endif()
+
+if(BUNGEEGUM_ENABLE_DIRECTX)
+	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineD3D11-static)
+	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineD3D12-static)
+endif()
+
+if(BUNGEEGUM_ENABLE_VULKAN)
+	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineVk-static)
+endif()
+
+if(BUNGEEGUM_ENABLE_OPENGL)
+	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineOpenGL-static)
+endif()
+
+if(BUNGEEGUM_ENABLE_METAL)
+	target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineMetal-static)
+endif()
+
+target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_BACKTRACE)
+target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_HOTSWAP)
+target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_OVERLAY)
+target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_EMBEDDED)
+target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_STANDALONE)
+target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_DIRECTX)
+target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_VULKAN)
+target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_OPENGL)
+
+if(MSVC)
+	target_compile_options(bungeegum_runtime PRIVATE /W4 /WX)
+else()
+	target_compile_options(bungeegum_runtime PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 if(DEFINED BUNGEEGUM_INSTALL_DIR)

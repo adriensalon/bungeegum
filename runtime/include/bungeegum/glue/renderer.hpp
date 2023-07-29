@@ -7,20 +7,19 @@
 #include <bungeegum/glue/toolchain.hpp>
 #include <bungeegum/glue/window.hpp>
 
-/// @brief Defines if the preferred GPU renderer is DirectX.
-/// @details Only D3D11 is implemented right now.
-#if !defined(BUNGEEGUM_USE_RENDERER_DIRECTX)
-#define BUNGEEGUM_USE_RENDERER_DIRECTX (BUNGEEGUM_ENABLE_DIRECTX && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP))
+/// @brief Defines if we use DirectX functionnality.
+#if !defined(BUNGEEGUM_USE_DIRECTX)
+#define BUNGEEGUM_USE_DIRECTX (BUNGEEGUM_ENABLE_DIRECTX && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP))
 #endif
 
-/// @brief Defines if the preferred GPU renderer is Vulkan.
-#if !defined(BUNGEEGUM_USE_RENDERER_VULKAN)
-#define BUNGEEGUM_USE_RENDERER_VULKAN (BUNGEEGUM_ENABLE_VULKAN && (TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID))
+/// @brief Defines if we use Vulkan functionnality.
+#if !defined(BUNGEEGUM_USE_VULKAN)
+#define BUNGEEGUM_USE_VULKAN (BUNGEEGUM_ENABLE_VULKAN && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID))
 #endif
 
-/// @brief Defines if the preferred GPU renderer is OpenGL.
-#if !defined(BUNGEEGUM_USE_RENDERER_OPENGL)
-#define BUNGEEGUM_USE_RENDERER_OPENGL (BUNGEEGUM_ENABLE_OPENGL && (TOOLCHAIN_PLATFORM_EMSCRIPTEN || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_IOS))
+/// @brief Defines if we use OpenGL functionnality.
+#if !defined(BUNGEEGUM_USE_OPENGL)
+#define BUNGEEGUM_USE_OPENGL (BUNGEEGUM_ENABLE_OPENGL && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID || TOOLCHAIN_PLATFORM_EMSCRIPTEN || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_IOS))
 #endif
 
 namespace bungeegum {
@@ -31,14 +30,41 @@ namespace detail {
     /// modified to force usage of a specific platform.
     /// @details Instances of this struct can only be moved.
     struct renderer {
-        renderer() = delete;
+    private:
+        renderer() = default;
+
+    public:
         renderer(const renderer& other) = delete;
         renderer& operator=(const renderer& other) = delete;
         renderer(renderer&& other) = default;
         renderer& operator=(renderer&& other) = default;
 
-        /// @brief Creates an instance from a cross-platform window.
-        renderer(const window& existing);
+#if BUNGEEGUM_USE_DIRECTX
+        /// @brief Creates an instance from an existing window with the DirectX 11 API.
+        static renderer create_directx11(const window& existing);
+
+        /// @brief Creates an instance from an existing window with the DirectX 12 API.
+        static renderer create_directx12(const window& existing);
+
+        /// @brief Creates an instance from an existing DirectX 11 context.
+        static renderer attach_directx11(void*, void*);
+
+        /// @brief Creates an instance from an existing DirectX 12 context.
+        static renderer attach_directx12(void*, void*);
+#endif
+
+#if BUNGEEGUM_USE_OPENGL
+        /// @brief Creates an instance from an existing window with the OpenGL API.
+        static renderer create_opengl(const window& existing);
+
+        /// @brief Creates an instance from an existing OpenGL context.
+        static renderer attach_opengl();
+#endif
+
+#if BUNGEEGUM_USE_VULKAN
+        /// @brief Creates an instance from an existing window with the Vulkan API.
+        static renderer create_vulkan(const window& existing);
+#endif
 
         /// @brief Begins a new frame, enabling all drawing commands.
         /// @exception Throws a backtraced exception if a new frame has already begun.
