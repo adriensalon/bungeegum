@@ -3,6 +3,7 @@ if(BUNGEEGUM_BUILD_INSTALLER)
 
 	set(bungeegum_installer_source
 		"source/glue/cmake.cpp"
+		"source/glue/doxygen.cpp"
 		"source/glue/git.cpp"
 		"source/glue/tool.cpp"
 	)

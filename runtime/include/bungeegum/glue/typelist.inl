@@ -123,12 +123,12 @@ namespace detail {
         return back_type();
     }
 
-    template <typename... types_t>
-    constexpr typename typelist<types_t...>::pop_back_type typelist<types_t...>::pop_back()
-    {
-        static_assert(!empty(), "BAD USAGE (calling pop_back() on empty typelist)");
-        return pop_back_type();
-    }
+    // template <typename... types_t>
+    // constexpr typename typelist<types_t...>::pop_back_type typelist<types_t...>::pop_back()
+    // {
+    //     static_assert(!empty(), "BAD USAGE (calling pop_back() on empty typelist)");
+    //     return pop_back_type();
+    // }
 
     template <typename... types_t>
     template <typename new_type_t>

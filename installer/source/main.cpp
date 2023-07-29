@@ -4,6 +4,7 @@
 
 #include <bungeegum/glue/cmake.hpp>
 #include <bungeegum/glue/console.hpp>
+#include <bungeegum/glue/doxygen.hpp>
 #include <bungeegum/glue/git.hpp>
 #include <bungeegum/glue/tool.hpp>
 #include <bungeegum/glue/toolchain.hpp>
@@ -54,7 +55,22 @@ namespace detail {
         if (!_cmake_version.has_value()) {
             throw "ERROR TODO";
         } else {
-            detail::console_log("found (version = " + _cmake_version.value() + ")\n");
+            detail::console_log("found (version = " + _cmake_version.value() + ")");
+        }
+    }
+
+    static bool has_doxygen = false;
+
+    void verify_doxygen_version()
+    {
+        detail::console_log("\n[optional] Doxygen ");
+        std::optional<std::string> _doxygen_version = detail::doxygen_version();
+        if (!_doxygen_version.has_value()) {
+            detail::console_log("not found\n");
+            has_doxygen = false;
+        } else {
+            detail::console_log("found (version = " + _doxygen_version.value() + ")\n");
+            has_doxygen = true;
         }
     }
 
@@ -108,10 +124,14 @@ namespace detail {
     {
         std::vector<std::pair<std::string, bool>> _options = {};
         should_build_widgets = detail::draw_question("Build widgets library?");
-        should_build_demo = detail::draw_question("Build demo application?");
-        should_build_doc = detail::draw_question("Build doxygen documentation?");
-        should_build_test = detail::draw_question("Build test executable?");
-        _options.push_back({ "BUNGEEGUM_IN_TREE_HEADERS", true });
+        if (should_build_widgets) {
+            should_build_demo = detail::draw_question("Build demo application?");
+            if (has_doxygen) {
+                should_build_doc = detail::draw_question("Build doxygen documentation?");
+            }
+            should_build_test = detail::draw_question("Build test executable?");
+        }
+
         _options.push_back({ "BUNGEEGUM_BUILD_INSTALLER", false });
         _options.push_back({ "BUNGEEGUM_ENABLE_EMBEDDED", true });
         _options.push_back({ "BUNGEEGUM_ENABLE_STANDALONE", true });
@@ -120,6 +140,25 @@ namespace detail {
         _options.push_back({ "BUNGEEGUM_BUILD_DOC", should_build_doc });
         _options.push_back({ "BUNGEEGUM_BUILD_TEST", should_build_test });
         return _options;
+    }
+
+    void build_targets(const std::filesystem::path& build_directory)
+    {
+        detail::console_log("\n[process] building bungeegum_runtime library \n");
+        detail::cmake_build(build_directory, "bungeegum_runtime");
+        // detail::cmake_build(build_directory, "bungeegum_tool");
+        if (detail::should_build_widgets) {
+            detail::console_log("\n[process] building bungeegum_widgets library \n");
+            detail::cmake_build(build_directory, "bungeegum_widgets");
+        }
+        if (detail::should_build_demo) {
+            detail::console_log("\n[process] building bungeegum_demo executable \n");
+            detail::cmake_build(build_directory, "bungeegum_demo");
+        }
+        if (detail::should_build_test) {
+            detail::console_log("\n[process] building bungeegum_test executable \n");
+            detail::cmake_build(build_directory, "bungeegum_test");
+        }
     }
 }
 }
@@ -132,6 +171,7 @@ int main(int argc, char* argv[])
     detail::verify_existing_install();
     detail::verify_git_version();
     detail::verify_cmake_version();
+    detail::verify_doxygen_version();
 
     detail::console_log("\n[process] cloning repository \n");
     std::filesystem::path _root_directory = detail::define_root_directory(argc, argv);
@@ -165,27 +205,12 @@ int main(int argc, char* argv[])
     //     _configure_options, false);
 
     detail::console_log("\n[process] building debug variant \n");
-    detail::cmake_build(_debug_build_directory, "bungeegum_runtime");
-    if (detail::should_build_widgets) {
-        detail::console_log("\n[process] building widgets library \n");
-        detail::cmake_build(_debug_build_directory, "bungeegum_widgets");
-    }
-    if (detail::should_build_demo) {
-        detail::console_log("\n[process] building demo executable \n");
-        detail::cmake_build(_debug_build_directory, "bungeegum_demo");
-    }
-    // if (detail::should_build_doc) {
-    // 	   detail::console_log("\n[process] building documentation \n");
-    //     detail::cmake_build(_debug_build_directory, "bungeegum_doc");
-    // }
-    // if (detail::should_build_test) {
-    // 	   detail::console_log("\n[process] building test executable \n");
-    //     detail::cmake_build(_debug_build_directory, "bungeegum_test");
-    // }
-    // detail::cmake_install(_debug_build_directory, _debug_install_directory);
+    detail::build_targets(_debug_build_directory);
 
-    detail::console_log("\n[process] building release variant \n");
-    // build
+    if (detail::should_build_doc) {
+        detail::console_log("\n[process] building documentation \n");
+        // DOXYBUILD
+    }
 
     return 0;
 }

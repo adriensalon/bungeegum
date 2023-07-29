@@ -91,26 +91,5 @@ namespace detail {
             });
         int _exit_status = _cmake_process.get_exit_status();
     }
-
-    void cmake_install(const std::filesystem::path& build_directory, const std::filesystem::path& prefix, const std::optional<std::string>& target)
-    {
-        std::string _cmake_string = "cmake --install " + build_directory.generic_string() + " --prefix \"" + prefix.generic_string() + "\"";
-        if (target.has_value()) {
-            _cmake_string += " --target " + target.value();
-        }
-        TinyProcessLib::Process _cmake_process(
-            _cmake_string, "",
-            [](const char* bytes, size_t n) {
-                std::string _line_str(bytes, n);
-                detail::console_log(_line_str, detail::console_color::blue);
-                std::cout << std::flush;
-            },
-            [](const char* bytes, size_t n) {
-                std::string _line_str(bytes, n);
-                detail::console_log(_line_str, detail::console_color::blue);
-                std::cout << std::flush;
-            });
-        int _exit_status = _cmake_process.get_exit_status();
-    }
 }
 }

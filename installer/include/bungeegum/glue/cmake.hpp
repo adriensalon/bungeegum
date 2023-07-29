@@ -21,7 +21,5 @@ namespace detail {
         const bool debug = false);
 
     void cmake_build(const std::filesystem::path& build_directory, const std::optional<std::string>& target = std::nullopt);
-
-    void cmake_install(const std::filesystem::path& build_directory, const std::filesystem::path& prefix, const std::optional<std::string>& target = std::nullopt);
 }
 }

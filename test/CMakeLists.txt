@@ -11,7 +11,8 @@ if(BUNGEEGUM_BUILD_TEST)
 	)
 
 	add_executable(bungeegum_test "${bungeegum_test_source}")
-	target_link_libraries(bungeegum_test bungeegum)
+	target_link_libraries(bungeegum_test bungeegum_runtime)
+	target_link_libraries(bungeegum_test bungeegum_widgets)
 	target_link_libraries(bungeegum_test gtest_main)
 	add_test(NAME "bungeegum_test" COMMAND bungeegum_test)
 

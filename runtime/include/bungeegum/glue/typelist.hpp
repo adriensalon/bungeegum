@@ -47,7 +47,7 @@ namespace detail {
 
         using back_type = typename detail::back_helper<typelist>::type_t;
 
-        using pop_back_type = typename detail::pop_back_helper<typelist>::type_t;
+        // using pop_back_type = typename detail::pop_back_helper<typelist>::type_t;
 
         template <typename new_type_t>
         using push_back_type = typename detail::push_back_helper<typelist, new_type_t>::type_t;
@@ -70,7 +70,7 @@ namespace detail {
 
         [[nodiscard]] static constexpr back_type back();
 
-        [[nodiscard]] static constexpr pop_back_type pop_back();
+        // [[nodiscard]] static constexpr pop_back_type pop_back();
 
         template <typename new_type_t>
         [[nodiscard]] static constexpr push_back_type<new_type_t> push_back();
