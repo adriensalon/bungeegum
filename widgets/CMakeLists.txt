@@ -40,4 +40,16 @@ else()
 	target_compile_options(bungeegum_widgets PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
-target_link_libraries(bungeegum_widgets bungeegum_runtime)
+target_link_libraries(bungeegum_widgets PUBLIC bungeegum_runtime)
+
+if(DEFINED BUNGEEGUM_INSTALL_DIR)
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/include/"
+		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/widgets/include/")
+
+	add_custom_command(
+		TARGET bungeegum_widgets POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		$<TARGET_FILE_DIR:bungeegum_widgets>
+		"${BUNGEEGUM_INSTALL_DIR}/widgets/bin/")
+endif()

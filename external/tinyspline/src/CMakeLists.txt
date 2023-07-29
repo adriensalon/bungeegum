@@ -820,10 +820,10 @@ if(TINYSPLINE_RUNTIME_LIBRARIES STREQUAL "")
   if(${TINYSPLINE_PLATFORM_NAME} STREQUAL "windows")
     # Store relevant files in CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS. This allows to
     # reuse CMake's InstallRequiredSystemLibraries module.
-    set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS "")
+    # set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS "")
     if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-      set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
-      include(InstallRequiredSystemLibraries)
+    #   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+    #   include(InstallRequiredSystemLibraries)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
       get_filename_component(basedir ${CMAKE_CXX_COMPILER} DIRECTORY)
       if(NOT EXISTS "${basedir}/libstdc++-6.dll")
@@ -865,21 +865,21 @@ if(TINYSPLINE_RUNTIME_LIBRARIES STREQUAL "")
     )
   endif()
 endif()
-foreach(file ${TINYSPLINE_RUNTIME_LIBRARIES})
-  if(NOT EXISTS ${file})
-    message(FATAL_ERROR "'${file}' does not exist")
-  endif()
-  file(COPY ${file} DESTINATION ${TINYSPLINE_OUTPUT_DIRECTORY})
-  get_filename_component(name ${file} NAME)
-  list(APPEND TINYSPLINE_RUNTIME_LIBS ${name})
-  if(CMAKE_STRIP AND NOT TINYSPLINE_MACOSX_TO_MACOSX)
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -E echo "Stripping ${name}"
-      COMMAND "${CMAKE_STRIP}" --strip-unneeded ${name}
-      WORKING_DIRECTORY "${TINYSPLINE_OUTPUT_DIRECTORY}"
-    )
-  endif()
-endforeach()
+# foreach(file ${TINYSPLINE_RUNTIME_LIBRARIES})
+#   if(NOT EXISTS ${file})
+#     message(FATAL_ERROR "'${file}' does not exist")
+#   endif()
+#   file(COPY ${file} DESTINATION ${TINYSPLINE_OUTPUT_DIRECTORY})
+#   get_filename_component(name ${file} NAME)
+#   list(APPEND TINYSPLINE_RUNTIME_LIBS ${name})
+#   if(CMAKE_STRIP AND NOT TINYSPLINE_MACOSX_TO_MACOSX)
+#     execute_process(
+#       COMMAND ${CMAKE_COMMAND} -E echo "Stripping ${name}"
+#       COMMAND "${CMAKE_STRIP}" --strip-unneeded ${name}
+#       WORKING_DIRECTORY "${TINYSPLINE_OUTPUT_DIRECTORY}"
+#     )
+#   endif()
+# endforeach()
 
 # ##############################################################################
 # Create the C/C++ libraries.

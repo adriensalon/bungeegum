@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.0)
 project(bungeegum_all)
 
 set(BUNGEEGUM_VERSION "v0.1.0-alpha")
+set(BUNGEEGUM_INSTALL_DIR "C:/USers/adri/Desktop/inst/")
 
 option(BUNGEEGUM_IN_TREE_HEADERS "Copy all required headers to runtime/include/" ON)
+option(BUNGEEGUM_BUILD_BUNDLED_RUNTIME "Bundles external dependencies along with the runtime library" ON)
 option(BUNGEEGUM_BUILD_WIDGETS "Build widgets library" ON)
 option(BUNGEEGUM_BUILD_DEMO "Build demo executable" ON)
 option(BUNGEEGUM_BUILD_DOC "Build doxygen documentation" ON)
