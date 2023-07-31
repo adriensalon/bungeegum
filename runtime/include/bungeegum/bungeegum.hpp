@@ -20,6 +20,7 @@
 #include <bungeegum/glue/window.hpp>
 
 #include <bungeegum/core/animation.hpp>
+#include <bungeegum/core/context.hpp>
 #include <bungeegum/core/draw.hpp>
 #include <bungeegum/core/event.hpp>
 #include <bungeegum/core/interact.hpp>
