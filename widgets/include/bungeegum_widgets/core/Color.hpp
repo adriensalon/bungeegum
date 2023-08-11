@@ -11,6 +11,11 @@ namespace widgets {
     /// of 0xF5 (245). In the common "hash syntax" for color values, it would be described as
     /// #42A5F5.
     struct Color {
+        Color() = default;
+        Color(const Color& other) = default;
+        Color& operator=(const Color& other) = default;
+        Color(Color&& other) = default;
+        Color& operator=(Color&& other) = default;
 
         /// @brief Construct a color from the lower 32 bits of an int.
         /// @details The bits are interpreted as follows:
@@ -108,12 +113,6 @@ namespace widgets {
 
         /// @brief The equality operator
         bool operator==(const Color& other);
-
-        Color() = default;
-        Color(const Color& other) = default;
-        Color& operator=(const Color& other) = default;
-        Color(Color&& other) = default;
-        Color& operator=(Color&& other) = default;
 
     private:
         template <typename archive_t>

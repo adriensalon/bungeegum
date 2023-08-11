@@ -4,12 +4,14 @@ namespace bungeegum {
 namespace widgets {
 
     /// @brief
-    struct PointerEnterEvent {
+    struct PointerCancelEvent {
 
         /// @brief Bit field using the *Button constants such as kPrimaryMouseButton,
         /// kSecondaryStylusButton, etc.
         const int buttons;
     };
 
+}
+}
 }
 }

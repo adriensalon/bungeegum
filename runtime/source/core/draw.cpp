@@ -30,20 +30,20 @@ float2 draw_command::resolved_size() const
     return _data.resolved_size;
 }
 
-void draw_command::clip_rect(const float2 first_point, const float2 second_point)
-{
-    _data.clipping = {
-        first_point,
-        second_point,
-        true
-    };
-#if BUNGEEGUM_USE_OVERLAY
-    std::pair<std::string, std::vector<std::string>>& _info = _data.commands_infos.emplace_back();
-    _info.first = "clip rect";
-    _info.second.push_back(to_string<float2>(first_point));
-    _info.second.push_back(to_string<float2>(second_point));
-#endif
-}
+// void draw_command::clip_rect(const float2 first_point, const float2 second_point)
+// {
+//     _data.clipping = {
+//         first_point,
+//         second_point,
+//         true
+//     };
+// #if BUNGEEGUM_USE_OVERLAY
+//     std::pair<std::string, std::vector<std::string>>& _info = _data.commands_infos.emplace_back();
+//     _info.first = "clip rect";
+//     _info.second.push_back(to_string<float2>(first_point));
+//     _info.second.push_back(to_string<float2>(second_point));
+// #endif
+// }
 
 void draw_command::draw_line(
     const float2 first_point, const float2 second_point,

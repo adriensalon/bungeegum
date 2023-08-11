@@ -160,13 +160,14 @@ int main()
                                                                    static auto fff = std::async([]() {
                                                                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                                                                        _osstream2 << "Helloooooo4466" << std::endl;
+                                                                       bungeegum::set_contextual<float>("myfloat", 2.f);
                                                                    });
                                                                    (void)fff;
                                                                    return bungeegum::make<WideStreamBuilder>()
                                                                        .initialData(L"heyyy")
                                                                        .builder([](const std::wstring& message) -> bungeegum::runtime_widget {
                                                                            //    std::wcout << message;
-
+																			
                                                                            return bungeegum::make<OverflowBox>()
                                                                                .maxHeight(40.f)
                                                                                .minHeight(10.f)

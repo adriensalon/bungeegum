@@ -4,6 +4,11 @@
 
 namespace bungeegum {
 
+struct clipping_mesh {
+    std::vector<float2> positions;
+    std::vector<uint1> indices;
+};
+
 /// @brief
 /// @details
 struct draw_command {
@@ -17,11 +22,17 @@ struct draw_command {
     /// @brief
     [[nodiscard]] float2 resolved_size() const;
 
-    /// @brief Sets the clipping rectangle for all the commands issued to this widget and all the
-    /// commands issued by its children.
-    /// @param first_point is the minimum point for this clipping rectangle
-    /// @param second_point is the maximum point for this clipping rectangle
-    void clip_rect(const float2 first_point, const float2 second_point);
+    // /// @brief Sets the clipping rectangle for all the commands issued to this widget and all the
+    // /// commands issued by its children.
+    // /// @param first_point is the minimum point for this clipping rectangle
+    // /// @param second_point is the maximum point for this clipping rectangle
+    // void clip_rect(const float2 first_point, const float2 second_point); //
+
+    void clip_mesh(const std::vector<float2>& positions, const std::vector<uint1>& indices);
+
+    void orthographic_projection();
+
+    void perspective_projection(const float1 fov);
 
     /// @brief
     /// @param first_point

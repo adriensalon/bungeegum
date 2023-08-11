@@ -28,6 +28,11 @@ struct runtime_widget {
     template <typename widget_t>
     runtime_widget(widget_reference<widget_t>& widget);
 
+    /// @brief
+    /// @tparam widget_t
+    template <typename widget_t>
+    runtime_widget(widget_ptr<widget_t>& widget);
+
 private:
     runtime_widget(const detail::runtime_widget_data& data);
 

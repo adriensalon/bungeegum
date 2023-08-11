@@ -5,7 +5,6 @@
 #include <typeindex>
 
 #include <bungeegum/core/draw.hpp>
-// #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/interact.hpp>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/resolve.hpp>

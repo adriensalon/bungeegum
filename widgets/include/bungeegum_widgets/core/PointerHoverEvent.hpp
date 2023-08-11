@@ -4,7 +4,7 @@ namespace bungeegum {
 namespace widgets {
 
     /// @brief
-    struct PointerEnterEvent {
+    struct PointerHoverEvent {
 
         /// @brief Bit field using the *Button constants such as kPrimaryMouseButton,
         /// kSecondaryStylusButton, etc.
