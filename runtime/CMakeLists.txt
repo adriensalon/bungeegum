@@ -1,5 +1,7 @@
 project(bungeegum_runtime)
 
+message("cmake system name = ${CMAKE_SYSTEM_NAME}")
+
 option(BUNGEEGUM_ENABLE_BACKTRACE "Build stacktrace functionality to inspect the context where exceptions happen." ON)
 option(BUNGEEGUM_ENABLE_HOTSWAP "Build selected user types so that they can be hotswapped on file save." ON)
 option(BUNGEEGUM_ENABLE_OVERLAY "Build a GUI overlay above applications to facilitate development." ON)
