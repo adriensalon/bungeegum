@@ -1,19 +1,5 @@
 project(bungeegum_runtime)
 
-message("[bungeegum] system name = ${CMAKE_SYSTEM_NAME}")
-
-option(BUNGEEGUM_ENABLE_BACKTRACE "Build stacktrace functionality to inspect the context where exceptions happen." ON)
-option(BUNGEEGUM_ENABLE_HOTSWAP "Build selected user types so that they can be hotswapped on file save." ON)
-option(BUNGEEGUM_ENABLE_OVERLAY "Build a GUI overlay above applications to facilitate development." ON)
-option(BUNGEEGUM_ENABLE_EMBEDDED "Build embedded GUIs on all supported platforms (can not be used with Vulkan renderer)." ON)
-option(BUNGEEGUM_ENABLE_STANDALONE "Build standalone applications on all supported platforms." ON)
-
-message("[bungeegum] runtime backtrace enabled = ${BUNGEEGUM_ENABLE_BACKTRACE}")
-message("[bungeegum] runtime hotswap enabled = ${BUNGEEGUM_ENABLE_HOTSWAP}")
-message("[bungeegum] runtime overlay enabled = ${BUNGEEGUM_ENABLE_OVERLAY}")
-message("[bungeegum] embedded runtime enabled = ${BUNGEEGUM_ENABLE_EMBEDDED}")
-message("[bungeegum] standalone runtime enabled = ${BUNGEEGUM_ENABLE_STANDALONE}")
-
 if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Android")
 	option(BUNGEEGUM_ENABLE_VULKAN "Build Vulkan renderer backend." ON)
 	option(BUNGEEGUM_ENABLE_OPENGL "Build OpenGL renderer backend." ON)
