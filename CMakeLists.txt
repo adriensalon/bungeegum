@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(bungeegum_all)
+project(bungeegum)
 
 set(BUNGEEGUM_VERSION "v0.1.0-alpha")
 
@@ -24,7 +24,7 @@ message(" | \\_\\ \\  |  /   |  \\/ /_/  >  ___/\\  ___// /_/  >  |  /  Y Y  \\"
 message(" |___  /____/|___|  /\\___  / \\___  >\\___  >___  /|____/|__|_|  /")
 message("     \\/           \\//_____/      \\/     \\/_____/             \\/")
 message("                                                 ${BUNGEEGUM_VERSION}\n")
-message("[bungeegum] system name = ${CMAKE_SYSTEM_NAME}")
+message("[bungeegum] system name = ${CMAKE_SYSTEM_NAME}\n")
 message("[bungeegum] build bundled runtime = ${BUNGEEGUM_BUILD_BUNDLED_RUNTIME}")
 message("[bungeegum] build widgets = ${BUNGEEGUM_BUILD_WIDGETS}")
 message("[bungeegum] build demo = ${BUNGEEGUM_BUILD_DEMO}")
