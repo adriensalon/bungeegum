@@ -1,0 +1,26 @@
+name: windows
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 0 * * *'
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure
+      run: cmake -B ${{github.workspace}}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --target bungeegum_test --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      run: ${{github.workspace}}/build/test/${{env.BUILD_TYPE}}/bungeegum_test.exe
+
