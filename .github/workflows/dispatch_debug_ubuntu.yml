@@ -1,4 +1,4 @@
-name: ubuntu
+name: dispatch debug ubuntu
 
 on:
   workflow_dispatch
