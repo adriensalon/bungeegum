@@ -1,4 +1,4 @@
-name: macos
+name: test debug macos
 
 on:
   workflow_dispatch
