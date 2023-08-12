@@ -30,7 +30,7 @@
 #include "GraphicsTypes.h"
 #include "imgui.h"
 #include "ImGuiImplSDL.hpp"
-#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_sdl2.h"
 #include "DebugUtilities.hpp"
 
 namespace Diligent

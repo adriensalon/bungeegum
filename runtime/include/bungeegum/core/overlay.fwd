@@ -1,0 +1,44 @@
+#pragma once
+
+#include <functional>
+
+#include <bungeegum/glue/config.hpp>
+#include <bungeegum/glue/toolchain.hpp>
+
+#if !defined(BUNGEEGUM_USE_OVERLAY)
+#define BUNGEEGUM_USE_OVERLAY (BUNGEEGUM_ENABLE_OVERLAY && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_LINUX))
+#endif
+
+struct ImDrawList;
+struct ImFont;
+
+namespace bungeegum {
+namespace detail {
+
+    constexpr inline float footer_height = 28.f;
+
+    inline static ImFont* regular_font = nullptr;
+    inline static ImFont* extrabold_font = nullptr;
+    inline static ImFont* icons_font = nullptr;
+
+    void setup_overlay();
+
+    void draw_overlay(const std::function<void(ImDrawList*)>& draw_commands);
+
+    void setup_profiler_overlay();
+
+    void setup_overlay_theme();
+
+    void draw_hierarchy_overlay();
+
+    void draw_inspector_overlay();
+
+    void draw_profiler_overlay();
+
+    void draw_logger_overlay();
+
+    void draw_wireframe_overlay();
+
+    void draw_hotswapper_overlay();
+}
+}

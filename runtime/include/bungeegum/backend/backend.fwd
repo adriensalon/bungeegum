@@ -1,0 +1,83 @@
+#pragma once
+
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <bungeegum/core/overlay.fwd>
+#include <bungeegum/core/widget.fwd>
+#include <bungeegum/glue/reload.hpp>
+#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/glue/time.hpp>
+
+namespace bungeegum {
+namespace detail {
+
+    using frames_chronometer = chronometer<BUNGEEGUM_USE_TIME_UNIT>;
+    using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_TIME_UNIT>;
+
+#if BUNGEEGUM_USE_OVERLAY
+    std::string clean_typename(const std::string& raw_typename);
+#endif
+
+    struct backend_manager {
+        backend_manager() = default;
+        backend_manager(const backend_manager& other) = delete;
+        backend_manager& operator=(const backend_manager& other) = delete;
+        backend_manager(backend_manager&& other) = delete;
+        backend_manager& operator=(backend_manager&& other) = delete;
+
+#if BUNGEEGUM_USE_HOTSWAP
+        void setup_if_required();
+
+        void save_widgets(const std::filesystem::path& archive_path);
+
+        void load_widgets(const std::filesystem::path& archive_path);
+
+        std::optional<std::string> inspect_reloadable_widget(const widget_update_data& update_data);
+
+        void update_reloadable_widget(widget_update_data& update_data, const std::string& serialized);
+
+        std::unique_ptr<reloader> reload_manager = nullptr;
+        std::wstring reload_initialization_message = {}; // Degager ptetre direct submit dans standalone.cpp
+#endif
+
+#if BUNGEEGUM_USE_OVERLAY
+        BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};
+        frames_chronometer profiler_frame_chronometer = {};
+        frames_chronometer profiler_resolve_chronometer = {};
+        frames_chronometer profiler_interact_chronometer = {};
+        frames_chronometer profiler_draw_chronometer = {};
+        std::optional<std::uintptr_t> inspector_selected = std::nullopt;
+
+        inline static std::string to_clean_typename(const std::string& raw_typename)
+        {
+            std::size_t _last_space = raw_typename.find_last_of(' ');
+            if (_last_space == raw_typename.npos) {
+                _last_space = 0;
+            }
+            std::size_t _last_column = raw_typename.find_last_of(':');
+            if (_last_column == raw_typename.npos) {
+                _last_column = 0;
+            }
+            if (_last_space == 0 && _last_column == 0) {
+                return raw_typename;
+            }
+            std::size_t _offset = std::max(_last_space, _last_column) + 1;
+            std::size_t _length = raw_typename.length() - _offset;
+            return raw_typename.substr(_offset, _length);
+        }
+
+        inline void set_clean_typename(widget_update_data& update_data)
+        {
+            std::string _clean_typename = to_clean_typename(update_data.kind->name());
+            update_data.resolver_command._data.clean_typename = _clean_typename;
+            update_data.clean_typename = _clean_typename;
+        }
+#endif
+
+        uint2 viewport_size = zero<float2>;
+    };
+}
+}

@@ -1,0 +1,64 @@
+#pragma once
+
+#include <functional>
+#include <future>
+#include <typeindex>
+
+#include <bungeegum/core/overlay.fwd>
+#include <bungeegum/glue/typelist.hpp>
+
+namespace bungeegum {
+namespace detail {
+
+    template <typename... values_t>
+    struct event_data {
+        event_data() = default;
+        event_data(const event_data& other);
+        event_data& operator=(const event_data& other);
+        event_data(event_data&& other) = default;
+        event_data& operator=(event_data&& other) = default;
+        ~event_data();
+
+        std::uintptr_t raw_event = 0;
+        std::vector<std::function<void(values_t...)>> callbacks = {};
+        std::vector<std::future<future_typelist_t<values_t...>>> futures = {};
+        std::vector<std::shared_future<future_typelist_t<values_t...>>> shared_futures = {};
+    };
+
+    struct event_update_data {
+        std::vector<std::type_index> kinds = {};
+        std::function<void()> ticker = nullptr;
+#if BUNGEEGUM_USE_OVERLAY
+        std::vector<std::string> clean_typenames = {};
+#endif
+    };
+
+    struct events_manager {
+        events_manager() = default;
+        events_manager(const events_manager& other) = delete;
+        events_manager& operator=(const events_manager& other) = delete;
+        events_manager(events_manager&& other) = delete;
+        events_manager& operator=(events_manager&& other) = delete;
+
+        using const_iterator = std::unordered_map<std::uintptr_t, event_update_data>::template const_iterator;
+
+        [[nodiscard]] const_iterator begin() const;
+
+        [[nodiscard]] bool contains(const std::uintptr_t raw_event) const;
+
+        [[nodiscard]] const_iterator end() const;
+
+        void notify_erase(const std::uintptr_t raw_event);
+
+        [[nodiscard]] event_update_data& operator[](const std::uintptr_t raw_event);
+
+        std::size_t size() const;
+
+        void update();
+
+    private:
+        std::unordered_map<std::uintptr_t, event_update_data> _updatables = {};
+        std::vector<std::uintptr_t> _updatables_to_erase = {};
+    };
+}
+}

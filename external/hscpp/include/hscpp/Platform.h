@@ -11,7 +11,6 @@
 
 #if defined(HSCPP_PLATFORM_WIN32)
 
-#define NOMINMAX
 #include <Windows.h>
 
 #elif defined(HSCPP_PLATFORM_UNIX)

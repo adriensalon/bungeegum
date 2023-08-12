@@ -1,0 +1,13 @@
+#pragma once
+
+#include <bungeegum/core/widget.hpp>
+
+namespace bungeegum {
+namespace detail {
+
+    struct runtime_widget_data {
+        std::uintptr_t raw_widget;
+    };
+
+}
+}

@@ -1,0 +1,71 @@
+#pragma once
+
+#include <array>
+#include <chrono>
+
+#include <bungeegum/core/event.fwd>
+#include <bungeegum/core/overlay.fwd>
+#include <bungeegum/glue/curve.hpp>
+
+namespace bungeegum {
+namespace detail {
+
+    template <typename value_t>
+    struct animation_data {
+        animation_data() = default;
+        animation_data(const animation_data& other) = default;
+        animation_data& operator=(const animation_data& other) = default;
+        animation_data(animation_data&& other) = default;
+        animation_data& operator=(animation_data&& other) = default;
+        ~animation_data();
+
+        std::uintptr_t raw_animation = 0;
+        std::unique_ptr<value_t> min_value = nullptr;
+        std::unique_ptr<value_t> max_value = nullptr;
+        event_data<value_t> event;
+        curve eval_curve = { 0.f, 1.f, std::vector<float2> {} };
+        float1 duration_seconds = 0.f;
+        bool1 is_playing = false;
+        float1 playing_cursor_seconds = 0.f;
+    };
+
+    struct animation_update_data {
+        std::unique_ptr<std::type_index> kind = nullptr;
+        std::function<void(const std::chrono::milliseconds&)> ticker = nullptr;
+
+#if BUNGEEGUM_USE_OVERLAY
+        std::string clean_typename = {};
+        std::vector<float1> overlay_samples = {};
+        std::array<float1, 2> overlay_position = { 0.f, 0.f };
+#endif
+    };
+
+    struct animations_manager {
+        animations_manager() = default;
+        animations_manager(const animations_manager& other) = delete;
+        animations_manager& operator=(const animations_manager& other) = delete;
+        animations_manager(animations_manager&& other) = delete;
+        animations_manager& operator=(animations_manager&& other) = delete;
+
+        using const_iterator = std::unordered_map<std::uintptr_t, animation_update_data>::template const_iterator;
+
+        [[nodiscard]] const_iterator begin() const;
+
+        [[nodiscard]] bool contains(const std::uintptr_t raw_animation) const;
+
+        [[nodiscard]] const_iterator end() const;
+
+        void notify_erase(const std::uintptr_t raw_animation);
+
+        [[nodiscard]] animation_update_data& operator[](const std::uintptr_t raw_animation);
+
+        std::size_t size() const;
+
+        void update(const std::chrono::milliseconds& delta_time);
+
+    private:
+        std::unordered_map<std::uintptr_t, animation_update_data> _updatables = {};
+        std::vector<std::uintptr_t> _updatables_to_erase = {};
+    };
+}
+}

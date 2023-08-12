@@ -405,7 +405,9 @@ void ImGuiDiligentRenderer::CreateDeviceObjects()
 
     GraphicsPipeline.RasterizerDesc.CullMode      = CULL_MODE_NONE;
     GraphicsPipeline.RasterizerDesc.ScissorEnable = True;
-    GraphicsPipeline.DepthStencilDesc.DepthEnable = False;
+    GraphicsPipeline.DepthStencilDesc.DepthEnable      = True;
+    GraphicsPipeline.DepthStencilDesc.DepthWriteEnable = False;
+    GraphicsPipeline.DepthStencilDesc.StencilEnable    = True;
 
     auto& RT0                 = GraphicsPipeline.BlendDesc.RenderTargets[0];
     RT0.BlendEnable           = True;

@@ -1,0 +1,133 @@
+#pragma once
+
+#include <functional>
+#include <optional>
+#include <typeindex>
+
+#include <bungeegum/core/draw.hpp>
+#include <bungeegum/core/interact.hpp>
+#include <bungeegum/core/overlay.fwd>
+#include <bungeegum/core/resolve.hpp>
+#include <bungeegum/glue/detection.hpp>
+#include <bungeegum/glue/raw.hpp>
+#include <bungeegum/glue/registry.hpp>
+#include <bungeegum/glue/reload.hpp>
+
+struct ImDrawList;
+
+namespace bungeegum {
+
+struct runtime_widget;
+
+template <typename widget_t>
+struct widget_reference;
+
+template <typename property_t>
+struct property_reference;
+
+namespace detail {
+
+    namespace traits {
+
+        template <typename widget_t>
+        using detected_resolve_function = decltype(std::declval<widget_t>().resolve(std::declval<resolve_command&>()));
+
+        template <typename widget_t>
+        constexpr static bool has_resolve_function_v = is_detected_exact_v<void, detected_resolve_function, widget_t>;
+
+        template <typename widget_t>
+        using detected_interact_function = decltype(std::declval<widget_t>().interact(std::declval<interact_command&>()));
+
+        template <typename widget_t>
+        constexpr static bool has_interact_function_v = is_detected_exact_v<void, detected_interact_function, widget_t>;
+
+        template <typename widget_t>
+        using detected_draw_function = decltype(std::declval<widget_t>().draw(std::declval<draw_command&>()));
+
+        template <typename widget_t>
+        constexpr static bool has_draw_function_v = is_detected_exact_v<void, detected_draw_function, widget_t>;
+
+    }
+
+    struct widget_update_data {
+        registry_entity entity = {};
+        std::uintptr_t raw_widget = {};
+        std::unique_ptr<std::type_index> kind = nullptr;
+        std::string kind_debug = ""; // to show type in debugger TODO REMOVE
+        std::optional<std::reference_wrapper<widget_update_data>> parent = std::nullopt;
+        std::vector<std::reference_wrapper<widget_update_data>> children = {};
+        resolve_command resolver_command;
+        std::function<void(resolve_command&)> resolver = nullptr;
+        std::optional<interact_command> interactor_command = std::nullopt;
+        std::function<void(interact_command&)> interactor = nullptr;
+        std::optional<draw_command> drawer_command = std::nullopt;
+        std::function<void(draw_command&)> drawer = nullptr;
+
+#if BUNGEEGUM_USE_HOTSWAP
+        std::function<void(reloaded_loader&)> loader = nullptr;
+        std::unordered_map<std::uintptr_t, std::function<void(reloaded_loader&)>> property_loaders = {};
+        std::function<void(reloaded_saver&)> saver = nullptr;
+        std::unordered_map<std::uintptr_t, std::function<void(reloaded_saver&)>> property_savers = {};
+#endif
+
+#if BUNGEEGUM_USE_OVERLAY
+        std::string clean_typename = {};
+        std::function<std::uintptr_t()> true_ptr = nullptr;
+        std::function<std::size_t()> true_sizeof = nullptr;
+#endif
+    };
+
+    struct widgets_manager {
+        widgets_manager() = default;
+        widgets_manager(const widgets_manager& other) = delete;
+        widgets_manager& operator=(const widgets_manager& other) = delete;
+        widgets_manager(widgets_manager&& other) = delete;
+        widgets_manager& operator=(widgets_manager&& other) = delete;
+
+        [[nodiscard]] bool contains(const std::uintptr_t raw_widget) const;
+
+        template <typename widget_t>
+        [[nodiscard]] widget_reference<widget_t> create_reference_widget(detail::value_type_t<widget_t>& reference);
+
+        template <typename property_t>
+        [[nodiscard]] property_reference<property_t> create_property_reference(detail::value_type_t<property_t>& reference);
+
+        runtime_widget create_runtime_widget(widget_update_data& widget_data);
+
+        void notify_erase(const std::uintptr_t raw_widget);
+
+        [[nodiscard]] widget_update_data& operator[](const std::uintptr_t raw_widget);
+
+        [[nodiscard]] widget_update_data& operator[](const runtime_widget& widget);
+
+        [[nodiscard]] std::uintptr_t raw(const runtime_widget& widget);
+
+        template <typename widget_t>
+        [[nodiscard]] std::uintptr_t raw(widget_t& widget);
+
+        template <typename widget_t>
+        void set_reloadable_raw(widget_t& widget, const std::uintptr_t raw_widget);
+
+        [[nodiscard]] std::uintptr_t& root();
+
+        [[nodiscard]] std::uintptr_t root() const;
+
+        [[nodiscard]] widget_update_data& root_update_data();
+
+        void traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback);
+
+        void traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback,
+            const std::function<void(widget_update_data&)>& tail_iterate_callback);
+
+        registry<registry_entity> widgets = {};
+        std::vector<std::uintptr_t> resolvables = {};
+        std::vector<std::uintptr_t> interactables = {};
+        std::vector<std::uintptr_t> drawables = {};
+
+    private:
+        std::unordered_map<std::uintptr_t, widget_update_data> _updatables = {};
+        std::vector<std::uintptr_t> _updatables_to_erase = {};
+        std::uintptr_t _root = {};
+    };
+}
+}

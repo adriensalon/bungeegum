@@ -1,10 +1,15 @@
 add_subdirectory("glm")
 add_subdirectory("imgui")
 add_subdirectory("implot")
+add_subdirectory("tinyprocess")
 add_subdirectory("tinyspline")
 add_subdirectory("entt")
 add_subdirectory("backwardcpp")
 add_subdirectory("cereal")
+
+set(NFD_INSTALL ON CACHE BOOL "" FORCE)
+add_subdirectory("nfdext")
+set_target_properties(nfd PROPERTIES LINKER_LANGUAGE CXX)
 
 add_subdirectory("hscpp")
 set(HSCPP_EXAMPLES OFF)
@@ -46,4 +51,23 @@ if(BUNGEEGUM_ENABLE_STANDALONE)
 
 	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
 	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
+endif()
+
+if(DEFINED BUNGEEGUM_INSTALL_DIR)
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/cereal/include/cereal/"
+		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/cereal/")
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/entt/src/entt/"
+		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/entt/")
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/glm/glm/"
+		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/glm/")
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/hscpp/include/hscpp/"
+		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/hscpp/")
+	file(
+		COPY "${CMAKE_CURRENT_LIST_DIR}/hscpp/extensions/mem/include/hscpp/mem/"
+		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/hscpp/mem/")
+
 endif()

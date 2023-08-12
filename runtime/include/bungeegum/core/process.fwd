@@ -1,0 +1,38 @@
+#pragma once
+
+#include <vector>
+
+#include <bungeegum/core/interact.hpp>
+#include <bungeegum/core/overlay.fwd>
+
+struct ImDrawList;
+
+namespace bungeegum {
+namespace detail {
+
+    struct process_manager {
+        process_manager() = default;
+        process_manager(const process_manager& other) = delete;
+        process_manager& operator=(const process_manager& other) = delete;
+        process_manager(process_manager&& other) = delete;
+        process_manager& operator=(process_manager&& other) = delete;
+
+        bool update(const std::chrono::milliseconds& delta_time);
+
+        void render();
+
+        std::vector<window_resized_event> window_resized_events = {};
+        std::vector<mouse_moved_event> mouse_moved_events = {};
+        std::vector<mouse_down_event> mouse_down_events = {};
+        std::vector<mouse_up_event> mouse_up_events = {};
+        std::vector<mouse_pressed_event> mouse_pressed_events = {};
+
+    private:
+        void _process_interact();
+
+        void _process_resolve();
+
+        void _process_draw(ImDrawList* imgui_drawlist);
+    };
+}
+}

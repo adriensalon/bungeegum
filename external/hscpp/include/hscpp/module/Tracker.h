@@ -45,18 +45,8 @@ namespace hscpp
         // The SwapHandler is an optional, user-set callback that will be called on runtime swaps.
         std::function<void(SwapInfo& swapInfo)> SwapHandler;
 
-        // Tracker() = default;
         Tracker(const Tracker& rhs) = delete;
         Tracker& operator=(const Tracker& rhs) = delete;
-        // Tracker(Tracker&& rhs)
-        // {
-        //     *this = std::move(rhs);
-        // }
-        // Tracker& operator=(Tracker&& rhs)
-        // {
-        //     m_pTrackedObj = rhs.m_pTrackedObj;
-        //     return *this;
-        // }
 
         Tracker(T* pTrackedObj)
         {

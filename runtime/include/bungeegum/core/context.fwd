@@ -1,0 +1,23 @@
+#pragma once
+
+#include <any>
+#include <string>
+#include <unordered_map>
+
+namespace bungeegum {
+
+namespace detail {
+
+    struct context_manager {
+        context_manager() = default;
+        context_manager(const context_manager& other) = delete;
+        context_manager& operator=(const context_manager& other) = delete;
+        context_manager(context_manager&& other) = delete;
+        context_manager& operator=(context_manager&& other) = delete;
+
+        std::unordered_map<std::string, std::any> untyped_map = {};
+    };
+
+}
+
+}

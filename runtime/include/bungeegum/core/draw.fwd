@@ -1,0 +1,46 @@
+#pragma once
+
+#include <functional>
+#include <optional>
+#include <vector>
+
+#include <bungeegum/core/overlay.fwd>
+#include <bungeegum/glue/simd.hpp>
+
+struct ImDrawList;
+
+namespace bungeegum {
+
+struct runtime_widget;
+
+namespace detail {
+
+    struct process_manager;
+
+#if BUNGEEGUM_USE_OVERLAY
+    struct widget_inspector;
+#endif
+
+    struct draw_command_data {
+
+        void draw(ImDrawList* imgui_drawlist);
+
+        void draw();
+
+        struct clip_data {
+            float2 first_point = zero<float2>;
+            float2 second_point = infinity<float2>;
+            bool1 intersect_with_existing = true;
+        };
+
+        bool is_blocked = false;
+        float2 resolved_position = zero<float2>;
+        float2 resolved_size = zero<float2>;
+        std::vector<std::function<void(ImDrawList*)>> commands = {};
+        std::optional<clip_data> clipping = std::nullopt;
+#if BUNGEEGUM_USE_OVERLAY
+        std::vector<std::pair<std::string, std::vector<std::string>>> commands_infos = {};
+#endif
+    };
+}
+}

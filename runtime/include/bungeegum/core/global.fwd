@@ -1,0 +1,44 @@
+#pragma once
+
+#include <bungeegum/backend/backend.fwd>
+#include <bungeegum/backend/embedded.fwd>
+#include <bungeegum/backend/standalone.fwd>
+#include <bungeegum/core/animation.fwd>
+#include <bungeegum/core/context.fwd>
+#include <bungeegum/core/log.fwd>
+#include <bungeegum/core/process.fwd>
+#include <bungeegum/core/widget.fwd>
+
+namespace bungeegum {
+namespace detail {
+
+    struct global_manager {
+        global_manager() = default;
+        global_manager(const global_manager& other) = delete;
+        global_manager& operator=(const global_manager& other) = delete;
+        global_manager(global_manager&& other) = delete;
+        global_manager& operator=(global_manager&& other) = delete;
+
+        backend_manager backend = {};
+        // embedded_manager embedded = {};
+        standalone_manager standalone = {};
+        animations_manager animations = {};
+        events_manager events = {};
+        logs_manager logs = {};
+        process_manager process = {};
+        widgets_manager widgets = {};
+        context_manager context = {};
+    };
+
+    void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)
+
+#if BUNGEEGUM_USE_HOTSWAP
+    inline global_manager& global() // This has to be inline for reload (?)
+    {
+        return get_global_data<global_manager>();
+    }
+#else
+    global_manager& global();
+#endif
+}
+}

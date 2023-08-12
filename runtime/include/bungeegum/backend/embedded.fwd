@@ -1,0 +1,24 @@
+#pragma once
+
+#include <functional>
+
+#include <bungeegum/glue/time.hpp>
+
+#if !defined(BUNGEEGUM_USE_EMBEDDED)
+#define BUNGEEGUM_USE_EMBEDDED BUNGEEGUM_ENABLE_EMBEDDED
+#endif
+
+#if BUNGEEGUM_USE_EMBEDDED
+
+namespace bungeegum {
+namespace detail {
+
+    struct bungeegum_functor_data {
+
+        detail::stopwatch stopwatch;
+    };
+
+}
+}
+
+#endif

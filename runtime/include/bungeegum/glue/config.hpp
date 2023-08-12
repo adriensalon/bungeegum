@@ -1,0 +1,35 @@
+#pragma once
+
+// backtrace
+#if !defined(BUNGEEGUM_ENABLE_BACKTRACE)
+#define BUNGEEGUM_ENABLE_BACKTRACE 1
+#endif
+
+// hotreload
+#if !defined(BUNGEEGUM_ENABLE_HOTSWAP)
+#define BUNGEEGUM_ENABLE_HOTSWAP 1
+#endif
+
+// overlay
+#if !defined(BUNGEEGUM_ENABLE_OVERLAY)
+#define BUNGEEGUM_ENABLE_OVERLAY 1
+#endif
+
+// backend
+#if !defined(BUNGEEGUM_ENABLE_STANDALONE)
+#define BUNGEEGUM_ENABLE_STANDALONE 1
+#endif
+#if !defined(BUNGEEGUM_ENABLE_EMBEDDED)
+#define BUNGEEGUM_ENABLE_EMBEDDED 1
+#endif
+
+// renderer
+#if !defined(BUNGEEGUM_ENABLE_DIRECTX)
+#define BUNGEEGUM_ENABLE_DIRECTX 1
+#endif
+#if !defined(BUNGEEGUM_ENABLE_VULKAN)
+#define BUNGEEGUM_ENABLE_VULKAN 1
+#endif
+#if !defined(BUNGEEGUM_ENABLE_OPENGL)
+#define BUNGEEGUM_ENABLE_OPENGL 1
+#endif
