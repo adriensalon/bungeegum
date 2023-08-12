@@ -1,4 +1,4 @@
-name: dispatch debug macos
+name: scheduled release macos
 
 on:
   schedule:

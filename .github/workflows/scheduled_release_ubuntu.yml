@@ -1,4 +1,4 @@
-name: dispatch debug ubuntu
+name: scheduled release ubuntu
 
 on:
   schedule:
