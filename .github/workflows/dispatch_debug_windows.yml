@@ -1,4 +1,4 @@
-name: windows
+name: dispatch debug windows
 
 on:
   workflow_dispatch
