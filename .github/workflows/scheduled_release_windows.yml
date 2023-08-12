@@ -1,4 +1,4 @@
-name: windows
+name: scheduled release windows
 
 on:
   schedule:
