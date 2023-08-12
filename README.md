@@ -3,9 +3,9 @@ bungeegum
 	
 ![licence badge](https://img.shields.io/badge/licence-MIT-blue?style=for-the-badge)
 ![cpp badge](https://img.shields.io/badge/C%2B%2B-17-blue?style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/windows.yml?label=windows&style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/macos.yml?label=macos&style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/ubuntu.yml?label=ubuntu&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/scheduled_release_windows.yml?label=windows&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/scheduled_release_macos.yml?label=macos&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/scheduled_release_ubuntu.yml?label=ubuntu&style=for-the-badge)
 	
 _bungeegum_ is a cross-platform C++17 library that offers a minimal and modular approach to implementing GUI widgets. It ships with a collection of widgets that mimic those of Flutter. Events and animations help facilitate synchronous and asynchronous operations that modify the GUI state and update changes on the screen. Additionally, a more advanced interface enables developers to augment widgets with lower-level functionalities. 
 
