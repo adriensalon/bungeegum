@@ -62,7 +62,7 @@ namespace detail {
         return *this;
     }
 
-    const char* backtraced_exception::what() const
+    const char* backtraced_exception::what() const noexcept
     {
         return _what.c_str();
     }

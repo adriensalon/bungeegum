@@ -58,7 +58,7 @@ namespace detail {
         backtraced_exception(const std::exception& existing, const std::size_t tracing_offset = 0u, const std::size_t tracing_size = BUNGEEGUM_USE_BACKTRACE_SIZE);
 
         /// @brief Gets the error message.
-        [[nodiscard]] const char* what() const;
+        [[nodiscard]] const char* what() const noexcept;
 
         /// @brief Data resulting from tracing.
         std::vector<backtraced_result> tracing;
