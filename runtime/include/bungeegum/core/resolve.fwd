@@ -3,7 +3,7 @@
 #include <functional>
 
 #include <bungeegum/core/overlay.fwd>
-#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/core/simd.hpp>
 
 namespace bungeegum {
 

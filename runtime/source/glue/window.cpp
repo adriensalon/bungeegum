@@ -8,7 +8,9 @@
 #else
 #include <SDL.h>
 #if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
+#include "windows.h"
 #include <SDL_syswm.h>
+
 #endif
 #endif
 
@@ -109,6 +111,11 @@ namespace detail {
         //
     }
 #endif
+
+    window window::create()
+    {
+        return window();
+    }
 
 #if BUNGEEGUM_USE_WINDOW_NATIVE
     window::window(SDL_Window* sdl_window)

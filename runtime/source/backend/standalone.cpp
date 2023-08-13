@@ -61,7 +61,7 @@ float2 standalone_app::viewport()
 }
 
 #if BUNGEEGUM_USE_STANDALONE
-void launch(const runtime_widget& widget)
+void launch(const runtime_widget& widget, const renderer_backend backend)
 {
     ///
     ///
@@ -74,12 +74,22 @@ void launch(const runtime_widget& widget)
     detail::global().logs.protect_library([&]() {
         detail::global().widgets.root() = detail::global().widgets.raw(widget);
         detail::stopwatch _stopwatch;
-        detail::window _window;
+        detail::window _window = detail::window::create();
         detail::global().backend.viewport_size = _window.get_size();
 
         // !!!!!!!!!!!!!!!!
         // !!!!!!!!!!!!!!!!
         // !!!!!!!!!!!!!!!!
+		(void)backend;
+		// switch (backend)
+		// {
+		// // case renderer_backend::directx11:
+		// // 	detail::renderer_backend _renderer = detail::renderer::create_directx11(_window);
+		// // 	break;
+		
+		// default:
+		// 	break;
+		// }
         detail::renderer _renderer = detail::renderer::create_directx11(_window);
 
 #if BUNGEEGUM_USE_HOTSWAP

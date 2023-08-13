@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/core/simd.hpp>
 #include <bungeegum/glue/toolchain.hpp>
 
 /// @brief Defines if we use a native window.
@@ -57,12 +57,45 @@ namespace detail {
     /// at runtime, collect OS events such as input, and swap buffers after rendering has finished.
     /// @details Instances of this struct can only be moved.
     struct window {
+	private:
         window();
+	
+	public:
         window(const window& other) = delete;
         window& operator=(const window& other) = delete;
         window(window&& other) = default;
         window& operator=(window&& other) = default;
         ~window();
+
+		static window create();
+
+#if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
+
+        /// @brief 
+        /// @param hwnd 
+        /// @return 
+        static window attach_windows(void* hwnd);
+
+#elif TOOLCHAIN_PLATFORM_MACOS
+
+        static window attach_macos(void* nswindow);
+
+#elif TOOLCHAIN_PLATFORM_LINUX
+
+        static window attach_linux(void* x11window);
+
+#elif TOOLCHAIN_PLATFORM_ANDROID
+
+        static window attach_android(void* anativewindow);
+
+#elif TOOLCHAIN_PLATFORM_IOS
+
+        static window attach_ios(void* uiwindow);
+
+#elif TOOLCHAIN_PLATFORM_EMSCRIPTEN
+
+        static window attach_emscripten();
+#endif
 
 #if BUNGEEGUM_USE_WINDOW_NATIVE
         /// @brief Creates an instance from an opaque OS window.

@@ -5,7 +5,7 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
-#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/core/simd.hpp>
 
 namespace bungeegum {
 namespace detail {

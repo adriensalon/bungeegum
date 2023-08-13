@@ -262,11 +262,11 @@ namespace detail {
         void draw_tabs(const float frame_height_without_padding = ImGui::GetFontSize())
         {
             if (ImGui::BeginTabBar(tag("tabs").c_str())) {
-                draw_defines(defines(), frame_height_without_padding);
-                draw_paths<true>("include dirs", include_directories(), frame_height_without_padding);
-                draw_paths<true>("source dirs", source_directories(), frame_height_without_padding);
-                draw_paths<false>("source files", force_compiled_source_files(), frame_height_without_padding, { { "Source File", { "c", "cpp", "cxx", "c++", "cc" } } });
-                draw_paths<false>("libraries", libraries(), frame_height_without_padding, { { "Library", { "lib", "dll" } } });
+                draw_defines(hotswap::defines(), frame_height_without_padding);
+                draw_paths<true>("include dirs", hotswap::include_directories(), frame_height_without_padding);
+                draw_paths<true>("source dirs", hotswap::source_directories(), frame_height_without_padding);
+                draw_paths<false>("source files", hotswap::force_compiled_source_files(), frame_height_without_padding, { { "Source File", { "c", "cpp", "cxx", "c++", "cc" } } });
+                draw_paths<false>("libraries", hotswap::libraries(), frame_height_without_padding, { { "Library", { "lib", "dll" } } });
             }
             ImGui::EndTabBar();
         }

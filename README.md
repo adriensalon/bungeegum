@@ -7,7 +7,7 @@ bungeegum
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/scheduled_release_macos.yml?label=macos&style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/adriensalon/bungeegum/scheduled_release_ubuntu.yml?label=ubuntu&style=for-the-badge)
 	
-_bungeegum_ is a cross-platform C++17 library that offers a minimal and modular approach to implementing GUI widgets. It ships with a collection of widgets that mimic those of Flutter. Events and animations help facilitate synchronous and asynchronous operations that modify the GUI state and update changes on the screen. Additionally, a more advanced interface enables developers to augment widgets with lower-level functionalities. 
+_bungeegum_ is a cross-platform C++17 GUI library that offers a minimal and modular approach to implementing GUI widgets. It ships with a collection of widgets that mimic those of Flutter. Events and animations help facilitate synchronous and asynchronous operations that modify the GUI state and update changes on the screen. Additionally, a more advanced interface enables developers to augment widgets with lower-level functionalities. 
 
 When a user interacts with the GUI, events are dispatched to the relevant widgets. These widgets can then react to the events and/or pass them on to their children. Widgets that require updating can modify their layout, following [Flutter's BoxLayout model](https://docs.flutter.dev/development/ui/layout/constraints), where widgets provide minimum and maximum size constraints to their children, who return the size they've chosen to their parent, which then positions them accordingly. Widgets that require redrawing can make changes to their draw command by submitting primitives, images, text, and other elements. 
 
@@ -98,7 +98,7 @@ __Accessibility__
 - 📕 Semantics  
 
 __Animation and motion__
-- 📕 AnimatedAlign
+- 📙 AnimatedAlign
 - 📕 AnimatededBuilder
 - 📕 AnimatedContainer
 - 📕 AnimatedCrossFade
@@ -121,7 +121,7 @@ __Animation and motion__
 __Assets, Images and Icons__
 - 📕 AssetBundle ?
 - 📕 Icon
-- 📕 Image
+- 📙 Image
 - 📕 RawImage
 
 __Async__
@@ -130,12 +130,13 @@ __Async__
 
 __Basics__
 - 📙 Container
-- 📕 MediaQuery
-- 📕 Placeholder
+- 📙 MediaQuery
+- 📙 Placeholder
+- 📙 SafeArea
 
 __Input__
-- 📕 Form
-- 📕 FormField
+- 📙 Form
+- 📙 FormField
 - 📕 RawKeyboardListener
 
 __Interaction model__

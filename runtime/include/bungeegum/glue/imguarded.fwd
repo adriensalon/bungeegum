@@ -2,7 +2,7 @@
 
 struct ImFont;
 
-#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/core/simd.hpp>
 
 namespace bungeegum {
 namespace detail {

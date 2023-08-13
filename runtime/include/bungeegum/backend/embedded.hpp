@@ -7,7 +7,7 @@
 namespace bungeegum {
 
 /// @brief
-struct bungeegum_functor {
+struct embedded_screen {
 
     /// @brief
     inline void operator()();
@@ -25,15 +25,16 @@ struct bungeegum_functor {
 private:
     detail::bungeegum_functor_data _data;
     template <typename widget_t>
-    friend bungeegum_functor embed(widget_t& widget);
+    friend embedded_screen embed(widget_t& widget);
 };
+
 
 /// @brief
 /// @tparam widget_t
 /// @param widget
 /// @return
 template <typename widget_t>
-bungeegum_functor embed(widget_t& widget);
+embedded_screen embed(widget_t& widget, void* native_window = nullptr, const renderer_backend backend = preferred_renderer_backend);
 }
 
 #include <bungeegum/backend/embedded.inl>

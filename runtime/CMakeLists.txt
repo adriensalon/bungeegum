@@ -26,7 +26,6 @@ set(bungeegum_runtime_source
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"
 	"source/glue/dialog.cpp"
-	"source/glue/curve.cpp"
 	"source/glue/imguarded.cpp"
 	"source/glue/regex.cpp"
 	"source/glue/reload.cpp"
@@ -36,6 +35,7 @@ set(bungeegum_runtime_source
 	"source/glue/window.cpp"
 
 	"source/core/animation.cpp"
+	"source/core/curve.cpp"
 	"source/core/draw.cpp"
 	"source/core/event.cpp"
 	"source/core/global.cpp"

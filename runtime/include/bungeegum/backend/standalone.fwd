@@ -6,6 +6,7 @@
 #include <bungeegum/backend/backend.fwd>
 #include <bungeegum/glue/config.hpp>
 #include <bungeegum/glue/window.hpp>
+#include <bungeegum/glue/renderer.hpp>
 
 #if !defined(BUNGEEGUM_USE_STANDALONE)
 #define BUNGEEGUM_USE_STANDALONE BUNGEEGUM_ENABLE_STANDALONE

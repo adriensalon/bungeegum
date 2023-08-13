@@ -93,34 +93,38 @@ namespace detail {
 }
 
 #if BUNGEEGUM_USE_HOTSWAP
-std::vector<std::string>& defines()
-{
-    detail::setup_global_if_required();
-    return detail::global().backend.reload_manager->defines();
-}
+namespace hotswap {
 
-std::vector<std::filesystem::path>& include_directories()
-{
-    detail::setup_global_if_required();
-    return detail::global().backend.reload_manager->include_directories();
-}
+    std::vector<std::string>& defines()
+    {
+        detail::setup_global_if_required();
+        return detail::global().backend.reload_manager->defines();
+    }
 
-std::vector<std::filesystem::path>& libraries()
-{
-    detail::setup_global_if_required();
-    return detail::global().backend.reload_manager->libraries();
-}
+    std::vector<std::filesystem::path>& include_directories()
+    {
+        detail::setup_global_if_required();
+        return detail::global().backend.reload_manager->include_directories();
+    }
 
-std::vector<std::filesystem::path>& source_directories()
-{
-    detail::setup_global_if_required();
-    return detail::global().backend.reload_manager->source_directories();
-}
+    std::vector<std::filesystem::path>& libraries()
+    {
+        detail::setup_global_if_required();
+        return detail::global().backend.reload_manager->libraries();
+    }
 
-std::vector<std::filesystem::path>& force_compiled_source_files()
-{
-    detail::setup_global_if_required();
-    return detail::global().backend.reload_manager->force_compiled_source_files();
+    std::vector<std::filesystem::path>& source_directories()
+    {
+        detail::setup_global_if_required();
+        return detail::global().backend.reload_manager->source_directories();
+    }
+
+    std::vector<std::filesystem::path>& force_compiled_source_files()
+    {
+        detail::setup_global_if_required();
+        return detail::global().backend.reload_manager->force_compiled_source_files();
+    }
+
 }
 #endif
 }

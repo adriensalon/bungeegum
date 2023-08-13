@@ -2,7 +2,7 @@
 
 #include <tinysplinecxx.h>
 
-#include <bungeegum/glue/curve.hpp>
+#include <bungeegum/core/curve.hpp>
 
 namespace bungeegum {
 
@@ -71,9 +71,32 @@ curve::curve(const float1 departure, const float1 arrival, const std::vector<flo
     _data->bspline = tinyspline::BSpline::interpolateCubicNatural(_controls_data, 2);
 }
 
-float2 curve::evaluate(const float1 fraction)
+curve curve::linear()
 {
-    float1 _clamped = math::min(1.f, math::max(0.f, fraction));
+    return curve({ { 0.f, 0.f }, { 1.f, 1.f } });
+}
+
+curve curve::bounce_in()
+{
+    return curve(
+        {
+            { 0.f, 0.f },
+            { 0.5f, 0.8f },
+            { 0.8f, 0.6f },
+            { 1.f, 1.f },
+        }); // TODOOOOO
+}
+
+float1 curve::evaluate_1d(const float1 fraction)
+{
+    float1 _clamped = math::clamp(fraction, 0.f, 1.f);
+    const std::vector<float1>& _result_data = _data->bspline.bisect(_clamped).result();
+    return _result_data[1];
+}
+
+float2 curve::evaluate_2d(const float1 fraction)
+{
+    float1 _clamped = math::clamp(fraction, 0.f, 1.f);
     const std::vector<float1>& _result_data = _data->bspline.eval(_clamped).result();
     return { _result_data[0], _result_data[1] };
 }

@@ -5,7 +5,7 @@
 
 #include <bungeegum/core/event.fwd>
 #include <bungeegum/core/overlay.fwd>
-#include <bungeegum/glue/curve.hpp>
+#include <bungeegum/core/curve.hpp>
 
 namespace bungeegum {
 namespace detail {

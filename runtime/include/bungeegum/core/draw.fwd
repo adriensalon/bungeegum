@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <bungeegum/core/overlay.fwd>
-#include <bungeegum/glue/simd.hpp>
+#include <bungeegum/core/simd.hpp>
 
 struct ImDrawList;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bungeegum/backend/standalone.fwd>
+#include <bungeegum/backend/backend.hpp>
 
 namespace bungeegum {
 
@@ -28,7 +29,7 @@ struct standalone_app {
 #if BUNGEEGUM_USE_STANDALONE
 
 /// @brief Starts an infinite loop
-void launch(const runtime_widget& widget);
+void launch(const runtime_widget& widget, const renderer_backend backend = preferred_renderer_backend);
 
 #endif
 }

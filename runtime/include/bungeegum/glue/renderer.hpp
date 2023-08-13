@@ -2,8 +2,8 @@
 
 #include <memory>
 
+#include <bungeegum/core/simd.hpp>
 #include <bungeegum/glue/config.hpp>
-#include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/toolchain.hpp>
 #include <bungeegum/glue/window.hpp>
 
@@ -23,6 +23,45 @@
 #endif
 
 namespace bungeegum {
+
+/// @brief
+enum struct renderer_backend {
+#if BUNGEEGUM_USE_DIRECTX
+    directx11,
+    directx12,
+#endif
+#if BUNGEEGUM_USE_OPENGL
+    opengl,
+    opengles,
+#endif
+#if BUNGEEGUM_USE_VULKAN
+    vulkan
+#endif
+};
+}
+
+#if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
+#define BUNGEEGUM_USE_PREFERRED_RENDERER_BACKEND renderer_backend::directx11
+#elif TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_MACOS
+#if BUNGEEGUM_USE_VULKAN
+#define BUNGEEGUM_USE_PREFERRED_RENDERER_BACKEND renderer_backend::vulkan
+#elif BUNGEEGUM_USE_OPENGL
+#define BUNGEEGUM_USE_PREFERRED_RENDERER_BACKEND renderer_backend::opengl
+#else
+#error "Linux or MacOS but no vulkan nor opengl"
+#endif
+#elif TOOLCHAIN_PLATFORM_IOS || TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if BUNGEEGUM_USE_OPENGL
+#define BUNGEEGUM_USE_PREFERRED_RENDERER_BACKEND renderer_backend::opengles
+#else
+#error "Emscripten or iOS but no opengles"
+#endif
+#endif
+
+namespace bungeegum {
+
+constexpr renderer_backend preferred_renderer_backend = BUNGEEGUM_USE_PREFERRED_RENDERER_BACKEND;
+
 namespace detail {
 
     /// @brief Instances of this struct represent cross-platform GPU renderers that will select the
@@ -47,10 +86,10 @@ namespace detail {
         static renderer create_directx12(const window& existing);
 
         /// @brief Creates an instance from an existing DirectX 11 context.
-        static renderer attach_directx11(void*, void*);
+        static renderer attach_directx11(const window& existing, void*, void*);
 
         /// @brief Creates an instance from an existing DirectX 12 context.
-        static renderer attach_directx12(void*, void*);
+        static renderer attach_directx12(const window& existing, void*, void*);
 #endif
 
 #if BUNGEEGUM_USE_OPENGL
@@ -58,7 +97,7 @@ namespace detail {
         static renderer create_opengl(const window& existing);
 
         /// @brief Creates an instance from an existing OpenGL context.
-        static renderer attach_opengl();
+        static renderer attach_opengl(const window& existing);
 #endif
 
 #if BUNGEEGUM_USE_VULKAN

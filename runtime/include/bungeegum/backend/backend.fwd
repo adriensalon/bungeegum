@@ -7,9 +7,10 @@
 
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.fwd>
+#include <bungeegum/core/simd.hpp>
 #include <bungeegum/glue/reload.hpp>
-#include <bungeegum/glue/simd.hpp>
 #include <bungeegum/glue/time.hpp>
+#include <bungeegum/glue/toolchain.hpp>
 
 namespace bungeegum {
 namespace detail {

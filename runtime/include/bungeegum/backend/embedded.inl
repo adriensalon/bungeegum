@@ -6,7 +6,7 @@
 
 namespace bungeegum {
 
-void bungeegum_functor::operator()()
+void embedded_screen::operator()()
 {
     std::chrono::microseconds _max_fps_period_microseconds = std::chrono::microseconds(static_cast<unsigned int>(
         std::floorf(1000000.f / 60.f /* MAX FPS !!!*/)));
@@ -17,9 +17,9 @@ void bungeegum_functor::operator()()
 }
 
 template <typename widget_t>
-bungeegum_functor embed(widget_t& widget)
+embedded_screen embed(widget_t& widget)
 {
-    bungeegum_functor _functor;
+    embedded_screen _functor;
     // detail::protect_library([&]() {
     detail::global_widgets_manager.root = detail::global_widgets_manager.get(widget);
     detail::setup_overlay();

@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <bungeegum/glue/time.hpp>
+#include <bungeegum/glue/renderer.hpp>
 
 #if !defined(BUNGEEGUM_USE_EMBEDDED)
 #define BUNGEEGUM_USE_EMBEDDED BUNGEEGUM_ENABLE_EMBEDDED
@@ -14,7 +15,10 @@ namespace bungeegum {
 namespace detail {
 
     struct bungeegum_functor_data {
-
+		
+		// window if not virtual
+		// renderer
+		// framebuffer / texture if virtual
         detail::stopwatch stopwatch;
     };
 

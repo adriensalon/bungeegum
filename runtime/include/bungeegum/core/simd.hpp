@@ -126,4 +126,4 @@ template <typename value_t>
 std::string to_string(const value_t& value);
 }
 
-#include <bungeegum/glue/simd.inl>
+#include <bungeegum/core/simd.inl>

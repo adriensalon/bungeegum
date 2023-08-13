@@ -7,9 +7,9 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/overlay.fwd>
+#include <bungeegum/core/simd.hpp>
 #include <bungeegum/glue/imguarded.fwd>
 #include <bungeegum/glue/regex.hpp>
-#include <bungeegum/glue/simd.hpp>
 
 
 #define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGE_LENGTH 300u

@@ -32,6 +32,9 @@ struct animation {
     /// @brief Sets the minimum value corresponding to y = 0.f on the curve.
     animation& min(value_t&& min_value);
 
+    /// @brief Sets the animation_mode for this instance. Default value is forward.
+	animation& mode(const animation_mode mode);
+
     /// @brief Emplaces new callbacks from an event to be fired when the animation is playing and
     /// the value has changed.
     animation& on_value_changed(const event<value_t>& value_changed_event);
@@ -59,6 +62,7 @@ struct animation {
 
 private:
     detail::animation_data<value_t> _data;
+	animation_mode _mode = animation_mode::forward;
 };
 }
 

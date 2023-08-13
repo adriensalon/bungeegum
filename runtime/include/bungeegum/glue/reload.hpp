@@ -21,10 +21,10 @@
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
+#include <bungeegum/core/simd.hpp>
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/foreach.hpp>
 #include <bungeegum/glue/serialize.hpp>
-#include <bungeegum/glue/simd.hpp>
 
 /// @brief Implements hotswapping functionnality to structs that use this macro among public or
 /// private fields. Variadic parameters are fields of this struct that we want to be serialized

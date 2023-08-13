@@ -108,12 +108,12 @@ int main()
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_STANDALONE 1");
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
 
-    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
-    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
-    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
-    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
-    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
-    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/runtime/include/");
+    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
+    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
+    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
+    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
+    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
+    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/runtime/include/");
 
     // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Release/bungeegum_runtime.lib");
     // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Release/bungeegum_widgets.lib");
@@ -121,16 +121,16 @@ int main()
     // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Release/hscpp-mem.lib");
     // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Release/imgui.lib");
 
-    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Debug/bungeegum_runtime.lib");
-    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Debug/bungeegum_widgets.lib");
-    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
-    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
-    bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
+    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Debug/bungeegum_runtime.lib");
+    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Debug/bungeegum_widgets.lib");
+    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
+    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
+    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
 
-    bungeegum::include_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/include/");
-    bungeegum::source_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/");
-    bungeegum::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
-    bungeegum::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
+    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/include/");
+    bungeegum::hotswap::source_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/");
+    bungeegum::hotswap::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
+    bungeegum::hotswap::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
 
     bungeegum::launch(bungeegum::make<Title>()
 
@@ -156,6 +156,7 @@ int main()
                                                            .builder([](const bool value) -> bungeegum::runtime_widget {
                                                                if (value) {
                                                                    static bungeegum::animation<float> _myanim;
+																   _myanim.shape(bungeegum::curve::bounce_in());
                                                                    _myanim.duration<std::chrono::seconds>(10).min(0.f).max(88.f).start();
                                                                    static auto fff = std::async([]() {
                                                                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));

@@ -28,7 +28,8 @@ namespace detail {
                 return;
             }
             float _frac = data.playing_cursor_seconds / data.duration_seconds;
-            float2 _curve_eval = data.eval_curve.evaluate(_frac);
+            float2 _curve_eval = {_frac, data.eval_curve.evaluate_1d(_frac)};
+
 #if BUNGEEGUM_USE_OVERLAY
             update_data.overlay_position = { _curve_eval.x, _curve_eval.y };
             update_data.overlay_samples = data.eval_curve.strided_samples(100);
@@ -105,6 +106,13 @@ template <typename value_t>
 animation<value_t>& animation<value_t>::max(value_t&& max_value)
 {
     _data.max_value = std::make_unique<value_t>(std::forward<value_t>(max_value));
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::mode(const animation_mode mode)
+{
+    _mode = mode;
     return *this;
 }
 
