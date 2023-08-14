@@ -31,6 +31,8 @@
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 
+#include <bungeegum/glue/foreach.hpp>
+
 namespace bungeegum {
 namespace detail {
 
@@ -40,7 +42,7 @@ namespace detail {
         std::vector<std::string> _names = split_names(names);
         std::tuple<fields_t&...> _tuple((fields)...);
         constexpr std::size_t _count = std::variant_size_v<std::variant<fields_t...>>;
-        bungeegum::detail::constexpr_for<0, _count, 1>([&](auto _index) {
+        constexpr bungeegum::detail::constexpr_for<0, _count, 1>([&](auto _index) {
             using field_type_t = std::variant_alternative_t<_index, std::variant<fields_t...>>;
 
             //
