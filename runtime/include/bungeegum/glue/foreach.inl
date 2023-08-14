@@ -14,16 +14,16 @@ namespace detail {
         }
     }
 
-    template <typename... values_t, typename function_t>
-    constexpr void constexpr_foreach(function_t&& function, values_t&... values)
-    {
-        std::tuple<values_t&...> _tuple((values)...);
-        constexpr std::size_t _count = std::variant_size_v<std::variant<values_t...>>;
-        constexpr_for<0, _count, 1>([&](const std::size_t _index) {
-            using child_type_t = std::variant_alternative_t<_index, std::variant<values_t...>>;
-            child_type_t& _child = std::get<_index>(_tuple);
-            function(_child);
-        });
-    }
+    // template <typename... values_t, typename function_t>
+    // constexpr void constexpr_foreach(function_t&& function, values_t&... values)
+    // {
+    //     std::tuple<values_t&...> _tuple((values)...);
+    //     constexpr std::size_t _count = std::variant_size_v<std::variant<values_t...>>;
+    //     constexpr_for<0, _count, 1>([&](const std::size_t _index) {
+    //         using child_type_t = std::variant_alternative_t<_index, std::variant<values_t...>>;
+    //         child_type_t& _child = std::get<_index>(_tuple);
+    //         function(_child);
+    //     });
+    // }
 }
 }

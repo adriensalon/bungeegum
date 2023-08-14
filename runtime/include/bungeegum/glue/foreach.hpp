@@ -18,8 +18,8 @@ namespace detail {
     /// @tparam ...values_t are the typed values to iterate through.
     /// @tparam function_t is the functor type to invoke on each iteration, taking an auto
     /// parameter representing the current value.
-    template <typename... values_t, typename function_t>
-    constexpr void constexpr_foreach(function_t&& function, values_t&... values);
+    // template <typename... values_t, typename function_t>
+    // constexpr void constexpr_foreach(function_t&& function, values_t&... values);
 
 }
 }
