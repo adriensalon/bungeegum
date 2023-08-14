@@ -25,6 +25,10 @@
 #define PLATFORM_IOS
 #endif
 
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
 #include <Common/interface/RefCntAutoPtr.hpp>
 #include <Graphics/GraphicsEngineD3D11/interface/EngineFactoryD3D11.h>
 #include <Graphics/GraphicsEngineD3D12/interface/EngineFactoryD3D12.h>
@@ -33,6 +37,9 @@
 #include <ImGui/interface/ImGuiDiligentRenderer.hpp>
 #include <ImGui/interface/ImGuiImplDiligent.hpp>
 #include <ImGui/interface/ImGuiImplSDL.hpp>
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic pop
+#endif
 
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/renderer.hpp>
