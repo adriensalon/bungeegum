@@ -99,7 +99,7 @@ __Accessibility__
 
 __Animation and motion__
 - 📙 AnimatedAlign
-- 📕 AnimatededBuilder
+- 📙 AnimatededBuilder
 - 📕 AnimatedContainer
 - 📕 AnimatedCrossFade
 - 📕 AnimatedDefaultTextStyle

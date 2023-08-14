@@ -1,5 +1,3 @@
-#pragma once
-
 #include <bungeegum/backend/standalone.hpp>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>

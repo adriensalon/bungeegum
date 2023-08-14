@@ -1,5 +1,3 @@
-#pragma once
-
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/overlay.fwd>

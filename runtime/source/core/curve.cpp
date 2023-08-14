@@ -1,5 +1,3 @@
-#pragma once
-
 #include <tinysplinecxx.h>
 
 #include <bungeegum/core/curve.hpp>
