@@ -172,8 +172,8 @@ namespace detail {
         reloaded_loader() = delete;
         reloaded_loader(const reloaded_loader& other) = delete;
         reloaded_loader& operator=(const reloaded_loader& other) = delete;
-        reloaded_loader(reloaded_loader&& other) = default;
-        reloaded_loader& operator=(reloaded_loader&& other) = default;
+        reloaded_loader(reloaded_loader&& other) = delete;
+        reloaded_loader& operator=(reloaded_loader&& other) = delete;
 
         /// @brief Creates an instance of this struct from a file path.
         reloaded_loader(const std::filesystem::path& archive_path);
@@ -200,8 +200,8 @@ namespace detail {
         reloaded_saver() = delete;
         reloaded_saver(const reloaded_saver& other) = delete;
         reloaded_saver& operator=(const reloaded_saver& other) = delete;
-        reloaded_saver(reloaded_saver&& other) = default;
-        reloaded_saver& operator=(reloaded_saver&& other) = default;
+        reloaded_saver(reloaded_saver&& other) = delete;
+        reloaded_saver& operator=(reloaded_saver&& other) = delete;
 
         /// @brief Creates an instance of this struct from a file path.
         reloaded_saver(const std::filesystem::path& archive_path);
