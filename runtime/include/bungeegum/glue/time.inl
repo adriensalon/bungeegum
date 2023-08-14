@@ -64,7 +64,7 @@ namespace detail {
                                        "begin_task() method. Please use the end_task() method "
                                        "before starting it again.");
         }
-        _task._watch.lap<unit_t>();
+        _task._watch.template lap<unit_t>();
         _task._is_running = true;
     }
 
@@ -77,7 +77,7 @@ namespace detail {
                                        "end_task() method. Please use the begin_task() method "
                                        "before ending it again.");
         }
-        unit_t _duration = _task._watch.lap<unit_t>();
+        unit_t _duration = _task._watch.template lap<unit_t>();
         _task.duration += _duration;
         _task._is_running = false;
     }

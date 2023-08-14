@@ -24,10 +24,9 @@ namespace detail {
 
     std::string timestamp::formatted(const std::string& format) const
     {
-        std::tm _ltime;
-        localtime_s(&_ltime, &_time); // hmmmmmm
         std::ostringstream _sstream;
-        _sstream << std::put_time(&_ltime, format.c_str());
+        const std::tm* _ltime = std::localtime(&_time);
+        _sstream << std::put_time(_ltime, format.c_str());
         return _sstream.str();
     }
 
