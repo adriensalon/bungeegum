@@ -36,25 +36,30 @@
 namespace bungeegum {
 namespace detail {
 
+    // template <typename archive_t, typename field_t>
+	// void serialize_field()
+
     template <typename archive_t, typename... fields_t>
     void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields)
     {
         std::vector<std::string> _names = split_names(names);
         std::tuple<fields_t&...> _tuple((fields)...);
         constexpr std::size_t _count = std::variant_size_v<std::variant<fields_t...>>;
-        constexpr bungeegum::detail::constexpr_for<0, _count, 1>([&](auto _index) {
-            using field_type_t = std::variant_alternative_t<_index, std::variant<fields_t...>>;
+        constexpr_for<0, _count, 1>([&archive, &_names, &_tuple](auto _index) {
+            std::integral_constant<std::size_t, _index> _constexpr_index;
+
+			using field_type_t = std::variant_alternative_t<_constexpr_index(), std::variant<fields_t...>>;
 
             //
             // static assert field not const :)
             //
 
-            field_type_t& _field = std::get<_index>(_tuple);
+            field_type_t& _field = std::get<_constexpr_index()>(_tuple);
 
 
 			
             try {
-                archive(cereal::make_nvp(_names[_index].c_str(), _field));
+                archive(cereal::make_nvp(_names[_constexpr_index()].c_str(), _field));
             } catch (...) {
                 std::cout << "error detected :) \n";
             }
