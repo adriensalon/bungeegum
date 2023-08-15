@@ -10,11 +10,11 @@
 namespace bungeegum {
 namespace detail {
 
-    void console_log_error(backtraced_exception&& exception);
+    void console_log_error(const backtraced_exception& exception);
 
-    void console_log_warning(backtraced_exception&& exception);
+    void console_log_warning(const backtraced_exception& exception);
 
-    void console_log_message(backtraced_exception&& exception);
+    void console_log_message(const backtraced_exception& exception);
 
     struct logs_manager {
         logs_manager() = default;

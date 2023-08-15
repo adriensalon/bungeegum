@@ -78,19 +78,21 @@ namespace detail {
 
 #elif TOOLCHAIN_PLATFORM_MACOS
 
-        static window attach_macos(void* nswindow);
+        static window attach_macos(void* ns_window);
 
 #elif TOOLCHAIN_PLATFORM_LINUX
 
-        static window attach_linux(void* x11window);
+        static window attach_linux_x11(void* x11_window);
+
+        static window attach_linux_wayland(void* wayland_window);
 
 #elif TOOLCHAIN_PLATFORM_ANDROID
 
-        static window attach_android(void* anativewindow);
+        static window attach_android(void* a_native_window);
 
 #elif TOOLCHAIN_PLATFORM_IOS
 
-        static window attach_ios(void* uiwindow);
+        static window attach_ios_uikit(void* ui_window);
 
 #elif TOOLCHAIN_PLATFORM_EMSCRIPTEN
 

@@ -27,6 +27,7 @@ namespace widgets {
 
 #if defined(__HOTRELOADING__)
         // std::cout << "oui" << std::endl;
+		log_message("from hotreload");
 #endif
         // std::cout << bungeegum::detail::animations_manager::stat_test++ << std::endl;
         // std::cout << bungeegum::detail::global().animations.stat_test++ << std::endl;

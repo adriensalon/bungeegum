@@ -100,8 +100,8 @@ __Accessibility__
 __Animation and motion__
 - 📙 AnimatedAlign
 - 📙 AnimatededBuilder
-- 📕 AnimatedContainer
-- 📕 AnimatedCrossFade
+- 📙 AnimatedContainer
+- 📙 AnimatedCrossFade
 - 📕 AnimatedDefaultTextStyle
 - 📕 AnimatedList
 - 📕 AnimatedModalBarrier
@@ -117,6 +117,7 @@ __Animation and motion__
 - 📕 ScaleTransition
 - 📕 SizeTransition
 - 📕 SlideTransition
+- 📙 TweenAnimationBuilder
 
 __Assets, Images and Icons__
 - 📕 AssetBundle ?

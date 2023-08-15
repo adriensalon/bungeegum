@@ -26,6 +26,7 @@
 #include <bungeegum_widgets/widgets/SizedBox.hpp>
 #include <bungeegum_widgets/widgets/StreamBuilder.hpp>
 #include <bungeegum_widgets/widgets/Title.hpp>
+#include <bungeegum_widgets/widgets/TweenAnimationBuilder.hpp>
 
 
 // material

@@ -42,10 +42,10 @@ namespace detail {
     /// @details Instances of this struct can only be moved.
     struct backtraced_exception : public std::exception {
         backtraced_exception() = delete;
-        backtraced_exception(const backtraced_exception& other) = delete;
-        backtraced_exception& operator=(const backtraced_exception& other) = delete;
-        backtraced_exception(backtraced_exception&& other);
-        backtraced_exception& operator=(backtraced_exception&& other);
+        backtraced_exception(const backtraced_exception& other) = default;
+        backtraced_exception& operator=(const backtraced_exception& other) = default;
+        backtraced_exception(backtraced_exception&& other) = default;
+        backtraced_exception& operator=(backtraced_exception&& other) = default;
 
         /// @brief Creates an instance from an error message and the count of calls to backtrace.
         backtraced_exception(const std::string& what, const std::size_t tracing_offset = 0u, const std::size_t tracing_size = BUNGEEGUM_USE_BACKTRACE_SIZE);

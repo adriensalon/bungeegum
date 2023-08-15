@@ -6,6 +6,7 @@
 #include <implot_internal.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+// #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/regex.hpp>
@@ -264,6 +265,9 @@ namespace detail {
 
     void draw_profiler_overlay()
     {
+		// if (ImGui::Button("Throw backtraced error in library")) {
+		// 	throw backtraced_exception("lol");
+		// }
         ImGui::SetNextWindowSize({ 700, 350 }, ImGuiCond_Once);
         if (ImGui::Begin(("profiler" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             static float _history = 10.f;

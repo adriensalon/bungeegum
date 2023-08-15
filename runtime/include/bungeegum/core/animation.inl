@@ -24,11 +24,14 @@ namespace detail {
             if (data.playing_cursor_seconds > data.duration_seconds) {
                 data.playing_cursor_seconds = data.duration_seconds;
                 data.is_playing = false;
+                for (std::function<void()>& _callback : data.on_end_event.callbacks) {
+                    _callback();
+                }
                 global().animations.notify_erase(data.raw_animation);
                 return;
             }
             float _frac = data.playing_cursor_seconds / data.duration_seconds;
-            float2 _curve_eval = {_frac, data.eval_curve.evaluate_1d(_frac)};
+            float2 _curve_eval = { _frac, data.eval_curve.evaluate_1d(_frac) };
 
 #if BUNGEEGUM_USE_OVERLAY
             update_data.overlay_position = { _curve_eval.x, _curve_eval.y };
@@ -36,24 +39,39 @@ namespace detail {
 #endif
             float _t = _curve_eval.y;
             value_t _lerped = lerp<value_t>(std::forward<value_t>(*(data.min_value)), std::forward<value_t>(*(data.max_value)), _t);
-            for (auto& _callback : data.event.callbacks)
+            for (auto& _callback : data.on_value_changed_event.callbacks) {
                 _callback(std::forward<value_t>(_lerped));
+            }
             data.playing_cursor_seconds += 0.001f * delta_time.count();
         };
     }
 }
 
 template <typename value_t>
-animation<value_t>& animation<value_t>::on_value_changed(const event<value_t>& value_changed_event)
+animation<value_t>& animation<value_t>::on_end(const event<void>& end_callback)
 {
-    _data.event.merge(value_changed_event);
+    _data.on_end_event.merge(value_changed_event);
     return *this;
 }
 
 template <typename value_t>
-animation<value_t>& animation<value_t>::on_value_changed(const on_value_changed_callback& tick_callback)
+animation<value_t>& animation<value_t>::on_end(const on_end_callback& end_callback)
 {
-    _data.event.callbacks.push_back(tick_callback);
+    _data.on_end_event.callbacks.push_back(end_callback);
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::on_value_changed(const event<value_t>& value_changed_event)
+{
+    _data.on_value_changed_event.merge(value_changed_event);
+    return *this;
+}
+
+template <typename value_t>
+animation<value_t>& animation<value_t>::on_value_changed(const on_value_changed_callback& value_changed_callback)
+{
+    _data.on_value_changed_event.callbacks.push_back(value_changed_callback);
     return *this;
 }
 
