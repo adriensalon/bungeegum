@@ -28,11 +28,14 @@ namespace detail {
 
         /// @brief Creates a new entity in the registry.
         entity_t create_entity();
+		
+		template <typename component_t>
+        void destroy_component(const entity_t entity);
 
         /// @brief Destroys the specified entity from the registry.
         /// @exception Throws an entt exception if the specified entity is not contained by the
         /// registry.
-        void erase(const entity_t entity);
+        void destroy_entity(const entity_t entity);
 
         /// @brief Gets if the specified has a component of a certain type.
         /// @tparam component_t is the component type to check.

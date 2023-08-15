@@ -43,6 +43,7 @@ set(bungeegum_runtime_source
 	"source/core/log.cpp"
 	"source/core/process.cpp"
 	"source/core/resolve.cpp"
+	"source/core/runtime.cpp"
 	"source/core/widget.cpp"
 
 	"source/core/overlay/hierarchy.cpp"

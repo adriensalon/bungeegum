@@ -10,9 +10,16 @@ namespace detail {
     {
         return _registry.create();
     }
+	
+    template <typename entity_t>
+	template <typename component_t>
+	void registry<entity_t>::destroy_component(const entity_t entity)
+	{
+		_registry.erase<component_t>(entity);
+	}
 
     template <typename entity_t>
-    void registry<entity_t>::erase(const entity_t entity)
+    void registry<entity_t>::destroy_entity(const entity_t entity)
     {
         _registry.destroy(entity);
     }

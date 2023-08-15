@@ -27,6 +27,8 @@ private:
     detail::reference_type_t<widget_t> _data;
 };
 
+// property ptr aussi !
+
 /// @brief
 template <typename property_t>
 [[nodiscard]] property_reference<property_t> make_property_reference(const runtime_widget& widget);
