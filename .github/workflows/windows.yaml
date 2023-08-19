@@ -5,98 +5,43 @@ on:
   
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     strategy:
       fail-fast: false
       matrix:
-        name:            ["Win10"]
-        toolset:         ["Win32", "x64"]
-        build_type:      ["Debug", "Release"]
-        cmake_generator: ["Visual Studio 17 2022"]
-        cmake_args:      ["-DBUNGEEGUM_BUILD_TEST=ON"]
-        platform:        ["Win32"]
-        build_args:      ["-- -restore"]
+        platform: ["Win32"]
+        build_type: ["Debug", "Release"]
 
-        include:
-          - name:            "Win10-Dev"
-            platform:        "Win32"
-            toolset:         "x64"
-            build_type:      "RelWithDebInfo"
-            cmake_generator: "Visual Studio 17 2022"
-            cmake_args:      "-DDILIGENT_BUILD_CORE_TESTS=ON -DDILIGENT_BUILD_TOOLS_TESTS=ON -DDILIGENT_DEVELOPMENT=ON"
-            build_args:      "-- -restore"
-
-          - name:            "Win8.1"
-            platform:        "Win32"
-            toolset:         "x64"
-            build_type:      "Release"
-            cmake_generator: "Visual Studio 17 2022"
-            cmake_args:      "-DDILIGENT_BUILD_CORE_TESTS=ON -DDILIGENT_BUILD_TOOLS_TESTS=ON -DCMAKE_SYSTEM_VERSION=8.1"
-            build_args:      "-- -restore"
-
-          - name:            "Win10-Ninja"
-            platform:        "Win32"
-            toolset:         "x64"
-            build_type:      "Debug"
-            cmake_generator: "Ninja"
-            cmake_args:      "-DDILIGENT_BUILD_CORE_TESTS=ON -DDILIGENT_BUILD_TOOLS_TESTS=ON"
-
-          - name:            "MinGW"
-            platform:        "Win32"
-            toolset:         "x64"
-            build_type:      "Release" # Debug build is unbelievably slow
-            cmake_generator: "MinGW Makefiles"
-            cmake_args:      "-DDILIGENT_BUILD_CORE_TESTS=ON -DDILIGENT_BUILD_TOOLS_TESTS=ON"
-
-          - name:            "UWP"
-            platform:        "UWP"
-            toolset:         "x64"
-            build_type:      "Debug"
-            cmake_generator: "Visual Studio 17 2022"
-            cmake_args:      "-DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0"
-
-          - name:            "UWP"
-            platform:        "UWP"
-            toolset:         "x64"
-            build_type:      "Release"
-            cmake_generator: "Visual Studio 17 2022"
-            cmake_args:      "-DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0"
-
-    name: Win10 -> ${{ matrix.name }}-${{ matrix.toolset }}, ${{ matrix.build_type }}
+    name: Windows -> ${{ matrix.platform }} (${{ matrix.build_type }})
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        submodules: recursive
+      uses: ./.github/workflows/steps/checkout.yaml
 
     - name: Setup
       if:   success()
-      uses: ${{ join(github.repository, ci/setup@v1 }}
+      uses: ./.github/workflows/steps/setup.yaml
       with:
-        platform:        ${{ matrix.platform }}
-        cmake-generator: ${{ matrix.cmake_generator }}
-        ninja-vs-arch:   ${{ matrix.toolset }}
+        platform: ${{ matrix.platform }}
+        build_type: ${{ matrix.build_type }}
 
     - name: Configure
       if:   success()
-      uses: ${{ join(github.repository, ci/configure@v1 }}
+      uses: ./.github/workflows/steps/configure.yaml
       with:
-        generator:  ${{ matrix.cmake_generator }}
-        vs-arch:    ${{ matrix.toolset }}
         build-type: ${{ matrix.build_type }}
-        cmake-args: ${{ matrix.cmake_args }}
+        cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
 
     - name: Build
       id:   build
       if:   success()
-      uses: ${{ join(github.repository, ci/build@v1 }}
+      uses: ./.github/workflows/steps/build.yaml
       with:
-        build-args: ${{ matrix.build_args }}
+        cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
 
     - name: Test
-      if:   ${{ success() && matrix.name != 'UWP'}}
-      uses: ${{ join(github.repository, ci/test@v1 }}
+      if:   success()
+      uses: ./.github/workflows/steps/test.yaml
       with:
         build-args: ${{ matrix.build_args }}
