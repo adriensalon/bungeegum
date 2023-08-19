@@ -33,10 +33,10 @@ namespace detail {
         using type_t = typename at_helper<sizeof...(types_t) - 1, typelist<types_t...>>::type_t;
     };
 
-    template <typename... head_types_t, typename tail_type_t>
-    struct pop_back_helper<typelist<head_types_t..., tail_type_t>> {
-        using type_t = typelist<head_types_t...>;
-    };
+    // template <typename... head_types_t, typename tail_type_t>
+    // struct pop_back_helper<typelist<head_types_t..., tail_type_t>> {
+    //     using type_t = typelist<head_types_t...>;
+    // };
 
     template <typename... existing_types_t, typename new_type_t>
     struct push_back_helper<typelist<existing_types_t...>, new_type_t> {

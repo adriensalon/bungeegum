@@ -18,6 +18,7 @@
 #include <vector>
 
 #define HSCPP_CXX_STANDARD 17
+#include <hscpp/mem/MemoryManager.h>
 #include <hscpp/mem/Ref.h>
 #include <hscpp/module/Tracker.h>
 
@@ -286,4 +287,6 @@ namespace detail {
 }
 }
 
+#if BUNGEEGUM_USE_HOTSWAP
 #include <bungeegum/glue/reload.inl>
+#endif

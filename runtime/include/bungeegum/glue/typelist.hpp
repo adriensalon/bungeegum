@@ -21,8 +21,8 @@ namespace detail {
     template <typename typelist_t>
     struct back_helper;
 
-    template <typename typelist_t>
-    struct pop_back_helper;
+    // template <typename typelist_t>
+    // struct pop_back_helper;
 
     template <typename typelist_t, typename new_type_t>
     struct push_back_helper;

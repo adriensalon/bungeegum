@@ -1,7 +1,6 @@
 add_subdirectory("glm")
 add_subdirectory("imgui")
 add_subdirectory("implot")
-add_subdirectory("tinyprocess")
 add_subdirectory("tinyspline")
 add_subdirectory("entt")
 add_subdirectory("cereal")

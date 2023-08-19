@@ -1,7 +1,5 @@
 #pragma once
 
-#include <hscpp/mem/MemoryManager.h>
-
 namespace bungeegum {
 namespace detail {
 
