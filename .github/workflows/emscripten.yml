@@ -31,7 +31,7 @@ jobs:
         uses: mymindstorm/setup-emsdk@v12
 
       - name: Configure
-        run: emcmake cmake -B ${{ github.workspace }}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        run: emcmake cmake -B ${{ github.workspace }}/build -G Ninja -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build
         run: emcmake cmake --build ${{ github.workspace }}/build --target bungeegum_test --config ${{ matrix.build_type }}
