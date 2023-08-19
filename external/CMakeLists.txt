@@ -22,7 +22,9 @@ set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 add_subdirectory("googletest")
 
 if(BUNGEEGUM_ENABLE_STANDALONE)
-	add_subdirectory("sdl")
+	if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+		add_subdirectory("sdl")
+	endif()
 
 	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Android")
 		set(DILIGENT_NO_DIRECT3D11 ON CACHE BOOL "" FORCE)
@@ -69,5 +71,4 @@ if(DEFINED BUNGEEGUM_INSTALL_DIR)
 	file(
 		COPY "${CMAKE_CURRENT_LIST_DIR}/hscpp/extensions/mem/include/hscpp/mem/"
 		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/hscpp/mem/")
-
 endif()

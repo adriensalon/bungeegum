@@ -17,16 +17,16 @@ namespace detail {
 
     namespace {
 
+        std::string tag(const std::string& name)
+        {
+            return "###__bungeegum_overlay_hotswapper_" + name + "__";
+        }
+
         constexpr float multiline_text_input_height = 50.f;
 
         static std::string current_tab = {};
         static std::vector<bool> selected_items = {};
         static std::size_t selected_count = 0;
-
-        std::string tag(const std::string& name)
-        {
-            return "###__bungeegum_overlay_hotswapper_" + name + "__";
-        }
 
         void draw_definition(const std::string& text)
         {
