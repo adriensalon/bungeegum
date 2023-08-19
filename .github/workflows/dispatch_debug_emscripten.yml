@@ -11,14 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3    
+    - uses: actions/checkout@v3
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: mesa-common-dev mesa-utils libgl-dev libgl1-mesa-dev
+        version: 1.0
     - uses: mymindstorm/setup-emsdk@v12
     
     - name: Verify EMSDK
       run: emcc -v
+
+    - name: Install xmllint
+      run: sudo apt-get install -y libxml2-utils
       
     - name: Install gtk
-      run: sudo apt-get install -y  gtk+-3.0
+      run: sudo apt-get install -y gtk+-3.0
 
     - name: Configure
       run: emcmake cmake -B ${{github.workspace}}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
