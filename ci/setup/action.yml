@@ -1,0 +1,79 @@
+name: "Setup bungeegum build environment"
+description: "Downloads build prerequisites and setups the environment."
+
+inputs:
+  platform:
+    description: Target platform. Must be Win32, UWP, Linux, Android, MacOS, iOS or Emscripten.
+    required: true
+
+  vulkan-sdk-version:
+    description: Vulkan SDK version. Optional.
+    required: false
+    default: '1.3.250.1'
+
+  java-version:
+    description: Java version. Optional.
+    required: false
+    default: '17'
+
+  emsdk-version:
+    description: Emscripten SDK version. Optional.
+    required: false
+    default: '3.1.9'
+
+  cmake-generator:
+    description: CMake generator. Optional.
+    required: false
+
+  ninja-vs-arch:
+    description: Ninja architecture for Visual Studio build. Must be x64 or Win32 if defined. Optional.
+    required: false
+    default: 'x64'
+
+runs:
+  using: "composite" # must be set to "composite"
+  steps:
+    - name: Setup environment variables
+      shell: bash
+      run: |
+        # Set Environment Variables
+        echo "BUNGEEGUM_TARGET_PLATFORM=${{inputs.platform}}" >> $GITHUB_ENV
+
+    - name: Setup Linux dependencies
+      if: ${{ inputs.platform == 'Linux' }}
+      shell: bash
+      run: |
+        # Download Linux dependencies GO SDL
+        sudo apt-get update && sudo apt-get install build-essential libx11-dev libgl1-mesa-dev mesa-vulkan-drivers xvfb
+  
+    - name: Setup Ninja
+      if: ${{ success() && (contains(inputs.cmake-generator, 'Ninja') || inputs.platform == 'Emscripten') }}
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Setup VS development environment for Ninja
+      if: ${{ success() && contains(inputs.cmake-generator, 'Ninja') && runner.os == 'Windows' }}
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ inputs.ninja-vs-arch }}
+
+    - name: Setup Vulkan SDK
+      if: ${{ success() && (inputs.platform == 'MacOS' || inputs.platform == 'iOS' || inputs.platform == 'tvOS') }}
+      working-directory: ${{github.action_path}}
+      shell: bash
+      run: |
+        # Download Vulkan SDK
+        chmod +x vulkan_sdk.sh
+        ./vulkan_sdk.sh ${{inputs.vulkan-sdk-version}}
+
+    - name: Setup Java
+      if: ${{ success() && inputs.platform == 'Android' }}
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: ${{ inputs.java-version }}
+
+    - name: Setup Emscripten SDK
+      if: ${{ success() && inputs.platform == 'Emscripten' }}
+      uses: mymindstorm/setup-emsdk@master
+      with:
+        version: ${{ inputs.emsdk-version }}
