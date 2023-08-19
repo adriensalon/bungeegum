@@ -46,16 +46,16 @@ set(bungeegum_runtime_source
 	"source/core/runtime.cpp"
 	"source/core/widget.cpp"
 
-	"source/core/overlay/hierarchy.cpp"
-	"source/core/overlay/hotswapper.cpp"
-	"source/core/overlay/inspector.cpp"
-	"source/core/overlay/logger.cpp"
-	"source/core/overlay/overlay.cpp"
-	"source/core/overlay/profiler.cpp"
-	"source/core/overlay/wireframe.cpp"
-	"source/core/overlay/compressed/fa4.cpp"
-	"source/core/overlay/compressed/inter_extrabold.cpp"
-	"source/core/overlay/compressed/inter_regular.cpp"
+	"source/overlay/hierarchy.cpp"
+	"source/overlay/hotswapper.cpp"
+	"source/overlay/inspector.cpp"
+	"source/overlay/logger.cpp"
+	"source/overlay/overlay.cpp"
+	"source/overlay/profiler.cpp"
+	"source/overlay/wireframe.cpp"
+	"source/overlay/compressed/fa4.cpp"
+	"source/overlay/compressed/inter_extrabold.cpp"
+	"source/overlay/compressed/inter_regular.cpp"
 
 	"source/backend/backend.cpp"
 	"source/backend/embedded.cpp"
@@ -100,7 +100,7 @@ if(BUNGEEGUM_ENABLE_HOTSWAP AND BUNGEEGUM_ENABLE_OVERLAY)
 	target_link_libraries(bungeegum_runtime nfd)
 endif()
 
-if(BUNGEEGUM_ENABLE_STANDALONE)
+if(BUNGEEGUM_ENABLE_STANDALONE AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 	target_link_libraries(bungeegum_runtime SDL2-static)
 endif()
 
