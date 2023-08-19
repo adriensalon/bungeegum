@@ -15,7 +15,7 @@ jobs:
 
     name: Windows -> ${{ matrix.platform }} (${{ matrix.build_type }})
 
-    uses: adriensalon/bungeegum/.github/workflows/setup.yaml@master
+    uses: adriensalon/bungeegum/.github/workflows/steps/setup.yaml@master
     with:
       platform: ${{ matrix.platform }}
       build_type: ${{ matrix.build_type }}
