@@ -23,7 +23,7 @@ jobs:
 
     - name: Setup
       if:   success()
-      uses: ./.github/workflows/setup.yaml
+      uses: ${{github.repository/.github/workflows/setup.yaml}}
       with:
         platform: ${{ matrix.platform }}
         build_type: ${{ matrix.build_type }}
