@@ -81,7 +81,7 @@ jobs:
 
     - name: Configure
       if:   success()
-      uses: ci/configure@v1
+      uses: ${{ github.repository }}/ci/configure@v1
       with:
         generator:  ${{ matrix.cmake_generator }}
         vs-arch:    ${{ matrix.toolset }}
@@ -91,12 +91,12 @@ jobs:
     - name: Build
       id:   build
       if:   success()
-      uses: ci/build@v1
+      uses: ${{ github.repository }}/ci/build@v1
       with:
         build-args: ${{ matrix.build_args }}
 
     - name: Test
       if:   ${{ success() && matrix.name != 'UWP'}}
-      uses: ci/test@v1
+      uses: ${{ github.repository }}/ci/test@v1
       with:
         build-args: ${{ matrix.build_args }}
