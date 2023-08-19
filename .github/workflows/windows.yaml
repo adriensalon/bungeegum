@@ -22,14 +22,14 @@ jobs:
 
     - name: Setup
       if:   success()
-      uses: ./.github/workflows/steps/setup.yaml
+      uses: ./.github/workflows/setup.yaml
       with:
         platform: ${{ matrix.platform }}
         build_type: ${{ matrix.build_type }}
 
     # - name: Configure
     #   if:   success()
-    #   uses: ./.github/workflows/steps/configure.yaml
+    #   uses: ./.github/workflows/configure.yaml
     #   with:
     #     build-type: ${{ matrix.build_type }}
     #     cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
@@ -37,12 +37,12 @@ jobs:
     # - name: Build
     #   id:   build
     #   if:   success()
-    #   uses: ./.github/workflows/steps/build.yaml
+    #   uses: ./.github/workflows/build.yaml
     #   with:
     #     cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
 
     # - name: Test
     #   if:   success()
-    #   uses: ./.github/workflows/steps/test.yaml
+    #   uses: ./.github/workflows/test.yaml
     #   with:
     #     build-args: ${{ matrix.build_args }}
