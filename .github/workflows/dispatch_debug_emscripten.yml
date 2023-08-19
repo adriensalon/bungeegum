@@ -1,0 +1,32 @@
+name: dispatch debug emscripten
+
+on:
+  workflow_dispatch
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3    
+    - uses: mymindstorm/setup-emsdk@v12
+    
+    - name: Verify EMSDK
+      run: emcc -v
+
+    - name: Configure
+      run: emcmake cmake -B ${{github.workspace}}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: emcmake cmake --build ${{github.workspace}}/build --target bungeegum_test --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      run: ${{github.workspace}}/build/test/bungeegum_test
+
+
+
+
+
