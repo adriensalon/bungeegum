@@ -15,18 +15,19 @@ jobs:
 
     name: Windows -> ${{ matrix.platform }} (${{ matrix.build_type }})
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        submodules: recursive
+    uses: adriensalon/bungeegum/.github/workflows/setup.yaml@master
+    with:
+      platform: ${{ matrix.platform }}
+      build_type: ${{ matrix.build_type }}
 
-    - name: Setup
-      if: success()
-      uses: adriensalon/bungeegum/.github/workflows/setup.yaml@master
-      with:
-        platform: ${{ matrix.platform }}
-        build_type: ${{ matrix.build_type }}
+    # steps:
+    # - name: Checkout
+    #   uses: actions/checkout@v3
+    #   with:
+    #     submodules: recursive
+
+    # - name: Setup
+    #   if: success()
 
     # - name: Configure
     #   if:   success()
