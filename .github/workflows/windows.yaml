@@ -1,6 +1,9 @@
 name: Windows CI
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 0 * * *'
   
 jobs:
   build:
@@ -9,40 +12,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ["Win32"]
         build_type: ["Debug", "Release"]
 
-    name: Windows -> ${{ matrix.platform }} (${{ matrix.build_type }})
+    name: Win32 (${{ matrix.build_type }})
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        submodules: recursive
+      - uses: actions/checkout@v3
 
-    - name: Setup
-      if: success()
-      uses: adriensalon/bungeegum/.github/workflows/setup.yaml@master
-      with:
-        platform: ${{ matrix.platform }}
-        build_type: ${{ matrix.build_type }}
+      - name: Configure
+        run: cmake -B ${{ github.workspace }}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
-    # - name: Configure
-    #   if:   success()
-      # uses: adriensalon/bungeegum/.github/workflows/configure.yaml@master
-    #   with:
-    #     build-type: ${{ matrix.build_type }}
-    #     cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/build --target bungeegum_test --config ${{ matrix.build_type }}
 
-    # - name: Build
-    #   id:   build
-    #   if:   success()
-    #   uses: ./.github/workflows/steps/build.yaml
-    #   with:
-    #     cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
-
-    # - name: Test
-    #   if:   success()
-    #   uses: ./.github/workflows/steps/test.yaml
-    #   with:
-    #     build-args: ${{ matrix.build_args }}
+      - name: Test
+        run: ${{ github.workspace }}/build/test/${{ matrix.build_type }}/bungeegum_test.exe
