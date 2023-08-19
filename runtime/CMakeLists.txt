@@ -79,7 +79,7 @@ target_link_libraries(bungeegum_runtime Diligent-GraphicsTools)
 target_link_libraries(bungeegum_runtime Diligent-ShaderTools)
 target_link_libraries(bungeegum_runtime Diligent-Imgui)
 
-if(BUNGEEGUM_ENABLE_BACKTRACE)
+if(BUNGEEGUM_ENABLE_BACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND CMAKE_BUILD_TYPE MATCHES "Debug")
 	target_link_libraries(bungeegum_runtime backward)
 endif()
 
