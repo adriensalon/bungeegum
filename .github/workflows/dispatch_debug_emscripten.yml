@@ -16,6 +16,9 @@ jobs:
     
     - name: Verify EMSDK
       run: emcc -v
+      
+    - name: Install gtk
+      run: sudo apt-get install -y  gtk+-3.0
 
     - name: Configure
       run: emcmake cmake -B ${{github.workspace}}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
