@@ -91,12 +91,12 @@ if(BUNGEEGUM_ENABLE_OVERLAY OR BUNGEEGUM_ENABLE_HOTSWAP)
 	target_link_libraries(bungeegum_runtime cereal)
 endif()
 
-if(BUNGEEGUM_ENABLE_HOTSWAP)
+if(BUNGEEGUM_ENABLE_HOTSWAP AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 	target_link_libraries(bungeegum_runtime hscpp)
 	target_link_libraries(bungeegum_runtime hscpp-mem)
 endif()
 
-if(BUNGEEGUM_ENABLE_HOTSWAP AND BUNGEEGUM_ENABLE_OVERLAY)
+if(BUNGEEGUM_ENABLE_HOTSWAP AND BUNGEEGUM_ENABLE_OVERLAY AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 	target_link_libraries(bungeegum_runtime nfd)
 endif()
 
