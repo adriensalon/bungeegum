@@ -17,6 +17,8 @@ jobs:
     name: ${{ matrix.build_type }}
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Setup Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
 
@@ -27,9 +29,6 @@ jobs:
       
       - name: Setup EMSDK
         uses: mymindstorm/setup-emsdk@v12
-
-      - name: Checkout
-        uses: actions/checkout@v3
 
       - name: Configure
         run: emcmake cmake -B ${{ github.workspace }}/build -G Ninja -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
