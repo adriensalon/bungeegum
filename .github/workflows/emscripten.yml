@@ -1,0 +1,40 @@
+name: Emscripten CI
+
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 0 * * *'
+  
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: ["Debug", "Release"]
+
+    name: ${{ matrix.build_type }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
+
+      - name: Setup VS Development Environment for Ninja
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      
+      - name: Setup EMSDK
+        uses: mymindstorm/setup-emsdk@v12
+
+      - name: Configure
+        run: emcmake cmake -B ${{ github.workspace }}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
+      - name: Build
+        run: emcmake cmake --build ${{ github.workspace }}/build --target bungeegum_test --config ${{ matrix.build_type }}
+
+      - name: Test
+        run: emcmake ${{ github.workspace }}/build/test/${{ matrix.build_type }}/bungeegum_test.exe

@@ -14,11 +14,11 @@ jobs:
       matrix:
         build_type: ["Debug", "Release"]
 
-    name: Win32 (${{ matrix.build_type }})
+    name: ${{ matrix.build_type }}
 
     steps:
       - uses: actions/checkout@v3
-
+      
       - name: Configure
         run: cmake -B ${{ github.workspace }}/build -DBUNGEEGUM_BUILD_TEST:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
