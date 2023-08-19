@@ -4,6 +4,7 @@ inputs:
   platform:
     required: true
     type: string
+    
   build_type:
     required: true
     type: string
@@ -11,4 +12,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    
+    - name: Set Environment Variables
+      shell: bash
+      run: |
+        # Set Environment Variables
+        echo "DILIGENT_TARGET_PLATFORM=${{inputs.platform}}" >> $GITHUB_ENV
+
