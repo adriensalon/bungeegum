@@ -23,7 +23,7 @@ jobs:
 
     - name: Setup
       if: success()
-      uses: adriensalon/bungeegum/.github/workflows/setup.yaml
+      uses: adriensalon/bungeegum/.github/workflows/setup.yaml@master
       with:
         platform: ${{ matrix.platform }}
         build_type: ${{ matrix.build_type }}
