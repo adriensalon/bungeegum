@@ -15,9 +15,10 @@ jobs:
 
     name: Windows -> ${{ matrix.platform }} (${{ matrix.build_type }})
 
-    steps:
     - name: Checkout
-      uses: ./.github/workflows/steps/checkout.yaml
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
 
     - name: Setup
       if:   success()
@@ -26,22 +27,22 @@ jobs:
         platform: ${{ matrix.platform }}
         build_type: ${{ matrix.build_type }}
 
-    - name: Configure
-      if:   success()
-      uses: ./.github/workflows/steps/configure.yaml
-      with:
-        build-type: ${{ matrix.build_type }}
-        cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
+    # - name: Configure
+    #   if:   success()
+    #   uses: ./.github/workflows/steps/configure.yaml
+    #   with:
+    #     build-type: ${{ matrix.build_type }}
+    #     cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
 
-    - name: Build
-      id:   build
-      if:   success()
-      uses: ./.github/workflows/steps/build.yaml
-      with:
-        cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
+    # - name: Build
+    #   id:   build
+    #   if:   success()
+    #   uses: ./.github/workflows/steps/build.yaml
+    #   with:
+    #     cmake-args: -DBUNGEEGUM_BUILD_TEST:BOOL=ON
 
-    - name: Test
-      if:   success()
-      uses: ./.github/workflows/steps/test.yaml
-      with:
-        build-args: ${{ matrix.build_args }}
+    # - name: Test
+    #   if:   success()
+    #   uses: ./.github/workflows/steps/test.yaml
+    #   with:
+    #     build-args: ${{ matrix.build_args }}

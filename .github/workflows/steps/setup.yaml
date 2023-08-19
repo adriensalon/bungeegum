@@ -1,0 +1,15 @@
+name: Setup step for bungeegum CI
+
+on:
+  workflow_call:
+    inputs:
+      platform:
+        required: true
+        type: string
+      build_type:
+        required: true
+        type: string
+        
+jobs:
+  triage:
+    runs-on: [windows-latest, macos-latest, ubuntu-latest]
