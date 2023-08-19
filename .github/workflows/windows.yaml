@@ -22,8 +22,8 @@ jobs:
         submodules: recursive
 
     - name: Setup
-      if:   success()
-      uses: ${{github.repository/.github/workflows/setup.yaml}}
+      if: success()
+      uses: adriensalon/bungeegum/.github/workflows/setup.yaml
       with:
         platform: ${{ matrix.platform }}
         build_type: ${{ matrix.build_type }}
