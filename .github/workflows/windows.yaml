@@ -1,8 +1,6 @@
 name: Windows CI
 
-on: [workflow_dispatch, schedule:
-    # * is a special character in YAML so we have to quote this string
-    - cron:  '0 0 * * *']
+on: [workflow_dispatch, schedule: - cron:  '0 0 * * *']
 
 jobs:
   build:
