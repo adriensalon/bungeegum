@@ -30,7 +30,7 @@ namespace widgets {
         /// @details This widget can only have one child. To lay out multiple children, let this
         /// widget's child be a widget such as Row, Column, or Stack, which have a children
         /// property, and then provide the children to that widget.
-        MouseRegion& child(const std::optional<runtime_widget>& value);
+        MouseRegion& child(const std::optional<widget_id>& value);
 
         /// @brief
         MouseRegion& cursor(const SystemMouseCursor value);
@@ -58,7 +58,7 @@ namespace widgets {
         friend struct access;
         void resolve(resolve_command& command);
 
-        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
     };
 
 }

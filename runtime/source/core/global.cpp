@@ -8,8 +8,8 @@ namespace detail {
     void setup_global_if_required()
     {
 #if BUNGEEGUM_USE_HOTSWAP
-        __bungeegum_global_manager.backend.setup_if_required();
-        __bungeegum_global_manager.backend.reload_manager->set_global_data(&__bungeegum_global_manager);
+        __bungeegum_global_manager.hotswap.setup_if_required();
+        __bungeegum_global_manager.hotswap.reload_manager->set_global_data(&__bungeegum_global_manager);
 #endif
     }
 

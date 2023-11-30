@@ -13,7 +13,7 @@ namespace widgets {
         /// @brief The build strategy currently used.
         /// @details Initial data can be used to fire the build callback only once in the lifetime
         /// of this FutureBuilder, the first time initialData() and builder() are defined.
-        FutureBuilder& builder(const std::function<runtime_widget(const futureValue_t&)>& value)
+        FutureBuilder& builder(const std::function<widget_id(const futureValue_t&)>& value)
         {
             // reset tout si deja defini && deja invoke ?
             _builderFunction = [this, value](const futureValue_t& futureValue) {
@@ -81,12 +81,12 @@ namespace widgets {
             }
         }
 
-        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
         std::optional<std::function<void(const futureValue_t&)>> _builderFunction = std::nullopt;
         std::optional<futureValue_t> _initialData = std::nullopt;
         event<futureValue_t> _event = {};
-        bool1 _initialDataBuildDone = false;
-        bool1 _futureDataBuildDone = false;
+        bool _initialDataBuildDone = false;
+        bool _futureDataBuildDone = false;
     };
 
 }

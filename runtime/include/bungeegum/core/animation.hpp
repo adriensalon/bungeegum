@@ -23,7 +23,7 @@ enum struct animation_mode {
 template <typename value_t>
 struct animation {
 
-    /// @brief 
+    /// @brief
     using on_end_callback = std::function<void()>;
 
     /// @brief Instances of this type are the callback objects.
@@ -36,13 +36,13 @@ struct animation {
     animation& min(value_t&& min_value);
 
     /// @brief Sets the animation_mode for this instance. Default value is forward.
-	animation& mode(const animation_mode mode);
+    animation& mode(const animation_mode mode);
 
-	/// @brief
-	animation& on_end(const event<void>& end_event);
+    /// @brief
+    animation& on_end(const event<>& end_event);
 
-	/// @brief
-	animation& on_end(const on_end_callback& end_callback);
+    /// @brief
+    animation& on_end(const on_end_callback& end_callback);
 
     /// @brief Emplaces new callbacks from an event to be fired when the animation is playing and
     /// the value has changed.
@@ -71,7 +71,7 @@ struct animation {
 
 private:
     detail::animation_data<value_t> _data;
-	animation_mode _mode = animation_mode::forward;
+    animation_mode _mode = animation_mode::forward;
 };
 }
 

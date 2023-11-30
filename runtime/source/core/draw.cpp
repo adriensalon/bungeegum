@@ -1,4 +1,4 @@
-#include <ImGui.h>
+#include <imgui.h>
 
 #include <bungeegum/core/draw.hpp>
 #include <bungeegum/core/global.fwd>
@@ -62,7 +62,7 @@ void draw_command::draw_line(
     _info.second.push_back(to_string<float2>(first_point));
     _info.second.push_back(to_string<float2>(second_point));
     _info.second.push_back(to_string<float4>(color));
-    _info.second.push_back(to_string<float1>(thickness));
+    _info.second.push_back(to_string<float>(thickness));
 #endif
 }
 
@@ -84,8 +84,8 @@ void draw_command::draw_rect(
     _info.second.push_back(to_string<float2>(min_point));
     _info.second.push_back(to_string<float2>(max_point));
     _info.second.push_back(to_string<float4>(color));
-    _info.second.push_back(to_string<float1>(rounding));
-    _info.second.push_back(to_string<float1>(thickness));
+    _info.second.push_back(to_string<float>(rounding));
+    _info.second.push_back(to_string<float>(thickness));
 #endif
 }
 
@@ -106,7 +106,7 @@ void draw_command::draw_rect_filled(
     _info.second.push_back(to_string<float2>(min_point));
     _info.second.push_back(to_string<float2>(max_point));
     _info.second.push_back(to_string<float4>(color));
-    _info.second.push_back(to_string<float1>(rounding));
+    _info.second.push_back(to_string<float>(rounding));
 #endif
 }
 

@@ -17,7 +17,7 @@ namespace widgets {
         {
             if (_childWidget.has_value())
                 abandon(this, _childWidget.value());
-            _childWidget = runtime_widget(value);
+            _childWidget = widget_id(value);
             adopt(this, _childWidget.value());
             return *this;
         }
@@ -34,7 +34,7 @@ namespace widgets {
 
         const char* okok = "heyyyyaaa";
 
-        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
     };
 
 }

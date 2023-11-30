@@ -5,13 +5,15 @@ namespace widgets {
 
     Title& Title::color(const Color value)
     {
-        standalone_app::color(value);
+        (void)value;
+        // standalone_app::color(value);
         return *this;
     }
 
     Title& Title::title(const std::string& value)
     {
-        standalone_app::title(value);
+        (void)value;
+        // standalone_app::title(value);
         return *this;
     }
 

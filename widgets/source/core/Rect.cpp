@@ -7,15 +7,15 @@ namespace widgets {
 
     Rect::Rect(const Offset& offset, const Size& size)
     {
-        float1 _left = offset.dx();
-        float1 _top = offset.dy();
+        float _left = offset.dx();
+        float _top = offset.dy();
         _value = { _left, _top, _left + size.width(), _top + size.height() };
     }
 
-    Rect Rect::fromCenter(const Offset& center, const float1 width, const float1 height)
+    Rect Rect::fromCenter(const Offset& center, const float width, const float height)
     {
-        float1 _half_width = width * 0.5f;
-        float1 _half_height = height * 0.5f;
+        float _half_width = width * 0.5f;
+        float _half_height = height * 0.5f;
         return fromLTRB(
             center.dx() - _half_width,
             center.dy() - _half_height,
@@ -23,30 +23,30 @@ namespace widgets {
             center.dy() + _half_height);
     }
 
-    Rect Rect::fromCircle(const Offset& center, const float1 radius)
+    Rect Rect::fromCircle(const Offset& center, const float radius)
     {
-        float1 _diameter = radius * 2.f;
+        float _diameter = radius * 2.f;
         return fromCenter(center, _diameter, _diameter);
     }
 
-    Rect Rect::fromLTRB(const float1 left, const float1 top, const float1 right, const float1 bottom)
+    Rect Rect::fromLTRB(const float left, const float top, const float right, const float bottom)
     {
         Rect _rect;
         _rect._value = { left, top, right, bottom };
         return _rect;
     }
 
-    Rect Rect::fromLTWH(const float1 left, const float1 top, const float1 width, const float1 height)
+    Rect Rect::fromLTWH(const float left, const float top, const float width, const float height)
     {
         return fromLTRB(left, top, left + width, top + height);
     }
 
     Rect Rect::fromPoints(const Offset& a, const Offset& b)
     {
-        float1 _adx = a.dx();
-        float1 _ady = a.dy();
-        float1 _bdx = b.dx();
-        float1 _bdy = b.dy();
+        float _adx = a.dx();
+        float _ady = a.dy();
+        float _bdx = b.dx();
+        float _bdy = b.dy();
         return fromLTRB(
             glm::min(_adx, _bdx),
             glm::min(_ady, _bdy),
@@ -54,7 +54,7 @@ namespace widgets {
             glm::max(_ady, _bdy));
     }
 
-    // float1 Rect::bottom() const
+    // float Rect::bottom() const
     // {
     // }
 
@@ -82,7 +82,7 @@ namespace widgets {
     // {
     // }
 
-    // float1 Rect::height() const
+    // float Rect::height() const
     // {
     // }
 
@@ -98,19 +98,19 @@ namespace widgets {
     // {
     // }
 
-    // float1 Rect::left() const
+    // float Rect::left() const
     // {
     // }
 
-    // float1 Rect::longestSide() const
+    // float Rect::longestSide() const
     // {
     // }
 
-    // float1 Rect::right() const
+    // float Rect::right() const
     // {
     // }
 
-    // float1 Rect::shortestSide() const
+    // float Rect::shortestSide() const
     // {
     // }
 
@@ -118,7 +118,7 @@ namespace widgets {
     // {
     // }
 
-    // float1 Rect::top() const
+    // float Rect::top() const
     // {
     // }
 
@@ -134,7 +134,7 @@ namespace widgets {
     // {
     // }
 
-    // float1 Rect::width() const
+    // float Rect::width() const
     // {
     // }
 

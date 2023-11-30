@@ -5,13 +5,13 @@
 namespace bungeegum {
 namespace widgets {
 
-    LimitedBox& LimitedBox::maxHeight(const float1 value)
+    LimitedBox& LimitedBox::maxHeight(const float value)
     {
         _maxSize.y = value;
         return *this;
     }
 
-    LimitedBox& LimitedBox::maxWidth(const float1 value)
+    LimitedBox& LimitedBox::maxWidth(const float value)
     {
         _maxSize.x = value;
         return *this;

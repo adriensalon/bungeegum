@@ -11,7 +11,7 @@ namespace widgets {
     template <typename id_t>
     struct LayoutCommand {
 
-        bool1 hasChild(const id_t& id) const
+        bool hasChild(const id_t& id) const
         {
         }
 

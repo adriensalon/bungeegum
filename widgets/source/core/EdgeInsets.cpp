@@ -3,24 +3,24 @@
 namespace bungeegum {
 namespace widgets {
 
-    EdgeInsets EdgeInsets::all(const float1 value)
+    EdgeInsets EdgeInsets::all(const float value)
     {
         return fromLTRB(value, value, value, value);
     }
 
-    EdgeInsets EdgeInsets::fromLTRB(const float1 left, const float1 top, const float1 right, const float1 bottom)
+    EdgeInsets EdgeInsets::fromLTRB(const float left, const float top, const float right, const float bottom)
     {
         EdgeInsets _edgeInsets;
         _edgeInsets._value = float4 { left, top, right, bottom };
         return _edgeInsets;
     }
 
-    EdgeInsets EdgeInsets::symmetric(const float1 vertical, const float1 horizontal)
+    EdgeInsets EdgeInsets::symmetric(const float vertical, const float horizontal)
     {
         return fromLTRB(horizontal, vertical, horizontal, vertical);
     }
 
-    float1 EdgeInsets::bottom() const
+    float EdgeInsets::bottom() const
     {
         return _value.w;
     }
@@ -45,7 +45,7 @@ namespace widgets {
         return fromLTRB(right(), bottom(), left(), top());
     }
 
-    float1 EdgeInsets::horizontal() const
+    float EdgeInsets::horizontal() const
     {
         return (left() + right());
     }
@@ -58,17 +58,17 @@ namespace widgets {
             && (bottom() >= 0.f));
     }
 
-    float1 EdgeInsets::left() const
+    float EdgeInsets::left() const
     {
         return _value.x;
     }
 
-    float1 EdgeInsets::right() const
+    float EdgeInsets::right() const
     {
         return _value.z;
     }
 
-    float1 EdgeInsets::top() const
+    float EdgeInsets::top() const
     {
         return _value.y;
     }
@@ -83,7 +83,7 @@ namespace widgets {
         return Offset(-right(), top());
     }
 
-    float1 EdgeInsets::vertical() const
+    float EdgeInsets::vertical() const
     {
         return (top() + bottom());
     }

@@ -8,25 +8,25 @@ namespace widgets {
 
     struct BoxConstraints {
 
-        BoxConstraints(const float1 minWidth, const float1 maxWidth, const float1 minHeight, const float1 maxHeight);
+        BoxConstraints(const float minWidth, const float maxWidth, const float minHeight, const float maxHeight);
 
         BoxConstraints(const float2 minSize, const float2 maxSize);
 
         BoxConstraints(const resolve_command& command);
 
-        static BoxConstraints expand(const float1 width = infinity<float1>, const float1 height = infinity<float1>);
+        static BoxConstraints expand(const float width = infinity<float>, const float height = infinity<float>);
 
         static BoxConstraints loose(const Size size);
 
         static BoxConstraints tight(const Size size);
 
-        // static BoxConstraints tightForWidth(const float1 width);
+        // static BoxConstraints tightForWidth(const float width);
 
-        // static BoxConstraints tightForHeight(const float1 height);
+        // static BoxConstraints tightForHeight(const float height);
 
-        // static BoxConstraints tightForFiniteWidth(const float1 width);
+        // static BoxConstraints tightForFiniteWidth(const float width);
 
-        // static BoxConstraints tightForFiniteHeight(const float1 height);
+        // static BoxConstraints tightForFiniteHeight(const float height);
 
         Size biggest() const;
 
@@ -48,9 +48,9 @@ namespace widgets {
 
         bool isTight() const;
 
-        float1 maxHeight() const;
+        float maxHeight() const;
 
-        float1 maxWidth() const;
+        float maxWidth() const;
 
         Size smallest() const;
 
@@ -58,13 +58,13 @@ namespace widgets {
 
         Size constrain(const Size size) const;
 
-        Size constrainDimensions(const float1 width, const float1 height) const;
+        Size constrainDimensions(const float width, const float height) const;
 
-        float1 constrainHeight(const float1 height = infinity<float1>) const;
+        float constrainHeight(const float height = infinity<float>) const;
 
         Size constrainSizeAndAttemptToPreserveAspectRatio(const Size size) const;
 
-        float1 constrainWidth(const float1 width = infinity<float1>) const;
+        float constrainWidth(const float width = infinity<float>) const;
 
         BoxConstraints() = default;
         BoxConstraints(const BoxConstraints& other) = default;

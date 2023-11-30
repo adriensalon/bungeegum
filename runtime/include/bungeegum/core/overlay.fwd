@@ -2,12 +2,8 @@
 
 #include <functional>
 
-#include <bungeegum/glue/config.hpp>
-#include <bungeegum/glue/toolchain.hpp>
-
-#if !defined(BUNGEEGUM_USE_OVERLAY)
-#define BUNGEEGUM_USE_OVERLAY (BUNGEEGUM_ENABLE_OVERLAY && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_LINUX))
-#endif
+#include <bungeegum/core/config.hpp>
+#include <bungeegum/glue/toolchain.fwd>
 
 struct ImDrawList;
 struct ImFont;
@@ -41,4 +37,6 @@ namespace detail {
 
     void draw_hotswapper_overlay();
 }
+
+// overlay manager ?
 }

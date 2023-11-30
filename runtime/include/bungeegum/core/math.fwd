@@ -1,0 +1,23 @@
+#pragma once
+
+#include <limits>
+#include <string>
+
+#include <glm/glm.hpp>
+
+/// @brief
+#if !defined(BUNGEEGUM_USE_SIMD_PRECISION)
+#define BUNGEEGUM_USE_SIMD_PRECISION glm::packed_highp
+#endif
+
+namespace bungeegum {
+namespace detail {
+
+    template <typename value_t, std::size_t count_t>
+    using simd_vector = glm::vec<count_t, value_t, BUNGEEGUM_USE_SIMD_PRECISION>;
+
+    template <typename value_t, std::size_t count_t>
+    using simd_matrix = glm::mat<count_t, count_t, value_t, BUNGEEGUM_USE_SIMD_PRECISION>;
+}
+
+}

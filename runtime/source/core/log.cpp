@@ -1,10 +1,8 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
-#include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/backtrace.hpp>
-#include <bungeegum/glue/console.hpp>
-#include <bungeegum/glue/toolchain.hpp>
+#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/console.fwd>
 
 #if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
 #include <Windows.h>
@@ -47,7 +45,7 @@ namespace detail {
                 }
             }
 #else
-            console_log(". \n", console_color::color);
+            console_log(". \n", color);
 #endif
         }
 

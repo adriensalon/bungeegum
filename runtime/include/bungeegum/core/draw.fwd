@@ -4,14 +4,14 @@
 #include <optional>
 #include <vector>
 
-#include <bungeegum/core/overlay.fwd>
-#include <bungeegum/core/simd.hpp>
+#include <bungeegum/core/config.hpp>
+#include <bungeegum/core/math.hpp>
 
 struct ImDrawList;
 
 namespace bungeegum {
 
-struct runtime_widget;
+struct widget_id;
 
 namespace detail {
 
@@ -30,7 +30,7 @@ namespace detail {
         struct clip_data {
             float2 first_point = zero<float2>;
             float2 second_point = infinity<float2>;
-            bool1 intersect_with_existing = true;
+            bool intersect_with_existing = true;
         };
 
         bool is_blocked = false;

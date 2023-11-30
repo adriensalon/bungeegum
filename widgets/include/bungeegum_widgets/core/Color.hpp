@@ -28,7 +28,7 @@ namespace widgets {
         /// Color(0xAARRGGBB). For example, to get a fully opaque orange, you would use
         /// Color(0xFFFF9000) (FF for the alpha, FF for the red, 90 for the green, and 00 for the
         /// blue).
-        Color(const uint1 hex);
+        Color(const unsigned int hex);
 
         /// @brief Construct a color from 8 bits integers.
         /// @param a is the alpha value, with 0 being transparent and 255 being fully opaque.
@@ -37,7 +37,7 @@ namespace widgets {
         /// @param b is green, from 0 to 255.
         /// @details Out of range values are brought into range using modulo 255.
         /// See also fromRGBO, which takes the alpha value as a floating point value.
-        static Color fromARGB(const uint1 a, const uint1 r, const uint1 g, const uint1 b);
+        static Color fromARGB(const unsigned int a, const unsigned int r, const unsigned int g, const unsigned int b);
 
         /// @brief Create a color from red, green, blue, and opacity, similar to rgba() in CSS.
         /// @param r is red, from 0 to 255.
@@ -47,7 +47,7 @@ namespace widgets {
         /// fully opaque.
         /// @details Out of range values are brought into range using modulo 255.
         /// See also fromARGB, which takes the opacity as an integer value.
-        static Color fromRGBO(const uint1 r, const uint1 g, const uint1 b, const float1 opacity);
+        static Color fromRGBO(const unsigned int r, const unsigned int g, const unsigned int b, const float opacity);
 
         /// @brief Combine the foreground color as a transparent color over top of a background
         /// color, and return the resulting combined color.
@@ -59,54 +59,54 @@ namespace widgets {
         static Color alphaBlend(const Color foreground, const Color background);
 
         /// @brief Returns an alpha value representative of the provided opacity value.
-        static uint1 getAlphaFromOpacity(float1 opacity);
+        static unsigned int getAlphaFromOpacity(float opacity);
 
         /// @brief The alpha channel of this color in an 8 bit value.
         /// @details A value of 0 means this color is fully transparent. A value of 255 means this
         /// color is fully opaque.
-        uint1 alpha() const;
+        unsigned int alpha() const;
 
         /// @brief The blue channel of this color in an 8 bit value.
-        uint1 blue() const;
+        unsigned int blue() const;
 
         /// @brief The green channel of this color in an 8 bit value.
-        uint1 green() const;
+        unsigned int green() const;
 
         /// @brief The alpha channel of this color as a float.
         /// @details A value of 0.f means this color is fully transparent. A value of 1.f means
         /// this color is fully opaque.
-        float1 opacity() const;
+        float opacity() const;
 
         /// @brief The red channel of this color in an 8 bit value.
-        uint1 red() const;
+        unsigned int red() const;
 
         /// @brief Returns a brightness value between 0.f for darkest and 1.f for lightest.
         /// @details Represents the relative luminance of the color. This value is computationally
         /// expensive to calculate. See https://en.wikipedia.org/wiki/Relative_luminance.
-        float1 computeLuminance() const;
+        float computeLuminance() const;
 
         /// @brief Returns a new color that matches this color with the alpha channel replaced with
         /// a (which ranges from 0 to 255).
-        Color withAlpha(const uint1 a);
+        Color withAlpha(const unsigned int a);
 
         /// @brief Returns a new color that matches this color with the blue channel replaced with
         /// b (which ranges from 0 to 255).
-        Color withBlue(const uint1 b);
+        Color withBlue(const unsigned int b);
 
         /// @brief Returns a new color that matches this color with the green channel replaced with
         /// g (which ranges from 0 to 255).
-        Color withGreen(const uint1 g);
+        Color withGreen(const unsigned int g);
 
         /// @brief Returns a new color that matches this color with the alpha channel replaced with
         /// the given opacity (which ranges from 0.0 to 1.0).
-        Color withOpacity(const float1 opacity);
+        Color withOpacity(const float opacity);
 
         /// @brief Returns a new color that matches this color with the alpha channel replaced with
         /// the given opacity (which ranges from 0.0 to 1.0).
-        Color withRed(const uint1 r);
+        Color withRed(const unsigned int r);
 
         /// @brief A 32 bit value representing this color.
-        operator uint1() const;
+        operator unsigned int() const;
 
         /// @brief A float4 RGBA value representing this color.
         operator float4() const;
@@ -118,25 +118,25 @@ namespace widgets {
         template <typename archive_t>
         void load(archive_t& archive)
         {
-            int1 _red, _green, _blue, _alpha;
+            int _red, _green, _blue, _alpha;
             archive(_red);
             archive(_green);
             archive(_blue);
             archive(_alpha);
             *this = fromARGB(
-                static_cast<uint1>(math::clamp<int1>(_alpha, 0, 255)),
-                static_cast<uint1>(math::clamp<int1>(_red, 0, 255)),
-                static_cast<uint1>(math::clamp<int1>(_green, 0, 255)),
-                static_cast<uint1>(math::clamp<int1>(_blue, 0, 255)));
+                math::clamp<unsigned int>(_alpha, 0u, 255u),
+                math::clamp<unsigned int>(_red, 0u, 255u),
+                math::clamp<unsigned int>(_green, 0u, 255u),
+                math::clamp<unsigned int>(_blue, 0u, 255u));
         }
 
         template <typename archive_t>
         void save(archive_t& archive) const
         {
-            archive(cereal::make_nvp("red", math::clamp<uint1>(red(), 0u, 255u)));
-            archive(cereal::make_nvp("green", math::clamp<uint1>(green(), 0u, 255u)));
-            archive(cereal::make_nvp("blue", math::clamp<uint1>(blue(), 0u, 255u)));
-            archive(cereal::make_nvp("alpha", math::clamp<uint1>(alpha(), 0u, 255u)));
+            archive(cereal::make_nvp("red", math::clamp<unsigned int>(red(), 0u, 255u)));
+            archive(cereal::make_nvp("green", math::clamp<unsigned int>(green(), 0u, 255u)));
+            archive(cereal::make_nvp("blue", math::clamp<unsigned int>(blue(), 0u, 255u)));
+            archive(cereal::make_nvp("alpha", math::clamp<unsigned int>(alpha(), 0u, 255u)));
         }
 
         uint32_t _value = zero<uint32_t>;

@@ -8,7 +8,7 @@ namespace widgets {
     namespace {
 
         // template <typename value_t>
-        // bool is_length_equal(const value_t hex, const uint1 length)
+        // bool is_length_equal(const value_t hex, const unsigned int length)
         // {
         //     std::stringstream _sstream_hex;
         //     _sstream_hex << std::hex << hex;
@@ -16,34 +16,34 @@ namespace widgets {
         //     return (_str_hex.length() == length);
         // }
 
-        float1 _linearizeColorComponent(const uint1 colorComponent)
+        float _linearizeColorComponent(const unsigned int colorComponent)
         {
             (void)colorComponent;
             // TODO
             return 1.f;
         }
 
-        uint1 _moduloComponent(const uint1 value, const uint1 operand)
+        unsigned int _moduloComponent(const unsigned int value, const unsigned int operand)
         {
-            uint1 _value = value;
+            unsigned int _value = value;
             while (_value > operand)
                 _value -= operand;
             return _value;
         }
 
-        uint1 _integerDivision(const uint1 a, const uint1 b)
+        unsigned int _integerDivision(const unsigned int a, const unsigned int b)
         {
-            return static_cast<uint1>(glm::trunc(static_cast<float1>(a) / b));
+            return static_cast<unsigned int>(glm::trunc(static_cast<float>(a) / b));
         }
     }
 
-    Color::Color(const uint1 hex)
+    Color::Color(const unsigned int hex)
     {
         uint32_t _hex = static_cast<uint32_t>(hex);
         _value = _hex;
     }
 
-    Color Color::fromARGB(const uint1 a, const uint1 r, const uint1 g, const uint1 b)
+    Color Color::fromARGB(const unsigned int a, const unsigned int r, const unsigned int g, const unsigned int b)
     {
         uint8_t _a = static_cast<uint8_t>(_moduloComponent(a, 0xff));
         uint8_t _r = static_cast<uint8_t>(_moduloComponent(r, 0xff));
@@ -53,7 +53,7 @@ namespace widgets {
         return Color(_hex);
     }
 
-    Color Color::fromRGBO(const uint1 r, const uint1 g, const uint1 b, const float1 opacity)
+    Color Color::fromRGBO(const unsigned int r, const unsigned int g, const unsigned int b, const float opacity)
     {
         uint8_t _r = static_cast<uint8_t>(_moduloComponent(r, 0xff));
         uint8_t _g = static_cast<uint8_t>(_moduloComponent(g, 0xff));
@@ -89,61 +89,61 @@ namespace widgets {
         }
     }
 
-    uint1 Color::getAlphaFromOpacity(float1 opacity)
+    unsigned int Color::getAlphaFromOpacity(float opacity)
     {
         return static_cast<uint8_t>(glm::round(glm::clamp(opacity, 0.f, 1.f) * 255));
     }
 
-    uint1 Color::alpha() const
+    unsigned int Color::alpha() const
     {
         return (0xff000000 & _value) >> 24u;
     }
 
-    uint1 Color::blue() const
+    unsigned int Color::blue() const
     {
         return (0x000000ff & _value) >> 0u;
     }
 
-    uint1 Color::green() const
+    unsigned int Color::green() const
     {
         return (0x0000ff00 & _value) >> 8;
     }
 
-    float1 Color::opacity() const
+    float Color::opacity() const
     {
         return static_cast<float_t>(alpha() / 0xFF);
     }
 
-    uint1 Color::red() const
+    unsigned int Color::red() const
     {
         return (0x00ff0000 & _value) >> 16;
     }
 
-    float1 Color::computeLuminance() const
+    float Color::computeLuminance() const
     {
         // See <https://www.w3.org/TR/WCAG20/#relativeluminancedef>
-        float1 _r = _linearizeColorComponent(red() / 0xFF);
-        float1 _g = _linearizeColorComponent(green() / 0xFF);
-        float1 _b = _linearizeColorComponent(blue() / 0xFF);
+        float _r = _linearizeColorComponent(red() / 0xFF);
+        float _g = _linearizeColorComponent(green() / 0xFF);
+        float _b = _linearizeColorComponent(blue() / 0xFF);
         return 0.2126f * _r + 0.7152f * _g + 0.0722f * _b;
     }
 
-    Color Color::withAlpha(const uint1 a)
+    Color Color::withAlpha(const unsigned int a)
     {
         return fromARGB(a, red(), green(), blue());
     }
 
-    Color Color::withBlue(const uint1 b)
+    Color Color::withBlue(const unsigned int b)
     {
         return fromARGB(alpha(), red(), green(), b);
     }
 
-    Color Color::withGreen(const uint1 g)
+    Color Color::withGreen(const unsigned int g)
     {
         return fromARGB(alpha(), red(), g, blue());
     }
 
-    Color Color::withOpacity(const float1 opacity)
+    Color Color::withOpacity(const float opacity)
     {
         if (opacity < 0.f)
             log_error("Invalid opacity < 0.f");
@@ -152,12 +152,12 @@ namespace widgets {
         return withAlpha(static_cast<uint32_t>(glm::round(255.f * opacity)));
     }
 
-    Color Color::withRed(const uint1 r)
+    Color Color::withRed(const unsigned int r)
     {
         return fromARGB(alpha(), r, green(), blue());
     }
 
-    Color::operator uint1() const
+    Color::operator unsigned int() const
     {
         return _value;
     }

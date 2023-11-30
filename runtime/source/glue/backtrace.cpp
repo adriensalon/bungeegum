@@ -1,9 +1,8 @@
-#include <bungeegum/glue/backtrace.hpp>
-#include <bungeegum/glue/console.hpp>
-#include <bungeegum/glue/toolchain.hpp>
+#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/console.fwd>
 
 #if BUNGEEGUM_USE_BACKTRACE
-#include <backward.hpp>
+#include "backward.hpp" // We can't use angle brackets because this lib is compiled with add_library(... OBJECT) lmao
 #endif
 
 namespace bungeegum {
@@ -39,13 +38,13 @@ namespace detail {
 #if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
         __try {
             emplace_traces(tracing, tracing_offset, tracing_size);
-        } __except (EXCEPTION_EXECUTE_HANDLER) {			
+        } __except (EXCEPTION_EXECUTE_HANDLER) {
         }
 #else
-		try {
+        try {
             emplace_traces(tracing, tracing_offset, tracing_size);
-		} catch (...) {
-		}
+        } catch (...) {
+        }
 #endif
     }
 

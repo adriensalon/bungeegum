@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/core/runtime.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 
@@ -31,27 +31,27 @@ private:
 
 /// @brief
 template <typename property_t>
-[[nodiscard]] property_reference<property_t> make_property_reference(const runtime_widget& widget);
+[[nodiscard]] property_reference<property_t> make_property_reference(const widget_id& widget);
 
 /// @brief
 template <typename property_t>
-[[nodiscard]] property_t& make_property(const runtime_widget& widget);
+[[nodiscard]] property_t& make_property(const widget_id& widget);
 
 /// @brief
 template <typename property_t>
-[[nodiscard]] bool has_property(const runtime_widget& widget);
+[[nodiscard]] bool has_property(const widget_id& widget);
 
 /// @brief
 template <typename property_t>
-[[nodiscard]] property_t& get_property(const runtime_widget& widget);
+[[nodiscard]] property_t& get_property(const widget_id& widget);
 
 /// @brief
 template <typename property_t>
-[[nodiscard]] property_t& get_or_make_property(const runtime_widget& widget);
+[[nodiscard]] property_t& get_or_make_property(const widget_id& widget);
 
 /// @brief
 template <typename property_t>
-void destroy_property(const runtime_widget& widget);
+void destroy_property(const widget_id& widget);
 }
 
 #include <bungeegum/core/property.inl>

@@ -15,7 +15,7 @@ namespace widgets {
         {
             if (_childWidget.has_value())
                 abandon(this, _childWidget.value());
-            _childWidget = runtime_widget(value);
+            _childWidget = widget_id(value);
             adopt(this, _childWidget.value());
             return *this;
         }
@@ -24,7 +24,7 @@ namespace widgets {
         SizedBox& expand();
 
         /// @brief Requires the child to have exactly this height.
-        SizedBox& height(const float1 value);
+        SizedBox& height(const float value);
 
         /// @brief The child will become as small as its parent allows.
         SizedBox& shrink();
@@ -33,16 +33,16 @@ namespace widgets {
         SizedBox& size(const Size value);
 
         /// @brief Requires the child to have exactly this width and height.
-        SizedBox& square(const float1 value);
+        SizedBox& square(const float value);
 
         /// @brief Requires the child to have exactly this width.
-        SizedBox& width(const float1 value);
+        SizedBox& width(const float value);
 
     private:
         friend struct access;
         void resolve(resolve_command& command);
 
-        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
         float2 _size = zero<float2>;
     };
 

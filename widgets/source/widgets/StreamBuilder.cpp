@@ -5,7 +5,7 @@ namespace widgets {
 
     // StreamBuilder
 
-    StreamBuilder& StreamBuilder::builder(const std::function<runtime_widget(const std::string&)>& value)
+    StreamBuilder& StreamBuilder::builder(const std::function<widget_id(const std::string&)>& value)
     {
         _flushCallback = value;
         processInitialData();
@@ -19,7 +19,7 @@ namespace widgets {
         return *this;
     }
 
-    StreamBuilder& StreamBuilder::stream(std::ostream& stream, const uint1 buffer_size)
+    StreamBuilder& StreamBuilder::stream(std::ostream& stream, const unsigned int buffer_size)
     {
         _customBuffer = StreamBuilderBuffer(stream, buffer_size);
         _customBuffer.value().flushCallback = [this](const std::string& buffer) {
@@ -68,7 +68,7 @@ namespace widgets {
 
     // StreamBuilderBuffer
 
-    StreamBuilder::StreamBuilderBuffer::StreamBuilderBuffer(std::ostream& sink, const uint1 buffer_size)
+    StreamBuilder::StreamBuilderBuffer::StreamBuilderBuffer(std::ostream& sink, const unsigned int buffer_size)
         : _sink(std::ref(sink))
         , _buffer(static_cast<std::size_t>(buffer_size) + 1)
     {
@@ -77,7 +77,7 @@ namespace widgets {
         setp(_base, _base + _buffer.size() - 1);
     }
 
-    bool1 StreamBuilder::StreamBuilderBuffer::triggerAndFlush()
+    bool StreamBuilder::StreamBuilderBuffer::triggerAndFlush()
     {
         std::ptrdiff_t _count = pptr() - pbase();
         std::string _str(pbase(), _count);
@@ -103,14 +103,14 @@ namespace widgets {
         return traits_type::eof();
     }
 
-    int1 StreamBuilder::StreamBuilderBuffer::sync()
+    int StreamBuilder::StreamBuilderBuffer::sync()
     {
         return triggerAndFlush() ? 0 : -1;
     }
 
     // WideStreamBuilder
 
-    WideStreamBuilder& WideStreamBuilder::builder(const std::function<runtime_widget(const std::wstring&)>& value)
+    WideStreamBuilder& WideStreamBuilder::builder(const std::function<widget_id(const std::wstring&)>& value)
     {
         _flushCallback = value;
         processInitialData();
@@ -124,7 +124,7 @@ namespace widgets {
         return *this;
     }
 
-    WideStreamBuilder& WideStreamBuilder::stream(std::wostream& stream, const uint1 buffer_size)
+    WideStreamBuilder& WideStreamBuilder::stream(std::wostream& stream, const unsigned int buffer_size)
     {
         _customBuffer = WideStreamBuilderBuffer(stream, buffer_size);
         _customBuffer.value().flushCallback = [this](const std::wstring& buffer) {
@@ -175,7 +175,7 @@ namespace widgets {
 
     // WideStreamBuilderBuffer
 
-    WideStreamBuilder::WideStreamBuilderBuffer::WideStreamBuilderBuffer(std::wostream& sink, const uint1 buffer_size)
+    WideStreamBuilder::WideStreamBuilderBuffer::WideStreamBuilderBuffer(std::wostream& sink, const unsigned int buffer_size)
         : _sink(std::ref(sink))
         , _buffer(static_cast<std::size_t>(buffer_size) + 1)
     {
@@ -184,7 +184,7 @@ namespace widgets {
         setp(_base, _base + _buffer.size() - 1);
     }
 
-    bool1 WideStreamBuilder::WideStreamBuilderBuffer::triggerAndFlush()
+    bool WideStreamBuilder::WideStreamBuilderBuffer::triggerAndFlush()
     {
         std::ptrdiff_t _count = pptr() - pbase();
         std::wstring _str(pbase(), _count);
@@ -210,7 +210,7 @@ namespace widgets {
         return traits_type::eof();
     }
 
-    int1 WideStreamBuilder::WideStreamBuilderBuffer::sync()
+    int WideStreamBuilder::WideStreamBuilderBuffer::sync()
     {
         return triggerAndFlush() ? 0 : -1;
     }

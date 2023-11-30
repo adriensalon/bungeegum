@@ -37,7 +37,7 @@ namespace widgets {
         {
             if (_childWidget.has_value())
                 abandon(this, _childWidget.value());
-            _childWidget = runtime_widget(value);
+            _childWidget = widget_id(value);
             adopt(this, _childWidget.value());
             return *this;
         }
@@ -64,7 +64,7 @@ namespace widgets {
         Container& foregroundDecoration(const ShapeDecoration& value);
 
         /// @brief
-        Container& height(const float1 value);
+        Container& height(const float value);
 
         /// @brief Empty space to surround the decoration and child.
         Container& margin(const EdgeInsets& value);
@@ -81,7 +81,7 @@ namespace widgets {
         Container& transformAlignment(const Alignment& value);
 
         /// @brief
-        Container& width(const float1 value);
+        Container& width(const float value);
 
     private:
         friend struct access;
@@ -89,7 +89,7 @@ namespace widgets {
         void draw(draw_command& command);
 
         Color _color = { 0xFF000000 };
-        std::optional<runtime_widget> _adoptedChild = std::nullopt;
+        std::optional<widget_id> _adoptedChild = std::nullopt;
         std::optional<BoxConstraints> _constraints = std::nullopt;
         std::optional<float2> _size = std::nullopt;
         std::optional<float4x4> _transform = std::nullopt;

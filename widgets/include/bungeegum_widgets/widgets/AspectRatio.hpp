@@ -11,17 +11,17 @@ namespace widgets {
     struct AspectRatio {
 
         /// @brief The aspect ratio to attempt to use.
-        AspectRatio& aspectRatio(const float1 value);
+        AspectRatio& aspectRatio(const float value);
 
         /// @brief The widget below this widget in the tree.
-        AspectRatio& child(const runtime_widget& value);
+        AspectRatio& child(const widget_id& value);
 
     private:
         friend struct access;
         void resolve(resolve_command& command);
 
-        std::optional<runtime_widget> _childWidget = std::nullopt;
-        std::optional<float1> _aspectRatio = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
+        std::optional<float> _aspectRatio = std::nullopt;
     };
 
 }

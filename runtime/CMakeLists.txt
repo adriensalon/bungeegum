@@ -23,43 +23,45 @@ else()
 endif()
 
 set(bungeegum_runtime_source
-	"source/glue/backtrace.cpp"
-	"source/glue/console.cpp"
-	"source/glue/dialog.cpp"
-	"source/glue/imguarded.cpp"
-	"source/glue/regex.cpp"
-	"source/glue/reload.cpp"
-	"source/glue/serialize.cpp"
-	"source/glue/time.cpp"
-	"source/glue/renderer.cpp"
-	"source/glue/window.cpp"
+	"source/asset/font.cpp"
+	"source/asset/image.cpp"
+	"source/asset/shader.cpp"
+
+	"source/core/overlay/compressed/fa4.cpp"
+	"source/core/overlay/compressed/inter_extrabold.cpp"
+	"source/core/overlay/compressed/inter_regular.cpp"
+
+	"source/core/overlay/hierarchy.cpp"
+	"source/core/overlay/hotswapper.cpp"
+	"source/core/overlay/inspector.cpp"
+	"source/core/overlay/logger.cpp"
+	"source/core/overlay/overlay.cpp"
+	"source/core/overlay/profiler.cpp"
+	"source/core/overlay/wireframe.cpp"
 
 	"source/core/animation.cpp"
 	"source/core/curve.cpp"
 	"source/core/draw.cpp"
 	"source/core/event.cpp"
 	"source/core/global.cpp"
+	"source/core/hotswap.cpp"
 	"source/core/interact.cpp"
 	"source/core/log.cpp"
+	"source/core/pipeline.cpp"
 	"source/core/process.cpp"
 	"source/core/resolve.cpp"
-	"source/core/runtime.cpp"
 	"source/core/widget.cpp"
 
-	"source/overlay/hierarchy.cpp"
-	"source/overlay/hotswapper.cpp"
-	"source/overlay/inspector.cpp"
-	"source/overlay/logger.cpp"
-	"source/overlay/overlay.cpp"
-	"source/overlay/profiler.cpp"
-	"source/overlay/wireframe.cpp"
-	"source/overlay/compressed/fa4.cpp"
-	"source/overlay/compressed/inter_extrabold.cpp"
-	"source/overlay/compressed/inter_regular.cpp"
-
-	"source/backend/backend.cpp"
-	"source/backend/embedded.cpp"
-	"source/backend/standalone.cpp"
+	"source/glue/backtrace.cpp"
+	"source/glue/console.cpp"
+	"source/glue/dialog.cpp"
+	"source/glue/imutil.cpp"
+	"source/glue/regex.cpp"
+	"source/glue/reload.cpp"
+	"source/glue/serialize.cpp"
+	"source/glue/time.cpp"
+	"source/glue/renderer.cpp"
+	"source/glue/window.cpp"
 )
 
 add_library(bungeegum_runtime ${bungeegum_runtime_source})
@@ -81,6 +83,9 @@ target_link_libraries(bungeegum_runtime Diligent-Imgui)
 
 if(BUNGEEGUM_ENABLE_BACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND CMAKE_BUILD_TYPE MATCHES "Debug")
 	target_link_libraries(bungeegum_runtime backward)
+	message("lool")
+else()
+	message("lol")
 endif()
 
 if(BUNGEEGUM_ENABLE_OVERLAY)
@@ -130,10 +135,12 @@ target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_DIRECTX)
 target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_VULKAN)
 target_compile_definitions(bungeegum_runtime PUBLIC BUNGEEGUM_ENABLE_OPENGL)
 
-if(MSVC)
-	target_compile_options(bungeegum_runtime PRIVATE /W4 /WX)
-else()
-	target_compile_options(bungeegum_runtime PRIVATE -Wall -Wextra -Wpedantic -Werror)
+if(NOT EMSCRIPTEN)
+	if(MSVC)
+		target_compile_options(bungeegum_runtime PRIVATE /W4 /WX)
+	else()
+		target_compile_options(bungeegum_runtime PRIVATE -Wall -Wextra -Wpedantic -Werror)
+	endif()
 endif()
 
 if(DEFINED BUNGEEGUM_INSTALL_DIR)

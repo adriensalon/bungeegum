@@ -3,38 +3,38 @@
 namespace bungeegum {
 namespace widgets {
 
-    Offset::Offset(const float1 dx, const float1 dy)
+    Offset::Offset(const float dx, const float dy)
         : _value { dx, dy }
     {
     }
 
-    Offset Offset::fromDirection(const float1 direction, const float1 distance)
+    Offset Offset::fromDirection(const float direction, const float distance)
     {
         return Offset(distance * std::cosf(direction), distance * std::sinf(direction));
     }
 
-    float1 Offset::direction() const
+    float Offset::direction() const
     {
         return std::atan2f(_value.y, _value.x);
     }
 
-    float1 Offset::distance() const
+    float Offset::distance() const
     {
         return std::sqrtf(distanceSquared());
     }
 
-    float1 Offset::distanceSquared() const
+    float Offset::distanceSquared() const
     {
         float2 _squared = _value * _value;
         return _squared.x + _squared.y;
     }
 
-    float1 Offset::dx() const
+    float Offset::dx() const
     {
         return _value.x;
     }
 
-    float1 Offset::dy() const
+    float Offset::dy() const
     {
         return _value.y;
     }
@@ -49,13 +49,13 @@ namespace widgets {
         return is_infinite<float2>(_value);
     }
 
-    Offset Offset::scale(const float1 scaleX, const float1 scaleY)
+    Offset Offset::scale(const float scaleX, const float scaleY)
     {
         _value *= float2 { scaleX, scaleY };
         return *this;
     }
 
-    Offset Offset::translate(const float1 translateX, const float1 translateY)
+    Offset Offset::translate(const float translateX, const float translateY)
     {
         _value += float2 { translateX, translateY };
         return *this;
@@ -67,23 +67,23 @@ namespace widgets {
         return *this;
     }
 
-    // Offset& Offset::operatorIntegerDivision(const float1 operand)
+    // Offset& Offset::operatorIntegerDivision(const float operand)
     // {
     // }
 
-    Offset Offset::operator%(const float1 operand)
+    Offset Offset::operator%(const float operand)
     {
         _value = glm::mod(_value, operand);
         return *this;
     }
 
-    Offset Offset::operator*(const float1 operand)
+    Offset Offset::operator*(const float operand)
     {
         _value *= operand;
         return *this;
     }
 
-    Offset Offset::operator+(const float1 operand)
+    Offset Offset::operator+(const float operand)
     {
         _value += operand;
         return *this;
@@ -95,13 +95,13 @@ namespace widgets {
         return *this;
     }
 
-    Offset Offset::operator-(const float1 operand)
+    Offset Offset::operator-(const float operand)
     {
         _value -= operand;
         return *this;
     }
 
-    Offset Offset::operator/(const float1 operand)
+    Offset Offset::operator/(const float operand)
     {
         _value /= operand;
         return *this;

@@ -3,13 +3,13 @@
 namespace bungeegum {
 namespace widgets {
 
-    AspectRatio& AspectRatio::aspectRatio(const float1 value)
+    AspectRatio& AspectRatio::aspectRatio(const float value)
     {
         _aspectRatio = value;
         return *this;
     }
 
-    AspectRatio& AspectRatio::child(const runtime_widget& value)
+    AspectRatio& AspectRatio::child(const widget_id& value)
     {
         if (_childWidget.has_value())
             abandon(this, _childWidget.value());

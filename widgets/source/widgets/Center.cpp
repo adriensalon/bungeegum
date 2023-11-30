@@ -8,7 +8,7 @@ namespace widgets {
 
         void _centerChildWidget(
             resolve_command& command,
-            runtime_widget& childWidget,
+            widget_id& childWidget,
             const float2 childSize,
             const float2 centerSize)
         {
@@ -26,13 +26,13 @@ namespace widgets {
 
     }
 
-    Center& Center::heightFactor(const float1 value)
+    Center& Center::heightFactor(const float value)
     {
         _sizeFactor.y = value;
         return *this;
     }
 
-    Center& Center::widthFactor(const float1 value)
+    Center& Center::widthFactor(const float value)
     {
         _sizeFactor.x = value;
         return *this;

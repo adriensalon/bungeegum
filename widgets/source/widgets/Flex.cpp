@@ -1,7 +1,6 @@
 #include <bungeegum_widgets/core/FlexFit.hpp>
 #include <bungeegum_widgets/widgets/Flex.hpp>
 
-
 namespace bungeegum {
 namespace widgets {
 
@@ -38,11 +37,11 @@ namespace widgets {
     void Flex::resolve(resolve_command& command)
     {
         struct childData {
-            std::optional<float1> flexFactor;
+            std::optional<float> flexFactor;
             std::optional<FlexFit> flexFit;
             float2 resolvedSize;
-            // float1 minMainAxisSpace;
-            float1 maxMainAxisSpace;
+            // float minMainAxisSpace;
+            float maxMainAxisSpace;
         };
 
         std::vector<childData> _childrenData(_children.size());
@@ -52,16 +51,16 @@ namespace widgets {
         // crossAxisAlignment is CrossAxisAlignment.stretch, instead use tight cross axis constraints
         // that match the incoming max extent in the cross axis.
 
-        float1 _mainAxisResolvedNoFlex = 0.f;
-        float1 _maxCrossAxisResolvedNoFlex = 0.f;
+        float _mainAxisResolvedNoFlex = 0.f;
+        float _maxCrossAxisResolvedNoFlex = 0.f;
         float2 _minSizeNoFlex = command.min_size();
         float2 _maxSizeNoFlex = command.max_size();
         if (_direction == Axis::horizontal) { // unbounded main axis
-            // _minSizeNoFlex.x = zero<float1>;
-            _maxSizeNoFlex.x = infinity<float1>;
+            // _minSizeNoFlex.x = zero<float>;
+            _maxSizeNoFlex.x = infinity<float>;
         } else {
-            // _minSizeNoFlex.y = zero<float1>;
-            _maxSizeNoFlex.y = infinity<float1>;
+            // _minSizeNoFlex.y = zero<float>;
+            _maxSizeNoFlex.y = infinity<float>;
         }
         if (_crossAxisAlignment == CrossAxisAlignment::stretch) { // tight cross axis if stretch
             if (_direction == Axis::horizontal) {
@@ -70,14 +69,14 @@ namespace widgets {
                 _minSizeNoFlex.x = _maxSizeNoFlex.x;
             }
         }
-        for (int1 _k = 0; _k < _children.size(); _k++) {
+        for (int _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             resolve_command& _childCommand = get_resolve_command(_children[_k]);
             (void)_childCommand;
-            // _childData.flexFactor = _childCommand.properties<float1>("flexFactor");
+            // _childData.flexFactor = _childCommand.properties<float>("flexFactor");
             // _childData.flexFit = _childCommand.properties<FlexFit>("flexFit");
             if (!_childData.flexFactor.has_value()) {
-                runtime_widget& _child = _children[_k];
+                widget_id& _child = _children[_k];
                 _childData.resolvedSize = command.resolve_child(_child, _minSizeNoFlex, _maxSizeNoFlex);
                 if (_direction == Axis::horizontal) {
                     _mainAxisResolvedNoFlex += _childData.resolvedSize.x;
@@ -94,8 +93,8 @@ namespace widgets {
         // a flex factor of 2.f will receive twice the amount of main axis space as a child with a
         // flex factor of 1.f.
 
-        float1 _sumFactors = zero<float1>;
-        uint1 _countFactors = zero<uint1>;
+        float _sumFactors = zero<float>;
+        unsigned int _countFactors = zero<unsigned int>;
         for (int _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             if (_childData.flexFactor.has_value()) {
@@ -106,7 +105,7 @@ namespace widgets {
         for (int _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             if (_childData.flexFactor.has_value()) {
-                float1 _factorFrac = _childData.flexFactor.value() / _sumFactors;
+                float _factorFrac = _childData.flexFactor.value() / _sumFactors;
                 if (_direction == Axis::horizontal) {
                     // _childData.minMainAxisSpace = _factorFrac * (command.min_size().x - _mainAxisResolvedNoFlex);
                     _childData.maxMainAxisSpace = _factorFrac * (command.max_size().x - _mainAxisResolvedNoFlex);
@@ -124,12 +123,12 @@ namespace widgets {
         // children with Flexible.fit properties that are FlexFit.loose are given loose constraints
         // (i.e., not forced to fill the allocated space).
 
-        float1 _mainAxisResolvedFlex = 0.f;
-        float1 _maxCrossAxisResolvedFlex = 0.f;
-        for (int1 _k = 0; _k < _children.size(); _k++) {
+        float _mainAxisResolvedFlex = 0.f;
+        float _maxCrossAxisResolvedFlex = 0.f;
+        for (int _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             if (_childData.flexFactor.has_value()) {
-                runtime_widget& _child = _children[_k];
+                widget_id& _child = _children[_k];
 
                 float2 _minSizeFlexChild = command.min_size();
                 float2 _maxSizeFlexChild = command.max_size();
@@ -162,7 +161,7 @@ namespace widgets {
         // 4. The cross axis extent of the Flex is the maximum cross axis extent of the children (which
         // will always satisfy the incoming constraints).
 
-        float1 _flexCrossAxisExtent = glm::max(_maxCrossAxisResolvedNoFlex, _maxCrossAxisResolvedFlex);
+        float _flexCrossAxisExtent = glm::max(_maxCrossAxisResolvedNoFlex, _maxCrossAxisResolvedFlex);
 
         // 5. The main axis extent of the Flex is determined by the mainAxisSize property. If the mainAxisSize
         // property is MainAxisSize.max, then the main axis extent of the Flex is the max extent of the
@@ -170,7 +169,7 @@ namespace widgets {
         // axis extent of the Flex is the sum of the main axis extents of the children (subject to the
         // incoming constraints).
 
-        float1 _flexMainAxisExtent;
+        float _flexMainAxisExtent;
         if (_mainAxisSize == MainAxisSize::max) {
             if (_direction == Axis::horizontal) {
                 _flexMainAxisExtent = command.max_size().x;

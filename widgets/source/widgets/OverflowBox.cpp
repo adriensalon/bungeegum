@@ -8,7 +8,7 @@ namespace widgets {
 
         void _alignChildWidget(
             resolve_command& command,
-            runtime_widget& childWidget,
+            widget_id& childWidget,
             const float2 childSize,
             const float2 overflowSize,
             const Alignment alignment)
@@ -36,7 +36,7 @@ namespace widgets {
         return *this;
     }
 
-    OverflowBox& OverflowBox::child(const runtime_widget& value)
+    OverflowBox& OverflowBox::child(const widget_id& value)
     {
         if (_childWidget.has_value())
             abandon(this, _childWidget.value());
@@ -45,25 +45,25 @@ namespace widgets {
         return *this;
     }
 
-    OverflowBox& OverflowBox::maxHeight(const std::optional<float1> value)
+    OverflowBox& OverflowBox::maxHeight(const std::optional<float> value)
     {
         _maxHeight = value;
         return *this;
     }
 
-    OverflowBox& OverflowBox::maxWidth(const std::optional<float1> value)
+    OverflowBox& OverflowBox::maxWidth(const std::optional<float> value)
     {
         _maxWidth = value;
         return *this;
     }
 
-    OverflowBox& OverflowBox::minHeight(const std::optional<float1> value)
+    OverflowBox& OverflowBox::minHeight(const std::optional<float> value)
     {
         _minHeight = value;
         return *this;
     }
 
-    OverflowBox& OverflowBox::minWidth(const std::optional<float1> value)
+    OverflowBox& OverflowBox::minWidth(const std::optional<float> value)
     {
         _minWidth = value;
         return *this;

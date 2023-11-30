@@ -17,7 +17,7 @@ namespace widgets {
     struct Alignment {
 
         // Constructors
-        inline Alignment(const float1 x, const float1 y)
+        inline Alignment(const float x, const float y)
             : _value { x, y } {};
 
         // Factories
@@ -32,8 +32,8 @@ namespace widgets {
         static Alignment topRight();
 
         // Properties
-        float1 x() const;
-        float1 y() const;
+        float x() const;
+        float y() const;
 
         // Methods
         Offset alongOffset(const Offset other);
@@ -42,14 +42,14 @@ namespace widgets {
         Offset withinRect(const Rect rect);
 
         // Operators
-        // Size& operatorIntegerDivision(const float1 operand);
+        // Size& operatorIntegerDivision(const float operand);
         // Size&
-        // operator%(const float1 operand);
-        // Size& operator*(const float1 operand);
+        // operator%(const float operand);
+        // Size& operator*(const float operand);
         // Size& operator+(const Offset& other);
         // Size& operator-(const Offset& other);
         // Size& operator-(const Size& other);
-        // Size& operator/(const float1 operand);
+        // Size& operator/(const float operand);
         // bool operator<(const Offset& other);
         // bool operator<=(const Offset& other);
         // bool operator==(const Offset& other);

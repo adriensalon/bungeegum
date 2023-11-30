@@ -1,0 +1,95 @@
+#pragma once
+
+#include <optional>
+#include <unordered_set>
+
+#include <bungeegum/core/config.hpp>
+#include <bungeegum/core/math.hpp>
+#include <bungeegum/core/widget.fwd>
+#include <bungeegum/glue/renderer.fwd>
+#include <bungeegum/glue/time.fwd>
+#include <bungeegum/glue/window.fwd>
+
+namespace bungeegum {
+
+struct pipeline_ref;
+
+namespace detail {
+
+    using frames_chronometer = chronometer<BUNGEEGUM_USE_TIME_UNIT>;
+    using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_TIME_UNIT>;
+
+    struct pipeline_data {
+        window pipeline_window = {};
+        renderer pipeline_renderer = {};
+        std::optional<std::uintptr_t> raw_root = std::nullopt;
+        std::vector<window_resized_event> window_resized_events = {};
+        std::vector<mouse_moved_event> mouse_moved_events = {};
+        std::vector<mouse_down_event> mouse_down_events = {};
+        std::vector<mouse_up_event> mouse_up_events = {};
+        std::vector<mouse_pressed_event> mouse_pressed_events = {};
+        float2 viewport_size = {};
+        stopwatch profiling_stopwatch; // if profiling
+    };
+
+    struct pipelines_manager {
+        pipelines_manager() = default;
+        pipelines_manager(const pipelines_manager& other) = delete;
+        pipelines_manager& operator=(const pipelines_manager& other) = delete;
+        pipelines_manager(pipelines_manager&& other) = delete;
+        pipelines_manager& operator=(pipelines_manager&& other) = delete;
+
+        [[nodiscard]] bool contains(const std::string& name);
+
+        [[nodiscard]] pipeline_ref create_directx11(const std::string& name);
+
+        [[nodiscard]] pipeline_ref create_directx12(const std::string& name);
+
+        [[nodiscard]] pipeline_ref create_opengl(const std::string& name);
+
+        [[nodiscard]] pipeline_ref create_vulkan(const std::string& name);
+
+        [[nodiscard]] pipeline_data& operator[](const std::string& name);
+
+        [[nodiscard]] pipeline_data& operator[](pipeline_ref& existing_pipeline);
+
+        void setup(const std::string& name, pipeline_data& data);
+
+        std::unordered_map<std::string, pipeline_data> named_pipelines = {};
+
+#if BUNGEEGUM_USE_OVERLAY
+        BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};
+        frames_chronometer profiler_frame_chronometer = {};
+        frames_chronometer profiler_resolve_chronometer = {};
+        frames_chronometer profiler_interact_chronometer = {};
+        frames_chronometer profiler_draw_chronometer = {};
+        std::optional<std::uintptr_t> inspector_selected = std::nullopt;
+
+        inline static std::string to_clean_typename(const std::string& raw_typename)
+        {
+            std::size_t _last_space = raw_typename.find_last_of(' ');
+            if (_last_space == raw_typename.npos) {
+                _last_space = 0;
+            }
+            std::size_t _last_column = raw_typename.find_last_of(':');
+            if (_last_column == raw_typename.npos) {
+                _last_column = 0;
+            }
+            if (_last_space == 0 && _last_column == 0) {
+                return raw_typename;
+            }
+            std::size_t _offset = std::max(_last_space, _last_column) + 1;
+            std::size_t _length = raw_typename.length() - _offset;
+            return raw_typename.substr(_offset, _length);
+        }
+
+        inline void set_clean_typename(widget_update_data& update_data)
+        {
+            std::string _clean_typename = to_clean_typename(update_data.kind->name());
+            update_data.resolver_command._data.clean_typename = _clean_typename;
+            update_data.clean_typename = _clean_typename;
+        }
+#endif
+    };
+}
+}

@@ -3,8 +3,8 @@
 #include <type_traits>
 #include <vector>
 
-#include <bungeegum/glue/console.hpp>
-#include <bungeegum/glue/toolchain.hpp>
+#include <bungeegum/core/config.hpp>
+#include <bungeegum/glue/console.fwd>
 
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
 #include <windows.h>

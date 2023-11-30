@@ -1,4 +1,4 @@
-#include <bungeegum/glue/regex.hpp>
+#include <bungeegum/glue/regex.fwd>
 
 namespace bungeegum {
 namespace detail {

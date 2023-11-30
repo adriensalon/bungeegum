@@ -46,7 +46,6 @@ struct multiDelegateTest {
 
 struct Composed {
 
-
     Composed& build()
     {
         bungeegum::adopt(this, _box.get());
@@ -107,12 +106,12 @@ int main()
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_STANDALONE 1");
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
 
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/runtime/include/");
+    bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
+    bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
+    bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
+    bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
+    bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
+    bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/runtime/include/");
 
     // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Release/bungeegum_runtime.lib");
     // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Release/bungeegum_widgets.lib");
@@ -120,101 +119,102 @@ int main()
     // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Release/hscpp-mem.lib");
     // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Release/imgui.lib");
 
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Debug/bungeegum_runtime.lib");
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Debug/bungeegum_widgets.lib");
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
-    bungeegum::hotswap::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
+    bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Debug/bungeegum_runtime.lib");
+    bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Debug/bungeegum_widgets.lib");
+    bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
+    bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
+    bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
 
-    bungeegum::hotswap::include_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/include/");
-    bungeegum::hotswap::source_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/");
-    bungeegum::hotswap::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
-    bungeegum::hotswap::force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
+    bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/include/");
+    bungeegum::hotswap::get_source_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/");
+    bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
+    bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
 
-    bungeegum::launch(bungeegum::make<Title>()
+    bungeegum::pipeline_ref p = (bungeegum::make_pipeline_ref<bungeegum::renderer_backend::directx11>("mypipe"));
+    p.root(bungeegum::make<Title>()
+               .title("my title !!!")
+               .child(bungeegum::make<Align>()
 
-                          .title("my title !!!")
-                          .child(bungeegum::make<Align>()
+                          .alignment(Alignment::center())
+                          .heightFactor(2.f) // LOL NE MARCHE PAS
+                          //   .widthFactor(2.f) // LOL NE MARCHE PAS
+                          .child(bungeegum::make<CustomSingleChildLayout>()
+                                     .delegate<delegateTest>()
 
-                                     .alignment(Alignment::center())
-                                     .heightFactor(2.f) // LOL NE MARCHE PAS
-                                     //   .widthFactor(2.f) // LOL NE MARCHE PAS
-                                     .child(bungeegum::make<CustomSingleChildLayout>()
-                                                .delegate<delegateTest>()
+                                     //  .constraints(BoxConstraints::tight(Size(500.f, 500.f)))
+                                     //  .height(100.f)
+                                     //  .width(100.f)
+                                     //  .expand()
+                                     .child(bungeegum::make<FutureBuilder<bool>>()
+                                                .initialData(false)
+                                                .future(std::async([]() {
+                                                    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+                                                    return true;
+                                                }))
+                                                .builder([](const bool value) -> bungeegum::widget_id {
+                                                    if (value) {
+                                                        static bungeegum::animation<float> _myanim;
+                                                        _myanim.shape(bungeegum::curve::bounce_in());
+                                                        _myanim.duration<std::chrono::seconds>(10).min(0.f).max(88.f).start();
+                                                        static auto fff = std::async([]() {
+                                                            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                                                            _osstream2 << "Helloooooo4466" << std::endl;
+                                                            bungeegum::set_contextual<float>("myfloat", 2.f);
+                                                        });
+                                                        (void)fff;
+                                                        return bungeegum::make<WideStreamBuilder>()
+                                                            .initialData(L"heyyy")
+                                                            .builder([](const std::wstring& message) -> bungeegum::widget_id {
+                                                                //    std::wcout << message;
 
-                                                //  .constraints(BoxConstraints::tight(Size(500.f, 500.f)))
-                                                //  .height(100.f)
-                                                //  .width(100.f)
-                                                //  .expand()
-                                                .child(bungeegum::make<FutureBuilder<bool>>()
-                                                           .initialData(false)
-                                                           .future(std::async([]() {
-                                                               std::this_thread::sleep_for(std::chrono::milliseconds(4000));
-                                                               return true;
-                                                           }))
-                                                           .builder([](const bool value) -> bungeegum::runtime_widget {
-                                                               if (value) {
-                                                                   static bungeegum::animation<float> _myanim;
-																   _myanim.shape(bungeegum::curve::bounce_in());
-                                                                   _myanim.duration<std::chrono::seconds>(10).min(0.f).max(88.f).start();
-                                                                   static auto fff = std::async([]() {
-                                                                       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                                                                       _osstream2 << "Helloooooo4466" << std::endl;
-                                                                       bungeegum::set_contextual<float>("myfloat", 2.f);
-                                                                   });
-                                                                   (void)fff;
-                                                                   return bungeegum::make<WideStreamBuilder>()
-                                                                       .initialData(L"heyyy")
-                                                                       .builder([](const std::wstring& message) -> bungeegum::runtime_widget {
-                                                                           //    std::wcout << message;
-																			
-                                                                           return bungeegum::make<OverflowBox>()
-                                                                               .maxHeight(40.f)
-                                                                               .minHeight(10.f)
-                                                                               .maxWidth(500.f)
-                                                                               .minWidth(500.f)
-                                                                               .child(bungeegum::make<ColoredBox>()
-                                                                                          .color(0xFF6611FF)
-                                                                                   //   .okok()
-                                                                               );
-                                                                       })
-                                                                       .stream(_osstream2);
-                                                               }
-                                                               return bungeegum::make<Padding>()
-                                                                   .padding(EdgeInsets::fromLTRB(44.f, 10.f, 15.f, 5.f))
-                                                                   .child(bungeegum::make<OverflowBox>()
-                                                                              .maxHeight(400.f)
-                                                                              .minHeight(100.f)
-                                                                              .maxWidth(50.f)
-                                                                              .minWidth(50.f)
-                                                                              .child(bungeegum::make<ColoredBox>()
-                                                                                         .color(0xFF6611FF)
-                                                                                  // .child(bungeegum::make<CustomMultiChildLayout<std::string>>()
-                                                                                  //            .delegate<multiDelegateTest>()
-                                                                                  //            .children({
-                                                                                  //                bungeegum::make<LayoutId<std::string>>()
-                                                                                  //                    .id("1st")
-                                                                                  //                    .child(bungeegum::make<ColoredBox>()
-                                                                                  //                               .color(0xFF8899FF)),
-                                                                                  //                bungeegum::make<LayoutId<std::string>>()
-                                                                                  //                    .id("2nd")
-                                                                                  //                    .child(bungeegum::make<ColoredBox>()
-                                                                                  //                               .color(0xFF8899FF)),
-                                                                                  //                bungeegum::make<LayoutId<std::string>>()
-                                                                                  //                    .id("3rd")
-                                                                                  //                    .child(bungeegum::make_and_get<ColoredBox>()
-                                                                                  //                               .color(0xFF8899FF)),
-                                                                                  //            }))
+                                                                return bungeegum::make<OverflowBox>()
+                                                                    .maxHeight(40.f)
+                                                                    .minHeight(10.f)
+                                                                    .maxWidth(500.f)
+                                                                    .minWidth(500.f)
+                                                                    .child(bungeegum::make<ColoredBox>()
+                                                                               .color(0xFF6611FF)
+                                                                        //   .okok()
+                                                                    );
+                                                            })
+                                                            .stream(_osstream2);
+                                                    }
+                                                    return bungeegum::make<Padding>()
+                                                        .padding(EdgeInsets::fromLTRB(44.f, 10.f, 15.f, 5.f))
+                                                        .child(bungeegum::make<OverflowBox>()
+                                                                   .maxHeight(400.f)
+                                                                   .minHeight(100.f)
+                                                                   .maxWidth(50.f)
+                                                                   .minWidth(50.f)
+                                                                   .child(bungeegum::make<ColoredBox>()
+                                                                              .color(0xFF6611FF)
+                                                                       // .child(bungeegum::make<CustomMultiChildLayout<std::string>>()
+                                                                       //            .delegate<multiDelegateTest>()
+                                                                       //            .children({
+                                                                       //                bungeegum::make<LayoutId<std::string>>()
+                                                                       //                    .id("1st")
+                                                                       //                    .child(bungeegum::make<ColoredBox>()
+                                                                       //                               .color(0xFF8899FF)),
+                                                                       //                bungeegum::make<LayoutId<std::string>>()
+                                                                       //                    .id("2nd")
+                                                                       //                    .child(bungeegum::make<ColoredBox>()
+                                                                       //                               .color(0xFF8899FF)),
+                                                                       //                bungeegum::make<LayoutId<std::string>>()
+                                                                       //                    .id("3rd")
+                                                                       //                    .child(bungeegum::make_and_get<ColoredBox>()
+                                                                       //                               .color(0xFF8899FF)),
+                                                                       //            }))
 
-                                                                                  )
+                                                                       )
 
-                                                                   );
-                                                           }))
+                                                        );
+                                                }))
 
-                                             ))
+                                  ))
 
         //   )
     );
+    p.process_loop(60, true);
 
     return 0;
 }

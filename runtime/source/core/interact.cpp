@@ -16,16 +16,16 @@ interaction_type interact_command::type() const
     return static_cast<interaction_type>(_index);
 }
 
-#define get_interaction_impl(interaction_name)                                                                      \
-    std::optional<interaction_name##_interaction> interact_command::interaction_name() const                        \
-    {                                                                                                               \
-        size_t _index = static_cast<size_t>(interaction_type::interaction_name);                                    \
-        if (_index != _data.command_data.index())                                                                   \
-            return std::nullopt;                                                                                    \
-        detail::##interaction_name##_event _event = std::get<detail::interaction_name##_event>(_data.command_data); \
-        interaction_name##_interaction _interaction;                                                                \
-        _interaction._event = _event;                                                                               \
-        return std::make_optional<interaction_name##_interaction>(_interaction);                                    \
+#define get_interaction_impl(interaction_name)                                                                    \
+    std::optional<interaction_name##_interaction> interact_command::interaction_name() const                      \
+    {                                                                                                             \
+        size_t _index = static_cast<size_t>(interaction_type::interaction_name);                                  \
+        if (_index != _data.command_data.index())                                                                 \
+            return std::nullopt;                                                                                  \
+        detail::interaction_name##_event _event = std::get<detail::interaction_name##_event>(_data.command_data); \
+        interaction_name##_interaction _interaction;                                                              \
+        _interaction._event = _event;                                                                             \
+        return std::make_optional<interaction_name##_interaction>(_interaction);                                  \
     }
 
 get_interaction_impl(window_resized);

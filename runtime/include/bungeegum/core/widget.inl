@@ -1,7 +1,7 @@
 #pragma once
 
-#include <bungeegum/backend/backend.fwd>
 #include <bungeegum/core/global.fwd>
+#include <bungeegum/core/hotswap.fwd>
 #include <bungeegum/core/log.fwd>
 
 namespace bungeegum {
@@ -77,7 +77,7 @@ struct access {
                 } else {
                     float2 _max_size = zero<float2>;
                     for (detail::widget_update_data& _child_widget_data : _widget_data.children) {
-                        runtime_widget _child_widget = detail::global().widgets.create_runtime_widget(_child_widget_data);
+                        widget_id _child_widget = detail::global().widgets.create_runtime_widget(_child_widget_data);
                         float2 _child_size = command.resolve_child(_child_widget, command.min_size(), command.max_size());
                         _max_size = glm::max(_max_size, _child_size);
                         command.position_child(_child_widget, zero<float2>);
@@ -91,6 +91,7 @@ struct access {
     template <typename widget_t>
     constexpr static void detect_on_load(widget_reference<widget_t>& widget)
     {
+#if BUNGEEGUM_USE_HOTSWAP
         const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
         detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
@@ -98,11 +99,15 @@ struct access {
                 archiver.load<widget_t>(const_cast<detail::reloaded<widget_t>&>(widget._data));
             };
         }
+#else
+        (void)widget;
+#endif
     }
 
     template <typename widget_t>
     constexpr static void detect_on_save(widget_reference<widget_t>& widget)
     {
+#if BUNGEEGUM_USE_HOTSWAP
         const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
         detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
@@ -110,11 +115,15 @@ struct access {
                 archiver.save<widget_t>(const_cast<detail::reloaded<widget_t>&>(widget._data));
             };
         }
+#else
+        (void)widget;
+#endif
     }
 
     template <typename widget_t>
     constexpr static void detect_on_sizeof(widget_reference<widget_t>& widget)
     {
+#if BUNGEEGUM_USE_HOTSWAP
         const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
         detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
@@ -126,11 +135,15 @@ struct access {
                 return sizeof(widget_t);
             };
         }
+#else
+        (void)widget;
+#endif
     }
 
     template <typename widget_t>
     constexpr static void detect_on_this(widget_reference<widget_t>& widget)
     {
+#if BUNGEEGUM_USE_HOTSWAP
         const std::uintptr_t _raw_widget = detail::global().widgets.raw(widget.get());
         detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
@@ -142,6 +155,9 @@ struct access {
                 return detail::raw_cast<widget_t>(widget.get());
             };
         }
+#else
+        (void)widget;
+#endif
     }
 };
 
@@ -175,9 +191,11 @@ widget_reference<widget_t> make_reference()
     std::uintptr_t _raw_widget;
     detail::value_type_t<widget_t>* _widget_ptr;
     if constexpr (detail::traits::is_reloadable_v<widget_t>) {
+#if BUNGEEGUM_USE_HOTSWAP
         _widget_ptr = &(detail::global().widgets.widgets.create_component<detail::value_type_t<widget_t>>(
             _entity,
-            detail::global().backend.reload_manager->allocate<widget_t>()));
+            detail::global().hotswap.reload_manager->allocate<widget_t>()));
+#endif
         _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
         detail::global().widgets.set_reloadable_raw<widget_t>(_widget_ptr->get(), _raw_widget);
     } else {
@@ -192,7 +210,7 @@ widget_reference<widget_t> make_reference()
     _update_data.kind = std::make_unique<std::type_index>(typeid(widget_t));
     _update_data.kind_debug = std::string(_update_data.kind->name());
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global().backend.set_clean_typename(_update_data);
+    detail::global().pipelines.set_clean_typename(_update_data);
 #endif
     bungeegum::access::detect_on_interact(_reference);
     bungeegum::access::detect_on_resolve(_reference);
@@ -210,5 +228,51 @@ template <typename widget_t>
 widget_t& make()
 {
     return make_reference<widget_t>().get();
+}
+
+template <typename widget_t>
+widget_id::widget_id(widget_t* widget)
+{
+    std::uintptr_t _raw_widget = detail::global().widgets.raw<widget_t>(*widget);
+    if (!detail::global().widgets.contains(_raw_widget)) {
+        throw detail::backtraced_exception("Errorlol");
+    }
+    _data.raw_widget = _raw_widget;
+}
+
+template <typename widget_t>
+widget_id::widget_id(widget_t& widget)
+{
+    std::uintptr_t _raw_widget = detail::global().widgets.raw<widget_t>(widget);
+    if (!detail::global().widgets.contains(_raw_widget)) {
+        // throw
+    }
+    _data.raw_widget = _raw_widget;
+}
+
+template <typename widget_t>
+widget_id::widget_id(widget_reference<widget_t>& widget)
+{
+    std::uintptr_t _raw_widget = detail::global().widgets.raw<widget_t>(widget.get());
+    if (!detail::global().widgets.contains(_raw_widget)) {
+        // throw
+    }
+    _data.raw_widget = _raw_widget;
+}
+
+template <template <typename, typename> typename container_t, typename allocator_t>
+void get_children(
+    const widget_id& widget,
+    container_t<widget_id, allocator_t>& container)
+{
+    (void)widget;
+    (void)container;
+}
+
+template <typename widget_t>
+bool has_type(const widget_id& widget)
+{
+    (void)widget;
+    return false;
 }
 }

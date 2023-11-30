@@ -8,16 +8,16 @@
 #include <bungeegum/core/interact.hpp>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/resolve.hpp>
-#include <bungeegum/glue/detection.hpp>
-#include <bungeegum/glue/raw.hpp>
-#include <bungeegum/glue/registry.hpp>
-#include <bungeegum/glue/reload.hpp>
+#include <bungeegum/glue/detection.fwd>
+#include <bungeegum/glue/raw.fwd>
+#include <bungeegum/glue/registry.fwd>
+#include <bungeegum/glue/reload.fwd>
 
 struct ImDrawList;
 
 namespace bungeegum {
 
-struct runtime_widget;
+struct widget_id;
 
 template <typename widget_t>
 struct widget_reference;
@@ -48,6 +48,10 @@ namespace detail {
         constexpr static bool has_draw_function_v = is_detected_exact_v<void, detected_draw_function, widget_t>;
 
     }
+
+    struct widget_id_data {
+        std::uintptr_t raw_widget;
+    };
 
     struct widget_update_data {
         registry_entity entity = {};
@@ -92,15 +96,15 @@ namespace detail {
         template <typename property_t>
         [[nodiscard]] property_reference<property_t> create_property_reference(detail::value_type_t<property_t>& reference);
 
-        runtime_widget create_runtime_widget(widget_update_data& widget_data);
+        widget_id create_runtime_widget(widget_update_data& widget_data);
 
         void notify_erase(const std::uintptr_t raw_widget);
 
         [[nodiscard]] widget_update_data& operator[](const std::uintptr_t raw_widget);
 
-        [[nodiscard]] widget_update_data& operator[](const runtime_widget& widget);
+        [[nodiscard]] widget_update_data& operator[](const widget_id& widget);
 
-        [[nodiscard]] std::uintptr_t raw(const runtime_widget& widget);
+        [[nodiscard]] std::uintptr_t raw(const widget_id& widget);
 
         template <typename widget_t>
         [[nodiscard]] std::uintptr_t raw(widget_t& widget);

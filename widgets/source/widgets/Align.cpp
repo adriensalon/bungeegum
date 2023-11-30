@@ -8,7 +8,7 @@ namespace widgets {
 
         void _alignChildWidget(
             resolve_command& command,
-            runtime_widget& childWidget,
+            widget_id& childWidget,
             const float2 childSize,
             const float2 alignSize,
             const Alignment alignment)
@@ -36,13 +36,13 @@ namespace widgets {
         return *this;
     }
 
-    Align& Align::heightFactor(const float1 value)
+    Align& Align::heightFactor(const float value)
     {
         _sizeFactor.y = value;
         return *this;
     }
 
-    Align& Align::widthFactor(const float1 value)
+    Align& Align::widthFactor(const float value)
     {
         _sizeFactor.x = value;
         return *this;

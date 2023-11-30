@@ -6,7 +6,7 @@
 namespace bungeegum {
 namespace widgets {
 
-    ColoredBox& ColoredBox::child(const runtime_widget& value)
+    ColoredBox& ColoredBox::child(const widget_id& value)
     {
         if (_childWidget.has_value())
             abandon(this, _childWidget.value());
@@ -27,7 +27,7 @@ namespace widgets {
 
 #if defined(__HOTRELOADING__)
         // std::cout << "oui" << std::endl;
-		log_message("from hotreload");
+        log_message("from hotreload");
 #endif
         // std::cout << bungeegum::detail::animations_manager::stat_test++ << std::endl;
         // std::cout << bungeegum::detail::global().animations.stat_test++ << std::endl;

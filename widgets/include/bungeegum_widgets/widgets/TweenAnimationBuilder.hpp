@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bungeegum/core/curve.hpp>
-#include <bungeegum/core/runtime.hpp>
+#include <bungeegum/core/widget.hpp>
 #include <bungeegum_widgets/core/Alignment.hpp>
 
 namespace bungeegum {
@@ -12,7 +12,7 @@ namespace widgets {
     struct TweenAnimationBuilder {
 
         /// @brief
-        using ValueWidgetBuilder = std::function<runtime_widget(const animatedValue_t& value, std::optional<runtime_widget>& child)>;
+        using ValueWidgetBuilder = std::function<widget_id(const animatedValue_t& value, std::optional<widget_id>& child)>;
 
         /// @brief Called every time the animation value changes.
         TweenAnimationBuilder& builder(const ValueWidgetBuilder& value)
@@ -25,7 +25,7 @@ namespace widgets {
         }
 
         /// @brief The child widget to pass to the builder.
-        TweenAnimationBuilder& child(const std::optional<runtime_widget>& value)
+        TweenAnimationBuilder& child(const std::optional<widget_id>& value)
         {
             if (_child.has_value()) {
                 abandon(this, _child.value());
@@ -66,7 +66,7 @@ namespace widgets {
         friend struct access;
         void resolve(resolve_command& command)
         {
-			if (_child.has_value()) {
+            if (_child.has_value()) {
                 float2 _childSize = command.resolve_child(_child.value(), command.min_size(), command.max_size());
                 command.position_child(_child.value(), zero<float2>);
                 command.resize(_childSize);
@@ -76,7 +76,7 @@ namespace widgets {
         }
 
         animation<animatedValue_t> _animation = {};
-        std::optional<runtime_widget> _child = std::nullopt;
+        std::optional<widget_id> _child = std::nullopt;
     };
 
 }

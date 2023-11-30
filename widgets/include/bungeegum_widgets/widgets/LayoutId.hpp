@@ -16,11 +16,11 @@ namespace widgets {
     template <typename id_t = LayoutIdDefaultType>
     struct LayoutId {
 
-        LayoutId& child(const runtime_widget& value)
+        LayoutId& child(const widget_id& value)
         {
             if (_childWidget.has_value())
                 abandon(this, _childWidget.value());
-            _childWidget = runtime_widget(value);
+            _childWidget = widget_id(value);
             adopt(this, _childWidget.value());
             return *this;
         }
@@ -44,7 +44,7 @@ namespace widgets {
             // TODO
         }
 
-        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
         std::optional<id_t> _idValue = std::nullopt;
     };
 }

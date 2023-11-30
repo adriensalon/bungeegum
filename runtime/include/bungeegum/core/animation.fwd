@@ -3,9 +3,9 @@
 #include <array>
 #include <chrono>
 
+#include <bungeegum/core/curve.hpp>
 #include <bungeegum/core/event.fwd>
 #include <bungeegum/core/overlay.fwd>
-#include <bungeegum/core/curve.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -23,11 +23,11 @@ namespace detail {
         std::unique_ptr<value_t> min_value = nullptr;
         std::unique_ptr<value_t> max_value = nullptr;
         event_data<value_t> on_value_changed_event;
-        event_data<void> on_end_event;
+        event_data<> on_end_event;
         curve eval_curve = { 0.f, 1.f, std::vector<float2> {} };
-        float1 duration_seconds = 0.f;
-        bool1 is_playing = false;
-        float1 playing_cursor_seconds = 0.f;
+        float duration_seconds = 0.f;
+        bool is_playing = false;
+        float playing_cursor_seconds = 0.f;
     };
 
     struct animation_update_data {
@@ -36,8 +36,8 @@ namespace detail {
 
 #if BUNGEEGUM_USE_OVERLAY
         std::string clean_typename = {};
-        std::vector<float1> overlay_samples = {};
-        std::array<float1, 2> overlay_position = { 0.f, 0.f };
+        std::vector<float> overlay_samples = {};
+        std::array<float, 2> overlay_position = { 0.f, 0.f };
 #endif
     };
 
@@ -48,7 +48,7 @@ namespace detail {
         animations_manager(animations_manager&& other) = delete;
         animations_manager& operator=(animations_manager&& other) = delete;
 
-        using const_iterator = std::unordered_map<std::uintptr_t, animation_update_data>::template const_iterator;
+        using const_iterator = std::unordered_map<std::uintptr_t, animation_update_data>::const_iterator;
 
         [[nodiscard]] const_iterator begin() const;
 

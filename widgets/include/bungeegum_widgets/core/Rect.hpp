@@ -19,25 +19,25 @@ namespace widgets {
 
         /// @brief Constructs a rectangle from its center point, width, and height.
         /// @details The center argument is assumed to be an offset from the origin.
-        static Rect fromCenter(const Offset& center, const float1 width, const float1 height);
+        static Rect fromCenter(const Offset& center, const float width, const float height);
 
         /// @brief Construct a rectangle that bounds the given circle.
         /// @details The center argument is assumed to be an offset from the origin.
-        static Rect fromCircle(const Offset& center, const float1 radius);
+        static Rect fromCircle(const Offset& center, const float radius);
 
         /// @brief Construct a rectangle from its left, top, right, and bottom edges.
-        static Rect fromLTRB(const float1 left, const float1 top, const float1 right, const float1 bottom);
+        static Rect fromLTRB(const float left, const float top, const float right, const float bottom);
 
         /// @brief Construct a rectangle from its left and top edges, its width, and its height.
         /// @details To construct a Rect from an Offset and a Size, you can use the constructor.
-        static Rect fromLTWH(const float1 left, const float1 top, const float1 width, const float1 height);
+        static Rect fromLTWH(const float left, const float top, const float width, const float height);
 
         /// @brief Construct the smallest rectangle that encloses the given offsets, treating
         /// them as vectors from the origin.
         static Rect fromPoints(const Offset& a, const Offset& b);
 
         /// @brief The offset of the bottom edge of this rectangle from the y axis.
-        float1 bottom() const;
+        float bottom() const;
 
         /// @brief The offset to the center of the bottom edge of this rectangle.
         Offset bottomCenter() const;
@@ -59,7 +59,7 @@ namespace widgets {
         Offset centerRight() const;
 
         /// @brief The distance between the top and bottom edges of this rectangle.
-        float1 height() const;
+        float height() const;
 
         /// @brief Whether this rectangle encloses a non-zero area. Negative areas are considered
         /// empty.
@@ -72,23 +72,23 @@ namespace widgets {
         bool isInfinite() const;
 
         /// @brief The offset of the left edge of this rectangle from the x axis.
-        float1 left() const;
+        float left() const;
 
         /// @brief The greater of the magnitudes of the width and the height of this rectangle.
-        float1 longestSide() const;
+        float longestSide() const;
 
         /// @brief The offset of the right edge of this rectangle from the x axis.
-        float1 right() const;
+        float right() const;
 
         /// @brief The lesser of the magnitudes of the width and the height of this rectangle.
-        float1 shortestSide() const;
+        float shortestSide() const;
 
         /// @brief The distance between the upper-left corner and the lower-right corner of this
         /// rectangle.
         Size size() const;
 
         /// @brief The offset of the top edge of this rectangle from the y axis.
-        float1 top() const;
+        float top() const;
 
         /// @brief The offset to the center of the top edge of this rectangle.
         Offset topCenter() const;
@@ -100,7 +100,7 @@ namespace widgets {
         Offset topRight() const;
 
         /// @brief The distance between the left and right edges of this rectangle.
-        float1 width() const;
+        float width() const;
 
         /// @brief Whether the point specified by the given offset (which is assumed to be relative
         /// to the origin) lies between the left and right and the top and bottom edges of this
@@ -125,7 +125,7 @@ namespace widgets {
 }
 
 template <>
-inline widgets::Rect zero<widgets::Rect> = widgets::Rect::fromLTRB(zero<float1>, zero<float1>, zero<float1>, zero<float1>);
+inline widgets::Rect zero<widgets::Rect> = widgets::Rect::fromLTRB(zero<float>, zero<float>, zero<float>, zero<float>);
 
 // largest ?
 }

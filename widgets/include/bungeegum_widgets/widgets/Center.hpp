@@ -20,22 +20,22 @@ namespace widgets {
         {
             if (_childWidget.has_value())
                 abandon(this, _childWidget.value());
-            _childWidget = runtime_widget(value);
+            _childWidget = widget_id(value);
             adopt(this, _childWidget.value());
             return *this;
         }
 
         /// @brief Sets its height to the child's height multiplied by this factor.
-        Center& heightFactor(const float1 value);
+        Center& heightFactor(const float value);
 
         /// @brief Sets its width to the child's width multiplied by this factor.
-        Center& widthFactor(const float1 value);
+        Center& widthFactor(const float value);
 
     private:
         friend struct access;
         void resolve(resolve_command& command);
 
-        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
         float2 _sizeFactor = { 1.f, 1.f };
     };
 

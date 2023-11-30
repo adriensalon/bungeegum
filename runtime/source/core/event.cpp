@@ -3,7 +3,7 @@
 namespace bungeegum {
 namespace detail {
 
-    events_manager::const_iterator events_manager::begin() const
+    std::unordered_map<std::uintptr_t, event_update_data>::const_iterator events_manager::begin() const
     {
         return _updatables.begin();
     }
@@ -13,7 +13,7 @@ namespace detail {
         return _updatables.find(raw_event) != _updatables.end();
     }
 
-    events_manager::const_iterator events_manager::end() const
+    std::unordered_map<std::uintptr_t, event_update_data>::const_iterator events_manager::end() const
     {
         return _updatables.end();
     }

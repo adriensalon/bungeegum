@@ -54,7 +54,7 @@ namespace widgets {
         friend struct access;
         void resolve(resolve_command& command);
 
-        std::vector<runtime_widget> _children = {};
+        std::vector<widget_id> _children = {};
         CrossAxisAlignment _crossAxisAlignment = CrossAxisAlignment::center;
         Axis _direction = Axis::horizontal;
         MainAxisAlignment _mainAxisAlignment = MainAxisAlignment::start; // ? ig

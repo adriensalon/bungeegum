@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <thread>
 
-#include <bungeegum/glue/backtrace.hpp>
-#include <bungeegum/glue/toolchain.hpp>
+#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/toolchain.fwd>
 
 namespace bungeegum {
 namespace detail {
@@ -35,7 +35,7 @@ namespace detail {
     template <typename unit_t>
     void chronometer<unit_t>::new_frame()
     {
-        _frame_duration = { 0 };
+        _frame_duration = unit_t { 0 };
         for (std::size_t _k = 0; _k < _tasks.size(); _k++) {
             chronometer_task<unit_t>& _task = _tasks[_k];
             for (const task_callback& _callback : _new_frame_for_each_task_callbacks) {

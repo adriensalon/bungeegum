@@ -1,10 +1,10 @@
-#include <hscpp/Hotswapper.h>
-#include <hscpp/mem/MemoryManager.h>
-
-#include <bungeegum/glue/console.hpp>
-#include <bungeegum/glue/reload.hpp>
+#include <bungeegum/glue/console.fwd>
+#include <bungeegum/glue/reload.fwd>
 
 #if BUNGEEGUM_USE_HOTSWAP
+
+#include <hscpp/Hotswapper.h>
+#include <hscpp/mem/MemoryManager.h>
 
 namespace bungeegum {
 namespace detail {
@@ -85,7 +85,6 @@ namespace detail {
         _swapper = std::make_shared<hscpp::Hotswapper>();
         _manager = std::make_shared<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>>(hscpp::mem::MemoryManager::Create());
         _swapper->SetAllocator((_manager.get()->operator->()));
-        // _swapper->EnableFeature(hscpp::Feature::ManualCompilationOnly);
     }
 
     std::size_t reloader::allocated_blocks_count()

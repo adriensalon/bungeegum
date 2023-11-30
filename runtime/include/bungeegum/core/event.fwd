@@ -3,9 +3,10 @@
 #include <functional>
 #include <future>
 #include <typeindex>
+#include <unordered_map>
 
 #include <bungeegum/core/overlay.fwd>
-#include <bungeegum/glue/typelist.hpp>
+#include <bungeegum/glue/typelist.fwd>
 
 namespace bungeegum {
 namespace detail {
@@ -40,13 +41,14 @@ namespace detail {
         events_manager(events_manager&& other) = delete;
         events_manager& operator=(events_manager&& other) = delete;
 
-        using const_iterator = std::unordered_map<std::uintptr_t, event_update_data>::template const_iterator;
+        // expected unqualified id (name clash ig)
+        // using const_iterator = std::unordered_map<std::uintptr_t, event_update_data>::template const_iterator;
 
-        [[nodiscard]] const_iterator begin() const;
+        [[nodiscard]] std::unordered_map<std::uintptr_t, event_update_data>::const_iterator begin() const;
 
         [[nodiscard]] bool contains(const std::uintptr_t raw_event) const;
 
-        [[nodiscard]] const_iterator end() const;
+        [[nodiscard]] std::unordered_map<std::uintptr_t, event_update_data>::const_iterator end() const;
 
         void notify_erase(const std::uintptr_t raw_event);
 

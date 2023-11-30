@@ -1,10 +1,6 @@
 #pragma once
 
-#include <cstddef>
-#include <memory>
-#include <vector>
-
-#include <bungeegum/core/simd.hpp>
+#include <bungeegum/core/curve.fwd>
 
 namespace bungeegum {
 
@@ -20,35 +16,35 @@ struct curve {
     curve& operator=(curve&& other) = default;
 
     /// @brief Creates an instance from strided control points.
-    curve(const std::vector<float1>& strided_controls);
+    curve(const std::vector<float>& strided_controls);
 
     /// @brief Creates an instance from control points.
     curve(const std::vector<float2>& controls);
 
     /// @brief Creates an instance from strided control points and departure and arrival values.
-    curve(const float1 departure, const float1 arrival, const std::vector<float1>& strided_controls);
+    curve(const float departure, const float arrival, const std::vector<float>& strided_controls);
 
     /// @brief Creates an instance from control points and departure and arrival values.
-    curve(const float1 departure, const float1 arrival, const std::vector<float2>& controls);
+    curve(const float departure, const float arrival, const std::vector<float2>& controls);
 
-	/// @brief Creates an instance from the linear preset.
-	static curve linear();
+    /// @brief Creates an instance from the linear preset.
+    static curve linear();
 
-	/// @brief Creates an instance from the bounce_in preset.
-	static curve bounce_in();
+    /// @brief Creates an instance from the bounce_in preset.
+    static curve bounce_in();
 
-	// ETC
-
-    /// @brief Evaluates the curve at the given fraction.
-    /// @details Clamps fraction between 0.f and 1.f.
-    float1 evaluate_1d(const float1 fraction);
+    // ETC
 
     /// @brief Evaluates the curve at the given fraction.
     /// @details Clamps fraction between 0.f and 1.f.
-    float2 evaluate_2d(const float1 fraction);
+    float evaluate_1d(const float fraction);
+
+    /// @brief Evaluates the curve at the given fraction.
+    /// @details Clamps fraction between 0.f and 1.f.
+    float2 evaluate_2d(const float fraction);
 
     /// @brief Samples the curve given a sample count.
-    std::vector<float1> strided_samples(const std::size_t count);
+    std::vector<float> get_strided_samples(const std::size_t count);
 
 private:
     struct curve_data;

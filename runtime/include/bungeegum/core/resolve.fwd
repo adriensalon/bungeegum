@@ -2,16 +2,16 @@
 
 #include <functional>
 
+#include <bungeegum/core/math.hpp>
 #include <bungeegum/core/overlay.fwd>
-#include <bungeegum/core/simd.hpp>
 
 namespace bungeegum {
 
-struct runtime_widget;
+struct widget_id;
 
 namespace detail {
 
-    struct backend_manager;
+    struct pipelines_manager;
 
     struct process_manager;
 

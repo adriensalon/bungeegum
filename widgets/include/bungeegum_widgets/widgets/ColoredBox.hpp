@@ -45,7 +45,7 @@ namespace widgets {
         //     return *this;
         // }
 
-        ColoredBox& child(const runtime_widget& value);
+        ColoredBox& child(const widget_id& value);
 
         /// @brief The color to paint the background area with.
         ColoredBox& color(const Color value);
@@ -56,7 +56,7 @@ namespace widgets {
         HOTSWAP_METHOD void draw(draw_command& command);
 
         Color _color = { 0xFF000000 };
-        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
 
         int ii = 43;
         float ff = 56.f;

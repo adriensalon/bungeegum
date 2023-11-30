@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/glue/raw.hpp>
+#include <bungeegum/glue/raw.fwd>
 
 namespace bungeegum {
 namespace detail {
@@ -33,8 +33,8 @@ namespace detail {
     void assign_ticker(event_data<values_t...>& data, event_update_data& update_data)
     {
         using callback_iterator = typename event<values_t...>::on_trigger_callback;
-        using future_iterator = typename std::vector<std::future<event<values_t...>::future_values>>::iterator;
-        using shared_future_iterator = typename std::vector<std::shared_future<event<values_t...>::future_values>>::iterator;
+        using future_iterator = typename std::vector<std::future<typename event<values_t...>::future_values>>::iterator;
+        using shared_future_iterator = typename std::vector<std::shared_future<typename event<values_t...>::future_values>>::iterator;
         update_data.ticker = [&]() {
             for (future_iterator _future_it = data.futures.begin(); _future_it != data.futures.end();) {
                 if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
@@ -134,7 +134,7 @@ event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& fut
         detail::assign_ticker(_data, _update_data);
 #if BUNGEEGUM_USE_OVERLAY
         for (const std::type_index& _type_index : _update_data.kinds) {
-            _update_data.clean_typenames.push_back(detail::backend_manager::to_clean_typename(_type_index.name()));
+            _update_data.clean_typenames.push_back(detail::pipelines_manager::to_clean_typename(_type_index.name()));
         }
 #endif
     }
@@ -153,7 +153,7 @@ event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_
         detail::assign_ticker(_data, _update_data);
 #if BUNGEEGUM_USE_OVERLAY
         for (const std::type_index& _type_index : _update_data.kinds) {
-            _update_data.clean_typenames.push_back(detail::backend_manager::to_clean_typename(_type_index.name()));
+            _update_data.clean_typenames.push_back(detail::global().pipelines.to_clean_typename(_type_index.name()));
         }
 #endif
     }

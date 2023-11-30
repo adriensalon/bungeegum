@@ -3,7 +3,7 @@
 namespace bungeegum {
 namespace widgets {
 
-    BoxConstraints::BoxConstraints(const float1 minWidth, const float1 maxWidth, const float1 minHeight, const float1 maxHeight)
+    BoxConstraints::BoxConstraints(const float minWidth, const float maxWidth, const float minHeight, const float maxHeight)
     {
         _minSize = float2 { minWidth, minHeight };
         _maxSize = float2 { maxWidth, maxHeight };
@@ -21,7 +21,7 @@ namespace widgets {
         _maxSize = command.max_size();
     }
 
-    BoxConstraints BoxConstraints::expand(const float1 width, const float1 height)
+    BoxConstraints BoxConstraints::expand(const float width, const float height)
     {
         return BoxConstraints(width, width, height, height);
     }
@@ -36,19 +36,19 @@ namespace widgets {
         return BoxConstraints(size.width(), size.width(), size.height(), size.height());
     }
 
-    // BoxConstraints BoxConstraints::tightForWidth(const float1 width)
+    // BoxConstraints BoxConstraints::tightForWidth(const float width)
     // {
     // }
 
-    // BoxConstraints BoxConstraints::tightForHeight(const float1 height)
+    // BoxConstraints BoxConstraints::tightForHeight(const float height)
     // {
     // }
 
-    // BoxConstraints BoxConstraints::tightForFiniteWidth(const float1 width)
+    // BoxConstraints BoxConstraints::tightForFiniteWidth(const float width)
     // {
     // }
 
-    // BoxConstraints BoxConstraints::tightForFiniteHeight(const float1 height)
+    // BoxConstraints BoxConstraints::tightForFiniteHeight(const float height)
     // {
     // }
 
@@ -63,12 +63,12 @@ namespace widgets {
 
     bool BoxConstraints::hasBoundedHeight() const
     {
-        return (_maxSize.y != infinity<float1>);
+        return (_maxSize.y != infinity<float>);
     }
 
     bool BoxConstraints::hasBoundedWidth() const
     {
-        return (_maxSize.x != infinity<float1>);
+        return (_maxSize.x != infinity<float>);
     }
 
     // bool BoxConstraints::hasInfiniteHeight() const
@@ -96,12 +96,12 @@ namespace widgets {
         return (_minSize == _maxSize);
     }
 
-    float1 BoxConstraints::maxHeight() const
+    float BoxConstraints::maxHeight() const
     {
         return _maxSize.y;
     }
 
-    float1 BoxConstraints::maxWidth() const
+    float BoxConstraints::maxWidth() const
     {
         return _maxSize.x;
     }
@@ -116,12 +116,12 @@ namespace widgets {
         return Size(constrainWidth(size.width()), constrainHeight(size.height()));
     }
 
-    Size BoxConstraints::constrainDimensions(const float1 width, const float1 height) const
+    Size BoxConstraints::constrainDimensions(const float width, const float height) const
     {
         return Size(constrainWidth(width), constrainHeight(height));
     }
 
-    float1 BoxConstraints::constrainHeight(const float1 height) const
+    float BoxConstraints::constrainHeight(const float height) const
     {
         return glm::clamp(height, _minSize.y, _maxSize.y);
     }
@@ -131,15 +131,15 @@ namespace widgets {
         if (isTight()) {
             return smallest();
         }
-        float1 _width = size.width();
-        float1 _height = size.height();
+        float _width = size.width();
+        float _height = size.height();
         if (_width <= 0.f) {
             log_error("Error TODO");
         }
         if (_height <= 0.f) {
             log_error("Error TODO");
         }
-        float1 _aspectRatio = _width / _height;
+        float _aspectRatio = _width / _height;
         if (_width > _maxSize.x) {
             _width = _maxSize.x;
             _height = _width / _aspectRatio;
@@ -159,7 +159,7 @@ namespace widgets {
         return Size(constrainWidth(_width), constrainHeight(_height));
     }
 
-    float1 BoxConstraints::constrainWidth(const float1 width) const
+    float BoxConstraints::constrainWidth(const float width) const
     {
         return glm::clamp(width, _minSize.x, _maxSize.x);
     }

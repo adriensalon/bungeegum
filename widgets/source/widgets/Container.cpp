@@ -45,7 +45,7 @@ namespace widgets {
         return *this;
     }
 
-    Container& Container::height(const float1 value)
+    Container& Container::height(const float value)
     {
         if (!_size.has_value())
             _size = float2 { 0.f, 0.f };
@@ -77,7 +77,7 @@ namespace widgets {
         return *this;
     }
 
-    Container& Container::width(const float1 value)
+    Container& Container::width(const float value)
     {
         if (!_size.has_value())
             _size = float2 { 0.f, 0.f };

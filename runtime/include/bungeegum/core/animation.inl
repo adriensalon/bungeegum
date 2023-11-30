@@ -1,7 +1,5 @@
 #pragma once
 
-#include <bungeegum/glue/lerp.hpp>
-
 namespace bungeegum {
 namespace detail {
 
@@ -35,10 +33,10 @@ namespace detail {
 
 #if BUNGEEGUM_USE_OVERLAY
             update_data.overlay_position = { _curve_eval.x, _curve_eval.y };
-            update_data.overlay_samples = data.eval_curve.strided_samples(100);
+            update_data.overlay_samples = data.eval_curve.get_strided_samples(100);
 #endif
             float _t = _curve_eval.y;
-            value_t _lerped = lerp<value_t>(std::forward<value_t>(*(data.min_value)), std::forward<value_t>(*(data.max_value)), _t);
+            value_t _lerped = math::lerp<value_t>(std::forward<value_t>(*(data.min_value)), std::forward<value_t>(*(data.max_value)), _t);
             for (auto& _callback : data.on_value_changed_event.callbacks) {
                 _callback(std::forward<value_t>(_lerped));
             }
@@ -48,9 +46,9 @@ namespace detail {
 }
 
 template <typename value_t>
-animation<value_t>& animation<value_t>::on_end(const event<void>& end_callback)
+animation<value_t>& animation<value_t>::on_end(const event<>& end_event)
 {
-    _data.on_end_event.merge(value_changed_event);
+    _data.on_end_event.merge(end_event);
     return *this;
 }
 
@@ -85,7 +83,7 @@ animation<value_t>& animation<value_t>::start()
         _update_data.kind = std::make_unique<std::type_index>(typeid(value_t));
         detail::assign_ticker(_data, _update_data);
 #if BUNGEEGUM_USE_OVERLAY
-        _update_data.clean_typename = detail::backend_manager::to_clean_typename(_update_data.kind->name());
+        _update_data.clean_typename = detail::pipelines_manager::to_clean_typename(_update_data.kind->name());
 #endif
     }
     _data.is_playing = true;

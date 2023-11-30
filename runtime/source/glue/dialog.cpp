@@ -1,6 +1,7 @@
-#include <bungeegum/glue/dialog.hpp>
+#include <bungeegum/glue/dialog.fwd>
 
-#if BUNGEEGUM_USE_DIALOG
+#if BUNGEEGUM_USE_OVERLAY
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
 #include <nfd.h>
 
@@ -150,4 +151,9 @@ namespace detail {
 }
 }
 
+#else
+
+// todo emscripten file dialog
+
+#endif
 #endif

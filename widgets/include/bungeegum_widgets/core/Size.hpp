@@ -12,25 +12,25 @@ namespace widgets {
     struct Size {
 
         // Constructors
-        Size(const float1 width, const float1 height);
+        Size(const float width, const float height);
         Size(const float2 size);
 
         // Factories
-        static Size fromHeight(const float1 height);
-        static Size fromRadius(const float1 radius);
-        static Size fromWidth(const float1 width);
-        static Size square(const float1 dimension);
+        static Size fromHeight(const float height);
+        static Size fromRadius(const float radius);
+        static Size fromWidth(const float width);
+        static Size square(const float dimension);
 
         // Properties
-        float1 aspectRatio() const;
+        float aspectRatio() const;
         Size flipped() const;
-        float1 height() const;
+        float height() const;
         bool isEmpty() const;
         bool isFinite() const;
         bool isInfinite() const;
-        float1 longestSide() const;
-        float1 shortestSide() const;
-        float1 width() const;
+        float longestSide() const;
+        float shortestSide() const;
+        float width() const;
         Offset bottomCenter(const Offset& origin) const;
         Offset bottomLeft(const Offset& origin) const;
         Offset bottomRight(const Offset& origin) const;
@@ -43,14 +43,14 @@ namespace widgets {
         Offset topRight(const Offset& origin) const;
 
         // Operators
-        // Size& operatorIntegerDivision(const float1 operand);
-        Size& operator%(const float1 operand);
-        Size& operator*(const float1 operand);
+        // Size& operatorIntegerDivision(const float operand);
+        Size& operator%(const float operand);
+        Size& operator*(const float operand);
         Size& operator+(const Size& other);
         Size& operator+(const Offset& other);
         Size& operator-(const Offset& other);
         Size& operator-(const Size& other);
-        Size& operator/(const float1 operand);
+        Size& operator/(const float operand);
         bool operator<(const Offset& other);
         bool operator<=(const Offset& other);
         bool operator==(const Offset& other);
@@ -76,8 +76,8 @@ namespace widgets {
 }
 
 template <>
-inline widgets::Size zero<widgets::Size> = { zero<float1>, zero<float1> };
+inline widgets::Size zero<widgets::Size> = { zero<float>, zero<float> };
 
 template <>
-inline widgets::Size infinity<widgets::Size> = { infinity<float1>, infinity<float1> };
+inline widgets::Size infinity<widgets::Size> = { infinity<float>, infinity<float> };
 }

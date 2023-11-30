@@ -23,22 +23,22 @@ namespace widgets {
         {
             if (_childWidget.has_value())
                 abandon(this, _childWidget.value());
-            _childWidget = runtime_widget(value);
+            _childWidget = widget_id(value);
             adopt(this, _childWidget.value());
             return *this;
         }
 
         /// @brief The maximum height limit to apply in the absence of a maxHeight constraint.
-        LimitedBox& maxHeight(const float1 value);
+        LimitedBox& maxHeight(const float value);
 
         /// @brief The maximum width limit to apply in the absence of a maxWidth constraint.
-        LimitedBox& maxWidth(const float1 value);
+        LimitedBox& maxWidth(const float value);
 
     private:
         friend struct access;
         void resolve(resolve_command& command);
 
-        std::optional<runtime_widget> _childWidget = std::nullopt;
+        std::optional<widget_id> _childWidget = std::nullopt;
         float2 _maxSize = infinity<float2>;
     };
 

@@ -4,7 +4,7 @@
 namespace bungeegum {
 namespace widgets {
 
-    Size::Size(const float1 width, const float1 height)
+    Size::Size(const float width, const float height)
         : _value { width, height }
     {
     }
@@ -14,34 +14,34 @@ namespace widgets {
     {
     }
 
-    Size Size::fromHeight(const float1 height)
+    Size Size::fromHeight(const float height)
     {
-        return Size(infinity<float1>, height);
+        return Size(infinity<float>, height);
     }
 
-    Size Size::fromRadius(const float1 radius)
+    Size Size::fromRadius(const float radius)
     {
         return Size::square(radius * 2.f);
     }
 
-    Size Size::fromWidth(const float1 width)
+    Size Size::fromWidth(const float width)
     {
-        return Size(width, infinity<float1>);
+        return Size(width, infinity<float>);
     }
 
-    Size Size::square(const float1 dimension)
+    Size Size::square(const float dimension)
     {
         return Size(dimension, dimension);
     }
 
-    float1 Size::aspectRatio() const
+    float Size::aspectRatio() const
     {
         if (_value.y != 0.f)
             return _value.x / _value.y;
         if (_value.x > 0.f)
-            return infinity<float1>;
+            return infinity<float>;
         if (_value.x < 0.f)
-            return -infinity<float1>; // negative infinity ?
+            return -infinity<float>; // negative infinity ?
         return 0.f;
     }
 
@@ -50,7 +50,7 @@ namespace widgets {
         return Size(_value.y, _value.x);
     }
 
-    float1 Size::height() const
+    float Size::height() const
     {
         return _value.y;
     }
@@ -71,17 +71,17 @@ namespace widgets {
         return is_infinite<float2>(_value);
     }
 
-    float1 Size::longestSide() const
+    float Size::longestSide() const
     {
         return glm::max(glm::abs(_value.x), glm::abs(_value.y));
     }
 
-    float1 Size::shortestSide() const
+    float Size::shortestSide() const
     {
         return glm::min(glm::abs(_value.x), glm::abs(_value.y));
     }
 
-    float1 Size::width() const
+    float Size::width() const
     {
         return _value.x;
     }
@@ -140,17 +140,17 @@ namespace widgets {
         return Offset(origin.dx() + _value.x, origin.dy());
     }
 
-    // Size& Size::operatorIntegerDivision(const float1 operand)
+    // Size& Size::operatorIntegerDivision(const float operand)
     // {
     // }
 
-    Size& Size::operator%(const float1 operand)
+    Size& Size::operator%(const float operand)
     {
         _value = glm::mod(_value, operand);
         return *this;
     }
 
-    Size& Size::operator*(const float1 operand)
+    Size& Size::operator*(const float operand)
     {
         _value *= operand;
         return *this;
@@ -180,7 +180,7 @@ namespace widgets {
         return *this;
     }
 
-    Size& Size::operator/(const float1 operand)
+    Size& Size::operator/(const float operand)
     {
         _value /= operand;
         return *this;

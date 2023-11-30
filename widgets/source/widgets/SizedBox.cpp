@@ -10,7 +10,7 @@ namespace widgets {
         return *this;
     }
 
-    SizedBox& SizedBox::height(const float1 value)
+    SizedBox& SizedBox::height(const float value)
     {
         _size.y = value;
         return *this;
@@ -28,14 +28,14 @@ namespace widgets {
         return *this;
     }
 
-    SizedBox& SizedBox::square(const float1 value)
+    SizedBox& SizedBox::square(const float value)
     {
         _size.x = value;
         _size.y = value;
         return *this;
     }
 
-    SizedBox& SizedBox::width(const float1 value)
+    SizedBox& SizedBox::width(const float value)
     {
         _size.x = value;
         return *this;

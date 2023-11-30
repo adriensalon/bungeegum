@@ -34,9 +34,9 @@ property_reference<property_t>::property_reference(detail::value_type_t<property
 }
 
 template <typename property_t>
-property_reference<property_t> make_property_reference(const runtime_widget& widget)
+property_reference<property_t> make_property_reference(const widget_id& widget)
 {
-	detail::widgets_manager& _widgets_manager = detail::global().widgets;
+    detail::widgets_manager& _widgets_manager = detail::global().widgets;
     detail::registry_entity _entity = _widgets_manager[widget].entity;
     detail::value_type_t<property_t>* _property_ptr;
     if constexpr (detail::traits::is_reloadable_v<property_t>) {
@@ -51,41 +51,41 @@ property_reference<property_t> make_property_reference(const runtime_widget& wid
 }
 
 template <typename property_t>
-property_t& make_property(const runtime_widget& widget)
+property_t& make_property(const widget_id& widget)
 {
     return make_property_reference<property_t>(widget).get();
 }
 
 template <typename property_t>
-bool has_property(const runtime_widget& widget)
+bool has_property(const widget_id& widget)
 {
-	detail::widgets_manager& _widgets_manager = detail::global().widgets;
+    detail::widgets_manager& _widgets_manager = detail::global().widgets;
     detail::registry_entity _entity = _widgets_manager[widget].entity;
     return _widgets_manager.widgets.has_component<property_t>(_entity);
 }
 
 template <typename property_t>
-property_t& get_property(const runtime_widget& widget)
+property_t& get_property(const widget_id& widget)
 {
-	detail::widgets_manager& _widgets_manager = detail::global().widgets;
+    detail::widgets_manager& _widgets_manager = detail::global().widgets;
     detail::registry_entity _entity = _widgets_manager[widget].entity;
     return _widgets_manager.widgets.get_component<property_t>(_entity);
 }
 
 template <typename property_t>
-property_t& get_or_make_property(const runtime_widget& widget)
+property_t& get_or_make_property(const widget_id& widget)
 {
-	if (has_property<property_t>(widget)) {
-		return get_property<property_t>(widget);
-	}
-	return make_property<property_t>(widget);
+    if (has_property<property_t>(widget)) {
+        return get_property<property_t>(widget);
+    }
+    return make_property<property_t>(widget);
 }
 
 template <typename property_t>
-void destroy_property(const runtime_widget& widget)
+void destroy_property(const widget_id& widget)
 {
-	detail::widgets_manager& _widgets_manager = detail::global().widgets;
+    detail::widgets_manager& _widgets_manager = detail::global().widgets;
     detail::registry_entity _entity = _widgets_manager[widget].entity;
-	_widgets_manager.widgets.destroy_component<property_t>(_entity);
+    _widgets_manager.widgets.destroy_component<property_t>(_entity);
 }
 }

@@ -15,12 +15,12 @@ namespace widgets {
 
         CustomMultiChildLayout& children(std::initializer_list<std::reference_wrapper<LayoutId<id_t>>> value)
         {
-            for (const runtime_widget& _widget : _childrenWidgets) {
+            for (const widget_id& _widget : _childrenWidgets) {
                 abandon(this, _widget);
             }
             _childrenWidgets.clear();
             for (std::reference_wrapper<LayoutId<id_t>> _widget : value) {
-                _childrenWidgets.push_back(runtime_widget(_widget.get()));
+                _childrenWidgets.push_back(widget_id(_widget.get()));
                 adopt(this, _widget);
             }
             return *this;
@@ -55,7 +55,7 @@ namespace widgets {
             // perform layout
         };
 
-        std::vector<runtime_widget> _childrenWidgets = {};
+        std::vector<widget_id> _childrenWidgets = {};
         untypedDelegate _delegate = {};
     };
 

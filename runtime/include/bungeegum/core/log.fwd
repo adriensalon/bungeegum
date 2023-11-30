@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/backtrace.fwd>
 
 namespace bungeegum {
 namespace detail {

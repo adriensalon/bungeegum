@@ -31,13 +31,10 @@
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 
-#include <bungeegum/glue/foreach.hpp>
+#include <bungeegum/glue/foreach.fwd>
 
 namespace bungeegum {
 namespace detail {
-
-    // template <typename archive_t, typename field_t>
-	// void serialize_field()
 
     template <typename archive_t, typename... fields_t>
     void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields)
@@ -48,7 +45,7 @@ namespace detail {
         constexpr_for<0, _count, 1>([&archive, &_names, &_tuple](auto _index) {
             std::integral_constant<std::size_t, _index> _constexpr_index;
 
-			using field_type_t = std::variant_alternative_t<_constexpr_index(), std::variant<fields_t...>>;
+            using field_type_t = std::variant_alternative_t<_constexpr_index(), std::variant<fields_t...>>;
 
             //
             // static assert field not const :)
@@ -56,8 +53,6 @@ namespace detail {
 
             field_type_t& _field = std::get<_constexpr_index()>(_tuple);
 
-
-			
             try {
                 archive(cereal::make_nvp(_names[_constexpr_index()].c_str(), _field));
             } catch (...) {

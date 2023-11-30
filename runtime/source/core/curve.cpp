@@ -20,7 +20,7 @@ curve& curve::operator=(const curve& other)
     return *this;
 }
 
-curve::curve(const std::vector<float1>& strided_controls)
+curve::curve(const std::vector<float>& strided_controls)
 {
     _data = std::make_shared<curve_data>();
     _data->bspline = tinyspline::BSpline::interpolateCubicNatural(strided_controls, 2);
@@ -30,7 +30,7 @@ curve::curve(const std::vector<float2>& controls)
 {
     _data = std::make_shared<curve_data>();
     std::size_t _half_size = controls.size();
-    std::vector<float1> _controls_data(2 * _half_size);
+    std::vector<float> _controls_data(2 * _half_size);
     for (std::size_t _k = 0; _k < 2 * _half_size; _k += 2) {
         _controls_data[_k] = controls[_k / 2].x;
         _controls_data[_k + 1] = controls[_k / 2].y;
@@ -38,11 +38,11 @@ curve::curve(const std::vector<float2>& controls)
     _data->bspline = tinyspline::BSpline::interpolateCubicNatural(_controls_data, 2);
 }
 
-curve::curve(const float1 departure, const float1 arrival, const std::vector<float1>& strided_controls)
+curve::curve(const float departure, const float arrival, const std::vector<float>& strided_controls)
 {
     _data = std::make_shared<curve_data>();
     std::size_t _total_size = strided_controls.size() + 4;
-    std::vector<float1> _controls_data(_total_size);
+    std::vector<float> _controls_data(_total_size);
     _controls_data[0] = 0.f;
     _controls_data[1] = departure;
     _controls_data[_total_size - 2] = 1.f;
@@ -53,11 +53,11 @@ curve::curve(const float1 departure, const float1 arrival, const std::vector<flo
     _data->bspline = tinyspline::BSpline::interpolateCubicNatural(_controls_data, 2);
 }
 
-curve::curve(const float1 departure, const float1 arrival, const std::vector<float2>& controls)
+curve::curve(const float departure, const float arrival, const std::vector<float2>& controls)
 {
     _data = std::make_shared<curve_data>();
     std::size_t _half_size = controls.size() + 2;
-    std::vector<float1> _controls_data(2 * _half_size);
+    std::vector<float> _controls_data(2 * _half_size);
     _controls_data[0] = 0.f;
     _controls_data[1] = departure;
     _controls_data[2 * _half_size - 2] = 1.f;
@@ -85,21 +85,21 @@ curve curve::bounce_in()
         }); // TODOOOOO
 }
 
-float1 curve::evaluate_1d(const float1 fraction)
+float curve::evaluate_1d(const float fraction)
 {
-    float1 _clamped = math::clamp(fraction, 0.f, 1.f);
-    const std::vector<float1>& _result_data = _data->bspline.bisect(_clamped).result();
+    float _clamped = math::clamp(fraction, 0.f, 1.f);
+    const std::vector<float>& _result_data = _data->bspline.bisect(_clamped).result();
     return _result_data[1];
 }
 
-float2 curve::evaluate_2d(const float1 fraction)
+float2 curve::evaluate_2d(const float fraction)
 {
-    float1 _clamped = math::clamp(fraction, 0.f, 1.f);
-    const std::vector<float1>& _result_data = _data->bspline.eval(_clamped).result();
+    float _clamped = math::clamp(fraction, 0.f, 1.f);
+    const std::vector<float>& _result_data = _data->bspline.eval(_clamped).result();
     return { _result_data[0], _result_data[1] };
 }
 
-std::vector<float1> curve::strided_samples(const std::size_t count)
+std::vector<float> curve::get_strided_samples(const std::size_t count)
 {
     return (_data->bspline.sample(count));
 }
