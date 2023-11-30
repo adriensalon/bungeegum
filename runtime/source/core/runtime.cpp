@@ -29,6 +29,11 @@ void adopt(const runtime_widget& widget, const runtime_widget& child_widget)
 {
     detail::widget_update_data& _update_data = detail::global().widgets[widget];
     detail::widget_update_data& _child_update_data = detail::global().widgets[child_widget];
+    if (!_update_data.resolver_command.has_value() && _update_data.children.size() > 0) {
+        log_error("Impossible to adopt a new widget because this widget already has one child and "
+                  "does not implement the resolve method. Please ensure that this widget only "
+                  "adopts one child or consider implementing the resolve method.");
+    }
     _child_update_data.parent = _update_data;
     _update_data.children.emplace_back(_child_update_data);
 }
@@ -53,21 +58,15 @@ bool has_parent(const runtime_widget& widget)
     return _update_data.parent.has_value();
 }
 
-runtime_widget get_parent(const runtime_widget& widget)
+std::optional<runtime_widget> get_parent(const runtime_widget& widget)
 {
     detail::widget_update_data& _update_data = detail::global().widgets[widget];
     if (!_update_data.parent.has_value()) {
-        // log_error("Error TODO");
+        return std::nullopt;
     }
     detail::widget_update_data& _parent_update_data = _update_data.parent.value();
     runtime_widget _parent_widget = detail::global().widgets.create_runtime_widget(_parent_update_data);
     return _parent_widget;
-}
-
-resolve_command& get_resolve_command(const runtime_widget& widget)
-{
-    detail::widget_update_data& _update_data = detail::global().widgets[widget];
-    return _update_data.resolver_command;
 }
 
 bool has_interact_command(const runtime_widget& widget)
@@ -76,13 +75,46 @@ bool has_interact_command(const runtime_widget& widget)
     return _update_data.interactor_command.has_value();
 }
 
-interact_command& get_interact_command(const runtime_widget& widget)
+std::optional<interact_command>& get_interact_command(const runtime_widget& widget)
 {
     detail::widget_update_data& _update_data = detail::global().widgets[widget];
-    if (!_update_data.interactor_command.has_value()) {
-        // log_error("Error TODO");
-    }
-    return _update_data.interactor_command.value();
+    return _update_data.interactor_command;
+}
+
+std::optional<runtime_widget> get_next_interacting_child(const runtime_widget& widget)
+{
+	(void)widget;
+	return std::nullopt;
+}
+
+std::optional<runtime_widget> get_previous_interacting_parent(const runtime_widget& widget)
+{
+	(void)widget;
+	return std::nullopt;
+}
+
+bool has_resolve_command(const runtime_widget& widget)
+{
+    detail::widget_update_data& _update_data = detail::global().widgets[widget];
+    return _update_data.resolver_command.has_value();
+}
+
+std::optional<resolve_command>& get_resolve_command(const runtime_widget& widget)
+{
+    detail::widget_update_data& _update_data = detail::global().widgets[widget];
+    return _update_data.resolver_command;
+}
+
+std::optional<runtime_widget> get_next_resolving_child(const runtime_widget& widget)
+{
+	(void)widget;
+	return std::nullopt;
+}
+
+std::optional<runtime_widget> get_previous_resolving_parent(const runtime_widget& widget)
+{
+	(void)widget;
+	return std::nullopt;
 }
 
 bool has_draw_command(const runtime_widget& widget)
@@ -91,12 +123,22 @@ bool has_draw_command(const runtime_widget& widget)
     return _update_data.drawer_command.has_value();
 }
 
-draw_command& get_draw_command(const runtime_widget& widget)
+std::optional<draw_command>& get_draw_command(const runtime_widget& widget)
 {
     detail::widget_update_data& _update_data = detail::global().widgets[widget];
-    if (!_update_data.drawer_command.has_value()) {
-        // log_error("Error TODO");
-    }
-    return _update_data.drawer_command.value();
+    return _update_data.drawer_command;
 }
+
+std::optional<runtime_widget> get_next_drawing_child(const runtime_widget& widget)
+{
+	(void)widget;
+	return std::nullopt;
+}
+
+std::optional<runtime_widget> get_previous_drawing_parent(const runtime_widget& widget)
+{
+	(void)widget;
+	return std::nullopt;
+}
+
 }

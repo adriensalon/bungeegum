@@ -22,14 +22,10 @@ struct resolve_command {
     /// @param constraint
     float2 resolve_child(const runtime_widget& child_widget, const float2 min_size, const float2 max_size) const;
 
-    std::vector<float2> resolve_children(const float2 min_size, const float2 max_size);
-
     /// @brief
     /// @param child_widget
     /// @param position
     void position_child(const runtime_widget& child_widget, const float2 position);
-
-    void position_children(const float2 position);
 
 private:
     detail::resolve_command_data _data;

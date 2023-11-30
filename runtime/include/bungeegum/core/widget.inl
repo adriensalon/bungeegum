@@ -67,25 +67,25 @@ struct access {
         detail::widget_update_data& _widget_data = detail::global().widgets[_raw_widget];
         if constexpr (detail::traits::has_resolve_function_v<widget_t>) {
             _widget_data.resolver = [widget](resolve_command& command) {
-                widget_t& okok = widget.get();
-                okok.resolve(command);
+                widget->resolve(command);
             };
-        } else {
-            _widget_data.resolver = [&_widget_data](resolve_command& command) {
-                if (_widget_data.children.empty()) {
-                    command.resize(command.max_size());
-                } else {
-                    float2 _max_size = zero<float2>;
-                    for (detail::widget_update_data& _child_widget_data : _widget_data.children) {
-                        runtime_widget _child_widget = detail::global().widgets.create_runtime_widget(_child_widget_data);
-                        float2 _child_size = command.resolve_child(_child_widget, command.min_size(), command.max_size());
-                        _max_size = glm::max(_max_size, _child_size);
-                        command.position_child(_child_widget, zero<float2>);
-                    }
-                    command.resize(_max_size);
-                }
-            };
-        }
+        } 
+		// else {
+        //     _widget_data.resolver = [&_widget_data](resolve_command& command) {
+        //         if (_widget_data.children.empty()) {
+        //             command.resize(command.max_size());
+        //         } else {
+        //             float2 _max_size = zero<float2>;
+        //             for (detail::widget_update_data& _child_widget_data : _widget_data.children) {
+        //                 runtime_widget _child_widget = detail::global().widgets.create_runtime_widget(_child_widget_data);
+        //                 float2 _child_size = command.resolve_child(_child_widget, command.min_size(), command.max_size());
+        //                 _max_size = glm::max(_max_size, _child_size);
+        //                 command.position_child(_child_widget, zero<float2>);
+        //             }
+        //             command.resize(_max_size);
+        //         }
+        //     };
+        // }
     }
 
     template <typename widget_t>

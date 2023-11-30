@@ -13,9 +13,6 @@ struct clipping_mesh {
 /// @details
 struct draw_command {
 
-    /// @brief Stops propagation
-    void block();
-
     /// @brief
     [[nodiscard]] float2 resolved_position() const;
 
@@ -29,6 +26,8 @@ struct draw_command {
     // void clip_rect(const float2 first_point, const float2 second_point); //
 
     void clip_mesh(const std::vector<float2>& positions, const std::vector<uint1>& indices);
+
+    void draw_child(const runtime_widget& child_widget);
 
     void orthographic_projection();
 

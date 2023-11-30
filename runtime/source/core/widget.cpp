@@ -11,7 +11,7 @@ namespace detail {
 
     void widgets_manager::notify_erase(const std::uintptr_t raw_widget)
     {
-       _updatables_to_erase.push_back(raw_widget);
+        _updatables_to_erase.push_back(raw_widget);
     }
 
     widget_update_data& widgets_manager::operator[](const std::uintptr_t raw_widget)
@@ -48,6 +48,11 @@ namespace detail {
     // {
     //     return _updatables.insert_or_assign(_root);
     // }
+
+    runtime_widget widgets_manager::create_runtime_widget(const std::uintptr_t raw_widget)
+    {
+        return runtime_widget(detail::runtime_widget_data { raw_widget });
+    }
 
     runtime_widget widgets_manager::create_runtime_widget(widget_update_data& widget_data)
     {

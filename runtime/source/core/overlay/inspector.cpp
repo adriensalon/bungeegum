@@ -265,33 +265,36 @@ namespace detail {
         {
             std::string _title = "resolve" + tag("widget_resolve_tab");
             if (ImGui::BeginTabItem(_title.c_str())) {
-                const resolve_command_data& _data = widget_inspector::access_resolve(update_data.resolver_command);
-                static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
+				std::optional<resolve_command> _resolve_command = update_data.resolver_command;
+				if (_resolve_command.has_value()) {
+					const resolve_command_data& _data = widget_inspector::access_resolve(_resolve_command.value());
+					static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
 
-                // _table_size.y = 2.f * ImGui::GetFrameHeight();
-                if (ImGui::BeginTable(tag("constraint_widget_resolve_table").c_str(), 2, _table_flags)) {
-                    ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::Text("constrained min size");
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text(to_string(_data.constraint.min_size).c_str());
-                    ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::Text("constrained max size");
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text(to_string(_data.constraint.max_size).c_str());
-                    ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::Text("resolved position");
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text(to_string(_data.accumulated_position).c_str());
-                    ImGui::TableNextRow();
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::Text("resolved size");
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text(to_string(_data.resolved_size).c_str());
-                    ImGui::EndTable();
-                }
+					// _table_size.y = 2.f * ImGui::GetFrameHeight();
+					if (ImGui::BeginTable(tag("constraint_widget_resolve_table").c_str(), 2, _table_flags)) {
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("constrained min size");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(to_string(_data.constraint.min_size).c_str());
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("constrained max size");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(to_string(_data.constraint.max_size).c_str());
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("resolved position");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(to_string(_data.accumulated_position).c_str());
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("resolved size");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(to_string(_data.resolved_size).c_str());
+						ImGui::EndTable();
+					}
+				}                
                 ImGui::EndTabItem();
             }
         }

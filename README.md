@@ -180,7 +180,7 @@ __Layout__ (Multi child)
 - 📕 LayoutBuilder
 - 📕 ListBody
 - 📕 ListView
-- 📕 Row
+- 📙 Row
 - 📕 Stack
 - 📕 Table
 - 📕 Wrap
@@ -201,7 +201,7 @@ __Painting__
 - 📕 CustomPainter
 - 📕 DecoratedBox
 - 📕 FractionalTranslation
-- 📕 Opacity
+- 📙 Opacity
 - 📕 RotatedBox
 - 📕 Transform
 
@@ -217,7 +217,7 @@ __Scrolling__
 __Text__
 - 📕 DefaultTextStyle
 - 📕 RichText
-- 📕 Text
+- 📙 Text
 
 ## Implementing widgets
 

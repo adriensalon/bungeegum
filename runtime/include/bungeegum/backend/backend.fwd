@@ -73,8 +73,10 @@ namespace detail {
         inline void set_clean_typename(widget_update_data& update_data)
         {
             std::string _clean_typename = to_clean_typename(update_data.kind->name());
-            update_data.resolver_command._data.clean_typename = _clean_typename;
             update_data.clean_typename = _clean_typename;
+			if (update_data.resolver_command.has_value()) {
+            	update_data.resolver_command.value()._data.clean_typename = _clean_typename;
+			}
         }
 #endif
 

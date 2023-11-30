@@ -36,15 +36,6 @@ runtime_widget::runtime_widget(widget_reference<widget_t>& widget)
     _data.raw_widget = _raw_widget;
 }
 
-template <template <typename, typename> typename container_t, typename allocator_t>
-void get_children(
-    const runtime_widget& widget,
-    container_t<runtime_widget, allocator_t>& container)
-{
-    (void)widget;
-    (void)container;
-}
-
 template <typename widget_t>
 bool has_type(const runtime_widget& widget)
 {

@@ -51,29 +51,52 @@ void adopt(const runtime_widget& widget, const runtime_widget& child_widget);
 void abandon(const runtime_widget& parent_widget, const runtime_widget& child_widget);
 
 /// @brief
-template <template <typename, typename> typename container_t, typename allocator_t = std::allocator<runtime_widget>>
-void get_children(const runtime_widget& widget, container_t<runtime_widget, allocator_t>& container);
+std::vector<runtime_widget> get_children(const runtime_widget& widget);
 
 /// @brief
-[[nodiscard]] bool has_parent(const runtime_widget& widget);
+[[nodiscard]] std::optional<runtime_widget> get_parent(const runtime_widget& widget);
 
-/// @brief
-runtime_widget get_parent(const runtime_widget& widget);
 
-/// @brief
-[[nodiscard]] resolve_command& get_resolve_command(const runtime_widget& widget);
 
 /// @brief
 [[nodiscard]] bool has_interact_command(const runtime_widget& widget);
 
 /// @brief
-[[nodiscard]] interact_command& get_interact_command(const runtime_widget& widget);
+[[nodiscard]] std::optional<interact_command>& get_interact_command(const runtime_widget& widget);
+
+/// @brief
+[[nodiscard]] std::optional<runtime_widget> get_next_interacting_child(const runtime_widget& widget);
+
+/// @brief
+[[nodiscard]] std::optional<runtime_widget> get_previous_interacting_parent(const runtime_widget& widget);
+
+
+
+/// @brief
+[[nodiscard]] bool has_resolve_command(const runtime_widget& widget);
+
+/// @brief
+[[nodiscard]] std::optional<resolve_command>& get_resolve_command(const runtime_widget& widget);
+
+/// @brief
+[[nodiscard]] std::optional<runtime_widget> get_next_resolving_child(const runtime_widget& widget);
+
+/// @brief
+[[nodiscard]] std::optional<runtime_widget> get_previous_resolving_parent(const runtime_widget& widget);
+
+
 
 /// @brief
 [[nodiscard]] bool has_draw_command(const runtime_widget& widget);
 
 /// @brief
-[[nodiscard]] draw_command& get_draw_command(const runtime_widget& widget);
+[[nodiscard]] std::optional<draw_command>& get_draw_command(const runtime_widget& widget);
+
+/// @brief
+[[nodiscard]] std::optional<runtime_widget> get_next_drawing_child(const runtime_widget& widget);
+
+/// @brief
+[[nodiscard]] std::optional<runtime_widget> get_previous_drawing_parent(const runtime_widget& widget);
 
 /// @brief
 template <typename widget_t>

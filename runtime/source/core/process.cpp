@@ -1,3 +1,4 @@
+#include <atomic>
 #include <execution>
 
 #include <bungeegum/backend/backend.fwd>
@@ -7,7 +8,7 @@
 #include <bungeegum/core/log.fwd>
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/core/process.fwd>
-#include <bungeegum/core/widget.hpp>
+#include <bungeegum/core/runtime.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -44,41 +45,59 @@ namespace detail {
 
     void process_manager::_process_resolve()
     {
-        detail::global().backend.profiler_frame_chronometer.begin_task("resolve widgets");
-        bool _resolve_done = false;
-        while (!_resolve_done) {
+        backend_manager& _backend_manager = global().backend;
+        widgets_manager& _widgets_manager = global().widgets;
+        _backend_manager.profiler_frame_chronometer.begin_task("resolve widgets");
+        std::atomic<bool> _resolve_done(false);
+        while (!_resolve_done.load()) {
             std::for_each(
                 std::execution::seq, // go parallel
-                global().widgets.resolvables.begin(),
-                global().widgets.resolvables.end(),
-                [](const std::uintptr_t _raw_widget) {
-                    widget_update_data& _widget_data = global().widgets[_raw_widget];
-                    resolve_command& _resolve_command = _widget_data.resolver_command;
-                    if (_raw_widget == global().widgets.root()) {
-                        _resolve_command._data.constraint.min_size = global().backend.viewport_size;
-                        _resolve_command._data.constraint.max_size = global().backend.viewport_size;
+                _widgets_manager.resolvables.begin(),
+                _widgets_manager.resolvables.end(),
+                [&_backend_manager, &_widgets_manager](const std::uintptr_t _raw_widget) {
+                    runtime_widget _widget = _widgets_manager.create_runtime_widget(_raw_widget);
+                    std::optional<runtime_widget> _optional_resolving;
+                    if (has_resolve_command(_widget)) {
+                        _optional_resolving = _widget;
                     } else {
-                        widget_update_data& _parent_widget_data_ptr = _widget_data.parent.value().get();
-                        resolve_command& _parent_resolve_command = _parent_widget_data_ptr.resolver_command;
-                        _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
+                        _optional_resolving = get_next_resolving_child(_widget);
+                        if (!_optional_resolving.has_value()) {
+                            return;
+                        }
+                    }
+                    const runtime_widget& _resolving = _optional_resolving.value();
+					widget_update_data& _update_data = _widgets_manager[_resolving];
+                    resolve_command& _resolve_command = _update_data.resolver_command.value();
+                    if (_raw_widget == _widgets_manager.root()) {
+                        _resolve_command._data.constraint.min_size = _backend_manager.viewport_size;
+                        _resolve_command._data.constraint.max_size = _backend_manager.viewport_size;
+                    } else {
+						std::optional<runtime_widget> _optional_resolving_parent = get_previous_resolving_parent(_widget);
+						if (!_optional_resolving_parent.has_value()) {
+							return;
+						}
+						const runtime_widget& _resolving_parent = _optional_resolving_parent.value();
+						resolve_command& _parent_resolve_command = get_resolve_command(_resolving_parent).value();
+						_resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
                         _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
+
                     }
 #if BUNGEEGUM_USE_OVERLAY
-                    global().backend.profiler_resolve_chronometer.begin_task(_widget_data.resolver_command._data.clean_typename);
+                    _backend_manager.profiler_resolve_chronometer.begin_task(_update_data.resolver_command.value()._data.clean_typename);
 #endif
-                    global().logs.protect_userspace([&_widget_data]() {
-                        _widget_data.resolver(_widget_data.resolver_command);
+                    global().logs.protect_userspace([&_update_data]() {
+                        _update_data.resolver(_update_data.resolver_command.value());
                     });
 #if BUNGEEGUM_USE_OVERLAY
-                    global().backend.profiler_resolve_chronometer.end_task(_widget_data.resolver_command._data.clean_typename);
+                    _backend_manager.profiler_resolve_chronometer.end_task(_update_data.resolver_command.value()._data.clean_typename);
 #endif
                 });
-            global().widgets.resolvables.erase(
-                global().widgets.resolvables.begin(),
-                global().widgets.resolvables.end());
-            _resolve_done = global().widgets.resolvables.empty();
+            _widgets_manager.resolvables.erase(
+                _widgets_manager.resolvables.begin(),
+                _widgets_manager.resolvables.end());
+            _resolve_done.store(_widgets_manager.resolvables.empty());
         }
-        detail::global().backend.profiler_frame_chronometer.end_task("resolve widgets");
+        _backend_manager.profiler_frame_chronometer.end_task("resolve widgets");
     }
 
     void process_manager::_process_draw(ImDrawList* imgui_drawlist)
@@ -93,10 +112,20 @@ namespace detail {
                 [imgui_drawlist](const std::uintptr_t _raw_widget) {
                     widget_update_data& _widget_data = global().widgets[_raw_widget];
                     global().widgets.traverse(_widget_data, [imgui_drawlist](widget_update_data& _widget_data) {
-                        // accumulate position anyway
-                        resolve_command& _widget_resolver_command = _widget_data.resolver_command;
+                        // accumulate position if 
+                    	runtime_widget _widget = global().widgets.create_runtime_widget(_widget_data);
+						std::optional<runtime_widget> _optional_resolving;
+						if (has_resolve_command(_widget)) {
+							_optional_resolving = _widget;
+						} else {
+							_optional_resolving = get_next_resolving_child(_widget);
+							if (!_optional_resolving.has_value()) {
+								return true;
+							}
+						}
+                        resolve_command& _widget_resolver_command = get_resolve_command(_optional_resolving.value()).value();
                         if (_widget_data.parent.has_value()) {
-                            resolve_command& _parent_resolver_command = _widget_data.parent.value().get().resolver_command;
+                            resolve_command& _parent_resolver_command = _widget_data.parent.value().get().resolver_command.value();
                             _widget_resolver_command._data.accumulated_position = _widget_resolver_command._data.resolved_position + _parent_resolver_command._data.accumulated_position;
                         }
 
