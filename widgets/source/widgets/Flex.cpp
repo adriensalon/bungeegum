@@ -69,7 +69,7 @@ namespace widgets {
                 _minSizeNoFlex.x = _maxSizeNoFlex.x;
             }
         }
-        for (int _k = 0; _k < _children.size(); _k++) {
+        for (std::size_t _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             resolve_command& _childCommand = get_resolve_command(_children[_k]);
             (void)_childCommand;
@@ -95,14 +95,14 @@ namespace widgets {
 
         float _sumFactors = zero<float>;
         unsigned int _countFactors = zero<unsigned int>;
-        for (int _k = 0; _k < _children.size(); _k++) {
+        for (std::size_t _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             if (_childData.flexFactor.has_value()) {
                 _sumFactors += _childData.flexFactor.value();
                 _countFactors++;
             }
         }
-        for (int _k = 0; _k < _children.size(); _k++) {
+        for (std::size_t _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             if (_childData.flexFactor.has_value()) {
                 float _factorFrac = _childData.flexFactor.value() / _sumFactors;
@@ -125,7 +125,7 @@ namespace widgets {
 
         float _mainAxisResolvedFlex = 0.f;
         float _maxCrossAxisResolvedFlex = 0.f;
-        for (int _k = 0; _k < _children.size(); _k++) {
+        for (std::size_t _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             if (_childData.flexFactor.has_value()) {
                 widget_id& _child = _children[_k];

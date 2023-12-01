@@ -24,7 +24,7 @@ namespace detail {
         renderer(renderer&& other) = default;
         renderer& operator=(renderer&& other) = default;
 
-#if ((TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP) && BUNGEEGUM_USE_DIRECTX)
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
         /// @brief Creates an instance from an existing DirectX 11 context.
         void attach_directx11(window& existing_window, void* directx_context, void* directx_swapchain);
 
@@ -32,17 +32,15 @@ namespace detail {
         void attach_directx12(window& existing_window, void* directx_context, void* directx_swapchain);
 #endif
 
-#if BUNGEEGUM_USE_OPENGL
         /// @brief Creates an instance from an existing OpenGL context.
         void attach_opengl(window& existing_window);
-#endif
 
-#if BUNGEEGUM_USE_VULKAN
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
         /// @brief Creates an instance from an existing window with the Vulkan API.
         void attach_vulkan(window& existing_window);
 #endif
 
-#if ((TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP) && BUNGEEGUM_USE_DIRECTX)
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
         /// @brief Creates an instance from an existing window with the DirectX 11 API.
         void create_directx11(window& existing_window);
 
@@ -50,12 +48,10 @@ namespace detail {
         void create_directx12(window& existing_window);
 #endif
 
-#if BUNGEEGUM_USE_OPENGL
         /// @brief Creates an instance from an existing window with the OpenGL API.
         void create_opengl(window& existing_window);
-#endif
 
-#if BUNGEEGUM_USE_VULKAN
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
         /// @brief Creates an instance from an existing window with the Vulkan API.
         void create_vulkan(window& existing_window);
 #endif

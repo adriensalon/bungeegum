@@ -103,8 +103,8 @@ target_include_directories(Diligent-Imgui
 	interface
 	${IMGUIZMO_QUAT_PATH}
 	${DILIGENT_DEAR_IMGUI_PATH}
-	"../../../../libdiligent/external/diligentcore/"
 	PRIVATE
+	"../../diligentcore/"
 	include
 )
 

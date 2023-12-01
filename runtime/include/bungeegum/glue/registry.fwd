@@ -3,7 +3,16 @@
 #include <optional>
 #include <vector>
 
+#include <bungeegum/glue/toolchain.fwd>
+
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #include <entt/entt.hpp>
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic pop
+#endif
 
 #include <bungeegum/glue/typelist.fwd>
 

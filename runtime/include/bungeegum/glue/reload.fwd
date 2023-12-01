@@ -278,10 +278,11 @@ namespace detail {
 #else
 
 /// @brief Only serializes fields for overlay. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
-#define HOTRELOAD_CLASS(classname, ...) SERIALIZE_FIELDS(__VA_ARGS__)
+#define HOTSWAP_CLASS(classname, ...)
+// #define HOTSWAP_CLASS(classname, ...) SERIALIZE_FIELDS(__VA_ARGS__)
 
 /// @brief Does nothing as hotswap is unused. Define BUNGEEGUM_ENABLE_HOTSWAP to 1 to enable.
-#define HOTRELOAD_METHOD
+#define HOTSWAP_METHOD
 
 namespace bungeegum {
 namespace detail {

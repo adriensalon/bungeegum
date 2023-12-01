@@ -107,11 +107,6 @@ target_include_directories(
 
 target_compile_features(EnTT INTERFACE cxx_std_17)
 
-# https://github.com/skypjack/entt/issues/1075
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	target_compile_options(EnTT INTERFACE "-Wno-deprecated-declarations")
-endif()
-
 if(ENTT_INCLUDE_HEADERS)
 	target_sources(
 		EnTT

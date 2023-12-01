@@ -17,7 +17,7 @@ namespace widgets {
         /// @brief Called every time the animation value changes.
         TweenAnimationBuilder& builder(const ValueWidgetBuilder& value)
         {
-            _animation.on_value_changed([this](const animatedValue_t& valueChanged) {
+            _animation.on_value_changed([&](const animatedValue_t& valueChanged) {
                 value(valueChanged, _child);
                 must_resolve(this);
             });
@@ -38,7 +38,7 @@ namespace widgets {
         template <typename durationUnit_t = std::chrono::seconds>
         TweenAnimationBuilder& duration(const unsigned int value)
         {
-            _animation.duration<durationUnit_t>(value);
+            _animation.template duration<durationUnit_t>(value);
             return *this;
         }
 

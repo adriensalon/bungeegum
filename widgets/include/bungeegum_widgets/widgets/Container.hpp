@@ -35,10 +35,10 @@ namespace widgets {
         template <typename childWidget_t>
         Container& child(childWidget_t& value)
         {
-            if (_childWidget.has_value())
-                abandon(this, _childWidget.value());
-            _childWidget = widget_id(value);
-            adopt(this, _childWidget.value());
+            if (_adoptedChild.has_value())
+                abandon(this, _adoptedChild.value());
+            _adoptedChild = widget_id(value);
+            adopt(this, _adoptedChild.value());
             return *this;
         }
 

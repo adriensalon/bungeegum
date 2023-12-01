@@ -21,7 +21,23 @@ namespace detail {
         setup(name, _data);
         return pipeline_ref(_data);
 #else
-        static_assert(false, "DirectX renderer is not available.");
+        // static_assert(false, "DirectX renderer is not available.");
+#endif
+    }
+
+    pipeline_ref pipelines_manager::create_directx12(const std::string& name)
+    {
+#if BUNGEEGUM_USE_DIRECTX
+		if (contains(name)) {
+            // throw
+        }
+        pipeline_data& _data = named_pipelines[name];
+        _data.pipeline_window.create();
+        _data.pipeline_renderer.create_directx12(_data.pipeline_window);
+        setup(name, _data);
+        return pipeline_ref(_data);
+#else
+        // static_assert(false, "DirectX renderer is not available.");
 #endif
     }
 
@@ -38,6 +54,22 @@ namespace detail {
         return pipeline_ref(_data);
 #else
         static_assert(false, "OpenGL renderer is not available.");
+#endif
+    }
+	
+    pipeline_ref pipelines_manager::create_vulkan(const std::string& name)
+    {
+#if BUNGEEGUM_USE_VULKAN
+		if (contains(name)) {
+            // throw
+        }
+        pipeline_data& _data = named_pipelines[name];
+        _data.pipeline_window.create();
+        _data.pipeline_renderer.create_vulkan(_data.pipeline_window);
+        setup(name, _data);
+        return pipeline_ref(_data);
+#else
+        // static_assert(false, "DirectX renderer is not available.");
 #endif
     }
 
@@ -141,24 +173,28 @@ pipeline_ref::pipeline_ref(detail::pipeline_data& data)
 template <>
 pipeline_ref make_pipeline_ref<renderer_backend::directx11>(const std::string& name)
 {
+	detail::setup_global_if_required();
     return detail::global().pipelines.create_directx11(name);
 }
 
 template <>
 pipeline_ref make_pipeline_ref<renderer_backend::directx12>(const std::string& name)
 {
+	detail::setup_global_if_required();
     return detail::global().pipelines.create_directx12(name);
 }
 
 template <>
 pipeline_ref make_pipeline_ref<renderer_backend::opengl>(const std::string& name)
 {
+	detail::setup_global_if_required();
     return detail::global().pipelines.create_opengl(name);
 }
 
 template <>
 pipeline_ref make_pipeline_ref<renderer_backend::vulkan>(const std::string& name)
 {
+	detail::setup_global_if_required();
     return detail::global().pipelines.create_vulkan(name);
 }
 

@@ -6,7 +6,7 @@ add_subdirectory("entt")
 add_subdirectory("cereal")
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-	if(CMAKE_BUILD_TYPE MATCHES "Debug")
+	if(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE MATCHES "Debug") # CMake defaults undefined build type to Debug
 		add_subdirectory("backwardcpp")
 	endif()
 
@@ -54,8 +54,6 @@ set(DILIGENT_NO_FORMAT_VALIDATION ON CACHE BOOL "" FORCE)
 set(DILIGENT_NO_ARCHIVER ON CACHE BOOL "" FORCE) # implement later
 add_subdirectory("diligent")
 
-target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
-target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
 
 if(DEFINED BUNGEEGUM_INSTALL_DIR)
 	file(

@@ -1,3 +1,7 @@
+// #define PLATFORM_WIN32
+#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/renderer.fwd> // TOOLCHAIN HERE !
+
 #include <array>
 
 #include <imgui.h>
@@ -9,26 +13,22 @@
 #include <implot.h>
 
 // define those before including diligent headers
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN && !defined(PLATFORM_EMSCRIPTEN)
 #define PLATFORM_EMSCRIPTEN
-#elif TOOLCHAIN_PLATFORM_WIN32
+#elif TOOLCHAIN_PLATFORM_WIN32 && !defined(PLATFORM_WIN32)
 #define PLATFORM_WIN32
-#elif TOOLCHAIN_PLATFORM_UWP
+#elif TOOLCHAIN_PLATFORM_UWP && !defined(PLATFORM_UNIVERSAL_WINDOWS)
 #define PLATFORM_UNIVERSAL_WINDOWS
-#elif TOOLCHAIN_PLATFORM_ANDROID
+#elif TOOLCHAIN_PLATFORM_ANDROID && !defined(PLATFORM_ANDROID)
 #define PLATFORM_ANDROID
-#elif TOOLCHAIN_PLATFORM_LINUX
+#elif TOOLCHAIN_PLATFORM_LINUX && !defined(PLATFORM_LINUX)
 #define PLATFORM_LINUX
-#elif TOOLCHAIN_PLATFORM_MACOS
+#elif TOOLCHAIN_PLATFORM_MACOS && !defined(PLATFORM_MACOS)
 #define PLATFORM_MACOS
-#elif TOOLCHAIN_PLATFORM_IOS
+#elif TOOLCHAIN_PLATFORM_IOS && !defined(PLATFORM_IOS)
 #define PLATFORM_IOS
 #endif
 
-// #if TOOLCHAIN_COMPILER_CLANG
-// #pragma clang diagnostic push
-// #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-// #endif
 #include <Common/interface/RefCntAutoPtr.hpp>
 #include <Graphics/GraphicsEngineOpenGL/interface/EngineFactoryOpenGL.h>
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
@@ -41,39 +41,25 @@
 #include <Imgui/interface/ImGuiDiligentRenderer.hpp>
 #include <Imgui/interface/ImGuiImplDiligent.hpp>
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-#include <ImGui/interface/ImGuiImplEmscripten.hpp>
+#include <Imgui/interface/ImGuiImplEmscripten.hpp>
 #else
 #include <Imgui/interface/ImGuiImplSDL.hpp>
 #endif
-// #if TOOLCHAIN_COMPILER_CLANG
-// #pragma clang diagnostic pop
-// #endif
-
-#include <bungeegum/glue/backtrace.fwd>
-#include <bungeegum/glue/renderer.fwd>
-
 
 
 namespace bungeegum {
 namespace detail {
-	
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        using diligent_imgui_renderer = Diligent::ImGuiImplEmscripten;
-        using diligent_native_window = Diligent::EmscriptenNativeWindow;
-#else
-        using diligent_imgui_renderer = Diligent::ImGuiImplSDL;
-        using diligent_native_window = Diligent::NativeWindow>;
-#endif
 
     struct renderer::renderer_data {
 
         Diligent::RefCntAutoPtr<Diligent::IRenderDevice> render_device = {};
         Diligent::RefCntAutoPtr<Diligent::IDeviceContext> device_context = {};
         Diligent::RefCntAutoPtr<Diligent::ISwapChain> swap_chain = {};
-        std::shared_ptr<diligent_imgui_renderer> imgui_renderer = nullptr;
-        Diligent::ImGuiImplSDL* imgui_renderer2 = nullptr;
         window* existing_window = nullptr;
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        std::shared_ptr<Diligent::ImGuiImplEmscripten> imgui_renderer = nullptr;
+#else
+        std::shared_ptr<Diligent::ImGuiImplSDL> imgui_renderer = nullptr;
         SDL_Window* sdl_window = nullptr;
 #endif
     };
@@ -129,12 +115,14 @@ namespace detail {
                 static_cast<unsigned int>(_rounded.y),
                 Diligent::SURFACE_TRANSFORM_OPTIMAL);
         });
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         _data->existing_window->on_sdl_event([&](const SDL_Event* _event) {
             _data->imgui_renderer->ProcessEvent(_event);
         });
+#endif
     }
 
-#if ((TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP) && BUNGEEGUM_USE_DIRECTX)
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
     void renderer::create_directx11(window& existing_window)
     {
         _data = std::make_shared<renderer_data>();
@@ -175,17 +163,8 @@ namespace detail {
         _consolidate(_swap_chain_descriptor);
         setup_implot_if_needed();
     }
-
-    // void renderer::attach_directx11(void*, void*)
-    // {
-    // }
-
-    // void renderer::attach_directx12(void*, void*)
-    // {
-    // }
 #endif
 
-#if BUNGEEGUM_USE_OPENGL
     void renderer::create_opengl(window& existing_window)
     {
         _data = std::make_shared<renderer_data>();
@@ -211,15 +190,11 @@ namespace detail {
         setup_implot_if_needed();
     }
 
-    // void renderer::attach_opengl()
-    // {
-    // }
-#endif
-
-#if BUNGEEGUM_USE_VULKAN
-    // void renderer::create_vulkan(window& existing)
-    // {
-    // }
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
+    void renderer::create_vulkan(window& existing)
+    {
+		(void)existing;
+    }
 #endif
 
     void renderer::rebuild_fonts()

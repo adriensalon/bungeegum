@@ -96,7 +96,7 @@ namespace widgets {
         /// @brief Apply a bitwise xor operator to the source and destination images. This leaves
         /// transparency where they would overlap.
         /// @details This corresponds to the "Source xor Destination" Porter-Duff operator.
-        xor,
+        bitwiseXor,
 
         /// @brief Sum the components of the source and destination images.
         /// @details Transparency in a pixel of one of the images reduces the contribution of that

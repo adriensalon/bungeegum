@@ -67,6 +67,8 @@ set(bungeegum_runtime_source
 add_library(bungeegum_runtime ${bungeegum_runtime_source})
 
 target_include_directories(bungeegum_runtime PUBLIC "include/")
+target_include_directories(bungeegum_runtime PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
+target_include_directories(bungeegum_runtime PRIVATE "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
 
 set_property(TARGET bungeegum_runtime PROPERTY CXX_STANDARD 17)
 
@@ -79,6 +81,7 @@ target_link_libraries(bungeegum_runtime Diligent-Primitives)
 target_link_libraries(bungeegum_runtime Diligent-GraphicsEngine)
 target_link_libraries(bungeegum_runtime Diligent-GraphicsTools)
 target_link_libraries(bungeegum_runtime Diligent-ShaderTools)
+# target_link_libraries(bungeegum_runtime Diligent-TargetPlatform)
 target_link_libraries(bungeegum_runtime Diligent-Imgui)
 
 if(BUNGEEGUM_ENABLE_BACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND CMAKE_BUILD_TYPE MATCHES "Debug")

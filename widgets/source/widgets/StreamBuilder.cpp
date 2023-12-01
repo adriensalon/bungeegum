@@ -34,7 +34,7 @@ namespace widgets {
         };
         using _char_type = StreamBuilderBuffer::char_type;
         std::streambuf* _formerStreambuf = stream.basic_ios<_char_type>::rdbuf(&_customBuffer.value());
-        _restoreFormerBuffer = [this, &stream, _formerStreambuf]() {
+        _restoreFormerBuffer = [&stream, _formerStreambuf]() {
             stream.basic_ios<_char_type>::rdbuf(_formerStreambuf);
         };
         return *this;
@@ -137,13 +137,13 @@ namespace widgets {
             adopt(this, _childWidget.value());
             must_resolve(this);
         };
-        using _char_type = WideStreamBuilderBuffer::char_type;
-        std::wstreambuf* _formerStreambuf = stream.basic_ios<_char_type>::rdbuf(&_customBuffer.value());
-        _restoreFormerBuffer = [this, &stream, _formerStreambuf]() {
-            if (&stream != nullptr) {
-                stream.basic_ios<_char_type>::rdbuf(_formerStreambuf);
-            }
-        };
+        // using _char_type = WideStreamBuilderBuffer::char_type;
+        // std::wstreambuf* _formerStreambuf = stream.basic_ios<_char_type>::rdbuf(&_customBuffer.value());
+        // _restoreFormerBuffer = [&stream, _formerStreambuf]() {
+        //     if (&stream != nullptr) {
+        //         stream.basic_ios<_char_type>::rdbuf(_formerStreambuf);
+        //     }
+        // };
         return *this;
     }
 

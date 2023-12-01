@@ -33,13 +33,13 @@ namespace detail {
     struct window::window_data {
         float2 window_size = { 0, 0 };
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        bool must_lock_cursor = false;
-        bool must_unlock_cursor = false;
-        std::vector<std::string> keys_down = {};
-        std::vector<std::string> keys_up = {};
-        std::vector<unsigned int> mouse_buttons_down = {};
-        std::vector<unsigned int> mouse_buttons_up = {};
-        float2 mouse_position_delta = { 0.f, 0.f };
+        inline static bool must_lock_cursor = false;
+        inline static bool must_unlock_cursor = false;
+        inline static std::vector<std::string> keys_down = {};
+        inline static std::vector<std::string> keys_up = {};
+        inline static std::vector<unsigned int> mouse_buttons_down = {};
+        inline static std::vector<unsigned int> mouse_buttons_up = {};
+        inline static float2 mouse_position_delta = { 0.f, 0.f };
 
         [[nodiscard]] static std::string result_to_string(EMSCRIPTEN_RESULT result)
         {
@@ -114,8 +114,8 @@ namespace detail {
             }
             if (event_type == EMSCRIPTEN_EVENT_MOUSEDOWN) {
                 unsigned int _button = event->button;
-                detail::buttons[_button] = true;
-                detail::buttons_changed.emplace_back(_button);
+                // detail::buttons[_button] = true;
+                // detail::buttons_changed.emplace_back(_button);
             } else if (event_type == EMSCRIPTEN_EVENT_MOUSEUP) {
                 unsigned int _button = event->button;
                 // detail::buttons[_button] = false;
@@ -306,7 +306,7 @@ namespace detail {
 
     float2 window::get_size() const
     {
-		return _data->window_size;
+        return _data->window_size;
         // if constexpr (is_platform_emscripten) {
         //     // TODO
         // } else {
@@ -477,11 +477,17 @@ namespace detail {
         }
     }
 
+	static void fake_loop()
+	{
+		
+	}
+
     void window::update_loop(const std::optional<unsigned int> max_framerate)
     {
         (void)max_framerate;
         if constexpr (is_platform_emscripten) {
-            // TODO
+            int _fps = max_framerate.has_value() ? max_framerate.value() : 0;
+            emscripten_set_main_loop([this]() { update_once(); }, _fps, EM_TRUE);
         } else {
             _is_running = true;
             while (_is_running) {

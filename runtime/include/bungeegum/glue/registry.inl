@@ -68,7 +68,7 @@ namespace detail {
     template <typename entity_t>
     std::size_t registry<entity_t>::size() const
     {
-        return _registry.size();
+        return _registry.template storage<entity_t>()->size();
     }
 }
 }
