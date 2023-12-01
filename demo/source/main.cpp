@@ -130,7 +130,8 @@ int main()
     bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
     bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
 
-    bungeegum::pipeline_ref p = (bungeegum::make_pipeline_ref<bungeegum::renderer_backend::directx11>("mypipe"));
+    // bungeegum::pipeline_ref p = (bungeegum::make_pipeline_ref<bungeegum::renderer_backend::directx11>("mypipe"));
+    bungeegum::pipeline_ref p = (bungeegum::make_pipeline_ref("mypipe"));
     p.root(bungeegum::make<Title>()
                .title("my title !!!")
                .child(bungeegum::make<Align>()

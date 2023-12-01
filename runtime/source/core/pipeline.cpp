@@ -11,7 +11,7 @@ namespace detail {
 
     pipeline_ref pipelines_manager::create_directx11(const std::string& name)
     {
-#if ((TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP) && BUNGEEGUM_USE_DIRECTX)
+#if BUNGEEGUM_USE_DIRECTX
         if (contains(name)) {
             // throw
         }
@@ -22,6 +22,22 @@ namespace detail {
         return pipeline_ref(_data);
 #else
         static_assert(false, "DirectX renderer is not available.");
+#endif
+    }
+
+    pipeline_ref pipelines_manager::create_opengl(const std::string& name)
+    {
+#if BUNGEEGUM_USE_OPENGL
+        if (contains(name)) {
+            // throw
+        }
+        pipeline_data& _data = named_pipelines[name];
+        _data.pipeline_window.create();
+        _data.pipeline_renderer.create_opengl(_data.pipeline_window);
+        setup(name, _data);
+        return pipeline_ref(_data);
+#else
+        static_assert(false, "OpenGL renderer is not available.");
 #endif
     }
 
@@ -128,6 +144,24 @@ pipeline_ref make_pipeline_ref<renderer_backend::directx11>(const std::string& n
     return detail::global().pipelines.create_directx11(name);
 }
 
+template <>
+pipeline_ref make_pipeline_ref<renderer_backend::directx12>(const std::string& name)
+{
+    return detail::global().pipelines.create_directx12(name);
+}
+
+template <>
+pipeline_ref make_pipeline_ref<renderer_backend::opengl>(const std::string& name)
+{
+    return detail::global().pipelines.create_opengl(name);
+}
+
+template <>
+pipeline_ref make_pipeline_ref<renderer_backend::vulkan>(const std::string& name)
+{
+    return detail::global().pipelines.create_vulkan(name);
+}
+
 // template <>
 // pipeline& pipeline::create<renderer_backend::directx12>()
 // {
@@ -211,16 +245,16 @@ void pipeline_ref::process_loop(const std::optional<unsigned int> frames_per_sec
 {
     (void)frames_per_second;
     (void)force_rendering;
-    if (!_data.raw_root.has_value()) {
+    if (!_data.get().raw_root.has_value()) {
         // throw
     }
-    _data.pipeline_window.update_loop();
+    _data.get().pipeline_window.update_loop();
 }
 
 pipeline_ref& pipeline_ref::process_once(const bool force_rendering)
 {
     (void)force_rendering;
-    if (!_data.raw_root.has_value()) {
+    if (!_data.get().raw_root.has_value()) {
         // throw
     }
     // _data.pipeline_window.process_once();
@@ -229,7 +263,7 @@ pipeline_ref& pipeline_ref::process_once(const bool force_rendering)
 
 pipeline_ref& pipeline_ref::root(const widget_id& widget)
 {
-    _data.raw_root = detail::global().widgets.raw(widget);
+    _data.get().raw_root = detail::global().widgets.raw(widget);
     // _data.root_widget = detail::global().widgets.raw(widget);
     // detail::global().widgets.root() = detail::global().widgets.raw(widget);
     return *this;
@@ -241,7 +275,7 @@ pipeline_ref& pipeline_ref::root(const widget_id& widget)
 
 pipeline_ref& pipeline_ref::window_title(const std::string& description)
 {
-    _data.pipeline_window.title(description);
+    _data.get().pipeline_window.title(description);
     return *this;
 }
 

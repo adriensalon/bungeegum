@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -9,6 +10,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>
+#include "../common/config.h"
 
 struct empty {
     ~empty() {
@@ -38,21 +40,9 @@ struct not_comparable {
     bool operator==(const not_comparable &) const = delete;
 };
 
-struct not_copyable {
-    not_copyable()
-        : payload{} {}
-
-    not_copyable(const not_copyable &) = delete;
-    not_copyable(not_copyable &&) = default;
-
-    not_copyable &operator=(const not_copyable &) = delete;
-    not_copyable &operator=(not_copyable &&) = default;
-
-    double payload;
-};
-
 struct not_movable {
     not_movable() = default;
+
     not_movable(const not_movable &) = default;
     not_movable(not_movable &&) = delete;
 
@@ -1182,30 +1172,28 @@ TEST_F(Any, AnyCast) {
     ASSERT_EQ(entt::any_cast<int &>(any), 42);
     ASSERT_EQ(entt::any_cast<const int &>(cany), 42);
 
-    not_copyable instance{};
-    instance.payload = 42.;
+    auto instance = std::make_unique<double>(42.);
     entt::any ref{entt::forward_as_any(instance)};
-    entt::any cref{entt::forward_as_any(std::as_const(instance).payload)};
+    entt::any cref{entt::forward_as_any(std::as_const(*instance))};
 
-    ASSERT_EQ(entt::any_cast<not_copyable>(std::move(ref)).payload, 42.);
     ASSERT_EQ(entt::any_cast<double>(std::move(cref)), 42.);
+    ASSERT_EQ(*entt::any_cast<std::unique_ptr<double>>(std::move(ref)), 42.);
     ASSERT_EQ(entt::any_cast<int>(entt::any{42}), 42);
 }
 
-TEST_F(AnyDeathTest, AnyCast) {
+ENTT_DEBUG_TEST_F(AnyDeathTest, AnyCast) {
     entt::any any{42};
     const auto &cany = any;
 
-    ASSERT_DEATH(entt::any_cast<double &>(any), "");
-    ASSERT_DEATH(entt::any_cast<const double &>(cany), "");
+    ASSERT_DEATH([[maybe_unused]] auto &elem = entt::any_cast<double &>(any), "");
+    ASSERT_DEATH([[maybe_unused]] const auto &elem = entt::any_cast<const double &>(cany), "");
 
-    not_copyable instance{};
-    instance.payload = 42.;
+    auto instance = std::make_unique<double>(42.);
     entt::any ref{entt::forward_as_any(instance)};
-    entt::any cref{entt::forward_as_any(std::as_const(instance).payload)};
+    entt::any cref{entt::forward_as_any(std::as_const(*instance))};
 
-    ASSERT_DEATH(entt::any_cast<not_copyable>(std::as_const(ref).as_ref()), "");
-    ASSERT_DEATH(entt::any_cast<double>(entt::any{42}), "");
+    ASSERT_DEATH([[maybe_unused]] auto elem = entt::any_cast<std::unique_ptr<double>>(std::as_const(ref).as_ref()), "");
+    ASSERT_DEATH([[maybe_unused]] auto elem = entt::any_cast<double>(entt::any{42}), "");
 }
 
 TEST_F(Any, MakeAny) {
@@ -1237,9 +1225,9 @@ TEST_F(Any, MakeAny) {
 
 TEST_F(Any, ForwardAsAny) {
     int value = 42;
-    auto any = entt::forward_as_any(std::move(value));
     auto ref = entt::forward_as_any(value);
     auto cref = entt::forward_as_any(std::as_const(value));
+    auto any = entt::forward_as_any(std::move(value));
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(ref);
@@ -1262,8 +1250,8 @@ TEST_F(Any, ForwardAsAny) {
 }
 
 TEST_F(Any, NotCopyableType) {
-    const not_copyable value{};
-    entt::any any{std::in_place_type<not_copyable>};
+    const std::unique_ptr<int> value{};
+    entt::any any{std::in_place_type<std::unique_ptr<int>>};
     entt::any other = entt::forward_as_any(value);
 
     ASSERT_TRUE(any);
@@ -1295,7 +1283,7 @@ TEST_F(Any, NotCopyableType) {
 
 TEST_F(Any, NotCopyableValueType) {
     std::vector<entt::any> vec{};
-    vec.emplace_back(std::in_place_type<not_copyable>);
+    vec.emplace_back(std::in_place_type<std::unique_ptr<int>>);
     vec.shrink_to_fit();
 
     ASSERT_EQ(vec.size(), 1u);
@@ -1303,7 +1291,7 @@ TEST_F(Any, NotCopyableValueType) {
     ASSERT_TRUE(vec[0u]);
 
     // strong exception guarantee due to noexcept move ctor
-    vec.emplace_back(std::in_place_type<not_copyable>);
+    vec.emplace_back(std::in_place_type<std::unique_ptr<int>>);
 
     ASSERT_EQ(vec.size(), 2u);
     ASSERT_TRUE(vec[0u]);
@@ -1410,7 +1398,7 @@ TEST_F(Any, SBOVsZeroedSBOSize) {
 }
 
 TEST_F(Any, SboAlignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+    constexpr auto alignment = alignof(over_aligned);
     entt::basic_any<alignment, alignment> sbo[2] = {over_aligned{}, over_aligned{}};
     const auto *data = sbo[0].data();
 
@@ -1426,7 +1414,7 @@ TEST_F(Any, SboAlignment) {
 }
 
 TEST_F(Any, NoSboAlignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+    constexpr auto alignment = alignof(over_aligned);
     entt::basic_any<alignment> nosbo[2] = {over_aligned{}, over_aligned{}};
     const auto *data = nosbo[0].data();
 

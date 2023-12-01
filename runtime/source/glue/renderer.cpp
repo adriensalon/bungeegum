@@ -30,13 +30,21 @@
 // #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 // #endif
 #include <Common/interface/RefCntAutoPtr.hpp>
+#include <Graphics/GraphicsEngineOpenGL/interface/EngineFactoryOpenGL.h>
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
 #include <Graphics/GraphicsEngineD3D11/interface/EngineFactoryD3D11.h>
 #include <Graphics/GraphicsEngineD3D12/interface/EngineFactoryD3D12.h>
-#include <Graphics/GraphicsEngineOpenGL/interface/EngineFactoryOpenGL.h>
+#endif
+#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
 #include <Graphics/GraphicsEngineVulkan/interface/EngineFactoryVk.h>
-#include <ImGui/interface/ImGuiDiligentRenderer.hpp>
-#include <ImGui/interface/ImGuiImplDiligent.hpp>
-#include <ImGui/interface/ImGuiImplSDL.hpp>
+#endif
+#include <Imgui/interface/ImGuiDiligentRenderer.hpp>
+#include <Imgui/interface/ImGuiImplDiligent.hpp>
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#include <ImGui/interface/ImGuiImplEmscripten.hpp>
+#else
+#include <Imgui/interface/ImGuiImplSDL.hpp>
+#endif
 // #if TOOLCHAIN_COMPILER_CLANG
 // #pragma clang diagnostic pop
 // #endif
@@ -44,16 +52,30 @@
 #include <bungeegum/glue/backtrace.fwd>
 #include <bungeegum/glue/renderer.fwd>
 
+
+
 namespace bungeegum {
 namespace detail {
+	
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        using diligent_imgui_renderer = Diligent::ImGuiImplEmscripten;
+        using diligent_native_window = Diligent::EmscriptenNativeWindow;
+#else
+        using diligent_imgui_renderer = Diligent::ImGuiImplSDL;
+        using diligent_native_window = Diligent::NativeWindow>;
+#endif
 
     struct renderer::renderer_data {
+
         Diligent::RefCntAutoPtr<Diligent::IRenderDevice> render_device = {};
         Diligent::RefCntAutoPtr<Diligent::IDeviceContext> device_context = {};
         Diligent::RefCntAutoPtr<Diligent::ISwapChain> swap_chain = {};
-        std::shared_ptr<Diligent::ImGuiImplSDL> imgui_renderer = nullptr;
+        std::shared_ptr<diligent_imgui_renderer> imgui_renderer = nullptr;
+        Diligent::ImGuiImplSDL* imgui_renderer2 = nullptr;
         window* existing_window = nullptr;
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         SDL_Window* sdl_window = nullptr;
+#endif
     };
 
     //     renderer::renderer(const window& existing_window)
@@ -88,11 +110,18 @@ namespace detail {
 
     void renderer::_consolidate(const Diligent::SwapChainDesc& swapchain_descriptor)
     {
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        _data->imgui_renderer = std::make_shared<Diligent::ImGuiImplEmscripten>(
+            _data->render_device,
+            swapchain_descriptor.ColorBufferFormat,
+            swapchain_descriptor.DepthBufferFormat);
+#else
         _data->imgui_renderer = std::make_shared<Diligent::ImGuiImplSDL>(
             _data->sdl_window,
             _data->render_device,
             swapchain_descriptor.ColorBufferFormat,
             swapchain_descriptor.DepthBufferFormat);
+#endif
         _data->existing_window->on_resized([&](const window_resized_event& _event) {
             float2 _rounded = math::round(_event.new_size);
             _data->swap_chain->Resize(
@@ -161,11 +190,17 @@ namespace detail {
     {
         _data = std::make_shared<renderer_data>();
         _data->existing_window = &existing_window;
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         _data->sdl_window = _data->existing_window->get_sdl();
+#endif
         Diligent::SwapChainDesc _swap_chain_descriptor;
         Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
         Diligent::EngineGLCreateInfo _engine_create_info;
-        _engine_create_info.Window = { existing_window.get_native() };
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
+#else
+        _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
+#endif
         _factory->CreateDeviceAndSwapChainGL(
             _engine_create_info,
             &(_data->render_device),

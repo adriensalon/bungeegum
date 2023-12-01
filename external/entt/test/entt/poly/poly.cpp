@@ -5,6 +5,7 @@
 #include <entt/core/type_info.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
+#include "../common/config.h"
 
 template<typename Base>
 struct common_type: Base {
@@ -17,7 +18,7 @@ struct common_type: Base {
     }
 
     int get() const {
-        return entt::poly_call<2>(*this);
+        return static_cast<int>(entt::poly_call<2>(*this));
     }
 
     void decr() {
@@ -25,11 +26,11 @@ struct common_type: Base {
     }
 
     int mul(int v) const {
-        return entt::poly_call<4>(*this, v);
+        return static_cast<int>(entt::poly_call<4>(*this, v));
     }
 
     int rand() const {
-        return entt::poly_call<5>(*this);
+        return static_cast<int>(entt::poly_call<5>(*this));
     }
 };
 
@@ -297,7 +298,7 @@ TYPED_TEST(Poly, Reference) {
     ASSERT_EQ(poly->mul(3), 3);
 }
 
-TYPED_TEST(Poly, ConstReference) {
+ENTT_DEBUG_TYPED_TEST(Poly, ConstReference) {
     using poly_type = typename TestFixture::template type<>;
 
     impl instance{};
@@ -384,7 +385,7 @@ TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
 }
 
 TYPED_TEST(Poly, SboAlignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+    constexpr auto alignment = alignof(over_aligned);
     typename TestFixture::template type<alignment, alignment> sbo[2]{over_aligned{}, over_aligned{}};
     const auto *data = sbo[0].data();
 
@@ -400,7 +401,7 @@ TYPED_TEST(Poly, SboAlignment) {
 }
 
 TYPED_TEST(Poly, NoSboAlignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+    constexpr auto alignment = alignof(over_aligned);
     typename TestFixture::template type<alignment> nosbo[2]{over_aligned{}, over_aligned{}};
     const auto *data = nosbo[0].data();
 

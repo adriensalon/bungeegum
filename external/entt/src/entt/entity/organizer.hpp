@@ -1,12 +1,10 @@
 #ifndef ENTT_ENTITY_ORGANIZER_HPP
 #define ENTT_ENTITY_ORGANIZER_HPP
 
-#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "../container/dense_map.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
@@ -27,8 +25,8 @@ namespace internal {
 template<typename>
 struct is_view: std::false_type {};
 
-template<typename... Get, typename... Exclude>
-struct is_view<basic_view<get_t<Get...>, exclude_t<Exclude...>>>: std::true_type {};
+template<typename... Args>
+struct is_view<basic_view<Args...>>: std::true_type {};
 
 template<typename Type>
 inline constexpr bool is_view_v = is_view<Type>::value;
@@ -128,7 +126,7 @@ class basic_organizer final {
         if constexpr(std::is_same_v<Type, Registry>) {
             return reg;
         } else if constexpr(internal::is_view_v<Type>) {
-            return as_view{reg};
+            return static_cast<Type>(as_view{reg});
         } else {
             return reg.ctx().template emplace<std::remove_reference_t<Type>>();
         }
@@ -145,8 +143,12 @@ class basic_organizer final {
             return {};
         } else {
             const type_info *info[sizeof...(Type)]{&type_id<Type>()...};
-            const auto length = (std::min)(count, sizeof...(Type));
-            std::copy_n(info, length, buffer);
+            const auto length = count < sizeof...(Type) ? count : sizeof...(Type);
+
+            for(std::size_t pos{}; pos < length; ++pos) {
+                buffer[pos] = info[pos];
+            }
+
             return length;
         }
     }

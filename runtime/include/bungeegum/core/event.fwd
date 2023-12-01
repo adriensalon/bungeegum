@@ -4,6 +4,7 @@
 #include <future>
 #include <typeindex>
 #include <unordered_map>
+#include <vector>
 
 #include <bungeegum/core/overlay.fwd>
 #include <bungeegum/glue/typelist.fwd>

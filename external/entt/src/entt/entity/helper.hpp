@@ -3,10 +3,10 @@
 
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
-#include "component.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
 #include "view.hpp"
@@ -28,7 +28,7 @@ public:
     /*! @brief Type of registry to convert. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<typename registry_type::entity_type>;
+    using entity_type = typename registry_type::entity_type;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -71,7 +71,7 @@ public:
     /*! @brief Type of registry to convert. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<typename registry_type::entity_type>;
+    using entity_type = typename registry_type::entity_type;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -103,7 +103,7 @@ private:
  * @param reg A registry that contains the given entity and its components.
  * @param entt Entity from which to get the component.
  */
-template<auto Member, typename Registry = std::remove_const_t<std::remove_reference_t<nth_argument_t<0u, Member>>>>
+template<auto Member, typename Registry = std::decay_t<nth_argument_t<0u, Member>>>
 void invoke(Registry &reg, const typename Registry::entity_type entt) {
     static_assert(std::is_member_function_pointer_v<decltype(Member)>, "Invalid pointer to non-static member function");
     delegate<void(Registry &, const typename Registry::entity_type)> func;
@@ -126,18 +126,132 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
  */
 template<typename Registry, typename Component>
 typename Registry::entity_type to_entity(const Registry &reg, const Component &instance) {
-    const auto &storage = reg.template storage<Component>();
-    const typename Registry::base_type &base = storage;
-    const auto *addr = std::addressof(instance);
+    if(const auto *storage = reg.template storage<Component>(); storage) {
+        constexpr auto page_size = std::remove_const_t<std::remove_pointer_t<decltype(storage)>>::traits_type::page_size;
+        const typename Registry::common_type &base = *storage;
+        const auto *addr = std::addressof(instance);
 
-    for(auto it = base.rbegin(), last = base.rend(); it < last; it += component_traits<Component>::page_size) {
-        if(const auto dist = (addr - std::addressof(storage.get(*it))); dist >= 0 && dist < static_cast<decltype(dist)>(component_traits<Component>::page_size)) {
-            return *(it + dist);
+        for(auto it = base.rbegin(), last = base.rend(); it < last; it += page_size) {
+            if(const auto dist = (addr - std::addressof(storage->get(*it))); dist >= 0 && dist < static_cast<decltype(dist)>(page_size)) {
+                return *(it + dist);
+            }
         }
     }
 
     return null;
 }
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct sigh_helper;
+
+/**
+ * @brief Signal connection helper for registries.
+ * @tparam Registry Basic registry type.
+ */
+template<typename Registry>
+struct sigh_helper<Registry> {
+    /*! @brief Registry type. */
+    using registry_type = Registry;
+
+    /**
+     * @brief Constructs a helper for a given registry.
+     * @param ref A valid reference to a registry.
+     */
+    sigh_helper(registry_type &ref)
+        : bucket{&ref} {}
+
+    /**
+     * @brief Binds a properly initialized helper to a given signal type.
+     * @tparam Type Type of signal to bind the helper to.
+     * @param id Optional name for the underlying storage to use.
+     * @return A helper for a given registry and signal type.
+     */
+    template<typename Type>
+    auto with(const id_type id = type_hash<Type>::value()) noexcept {
+        return sigh_helper<registry_type, Type>{*bucket, id};
+    }
+
+    /**
+     * @brief Returns a reference to the underlying registry.
+     * @return A reference to the underlying registry.
+     */
+    [[nodiscard]] registry_type &registry() noexcept {
+        return *bucket;
+    }
+
+private:
+    registry_type *bucket;
+};
+
+/**
+ * @brief Signal connection helper for registries.
+ * @tparam Registry Basic registry type.
+ * @tparam Type Type of signal to connect listeners to.
+ */
+template<typename Registry, typename Type>
+struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
+    /*! @brief Registry type. */
+    using registry_type = Registry;
+
+    /**
+     * @brief Constructs a helper for a given registry.
+     * @param ref A valid reference to a registry.
+     * @param id Optional name for the underlying storage to use.
+     */
+    sigh_helper(registry_type &ref, const id_type id = type_hash<Type>::value())
+        : sigh_helper<Registry>{ref},
+          name{id} {}
+
+    /**
+     * @brief Forwards the call to `on_construct` on the underlying storage.
+     * @tparam Candidate Function or member to connect.
+     * @tparam Args Type of class or type of payload, if any.
+     * @param args A valid object that fits the purpose, if any.
+     * @return This helper.
+     */
+    template<auto Candidate, typename... Args>
+    auto on_construct(Args &&...args) {
+        this->registry().template on_construct<Type>(name).template connect<Candidate>(std::forward<Args>(args)...);
+        return *this;
+    }
+
+    /**
+     * @brief Forwards the call to `on_update` on the underlying storage.
+     * @tparam Candidate Function or member to connect.
+     * @tparam Args Type of class or type of payload, if any.
+     * @param args A valid object that fits the purpose, if any.
+     * @return This helper.
+     */
+    template<auto Candidate, typename... Args>
+    auto on_update(Args &&...args) {
+        this->registry().template on_update<Type>(name).template connect<Candidate>(std::forward<Args>(args)...);
+        return *this;
+    }
+
+    /**
+     * @brief Forwards the call to `on_destroy` on the underlying storage.
+     * @tparam Candidate Function or member to connect.
+     * @tparam Args Type of class or type of payload, if any.
+     * @param args A valid object that fits the purpose, if any.
+     * @return This helper.
+     */
+    template<auto Candidate, typename... Args>
+    auto on_destroy(Args &&...args) {
+        this->registry().template on_destroy<Type>(name).template connect<Candidate>(std::forward<Args>(args)...);
+        return *this;
+    }
+
+private:
+    id_type name;
+};
+
+/**
+ * @brief Deduction guide.
+ * @tparam Registry Basic registry type.
+ */
+template<typename Registry>
+sigh_helper(Registry &) -> sigh_helper<Registry>;
 
 } // namespace entt
 

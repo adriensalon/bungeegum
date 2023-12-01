@@ -7,6 +7,7 @@
 #include <utility>
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
+#include "entity.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -42,7 +43,9 @@ public:
         : entt{value},
           it{from},
           last{to} {
-        while(it != last && !it->second.contains(entt)) { ++it; }
+        while(it != last && !it->second.contains(entt)) {
+            ++it;
+        }
     }
 
     constexpr handle_storage_iterator &operator++() noexcept {
@@ -140,7 +143,7 @@ struct basic_handle {
 
     /**
      * @brief Constructs a const handle from a non-const one.
-     * @tparam Other A valid entity type (see entt_traits for more details).
+     * @tparam Other A valid entity type.
      * @tparam Args Scope of the handle to construct.
      * @return A const handle referring to the same registry and the same
      * entity.
@@ -193,26 +196,21 @@ struct basic_handle {
         return entt;
     }
 
-    /**
-     * @brief Destroys the entity associated with a handle.
-     * @sa basic_registry::destroy
-     */
+    /*! @brief Destroys the entity associated with a handle. */
     void destroy() {
-        reg->destroy(entt);
+        reg->destroy(std::exchange(entt, null));
     }
 
     /**
      * @brief Destroys the entity associated with a handle.
-     * @sa basic_registry::destroy
      * @param version A desired version upon destruction.
      */
     void destroy(const version_type version) {
-        reg->destroy(entt, version);
+        reg->destroy(std::exchange(entt, null), version);
     }
 
     /**
      * @brief Assigns the given component to a handle.
-     * @sa basic_registry::emplace
      * @tparam Component Type of component to create.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
@@ -226,7 +224,6 @@ struct basic_handle {
 
     /**
      * @brief Assigns or replaces the given component for a handle.
-     * @sa basic_registry::emplace_or_replace
      * @tparam Component Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
@@ -240,7 +237,6 @@ struct basic_handle {
 
     /**
      * @brief Patches the given component for a handle.
-     * @sa basic_registry::patch
      * @tparam Component Type of component to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param func Valid function objects.
@@ -254,7 +250,6 @@ struct basic_handle {
 
     /**
      * @brief Replaces the given component for a handle.
-     * @sa basic_registry::replace
      * @tparam Component Type of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
@@ -268,7 +263,6 @@ struct basic_handle {
 
     /**
      * @brief Removes the given components from a handle.
-     * @sa basic_registry::remove
      * @tparam Component Types of components to remove.
      * @return The number of components actually removed.
      */
@@ -280,7 +274,6 @@ struct basic_handle {
 
     /**
      * @brief Erases the given components from a handle.
-     * @sa basic_registry::erase
      * @tparam Component Types of components to erase.
      */
     template<typename... Component>
@@ -291,7 +284,6 @@ struct basic_handle {
 
     /**
      * @brief Checks if a handle has all the given components.
-     * @sa basic_registry::all_of
      * @tparam Component Components for which to perform the check.
      * @return True if the handle has all the components, false otherwise.
      */
@@ -302,7 +294,6 @@ struct basic_handle {
 
     /**
      * @brief Checks if a handle has at least one of the given components.
-     * @sa basic_registry::any_of
      * @tparam Component Components for which to perform the check.
      * @return True if the handle has at least one of the given components,
      * false otherwise.
@@ -314,7 +305,6 @@ struct basic_handle {
 
     /**
      * @brief Returns references to the given components for a handle.
-     * @sa basic_registry::get
      * @tparam Component Types of components to get.
      * @return References to the components owned by the handle.
      */
@@ -326,7 +316,6 @@ struct basic_handle {
 
     /**
      * @brief Returns a reference to the given component for a handle.
-     * @sa basic_registry::get_or_emplace
      * @tparam Component Type of component to get.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
@@ -340,7 +329,6 @@ struct basic_handle {
 
     /**
      * @brief Returns pointers to the given components for a handle.
-     * @sa basic_registry::try_get
      * @tparam Component Types of components to get.
      * @return Pointers to the components owned by the handle.
      */

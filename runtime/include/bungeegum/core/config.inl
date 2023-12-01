@@ -4,16 +4,10 @@
 #define BUNGEEGUM_USE_DIRECTX (BUNGEEGUM_ENABLE_DIRECTX && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP))
 
 // vulkan is available on any supported platform (with some prerequisite satisfied or not by CMake).
-#define BUNGEEGUM_USE_VULKAN BUNGEEGUM_ENABLE_VULKAN
+#define BUNGEEGUM_USE_VULKAN (BUNGEEGUM_ENABLE_VULKAN && (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID))
 
 // opengl is available on any supported platform.
 #define BUNGEEGUM_USE_OPENGL BUNGEEGUM_ENABLE_OPENGL
-
-// standalone is available on any supported platform.
-#define BUNGEEGUM_USE_STANDALONE BUNGEEGUM_ENABLE_STANDALONE
-
-// embedded is available on any supported platform.
-#define BUNGEEGUM_USE_EMBEDDED BUNGEEGUM_ENABLE_EMBEDDED
 
 // backtrace is only available on non Emscripten platforms for debug builds.
 #define BUNGEEGUM_USE_BACKTRACE (BUNGEEGUM_ENABLE_BACKTRACE && TOOLCHAIN_BUILD_DEBUG && !TOOLCHAIN_PLATFORM_EMSCRIPTEN)

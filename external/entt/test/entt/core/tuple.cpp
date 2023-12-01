@@ -2,6 +2,13 @@
 #include <gtest/gtest.h>
 #include <entt/core/tuple.hpp>
 
+TEST(Tuple, IsTuple) {
+    static_assert(!entt::is_tuple_v<int>);
+    static_assert(entt::is_tuple_v<std::tuple<>>);
+    static_assert(entt::is_tuple_v<std::tuple<int>>);
+    static_assert(entt::is_tuple_v<std::tuple<int, char>>);
+}
+
 TEST(Tuple, UnwrapTuple) {
     auto single = std::make_tuple(42);
     auto multi = std::make_tuple(42, 'c');
@@ -27,5 +34,5 @@ TEST(Tuple, UnwrapTuple) {
 TEST(Tuple, ForwardApply) {
     ASSERT_EQ(entt::forward_apply{[](auto &&...args) { return sizeof...(args); }}(std::make_tuple()), 0u);
     ASSERT_EQ(entt::forward_apply{[](int i) { return i; }}(std::make_tuple(42)), 42);
-    ASSERT_EQ(entt::forward_apply{[](auto... args) { return (args + ...); }}(std::make_tuple('a', 1u)), 'b');
+    ASSERT_EQ(entt::forward_apply{[](auto... args) { return (args + ...); }}(std::make_tuple('a', 1)), 'b');
 }

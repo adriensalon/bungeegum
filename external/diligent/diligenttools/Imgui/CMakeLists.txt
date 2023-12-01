@@ -123,7 +123,9 @@ if(PLATFORM_WIN32 AND MINGW_BUILD)
 	target_link_libraries(Diligent-Imgui PRIVATE xinput.lib)
 endif()
 
-target_link_libraries(Diligent-Imgui PRIVATE SDL2-static)
+if(NOT PLATFORM_EMSCRIPTEN)
+	target_link_libraries(Diligent-Imgui PRIVATE SDL2-static)
+endif()
 
 source_group("src" FILES ${SOURCE})
 source_group("include" FILES ${INCLUDE})

@@ -1,6 +1,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/node.hpp>
@@ -74,7 +75,7 @@ TEST_F(MetaDtor, AsRefConstruction) {
 
     clazz_t instance{};
     auto any = entt::forward_as_meta(instance);
-    auto cany = entt::make_meta<const clazz_t &>(instance);
+    auto cany = entt::forward_as_meta(std::as_const(instance));
     auto cref = cany.as_ref();
     auto ref = any.as_ref();
 
@@ -101,9 +102,9 @@ TEST_F(MetaDtor, AsRefConstruction) {
 TEST_F(MetaDtor, ReRegistration) {
     SetUp();
 
-    auto *node = entt::internal::meta_node<clazz_t>::resolve();
+    auto &&node = entt::internal::resolve<clazz_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
 
-    ASSERT_NE(node->dtor, nullptr);
+    ASSERT_NE(node.dtor.dtor, nullptr);
 
     entt::meta<clazz_t>().dtor<&clazz_t::destroy_incr>();
     entt::resolve<clazz_t>().construct().reset();

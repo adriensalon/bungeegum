@@ -1,6 +1,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/node.hpp>
@@ -116,8 +117,9 @@ TEST_F(MetaBase, SetGetWithMutatingThis) {
 
 TEST_F(MetaBase, ConvWithMutatingThis) {
     entt::meta_any any{derived_t{}};
+    auto &&ref = any.cast<derived_t &>();
     auto as_cref = std::as_const(any).as_ref();
-    any.cast<derived_t &>().value_2 = 42;
+    ref.value_2 = 42;
 
     auto conv = std::as_const(any).allow_cast<int>();
     auto from_cref = std::as_const(as_cref).allow_cast<int>();
@@ -127,10 +129,11 @@ TEST_F(MetaBase, ConvWithMutatingThis) {
     ASSERT_EQ(conv.cast<int>(), 42);
     ASSERT_EQ(from_cref.cast<int>(), 42);
 
-    ASSERT_TRUE(any.allow_cast<int>());
     ASSERT_TRUE(as_cref.allow_cast<int>());
-    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_TRUE(any.allow_cast<int>());
+
     ASSERT_EQ(as_cref.cast<int>(), 42);
+    ASSERT_EQ(any.cast<int>(), 42);
 }
 
 TEST_F(MetaBase, OpaqueConvWithMutatingThis) {
@@ -146,10 +149,11 @@ TEST_F(MetaBase, OpaqueConvWithMutatingThis) {
     ASSERT_EQ(conv.cast<int>(), 42);
     ASSERT_EQ(from_cref.cast<int>(), 42);
 
-    ASSERT_TRUE(any.allow_cast(entt::resolve<int>()));
     ASSERT_TRUE(as_cref.allow_cast(entt::resolve<int>()));
-    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_TRUE(any.allow_cast(entt::resolve<int>()));
+
     ASSERT_EQ(as_cref.cast<int>(), 42);
+    ASSERT_EQ(any.cast<int>(), 42);
 }
 
 TEST_F(MetaBase, AssignWithMutatingThis) {
@@ -181,15 +185,9 @@ TEST_F(MetaBase, TransferWithMutatingThis) {
 TEST_F(MetaBase, ReRegistration) {
     SetUp();
 
-    auto *node = entt::internal::meta_node<derived_t>::resolve();
+    auto &&node = entt::internal::resolve<derived_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
 
-    ASSERT_NE(node->base, nullptr);
-    ASSERT_NE(node->base->type->base, nullptr);
-    ASSERT_EQ(node->base->type->base->next, nullptr);
-    ASSERT_EQ(node->base->type->base->type->base, nullptr);
-
-    ASSERT_NE(node->base->next, nullptr);
-    ASSERT_EQ(node->base->next->type->base, nullptr);
-
-    ASSERT_EQ(node->base->next->next, nullptr);
+    ASSERT_TRUE(node.details);
+    ASSERT_FALSE(node.details->base.empty());
+    ASSERT_EQ(node.details->base.size(), 2u);
 }

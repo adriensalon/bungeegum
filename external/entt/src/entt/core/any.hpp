@@ -52,15 +52,17 @@ template<std::size_t Len, std::size_t Align>
 class basic_any {
     using operation = internal::any_operation;
     using policy = internal::any_policy;
-
-    using storage_type = std::aligned_storage_t<Len + !Len, Align>;
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
-    template<typename Type>
-    static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
+    struct storage_type {
+        alignas(Align) std::byte data[Len + !Len];
+    };
 
     template<typename Type>
-    static const void *basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &value, [[maybe_unused]] const void *other) {
+    static constexpr bool in_situ = Len && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>;
+
+    template<typename Type>
+    static const void *basic_vtable(const operation op, const basic_any &value, const void *other) {
         static_assert(!std::is_same_v<Type, void> && std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
         const Type *element = nullptr;
 
@@ -120,25 +122,26 @@ class basic_any {
 
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
+        info = &type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
+
         if constexpr(!std::is_void_v<Type>) {
-            info = &type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
             vtable = basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
+                static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? policy::cref : policy::ref;
                 instance = (std::addressof(args), ...);
-            } else if constexpr(in_situ<Type>) {
-                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<Type>) {
-                    new(&storage) Type{std::forward<Args>(args)...};
+            } else if constexpr(in_situ<std::remove_cv_t<std::remove_reference_t<Type>>>) {
+                if constexpr(std::is_aggregate_v<std::remove_cv_t<std::remove_reference_t<Type>>> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<std::remove_cv_t<std::remove_reference_t<Type>>>)) {
+                    new(&storage) std::remove_cv_t<std::remove_reference_t<Type>>{std::forward<Args>(args)...};
                 } else {
-                    new(&storage) Type(std::forward<Args>(args)...);
+                    new(&storage) std::remove_cv_t<std::remove_reference_t<Type>>(std::forward<Args>(args)...);
                 }
             } else {
-                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<Type>) {
-                    instance = new Type{std::forward<Args>(args)...};
+                if constexpr(std::is_aggregate_v<std::remove_cv_t<std::remove_reference_t<Type>>> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<std::remove_cv_t<std::remove_reference_t<Type>>>)) {
+                    instance = new std::remove_cv_t<std::remove_reference_t<Type>>{std::forward<Args>(args)...};
                 } else {
-                    instance = new Type(std::forward<Args>(args)...);
+                    instance = new std::remove_cv_t<std::remove_reference_t<Type>>(std::forward<Args>(args)...);
                 }
             }
         }
@@ -158,10 +161,7 @@ public:
 
     /*! @brief Default constructor. */
     constexpr basic_any() noexcept
-        : instance{},
-          info{&type_id<void>()},
-          vtable{},
-          mode{policy::owner} {}
+        : basic_any{std::in_place_type<void>} {}
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
@@ -171,7 +171,10 @@ public:
      */
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, Args &&...args)
-        : basic_any{} {
+        : instance{},
+          info{},
+          vtable{},
+          mode{policy::owner} {
         initialize<Type>(std::forward<Args>(args)...);
     }
 
@@ -182,9 +185,7 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
     basic_any(Type &&value)
-        : basic_any{} {
-        initialize<std::decay_t<Type>>(std::forward<Type>(value));
-    }
+        : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
 
     /**
      * @brief Copy constructor.
@@ -294,7 +295,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data() noexcept {
-        return (!vtable || mode == policy::cref) ? nullptr : const_cast<void *>(vtable(operation::get, *this, nullptr));
+        return mode == policy::cref ? nullptr : const_cast<void *>(std::as_const(*this).data());
     }
 
     /**
@@ -303,7 +304,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data(const type_info &req) noexcept {
-        return *info == req ? data() : nullptr;
+        return mode == policy::cref ? nullptr : const_cast<void *>(std::as_const(*this).data(req));
     }
 
     /**
@@ -350,6 +351,8 @@ public:
             vtable(operation::destroy, *this, nullptr);
         }
 
+        // unnecessary but it helps to detect nasty bugs
+        ENTT_ASSERT((instance = nullptr) == nullptr, "");
         info = &type_id<void>();
         vtable = nullptr;
         mode = policy::owner;
@@ -368,12 +371,21 @@ public:
      * @param other Wrapper with which to compare.
      * @return False if the two objects differ in their content, true otherwise.
      */
-    bool operator==(const basic_any &other) const noexcept {
+    [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
         if(vtable && *info == *other.info) {
             return (vtable(operation::compare, *this, other.data()) != nullptr);
         }
 
         return (!vtable && !other.vtable);
+    }
+
+    /**
+     * @brief Checks if two wrappers differ in their content.
+     * @param other Wrapper with which to compare.
+     * @return True if the two objects differ in their content, false otherwise.
+     */
+    [[nodiscard]] bool operator!=(const basic_any &other) const noexcept {
+        return !(*this == other);
     }
 
     /**
@@ -408,19 +420,6 @@ private:
 };
 
 /**
- * @brief Checks if two wrappers differ in their content.
- * @tparam Len Size of the storage reserved for the small buffer optimization.
- * @tparam Align Alignment requirement.
- * @param lhs A wrapper, either empty or not.
- * @param rhs A wrapper, either empty or not.
- * @return True if the two wrappers differ in their content, false otherwise.
- */
-template<std::size_t Len, std::size_t Align>
-[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-/**
  * @brief Performs type-safe access to the contained object.
  * @tparam Type Type to which conversion is required.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
@@ -429,7 +428,7 @@ template<std::size_t Len, std::size_t Align>
  * @return The element converted to the requested type.
  */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(const basic_any<Len, Align> &data) noexcept {
+[[nodiscard]] Type any_cast(const basic_any<Len, Align> &data) noexcept {
     const auto *const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
     return static_cast<Type>(*instance);
@@ -437,7 +436,7 @@ Type any_cast(const basic_any<Len, Align> &data) noexcept {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(basic_any<Len, Align> &data) noexcept {
+[[nodiscard]] Type any_cast(basic_any<Len, Align> &data) noexcept {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto *const instance = any_cast<std::remove_reference_t<const Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
@@ -446,7 +445,7 @@ Type any_cast(basic_any<Len, Align> &data) noexcept {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(basic_any<Len, Align> &&data) noexcept {
+[[nodiscard]] Type any_cast(basic_any<Len, Align> &&data) noexcept {
     if constexpr(std::is_copy_constructible_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
         if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(std::move(*instance));
@@ -462,14 +461,14 @@ Type any_cast(basic_any<Len, Align> &&data) noexcept {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
+[[nodiscard]] const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
     const auto &info = type_id<std::remove_cv_t<Type>>();
     return static_cast<const Type *>(data->data(info));
 }
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type *any_cast(basic_any<Len, Align> *data) noexcept {
+[[nodiscard]] Type *any_cast(basic_any<Len, Align> *data) noexcept {
     if constexpr(std::is_const_v<Type>) {
         // last attempt to make wrappers for const references return their values
         return any_cast<Type>(&std::as_const(*data));
@@ -489,7 +488,7 @@ Type *any_cast(basic_any<Len, Align> *data) noexcept {
  * @return A properly initialized wrapper for an object of the given type.
  */
 template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename... Args>
-basic_any<Len, Align> make_any(Args &&...args) {
+[[nodiscard]] basic_any<Len, Align> make_any(Args &&...args) {
     return basic_any<Len, Align>{std::in_place_type<Type>, std::forward<Args>(args)...};
 }
 
@@ -502,8 +501,8 @@ basic_any<Len, Align> make_any(Args &&...args) {
  * @return A properly initialized and not necessarily owning wrapper.
  */
 template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename Type>
-basic_any<Len, Align> forward_as_any(Type &&value) {
-    return basic_any<Len, Align>{std::in_place_type<std::conditional_t<std::is_rvalue_reference_v<Type>, std::decay_t<Type>, Type>>, std::forward<Type>(value)};
+[[nodiscard]] basic_any<Len, Align> forward_as_any(Type &&value) {
+    return basic_any<Len, Align>{std::in_place_type<Type &&>, std::forward<Type>(value)};
 }
 
 } // namespace entt

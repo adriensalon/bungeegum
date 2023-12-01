@@ -22,7 +22,9 @@ enum struct renderer_backend {
 
 }
 
-#if BUNGEEGUM_USE_DIRECTX
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#define BUNGEEGUM_USE_PREFERRED_PIPELINE_RENDERER bungeegum::renderer_backend::opengl
+#elif BUNGEEGUM_USE_DIRECTX
 #define BUNGEEGUM_USE_PREFERRED_PIPELINE_RENDERER bungeegum::renderer_backend::directx11
 #elif BUNGEEGUM_USE_VULKAN
 #define BUNGEEGUM_USE_PREFERRED_PIPELINE_RENDERER bungeegum::renderer_backend::vulkan
@@ -128,7 +130,7 @@ private:
     pipeline_ref(detail::pipeline_data& data);
 
     friend struct detail::pipelines_manager;
-    detail::pipeline_data& _data;
+    std::reference_wrapper<detail::pipeline_data> _data;
 };
 
 /// @brief

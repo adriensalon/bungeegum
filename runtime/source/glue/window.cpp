@@ -31,16 +31,16 @@ namespace detail {
 #endif
 
     struct window::window_data {
+        float2 window_size = { 0, 0 };
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        static bool must_lock_cursor = false;
-        static bool must_unlock_cursor = false;
-        static std::vector<std::string> keys_down = {};
-        static std::vector<std::string> keys_up = {};
-        static std::vector<unsigned int> mouse_buttons_down = {};
-        static std::vector<unsigned int> mouse_buttons_up = {};
-        static float2 mouse_position_delta = { 0.f, 0.f };
+        bool must_lock_cursor = false;
+        bool must_unlock_cursor = false;
+        std::vector<std::string> keys_down = {};
+        std::vector<std::string> keys_up = {};
+        std::vector<unsigned int> mouse_buttons_down = {};
+        std::vector<unsigned int> mouse_buttons_up = {};
+        float2 mouse_position_delta = { 0.f, 0.f };
 
-    private:
         [[nodiscard]] static std::string result_to_string(EMSCRIPTEN_RESULT result)
         {
             if (result == EMSCRIPTEN_RESULT_SUCCESS)
@@ -109,8 +109,8 @@ namespace detail {
         {
             // https://github.com/emscripten-core/emscripten/blob/main/test/test_html5_core.c
             if (event_type == EMSCRIPTEN_EVENT_MOUSEMOVE) {
-                detail::mouse_position_delta = glm::vec2((float)event->movementX, (float)event->movementY);
-                detail::mouse_position = glm::vec2((float)event->clientX, (float)event->clientY);
+                // detail::mouse_position_delta = glm::vec2((float)event->movementX, (float)event->movementY);
+                // detail::mouse_position = glm::vec2((float)event->clientX, (float)event->clientY);
             }
             if (event_type == EMSCRIPTEN_EVENT_MOUSEDOWN) {
                 unsigned int _button = event->button;
@@ -118,8 +118,8 @@ namespace detail {
                 detail::buttons_changed.emplace_back(_button);
             } else if (event_type == EMSCRIPTEN_EVENT_MOUSEUP) {
                 unsigned int _button = event->button;
-                detail::buttons[_button] = false;
-                detail::buttons_changed.emplace_back(_button);
+                // detail::buttons[_button] = false;
+                // detail::buttons_changed.emplace_back(_button);
             }
             if (event_type == EMSCRIPTEN_EVENT_CLICK) // we lock / unlock the pointer on click
             {
@@ -134,11 +134,11 @@ namespace detail {
         {
             const EmscriptenTouchPoint* _touch_point = &(event->touches[0]);
             glm::vec2 _touch_move_position = glm::vec2((float)_touch_point->clientX, (float)_touch_point->clientY);
-            if (event_type == EMSCRIPTEN_EVENT_TOUCHSTART) {
-                detail::mouse_position_delta = { 0, 0 };
-            } else if (event_type == EMSCRIPTEN_EVENT_TOUCHMOVE)
-                detail::mouse_position_delta = _touch_move_position - detail::mouse_position;
-            detail::mouse_position = _touch_move_position;
+            // if (event_type == EMSCRIPTEN_EVENT_TOUCHSTART) {
+            // detail::mouse_position_delta = { 0, 0 };
+            // } else if (event_type == EMSCRIPTEN_EVENT_TOUCHMOVE)
+            //     detail::mouse_position_delta = _touch_move_position - detail::mouse_position;
+            // detail::mouse_position = _touch_move_position;
             return EM_TRUE; // we use preventDefault() for touch callbacks (see Safari on iPad)
         }
 
@@ -163,7 +163,7 @@ namespace detail {
             return true;
         }
 
-        static bool static_setup = setup_emscripten();
+        inline static bool static_setup = setup_emscripten();
 #else
         SDL_Window* sdl_window = nullptr;
         std::function<void(const SDL_Event*)> sdl_event_callback = nullptr;
@@ -215,21 +215,21 @@ namespace detail {
     void window::create()
     {
         _data = std::make_shared<window_data>();
-        if constexpr (is_platform_emscripten) {
-            window_data::check_only_one();
-            // TODO
-        } else {
-            window_data::check_main_ready();
-            SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-            _data->sdl_window = SDL_CreateWindow(
-                window_data::sdl_default_window_title.data(),
-                SDL_WINDOWPOS_CENTERED,
-                SDL_WINDOWPOS_CENTERED,
-                window_data::sdl_default_window_size.x,
-                window_data::sdl_default_window_size.y,
-                _window_flags);
-            window_data::check_errors();
-        }
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        window_data::check_only_one();
+        // TODO
+#else
+        window_data::check_main_ready();
+        SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        _data->sdl_window = SDL_CreateWindow(
+            window_data::sdl_default_window_title.data(),
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            window_data::sdl_default_window_size.x,
+            window_data::sdl_default_window_size.y,
+            _window_flags);
+        window_data::check_errors();
+#endif
     }
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
@@ -260,26 +260,26 @@ namespace detail {
 
     void window::cursor(const bool enabled)
     {
-        if constexpr (is_platform_emscripten) {
-            // TODO
-        } else {
-            if (SDL_ShowCursor(enabled) < 0) {
-                window_data::check_errors();
-            }
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        // TODO
+#else
+        if (SDL_ShowCursor(enabled) < 0) {
+            window_data::check_errors();
         }
+#endif
     }
 
     void window::fullscreen(const bool enabled)
     {
-        if constexpr (is_platform_emscripten) {
-            // TODO
-        } else {
-            if (enabled && SDL_SetWindowFullscreen(_data->sdl_window, SDL_WINDOW_FULLSCREEN) < 0) {
-                window_data::check_errors();
-            } else if (SDL_SetWindowFullscreen(_data->sdl_window, NULL) < 0) {
-                window_data::check_errors();
-            }
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        // TODO
+#else
+        if (enabled && SDL_SetWindowFullscreen(_data->sdl_window, SDL_WINDOW_FULLSCREEN) < 0) {
+            window_data::check_errors();
+        } else if (SDL_SetWindowFullscreen(_data->sdl_window, NULL) < 0) {
+            window_data::check_errors();
         }
+#endif
     }
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
@@ -306,13 +306,14 @@ namespace detail {
 
     float2 window::get_size() const
     {
-        if constexpr (is_platform_emscripten) {
-            // TODO
-        } else {
-            int _width, _height;
-            SDL_GetWindowSize(_data->sdl_window, &_width, &_height);
-            return float2 { _width, _height };
-        }
+		return _data->window_size;
+        // if constexpr (is_platform_emscripten) {
+        //     // TODO
+        // } else {
+        //     int _width, _height;
+        //     SDL_GetWindowSize(_data->sdl_window, &_width, &_height);
+        //     return float2 { _width, _height };
+        // }
     }
 
     void window::on_exit(const std::function<void()>& exit_callback)
@@ -359,8 +360,11 @@ namespace detail {
 
     bool window::poll(const bool poll_simulated, const bool poll_device)
     {
-        // poll device
         bool _polled = false;
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        _data->window_size = float2 { canvas_get_width(), canvas_get_height() };
+#else
+        // poll device
         if constexpr (!is_platform_emscripten) { // emscripten events already stashed
             SDL_Event _event;
             while (SDL_PollEvent(&_event)) {
@@ -403,6 +407,7 @@ namespace detail {
                 }
             }
         }
+#endif
 
         // poll simulated
         if (poll_simulated) {
@@ -485,6 +490,7 @@ namespace detail {
         }
     }
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
     void window::resize(const float2 new_size)
     {
         // eventuellement sanitize to : max(0, round(new_size))
@@ -494,6 +500,7 @@ namespace detail {
             SDL_SetWindowSize(_data->sdl_window, _width, _height);
         }
     }
+#endif
 
     void window::simulate_mouse_down(const unsigned int button_index)
     {
@@ -530,11 +537,12 @@ namespace detail {
 
     void window::title(const std::string& description)
     {
-        if constexpr (is_platform_emscripten) {
-            // TODO
-        } else {
-            SDL_SetWindowTitle(_data->sdl_window, description.c_str());
-        }
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+
+        // TODO
+#else
+        SDL_SetWindowTitle(_data->sdl_window, description.c_str());
+#endif
     }
 }
 }

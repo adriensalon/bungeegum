@@ -3,6 +3,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
@@ -165,7 +166,7 @@ TEST_F(MetaCtor, FuncArithmeticConversion) {
 TEST_F(MetaCtor, FuncConstNonConstRefArgs) {
     int ivalue = 42;
     auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(ivalue));
-    auto other = entt::resolve<clazz_t>().construct(entt::make_meta<const int &>(ivalue));
+    auto other = entt::resolve<clazz_t>().construct(entt::forward_as_meta(std::as_const(ivalue)));
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
@@ -205,9 +206,10 @@ TEST_F(MetaCtor, NonDefaultConstructibleType) {
 TEST_F(MetaCtor, ReRegistration) {
     SetUp();
 
-    auto *node = entt::internal::meta_node<double>::resolve();
+    auto &&node = entt::internal::resolve<double>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
 
-    ASSERT_NE(node->ctor, nullptr);
+    ASSERT_TRUE(node.details);
+    ASSERT_FALSE(node.details->ctor.empty());
     // implicitly generated default constructor is not cleared
-    ASSERT_NE(node->default_constructor, nullptr);
+    ASSERT_NE(node.default_constructor, nullptr);
 }

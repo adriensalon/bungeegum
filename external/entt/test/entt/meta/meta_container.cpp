@@ -1,4 +1,6 @@
 #include <array>
+#include <deque>
+#include <list>
 #include <map>
 #include <set>
 #include <utility>
@@ -9,28 +11,11 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../common/config.h"
 
 struct invalid_type {};
 
-struct MetaContainer: ::testing::Test {
-    void SetUp() override {
-        using namespace entt::literals;
-
-        entt::meta<double>()
-            .type("double"_hs);
-
-        entt::meta<int>()
-            .type("int"_hs);
-    }
-
-    void TearDown() override {
-        entt::meta_reset();
-    }
-};
-
-using MetaContainerDeathTest = MetaContainer;
-
-TEST_F(MetaContainer, InvalidContainer) {
+TEST(MetaContainer, InvalidContainer) {
     ASSERT_FALSE(entt::meta_any{42}.as_sequence_container());
     ASSERT_FALSE(entt::meta_any{42}.as_associative_container());
 
@@ -38,7 +23,7 @@ TEST_F(MetaContainer, InvalidContainer) {
     ASSERT_FALSE(entt::meta_any{std::vector<int>{}}.as_associative_container());
 }
 
-TEST_F(MetaContainer, EmptySequenceContainer) {
+TEST(MetaContainer, EmptySequenceContainer) {
     entt::meta_sequence_container container{};
 
     ASSERT_FALSE(container);
@@ -49,7 +34,7 @@ TEST_F(MetaContainer, EmptySequenceContainer) {
     ASSERT_TRUE(container);
 }
 
-TEST_F(MetaContainer, EmptyAssociativeContainer) {
+TEST(MetaContainer, EmptyAssociativeContainer) {
     entt::meta_associative_container container{};
 
     ASSERT_FALSE(container);
@@ -60,7 +45,7 @@ TEST_F(MetaContainer, EmptyAssociativeContainer) {
     ASSERT_TRUE(container);
 }
 
-TEST_F(MetaContainer, SequenceContainerIterator) {
+TEST(MetaContainer, SequenceContainerIterator) {
     std::vector<int> vec{2, 3, 4};
     auto any = entt::forward_as_meta(vec);
     entt::meta_sequence_container::iterator first{};
@@ -89,7 +74,7 @@ TEST_F(MetaContainer, SequenceContainerIterator) {
     ASSERT_EQ((--first)->cast<int>(), 2);
 }
 
-TEST_F(MetaContainer, AssociativeContainerIterator) {
+TEST(MetaContainer, AssociativeContainerIterator) {
     std::map<int, char> map{{2, 'c'}, {3, 'd'}, {4, 'e'}};
     auto any = entt::forward_as_meta(map);
     entt::meta_associative_container::iterator first{};
@@ -116,10 +101,11 @@ TEST_F(MetaContainer, AssociativeContainerIterator) {
     ASSERT_FALSE(first != last);
 }
 
-TEST_F(MetaContainer, StdVector) {
+TEST(MetaContainer, StdVector) {
     std::vector<int> vec{};
     auto any = entt::forward_as_meta(vec);
     auto view = any.as_sequence_container();
+    auto cview = std::as_const(any).as_sequence_container();
 
     ASSERT_TRUE(view);
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
@@ -147,7 +133,7 @@ TEST_F(MetaContainer, StdVector) {
     ASSERT_EQ(view.begin()->cast<int>(), 0);
     ASSERT_EQ((++view.begin())->cast<int>(), 1);
 
-    ret = view.insert(view.end(), 42);
+    ret = view.insert(cview.end(), 42);
 
     ASSERT_TRUE(ret);
     ASSERT_EQ(*ret, 42);
@@ -159,11 +145,17 @@ TEST_F(MetaContainer, StdVector) {
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ(ret->cast<int>(), 1);
 
+    ret = view.erase(cview.begin());
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ(ret->cast<int>(), 2);
+
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST_F(MetaContainer, StdArray) {
+TEST(MetaContainer, StdArray) {
     std::array<int, 3> arr{};
     auto any = entt::forward_as_meta(arr);
     auto view = any.as_sequence_container();
@@ -204,7 +196,115 @@ TEST_F(MetaContainer, StdArray) {
     ASSERT_EQ(view.size(), 3u);
 }
 
-TEST_F(MetaContainer, StdMap) {
+TEST(MetaContainer, StdList) {
+    std::list<int> list{};
+    auto any = entt::forward_as_meta(list);
+    auto view = any.as_sequence_container();
+    auto cview = std::as_const(any).as_sequence_container();
+
+    ASSERT_TRUE(view);
+    ASSERT_EQ(view.value_type(), entt::resolve<int>());
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.resize(3u));
+    ASSERT_EQ(view.size(), 3u);
+    ASSERT_NE(view.begin(), view.end());
+
+    view[0].cast<int &>() = 2;
+    view[1].cast<int &>() = 3;
+    view[2].cast<int &>() = 4;
+
+    ASSERT_EQ(view[1u].cast<int>(), 3);
+
+    auto it = view.begin();
+    auto ret = view.insert(it, 0);
+
+    ASSERT_TRUE(ret);
+    ASSERT_FALSE(view.insert(ret, invalid_type{}));
+    ASSERT_TRUE(view.insert(++ret, 1.));
+
+    ASSERT_EQ(view.size(), 5u);
+    ASSERT_EQ(view.begin()->cast<int>(), 0);
+    ASSERT_EQ((++view.begin())->cast<int>(), 1);
+
+    ret = view.insert(cview.end(), 42);
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(*ret, 42);
+
+    it = view.begin();
+    ret = view.erase(it);
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 5u);
+    ASSERT_EQ(ret->cast<int>(), 1);
+
+    ret = view.erase(cview.begin());
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ(ret->cast<int>(), 2);
+
+    ASSERT_TRUE(view.clear());
+    ASSERT_EQ(view.size(), 0u);
+}
+
+TEST(MetaContainer, StdDeque) {
+    std::deque<int> deque{};
+    auto any = entt::forward_as_meta(deque);
+    auto view = any.as_sequence_container();
+    auto cview = std::as_const(any).as_sequence_container();
+
+    ASSERT_TRUE(view);
+    ASSERT_EQ(view.value_type(), entt::resolve<int>());
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.resize(3u));
+    ASSERT_EQ(view.size(), 3u);
+    ASSERT_NE(view.begin(), view.end());
+
+    view[0].cast<int &>() = 2;
+    view[1].cast<int &>() = 3;
+    view[2].cast<int &>() = 4;
+
+    ASSERT_EQ(view[1u].cast<int>(), 3);
+
+    auto it = view.begin();
+    auto ret = view.insert(it, 0);
+
+    ASSERT_TRUE(ret);
+    ASSERT_FALSE(view.insert(ret, invalid_type{}));
+    ASSERT_TRUE(view.insert(++ret, 1.));
+
+    ASSERT_EQ(view.size(), 5u);
+    ASSERT_EQ(view.begin()->cast<int>(), 0);
+    ASSERT_EQ((++view.begin())->cast<int>(), 1);
+
+    ret = view.insert(cview.end(), 42);
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(*ret, 42);
+
+    it = view.begin();
+    ret = view.erase(it);
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 5u);
+    ASSERT_EQ(ret->cast<int>(), 1);
+
+    ret = view.erase(cview.begin());
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ(ret->cast<int>(), 2);
+
+    ASSERT_TRUE(view.clear());
+    ASSERT_EQ(view.size(), 0u);
+}
+
+TEST(MetaContainer, StdMap) {
     std::map<int, char> map{{2, 'c'}, {3, 'd'}, {4, 'e'}};
     auto any = entt::forward_as_meta(map);
     auto view = any.as_associative_container();
@@ -247,7 +347,7 @@ TEST_F(MetaContainer, StdMap) {
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST_F(MetaContainer, StdSet) {
+TEST(MetaContainer, StdSet) {
     std::set<int> set{2, 3, 4};
     auto any = entt::forward_as_meta(set);
     auto view = any.as_associative_container();
@@ -289,7 +389,7 @@ TEST_F(MetaContainer, StdSet) {
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST_F(MetaContainer, DenseMap) {
+TEST(MetaContainer, DenseMap) {
     entt::dense_map<int, char> map{};
     auto any = entt::forward_as_meta(map);
     auto view = any.as_associative_container();
@@ -336,7 +436,7 @@ TEST_F(MetaContainer, DenseMap) {
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST_F(MetaContainer, DenseSet) {
+TEST(MetaContainer, DenseSet) {
     entt::dense_set<int> set{};
     auto any = entt::forward_as_meta(set);
     auto view = any.as_associative_container();
@@ -382,7 +482,7 @@ TEST_F(MetaContainer, DenseSet) {
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST_F(MetaContainer, ConstSequenceContainer) {
+TEST(MetaContainer, ConstSequenceContainer) {
     std::vector<int> vec{};
     auto any = entt::forward_as_meta(std::as_const(vec));
     auto view = any.as_sequence_container();
@@ -420,7 +520,7 @@ TEST_F(MetaContainer, ConstSequenceContainer) {
     ASSERT_EQ(view.size(), 1u);
 }
 
-TEST_F(MetaContainerDeathTest, ConstSequenceContainer) {
+ENTT_DEBUG_TEST(MetaContainerDeathTest, ConstSequenceContainer) {
     std::vector<int> vec{};
     auto any = entt::forward_as_meta(std::as_const(vec));
     auto view = any.as_sequence_container();
@@ -429,7 +529,7 @@ TEST_F(MetaContainerDeathTest, ConstSequenceContainer) {
     ASSERT_DEATH(view[0].cast<int &>() = 2, "");
 }
 
-TEST_F(MetaContainer, ConstKeyValueAssociativeContainer) {
+TEST(MetaContainer, ConstKeyValueAssociativeContainer) {
     std::map<int, char> map{};
     auto any = entt::forward_as_meta(std::as_const(map));
     auto view = any.as_associative_container();
@@ -462,7 +562,7 @@ TEST_F(MetaContainer, ConstKeyValueAssociativeContainer) {
     ASSERT_EQ(view.size(), 1u);
 }
 
-TEST_F(MetaContainerDeathTest, ConstKeyValueAssociativeContainer) {
+ENTT_DEBUG_TEST(MetaContainerDeathTest, ConstKeyValueAssociativeContainer) {
     std::map<int, char> map{};
     auto any = entt::forward_as_meta(std::as_const(map));
     auto view = any.as_associative_container();
@@ -471,7 +571,7 @@ TEST_F(MetaContainerDeathTest, ConstKeyValueAssociativeContainer) {
     ASSERT_DEATH(view.find(2)->second.cast<char &>() = 'a', "");
 }
 
-TEST_F(MetaContainer, ConstKeyOnlyAssociativeContainer) {
+TEST(MetaContainer, ConstKeyOnlyAssociativeContainer) {
     std::set<int> set{};
     auto any = entt::forward_as_meta(std::as_const(set));
     auto view = any.as_associative_container();
@@ -508,7 +608,7 @@ TEST_F(MetaContainer, ConstKeyOnlyAssociativeContainer) {
     ASSERT_EQ(view.size(), 1u);
 }
 
-TEST_F(MetaContainer, SequenceContainerConstMetaAny) {
+TEST(MetaContainer, SequenceContainerConstMetaAny) {
     auto test = [](const entt::meta_any any) {
         auto view = any.as_sequence_container();
 
@@ -524,7 +624,7 @@ TEST_F(MetaContainer, SequenceContainerConstMetaAny) {
     test(entt::forward_as_meta(std::as_const(vec)));
 }
 
-TEST_F(MetaContainerDeathTest, SequenceContainerConstMetaAny) {
+ENTT_DEBUG_TEST(MetaContainerDeathTest, SequenceContainerConstMetaAny) {
     auto test = [](const entt::meta_any any) {
         auto view = any.as_sequence_container();
 
@@ -539,7 +639,7 @@ TEST_F(MetaContainerDeathTest, SequenceContainerConstMetaAny) {
     test(entt::forward_as_meta(std::as_const(vec)));
 }
 
-TEST_F(MetaContainer, KeyValueAssociativeContainerConstMetaAny) {
+TEST(MetaContainer, KeyValueAssociativeContainerConstMetaAny) {
     auto test = [](const entt::meta_any any) {
         auto view = any.as_associative_container();
 
@@ -555,7 +655,7 @@ TEST_F(MetaContainer, KeyValueAssociativeContainerConstMetaAny) {
     test(entt::forward_as_meta(std::as_const(map)));
 }
 
-TEST_F(MetaContainerDeathTest, KeyValueAssociativeContainerConstMetaAny) {
+ENTT_DEBUG_TEST(MetaContainerDeathTest, KeyValueAssociativeContainerConstMetaAny) {
     auto test = [](const entt::meta_any any) {
         auto view = any.as_associative_container();
 
@@ -570,7 +670,7 @@ TEST_F(MetaContainerDeathTest, KeyValueAssociativeContainerConstMetaAny) {
     test(entt::forward_as_meta(std::as_const(map)));
 }
 
-TEST_F(MetaContainer, KeyOnlyAssociativeContainerConstMetaAny) {
+TEST(MetaContainer, KeyOnlyAssociativeContainerConstMetaAny) {
     auto test = [](const entt::meta_any any) {
         auto view = any.as_associative_container();
 
@@ -590,7 +690,7 @@ TEST_F(MetaContainer, KeyOnlyAssociativeContainerConstMetaAny) {
     test(entt::forward_as_meta(std::as_const(set)));
 }
 
-TEST_F(MetaContainer, StdVectorBool) {
+TEST(MetaContainer, StdVectorBool) {
     using proxy_type = typename std::vector<bool>::reference;
     using const_proxy_type = typename std::vector<bool>::const_reference;
 

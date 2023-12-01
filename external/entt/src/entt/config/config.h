@@ -37,11 +37,20 @@
 
 #ifdef ENTT_DISABLE_ASSERT
 #    undef ENTT_ASSERT
-#    define ENTT_ASSERT(...) (void(0))
+#    define ENTT_ASSERT(condition, msg) (void(0))
 #elif !defined ENTT_ASSERT
 #    include <cassert>
-#    define ENTT_ASSERT(condition, ...) assert(condition)
+#    define ENTT_ASSERT(condition, msg) assert(condition)
 #endif
+
+#ifdef ENTT_DISABLE_ASSERT
+#    undef ENTT_ASSERT_CONSTEXPR
+#    define ENTT_ASSERT_CONSTEXPR(condition, msg) (void(0))
+#elif !defined ENTT_ASSERT_CONSTEXPR
+#    define ENTT_ASSERT_CONSTEXPR(condition, msg) ENTT_ASSERT(condition, msg)
+#endif
+
+#define ENTT_FAIL(msg) ENTT_ASSERT(false, msg);
 
 #ifdef ENTT_NO_ETO
 #    define ENTT_ETO_TYPE(Type) void

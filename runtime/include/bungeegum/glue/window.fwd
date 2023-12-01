@@ -138,10 +138,12 @@ namespace detail {
         /// appropriate callbacks.
         bool poll(const bool poll_simulated = true, const bool poll_device = true);
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         /// @brief Sets a new size for this instance.
         /// @details This has no effect on Android, iOS and Emscripten platforms.
         /// @param new_size The new size in pixels.
         void resize(const float2 new_size);
+#endif
 
         /// @brief Simulates a mouse down event, without modifying device state.
         /// @param button_index The simulated mouse button.

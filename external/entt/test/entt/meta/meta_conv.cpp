@@ -1,6 +1,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/node.hpp>
@@ -62,10 +63,9 @@ TEST_F(MetaConv, Functionalities) {
 TEST_F(MetaConv, ReRegistration) {
     SetUp();
 
-    auto *node = entt::internal::meta_node<clazz_t>::resolve();
+    auto &&node = entt::internal::resolve<clazz_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
 
-    ASSERT_NE(node->conv, nullptr);
-    ASSERT_NE(node->conv->next, nullptr);
-    ASSERT_NE(node->conv->next->next, nullptr);
-    ASSERT_EQ(node->conv->next->next->next, nullptr);
+    ASSERT_TRUE(node.details);
+    ASSERT_FALSE(node.details->conv.empty());
+    ASSERT_EQ(node.details->conv.size(), 3u);
 }

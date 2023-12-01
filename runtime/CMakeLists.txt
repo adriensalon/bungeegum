@@ -83,9 +83,6 @@ target_link_libraries(bungeegum_runtime Diligent-Imgui)
 
 if(BUNGEEGUM_ENABLE_BACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND CMAKE_BUILD_TYPE MATCHES "Debug")
 	target_link_libraries(bungeegum_runtime backward)
-	message("lool")
-else()
-	message("lol")
 endif()
 
 if(BUNGEEGUM_ENABLE_OVERLAY)
@@ -139,7 +136,7 @@ if(NOT EMSCRIPTEN)
 	if(MSVC)
 		target_compile_options(bungeegum_runtime PRIVATE /W4 /WX)
 	else()
-		target_compile_options(bungeegum_runtime PRIVATE -Wall -Wextra -Wpedantic -Werror)
+		target_compile_options(bungeegum_runtime PRIVATE -Wall -Wextra -Wpedantic)
 	endif()
 endif()
 

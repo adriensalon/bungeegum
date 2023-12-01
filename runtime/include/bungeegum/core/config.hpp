@@ -9,7 +9,7 @@
 #endif
 
 #if !defined(BUNGEEGUM_ENABLE_VULKAN)
-#define BUNGEEGUM_ENABLE_VULKAN 1
+#define BUNGEEGUM_ENABLE_VULKAN 0
 #endif
 
 #if !defined(BUNGEEGUM_ENABLE_OPENGL)

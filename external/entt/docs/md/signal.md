@@ -9,6 +9,7 @@
 * [Delegate](#delegate)
   * [Runtime arguments](#runtime-arguments)
   * [Lambda support](#lambda-support)
+  * [Raw access](#raw-access)
 * [Signals](#signals)
 * [Event dispatcher](#event-dispatcher)
   * [Named queues](#named-queues)
@@ -19,14 +20,14 @@
 
 # Introduction
 
-Signals are usually a core part of games and software architectures in
-general.<br/>
-Roughly speaking, they help to decouple the various parts of a system while
-allowing them to communicate with each other somehow.
+Signals are more often than not a core part of games and software architectures
+in general.<br/>
+They help to decouple the various parts of a system while allowing them to
+communicate with each other somehow.
 
-The so called _modern C++_ comes with a tool that can be useful in these terms,
+The so called _modern C++_ comes with a tool that can be useful in this regard,
 the `std::function`. As an example, it can be used to create delegates.<br/>
-However, there is no guarantee that an `std::function` does not perform
+However, there is no guarantee that an `std::function` doesn't perform
 allocations under the hood and this could be problematic sometimes. Furthermore,
 it solves a problem but may not adapt well to other requirements that may arise
 from time to time.
@@ -38,8 +39,8 @@ lightweight classes to solve the same and many other problems.
 # Delegate
 
 A delegate can be used as a general purpose invoker with no memory overhead for
-free functions and members provided along with an instance on which to invoke
-them.<br/>
+free functions, lambdas and members provided along with an instance on which to
+invoke them.<br/>
 It doesn't claim to be a drop-in replacement for an `std::function`, so don't
 expect to use it whenever an `std::function` fits well. That said, it's most
 likely even a better fit than an `std::function` in a lot of cases, so expect to
@@ -52,15 +53,13 @@ delegates:
 entt::delegate<int(int)> delegate{};
 ```
 
-All what is needed to create an instance is to specify the type of the function
-the delegate will _contain_, that is the signature of the free function or the
-member one wants to assign to it.
+What is needed to create an instance is to specify the type of the function the
+delegate _accepts_, that is the signature of the functions it models.<br/>
+However, attempting to use an empty delegate by invoking its function call
+operator results in undefined behavior or most likely a crash.
 
-Attempting to use an empty delegate by invoking its function call operator
-results in undefined behavior or most likely a crash. Before to use a delegate,
-it must be initialized.<br/>
-There exists a bunch of overloads of the `connect` member function to do that.
-As an example of use:
+There exist a few overloads of the `connect` member function to initialize a
+delegate:
 
 ```cpp
 int f(int i) { return i; }
@@ -77,7 +76,7 @@ my_struct instance;
 delegate.connect<&my_struct::f>(instance);
 ```
 
-The delegate class accepts also data members, if needed. In this case, the
+The delegate class also accepts data members, if needed. In this case, the
 function type of the delegate is such that the parameter list is empty and the
 value of the data member is at least convertible to the return type.
 
@@ -94,14 +93,11 @@ delegate.connect<&g>(c);
 delegate(42);
 ```
 
-The function `g` will be invoked with a reference to `c` and `42`. However, the
-function type of the delegate is still `void(int)`. This is also the signature
-of its function call operator.
-
-Another interesting aspect of the delegate class is that it accepts also
-functions with a list of parameters that is shorter than that of the function
-type used to specialize the delegate itself.<br/>
-The following code is therefore perfectly valid:
+Function `g` is invoked with a reference to `c` and `42`. However, the function
+type of the delegate is still `void(int)`. This is also the signature of its
+function call operator.<br/>
+Another interesting aspect of the delegate class is that it accepts functions
+with a list of parameters that is shorter than that of its function type:
 
 ```cpp
 void g() { /* ... */ }
@@ -110,9 +106,15 @@ delegate(42);
 ```
 
 Where the function type of the delegate is `void(int)` as above. It goes without
-saying that the extra arguments are silently discarded internally.<br/>
-This is a nice-to-have feature in a lot of cases, as an example when the
-`delegate` class is used as a building block of a signal-slot system.
+saying that the extra arguments are silently discarded internally. This is a
+nice-to-have feature in a lot of cases, as an example when the `delegate` class
+is used as a building block of a signal-slot system.<br/>
+In fact, this filtering works both ways. The class tries to pass its first
+_count_ arguments **first**, then the last _count_. Watch out for conversion
+rules if in doubt when connecting a listener!<br/>
+Arbitrary functions that pull random arguments from the delegate list aren't
+supported instead. Other feature were preferred, such as support for functions
+with compatible argument lists although not equal to those of the delegate.
 
 To create and initialize a delegate at once, there are a few specialized
 constructors. Because of the rules of the language, the listener is provided by
@@ -140,7 +142,7 @@ already shown in the examples above:
 auto ret = delegate(42);
 ```
 
-In all cases, the listeners don't have to strictly follow the signature of the
+In all cases, listeners don't have to strictly follow the signature of the
 delegate. As long as a listener can be invoked with the given arguments to yield
 a result that is convertible to the given result type, everything works just
 fine.
@@ -158,7 +160,7 @@ my_struct instance;
 delegate(instance, 42);
 ```
 
-In this case, it's not possible to deduce the function type since the first
+In this case, it's not possible to _deduce_ the function type since the first
 argument doesn't necessarily have to be a reference (for example, it can be a
 pointer, as well as a const reference).<br/>
 Therefore, the function type must be declared explicitly for unbound members.
@@ -166,9 +168,9 @@ Therefore, the function type must be declared explicitly for unbound members.
 ## Runtime arguments
 
 The `delegate` class is meant to be used primarily with template arguments.
-However, as a consequence of its design, it can also offer minimal support for
+However, as a consequence of its design, it also offers minimal support for
 runtime arguments.<br/>
-When used in this modality, some feature aren't supported though. In particular:
+When used like this, some features aren't supported though. In particular:
 
 * Curried functions aren't accepted.
 * Functions with an argument list that differs from that of the delegate aren't
@@ -209,7 +211,7 @@ their nuances. The reason is pretty simple: a `delegate` isn't a drop-in
 replacement for an `std::function`. Instead, it tries to overcome the problems
 with the latter.<br/>
 That being said, non-capturing lambda functions are supported, even though some
-feature aren't available in this case.
+features aren't available in this case.
 
 This is a logical consequence of the support for connecting functions at
 runtime. Therefore, lambda functions undergo the same rules and
@@ -236,6 +238,24 @@ As above, the first parameter (`const void *`) isn't part of the function type
 of the delegate and is used to dispatch arbitrary user data back and forth. In
 other terms, the function type of the delegate above is `int(int)`.
 
+## Raw access
+
+While not recommended, a delegate also allows direct access to the stored
+callable function target and underlying data, if any.<br/>
+This makes it possible to bypass the behavior of the delegate itself and force
+calls on different instances:
+
+```cpp
+my_struct other;
+delegate.target(&other, 42);
+```
+
+It goes without saying that this type of approach is **very** risky, especially
+since there is no way of knowing whether the contained function was originally a
+member function of some class, a free function or a lambda.<br/>
+Another possible (and meaningful) use of this feature is that of identifying a
+particular delegate through its descriptive _traits_ instead.
+
 # Signals
 
 Signal handlers work with references to classes, function pointers and pointers
@@ -247,16 +267,17 @@ Signals make use of delegates internally and therefore they undergo the same
 rules and offer similar functionalities. It may be a good idea to consult the
 documentation of the `delegate` class for further information.
 
-A signal handler can be used as a private data member without exposing any
-_publish_ functionality to the clients of a class. The basic idea is to impose a
-clear separation between the signal itself and the `sink` class, that is a tool
-to be used to connect and disconnect listeners on the fly.
+A signal handler is can be used as a private data member without exposing any
+_publish_ functionality to the clients of a class.<br/>
+The basic idea is to impose a clear separation between the signal itself and the
+`sink` class, that is a tool to be used to connect and disconnect listeners on
+the fly.
 
 The API of a signal handler is straightforward. If a collector is supplied to
-the signal when something is published, all the values returned by the listeners
-can be literally _collected_ and used later by the caller. Otherwise, the class
+the signal when something is published, all the values returned by its listeners
+are literally _collected_ and used later by the caller. Otherwise, the class
 works just like a plain signal that emits events from time to time.<br/>
-To create instances of signal handlers it is sufficient to provide the type of
+To create instances of signal handlers it's sufficient to provide the type of
 function to which they refer:
 
 ```cpp
@@ -294,41 +315,31 @@ sink.disconnect<&foo>();
 sink.disconnect<&listener::bar>(instance);
 
 // disconnect all member functions of an instance, if any
-sink.disconnect(instance);
+sink.disconnect(&instance);
 
 // discards all listeners at once
 sink.disconnect();
 ```
 
-As shown above, the listeners don't have to strictly follow the signature of the
+As shown above, listeners don't have to strictly follow the signature of the
 signal. As long as a listener can be invoked with the given arguments to yield a
 result that is convertible to the given return type, everything works just
 fine.<br/>
-It's also possible to connect a listener before other listeners already
-contained by the signal. The `before` function returns a `sink` object correctly
-initialized for the purpose that can be used to connect one or more listeners in
-order and in the desired position:
-
-```cpp
-sink.before<&foo>().connect<&listener::bar>(instance);
-```
-
 In all cases, the `connect` member function returns by default a `connection`
 object to be used as an alternative to break a connection by means of its
-`release` member function. A `scoped_connection` can also be created from a
-connection. In this case, the link is broken automatically as soon as the object
-goes out of scope.
+`release` member function.<br/>
+A `scoped_connection` can also be created from a connection. In this case, the
+link is broken automatically as soon as the object goes out of scope.
 
 Once listeners are attached (or even if there are no listeners at all), events
-and data in general can be published through a signal by means of the `publish`
+and data in general are published through a signal by means of the `publish`
 member function:
 
 ```cpp
 signal.publish(42, 'c');
 ```
 
-To collect data, the `collect` member function should be used instead. Below is
-a minimal example to show how to use it:
+To collect data, the `collect` member function is used instead:
 
 ```cpp
 int f() { return 0; }
@@ -414,7 +425,7 @@ of them at once:
 
 ```cpp
 dispatcher.sink<an_event>().disconnect<&listener::receive>(listener);
-dispatcher.sink<another_event>().disconnect(listener);
+dispatcher.sink<another_event>().disconnect(&listener);
 ```
 
 The `trigger` member function serves the purpose of sending an immediate event
@@ -528,8 +539,8 @@ emitter.erase<my_event>();
 emitter.clear()
 ```
 
-To send an event to the listener registered on a given type, the `publish` is
-the way to go:
+To send an event to the listener registered on a given type, the `publish`
+function is the way to go:
 
 ```cpp
 struct my_event { int i; };

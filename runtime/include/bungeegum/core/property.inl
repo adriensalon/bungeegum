@@ -40,9 +40,9 @@ property_reference<property_t> make_property_reference(const widget_id& widget)
     detail::registry_entity _entity = _widgets_manager[widget].entity;
     detail::value_type_t<property_t>* _property_ptr;
     if constexpr (detail::traits::is_reloadable_v<property_t>) {
-        _property_ptr = &(_widgets_manager.widgets.create_component<detail::value_type_t<property_t>>(
-            _entity,
-            detail::global().backend().reload_manager->allocate<property_t>()));
+        // _property_ptr = &(_widgets_manager.widgets.create_component<detail::value_type_t<property_t>>(
+        //     _entity,
+            // detail::global().backend().reload_manager->allocate<property_t>()));
     } else {
         _property_ptr = &(_widgets_manager.widgets.create_component<detail::value_type_t<property_t>>(_entity));
     }
