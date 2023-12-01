@@ -13,6 +13,8 @@
 #include <windows.h>
 #endif
 
+#include <iostream>
+
 namespace bungeegum {
 namespace detail {
 
@@ -472,14 +474,16 @@ namespace detail {
 
     void window::update_once()
     {
+		
         for (const std::function<void()>& _callback : _update_callbacks) {
+std::cout << "hiiiii\n";
             _callback();
         }
     }
 
-	static void fake_loop()
+	static void fake_loop(void* window_ptr)
 	{
-		
+		static_cast<window*>(window_ptr)->update_once();
 	}
 
     void window::update_loop(const std::optional<unsigned int> max_framerate)
@@ -487,7 +491,9 @@ namespace detail {
         (void)max_framerate;
         if constexpr (is_platform_emscripten) {
             int _fps = max_framerate.has_value() ? max_framerate.value() : 0;
-            emscripten_set_main_loop([this]() { update_once(); }, _fps, EM_TRUE);
+std::cout << "before22\n";
+
+            emscripten_set_main_loop_arg(fake_loop, this, _fps, EM_TRUE);
         } else {
             _is_running = true;
             while (_is_running) {

@@ -51,6 +51,7 @@ namespace detail {
         _data.pipeline_window.create();
         _data.pipeline_renderer.create_opengl(_data.pipeline_window);
         setup(name, _data);
+		std::cout << "setup finished\n";
         return pipeline_ref(_data);
 #else
         static_assert(false, "OpenGL renderer is not available.");
@@ -122,6 +123,9 @@ namespace detail {
         });
 
         data.pipeline_window.on_update([name]() {
+
+				
+std::cout << "hiiiii from loop!!!\n";
             pipeline_data& _update_pipeline_data = global().pipelines[name];
 
             _update_pipeline_data.viewport_size = _update_pipeline_data.pipeline_window.get_size();
@@ -130,7 +134,9 @@ namespace detail {
             std::chrono::microseconds _max_fps_period_microseconds = std::chrono::microseconds(static_cast<unsigned int>(std::floorf(1000000.f / 60.f /* MAX FPS !!!*/)));
             std::chrono::microseconds _delta_time = _update_pipeline_data.profiling_stopwatch.lap_at_least(_max_fps_period_microseconds);
             std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
-            bool _has_polled = _update_pipeline_data.pipeline_window.poll();
+            
+
+			bool _has_polled = _update_pipeline_data.pipeline_window.poll();
             (void)_has_polled;
 
             global().pipelines.profiler_frame_chronometer.new_frame();
@@ -138,7 +144,9 @@ namespace detail {
             global().pipelines.profiler_interact_chronometer.new_frame();
             global().pipelines.profiler_draw_chronometer.new_frame();
 
+std::cout << "before update!!!\n";
             bool _has_ticked = global().process.update(_delta_milliseconds);
+std::cout << "after update!!!\n";
             if (_has_ticked) {
 
                 global().pipelines.profiler_frame_chronometer.begin_task("draw widgets");
@@ -279,12 +287,13 @@ pipeline_ref make_pipeline_ref<renderer_backend::vulkan>(const std::string& name
 
 void pipeline_ref::process_loop(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
 {
-    (void)frames_per_second;
+		std::cout << "before loop\n";
     (void)force_rendering;
     if (!_data.get().raw_root.has_value()) {
         // throw
     }
-    _data.get().pipeline_window.update_loop();
+		std::cout << "before loop 2\n";
+    _data.get().pipeline_window.update_loop(frames_per_second);
 }
 
 pipeline_ref& pipeline_ref::process_once(const bool force_rendering)
@@ -299,6 +308,7 @@ pipeline_ref& pipeline_ref::process_once(const bool force_rendering)
 
 pipeline_ref& pipeline_ref::root(const widget_id& widget)
 {
+		std::cout << "before root\n";
     _data.get().raw_root = detail::global().widgets.raw(widget);
     // _data.root_widget = detail::global().widgets.raw(widget);
     // detail::global().widgets.root() = detail::global().widgets.raw(widget);

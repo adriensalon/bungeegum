@@ -175,6 +175,8 @@ namespace detail {
         Diligent::SwapChainDesc _swap_chain_descriptor;
         Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
         Diligent::EngineGLCreateInfo _engine_create_info;
+		_engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1);
+		
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
 #else

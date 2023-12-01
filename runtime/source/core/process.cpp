@@ -138,10 +138,12 @@ namespace detail {
     bool process_manager::update(const std::chrono::milliseconds& delta_time)
     {
         detail::global().pipelines.profiler_frame_chronometer.begin_task("animations");
+		std::cout << "before animations\n";
         global().animations.update(delta_time);
         // std::this_thread::sleep_for(std::chrono::milliseconds(2));
         detail::global().pipelines.profiler_frame_chronometer.end_task("animations");
         detail::global().pipelines.profiler_frame_chronometer.begin_task("events");
+		std::cout << "before events\n";
         global().events.update();
         // std::this_thread::sleep_for(std::chrono::milliseconds(2));
         detail::global().pipelines.profiler_frame_chronometer.end_task("events");
@@ -155,7 +157,9 @@ namespace detail {
         // debug only !
 
         // context::_process_interact();
-        _process_resolve();
+		std::cout << "before pr\n";
+        // _process_resolve();
+		std::cout << "after pr\n";
         // return (has_userspace_thrown() || !global().widgets.drawables.empty());
 
 #if BUNGEEGUM_USE_OVERLAY
