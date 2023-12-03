@@ -8,8 +8,13 @@
 
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/glue/toolchain.fwd>
+#include <bungeegum/glue/time.fwd>
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+struct EmscriptenMouseEvent;
+struct EmscriptenWheelEvent;
+struct EmscriptenKeyboardEvent;
+#else
 struct SDL_Window;
 union SDL_Event;
 #endif
@@ -100,6 +105,20 @@ namespace detail {
         /// @brief Gets the current size of this instance.
         [[nodiscard]] float2 get_size() const;
 
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        /// @brief 
+        /// @param sdl_event_callback 
+        void on_emscripten_mouse_event(const std::function<void(int32_t, const EmscriptenMouseEvent*)>& emscripten_event_callback);
+        
+		/// @brief 
+        /// @param sdl_event_callback 
+        void on_emscripten_wheel_event(const std::function<void(int32_t, const EmscriptenWheelEvent*)>& emscripten_event_callback);
+        
+		/// @brief 
+        /// @param sdl_event_callback 
+        void on_emscripten_key_event(const std::function<void(int32_t, const EmscriptenKeyboardEvent*)>& emscripten_event_callback);
+#endif
+
         /// @brief Sets a callback to be trigged before the window will be destroyed (if created)
         /// or released (if attached).
         void on_exit(const std::function<void()>& exit_callback);
@@ -132,7 +151,7 @@ namespace detail {
 
         /// @brief Sets a callback to be triggered each time
         /// @details Event callbacks are fired when update() or update_loop() is called.
-        void on_update(const std::function<void()>& update_callback);
+        void on_update(const std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>& update_callback);
 
         /// @brief Collects all the events fired since the last call to poll() and triggers
         /// appropriate callbacks.
@@ -170,7 +189,7 @@ namespace detail {
         void title(const std::string& description);
 
         /// @brief Sets the title of this instance.
-        void update_once();
+        void update_once(const BUNGEEGUM_USE_TIME_UNIT& delta_time);
 
         /// @brief Sets the title of this instance.
         void update_loop(const std::optional<unsigned int> max_framerate = std::nullopt);
@@ -188,14 +207,14 @@ namespace detail {
         bool _is_running = false;
         std::shared_ptr<window_data> _data = nullptr;
         std::vector<std::function<void()>> _exit_callbacks = {};
-        std::vector<std::function<void()>> _update_callbacks = {};
+        std::vector<std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>> _update_callbacks = {};
         event_container<mouse_down_event> _mouse_down_events = {};
         event_container<mouse_moved_event> _mouse_moved_events = {};
         event_container<mouse_up_event> _mouse_up_events = {};
         event_container<mouse_pressed_event> _mouse_pressed_events = {};
         event_container<window_resized_event> _resized_events = {};
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        std::vector<std::function<void(const SDL_Event*)>> _sdl_event_callbacks = {};
+		stopwatch _loop_watch = {};
 #endif
     };
 

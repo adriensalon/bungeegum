@@ -32,7 +32,7 @@ namespace widgets {
         friend struct access;
         void resolve(resolve_command& command);
 
-        const char* okok = "heyyyyaaa";
+        std::string okok = "heyyyyaaa";
 
         std::optional<widget_id> _childWidget = std::nullopt;
     };

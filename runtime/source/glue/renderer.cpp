@@ -115,10 +115,20 @@ namespace detail {
                 static_cast<unsigned int>(_rounded.y),
                 Diligent::SURFACE_TRANSFORM_OPTIMAL);
         });
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+		_data->existing_window->on_emscripten_mouse_event([&](int32_t _event_type, const EmscriptenMouseEvent* _event) {
+            _data->imgui_renderer->OnMouseEvent(_event_type, _event);
+        });
+		_data->existing_window->on_emscripten_wheel_event([&](int32_t _event_type, const EmscriptenWheelEvent* _event) {
+            _data->imgui_renderer->OnWheelEvent(_event_type, _event);
+        });
+		_data->existing_window->on_emscripten_key_event([&](int32_t _event_type, const EmscriptenKeyboardEvent* _event) {
+            _data->imgui_renderer->OnKeyEvent(_event_type, _event);
+        });
+#else
         _data->existing_window->on_sdl_event([&](const SDL_Event* _event) {
             _data->imgui_renderer->ProcessEvent(_event);
-        });
+        });		
 #endif
     }
 
@@ -236,7 +246,9 @@ namespace detail {
             throw backtraced_exception("TODO");
         }
         _data->imgui_renderer->Render(_data->device_context);
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         _data->swap_chain->Present();
+#endif
         _is_rendering = false;
     }
 }

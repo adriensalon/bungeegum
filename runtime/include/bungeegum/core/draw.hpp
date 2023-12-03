@@ -119,11 +119,13 @@ struct draw_command {
 
     // draw bezier and bspline from points direct (sans curve)
 
+	// draw_child
+	// draw_children
 private:
     detail::draw_command_data _data;
     friend struct detail::process_manager;
 #if BUNGEEGUM_USE_OVERLAY
-    friend struct detail::widget_inspector;
+    friend struct detail::widget_inspector; // go create accessor in detail::process_manager
 #endif
 };
 

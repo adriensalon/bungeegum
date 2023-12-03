@@ -6,13 +6,14 @@
 #include <bungeegum/core/config.hpp>
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/core/widget.fwd>
+#include <bungeegum/glue/idgen.fwd>
 #include <bungeegum/glue/renderer.fwd>
 #include <bungeegum/glue/time.fwd>
 #include <bungeegum/glue/window.fwd>
 
 namespace bungeegum {
 
-struct pipeline_ref;
+struct pipeline;
 
 namespace detail {
 
@@ -20,7 +21,16 @@ namespace detail {
     using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_TIME_UNIT>;
 
     struct pipeline_data {
-        window pipeline_window = {};
+		pipeline_data();
+		pipeline_data(const pipeline_data& other) = delete;
+		pipeline_data& operator=(const pipeline_data& other) = delete;
+		pipeline_data(pipeline_data&& other);
+		pipeline_data& operator=(pipeline_data&& other);
+		~pipeline_data();
+
+		bool was_moved_from = false;
+		std::uintptr_t generated_id = 0;
+		window pipeline_window = {};
         renderer pipeline_renderer = {};
         std::optional<std::uintptr_t> raw_root = std::nullopt;
         std::vector<window_resized_event> window_resized_events = {};
@@ -29,7 +39,11 @@ namespace detail {
         std::vector<mouse_up_event> mouse_up_events = {};
         std::vector<mouse_pressed_event> mouse_pressed_events = {};
         float2 viewport_size = {};
-        stopwatch profiling_stopwatch; // if profiling
+        stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
+		
+#if BUNGEEGUM_USE_OVERLAY
+		std::string renderer_info = {};
+#endif
     };
 
     struct pipelines_manager {
@@ -41,21 +55,13 @@ namespace detail {
 
         [[nodiscard]] bool contains(const std::string& name);
 
-        [[nodiscard]] pipeline_ref create_directx11(const std::string& name);
-
-        [[nodiscard]] pipeline_ref create_directx12(const std::string& name);
-
-        [[nodiscard]] pipeline_ref create_opengl(const std::string& name);
-
-        [[nodiscard]] pipeline_ref create_vulkan(const std::string& name);
-
         [[nodiscard]] pipeline_data& operator[](const std::string& name);
 
-        [[nodiscard]] pipeline_data& operator[](pipeline_ref& existing_pipeline);
+        [[nodiscard]] pipeline_data& operator[](pipeline& existing_pipeline);
 
-        void setup(const std::string& name, pipeline_data& data);
+		id_generator<pipelines_manager, std::uintptr_t> generator = {};
 
-        std::unordered_map<std::string, pipeline_data> named_pipelines = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<pipeline_data>> updatables = {};
 
 #if BUNGEEGUM_USE_OVERLAY
         BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};

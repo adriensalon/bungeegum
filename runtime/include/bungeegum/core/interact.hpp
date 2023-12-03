@@ -130,11 +130,15 @@ struct interact_command {
     /// @return
     [[nodiscard]] std::optional<mouse_pressed_interaction> mouse_pressed() const;
 
+	// interact_child()
+	
+	// interact_children()
+
 private:
     detail::interact_command_data _data;
     friend struct detail::process_manager;
 #if BUNGEEGUM_USE_OVERLAY
-    friend struct detail::widget_inspector;
+    friend struct detail::widget_inspector; // accessor in detail::process_manager
 #endif
 };
 

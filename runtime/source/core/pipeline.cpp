@@ -4,158 +4,53 @@
 namespace bungeegum {
 namespace detail {
 
-    bool pipelines_manager::contains(const std::string& name)
+    pipeline_data::pipeline_data()
     {
-        return named_pipelines.find(name) != named_pipelines.end();
-    }
+        setup_global_if_required(); // We only need to do this here
 
-    pipeline_ref pipelines_manager::create_directx11(const std::string& name)
-    {
-#if BUNGEEGUM_USE_DIRECTX
-        if (contains(name)) {
-            // throw
-        }
-        pipeline_data& _data = named_pipelines[name];
-        _data.pipeline_window.create();
-        _data.pipeline_renderer.create_directx11(_data.pipeline_window);
-        setup(name, _data);
-        return pipeline_ref(_data);
-#else
-        // static_assert(false, "DirectX renderer is not available.");
-#endif
-    }
-
-    pipeline_ref pipelines_manager::create_directx12(const std::string& name)
-    {
-#if BUNGEEGUM_USE_DIRECTX
-		if (contains(name)) {
-            // throw
-        }
-        pipeline_data& _data = named_pipelines[name];
-        _data.pipeline_window.create();
-        _data.pipeline_renderer.create_directx12(_data.pipeline_window);
-        setup(name, _data);
-        return pipeline_ref(_data);
-#else
-        // static_assert(false, "DirectX renderer is not available.");
-#endif
-    }
-
-    pipeline_ref pipelines_manager::create_opengl(const std::string& name)
-    {
-#if BUNGEEGUM_USE_OPENGL
-        if (contains(name)) {
-            // throw
-        }
-        pipeline_data& _data = named_pipelines[name];
-        _data.pipeline_window.create();
-        _data.pipeline_renderer.create_opengl(_data.pipeline_window);
-        setup(name, _data);
-		std::cout << "setup finished\n";
-        return pipeline_ref(_data);
-#else
-        static_assert(false, "OpenGL renderer is not available.");
-#endif
-    }
-	
-    pipeline_ref pipelines_manager::create_vulkan(const std::string& name)
-    {
-#if BUNGEEGUM_USE_VULKAN
-		if (contains(name)) {
-            // throw
-        }
-        pipeline_data& _data = named_pipelines[name];
-        _data.pipeline_window.create();
-        _data.pipeline_renderer.create_vulkan(_data.pipeline_window);
-        setup(name, _data);
-        return pipeline_ref(_data);
-#else
-        // static_assert(false, "DirectX renderer is not available.");
-#endif
-    }
-
-    pipeline_data& pipelines_manager::operator[](const std::string& name)
-    {
-        if (!contains(name)) {
-            // throw
-        }
-        return named_pipelines.at(name);
-    }
-
-    pipeline_data& pipelines_manager::operator[](pipeline_ref& existing_pipeline)
-    {
-        return existing_pipeline._data;
-    }
-
-    void pipelines_manager::setup(const std::string& name, pipeline_data& data)
-    {
-        setup_global_if_required();
-
-        // global().logs.protect_library([&]() {
-        data.viewport_size = data.pipeline_window.get_size();
-
-#if BUNGEEGUM_USE_HOTSWAP
-        // setup_if_required();
-        // TODO
-#endif
-
-#if BUNGEEGUM_USE_OVERLAY
-        setup_overlay();
-#endif
-
-        data.pipeline_renderer.rebuild_fonts(); /// idk why MSVC needs this otherwise gives error C2039: '__this': is not a member of 'bungeegum::detail::global_manager'
-
-        /// mhhh
-        data.pipeline_window.on_mouse_down([](const mouse_down_event& event) {
-            global().process.mouse_down_events.push_back(event);
+        generated_id = global().pipelines.generator.generate();
+        global().pipelines.updatables.emplace(generated_id, std::ref(*this));
+        pipeline_renderer.clear_color = float4 { 1.f, 1.f, 1.f, 1.f };
+        std::uintptr_t _copyable_id = generated_id;
+        pipeline_window.on_mouse_down([_copyable_id](const mouse_down_event& event) {
+            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
+            _data.mouse_down_events.push_back(event);
         });
-        data.pipeline_window.on_mouse_moved([](const mouse_moved_event& event) {
-            global().process.mouse_moved_events.push_back(event);
+        pipeline_window.on_mouse_moved([_copyable_id](const mouse_moved_event& event) {
+            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
+            _data.mouse_moved_events.push_back(event);
         });
-        data.pipeline_window.on_mouse_pressed([](const mouse_pressed_event& event) {
-            global().process.mouse_pressed_events.push_back(event);
+        pipeline_window.on_mouse_pressed([_copyable_id](const mouse_pressed_event& event) {
+            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
+            _data.mouse_pressed_events.push_back(event);
         });
-        data.pipeline_window.on_mouse_up([](const mouse_up_event& event) {
-            global().process.mouse_up_events.push_back(event);
+        pipeline_window.on_mouse_up([_copyable_id](const mouse_up_event& event) {
+            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
+            _data.mouse_up_events.push_back(event);
         });
-        data.pipeline_window.on_resized([this](const window_resized_event& event) {
-            global().process.window_resized_events.push_back(event);
+        pipeline_window.on_resized([_copyable_id](const window_resized_event& event) {
+            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
+            _data.window_resized_events.push_back(event);
         });
-
-        data.pipeline_window.on_update([name]() {
-
-				
-std::cout << "hiiiii from loop!!!\n";
-            pipeline_data& _update_pipeline_data = global().pipelines[name];
-
-            _update_pipeline_data.viewport_size = _update_pipeline_data.pipeline_window.get_size();
-            // std::cout << "OK viewport size = " << viewport_size.x << ", " << viewport_size.y << std::endl;
-
-            std::chrono::microseconds _max_fps_period_microseconds = std::chrono::microseconds(static_cast<unsigned int>(std::floorf(1000000.f / 60.f /* MAX FPS !!!*/)));
-            std::chrono::microseconds _delta_time = _update_pipeline_data.profiling_stopwatch.lap_at_least(_max_fps_period_microseconds);
-            std::chrono::milliseconds _delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(_max_fps_period_microseconds);
-            
-
-			bool _has_polled = _update_pipeline_data.pipeline_window.poll();
+        pipeline_window.on_update([_copyable_id](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
+            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
+            _data.viewport_size = _data.pipeline_window.get_size();
+			
+            // global().logs.protect_library([&]() {
+            bool _has_polled = _data.pipeline_window.poll();
             (void)_has_polled;
-
             global().pipelines.profiler_frame_chronometer.new_frame();
             global().pipelines.profiler_resolve_chronometer.new_frame();
             global().pipelines.profiler_interact_chronometer.new_frame();
             global().pipelines.profiler_draw_chronometer.new_frame();
-
-std::cout << "before update!!!\n";
-            bool _has_ticked = global().process.update(_delta_milliseconds);
-std::cout << "after update!!!\n";
+            bool _has_ticked = global().process.update(delta_time);
             if (_has_ticked) {
-
                 global().pipelines.profiler_frame_chronometer.begin_task("draw widgets");
-                _update_pipeline_data.pipeline_renderer.new_frame();
+                _data.pipeline_renderer.new_frame();
                 global().process.render();
-                _update_pipeline_data.pipeline_renderer.present();
+                _data.pipeline_renderer.present();
                 global().pipelines.profiler_frame_chronometer.end_task("draw widgets");
             }
-
 #if BUNGEEGUM_USE_HOTSWAP
             // FAIRE PAREIL AVANT / APRES FORCE UPDATE
             std::wstringstream _sstream;
@@ -167,44 +62,188 @@ std::cout << "after update!!!\n";
             }
 #endif
         });
-        data.pipeline_renderer.clear_color = float4 { 1.f, 1.f, 1.f, 1.f };
-        // });
+    }
+
+    pipeline_data::pipeline_data(pipeline_data&& other)
+    {
+        *this = std::move(other);
+    }
+
+    pipeline_data& pipeline_data::operator=(pipeline_data&& other)
+    {
+		generated_id = std::move(other.generated_id);
+		pipeline_window = std::move(other.pipeline_window);
+		pipeline_renderer = std::move(other.pipeline_renderer);
+		raw_root = std::move(other.raw_root);
+		window_resized_events = std::move(other.window_resized_events);
+		mouse_moved_events = std::move(other.mouse_moved_events);
+		mouse_down_events = std::move(other.mouse_down_events);
+		mouse_up_events = std::move(other.mouse_up_events);
+		mouse_pressed_events = std::move(other.mouse_pressed_events);
+		viewport_size = std::move(other.viewport_size);
+		global().pipelines.updatables.at(generated_id) = std::ref(*this);
+        other.was_moved_from = true;
+		return *this;
+    }
+
+    pipeline_data::~pipeline_data()
+    {
+        if (!was_moved_from) {
+			global().pipelines.updatables.erase(generated_id);
+        }
+    }
+
+    // bool pipelines_manager::contains(const std::string& name)
+    // {
+    //     return named_pipelines.find(name) != named_pipelines.end();
+    // }
+
+    // pipeline_data& pipelines_manager::operator[](const std::string& name)
+    // {
+    //     if (!contains(name)) {
+    //         // throw
+    //     }
+    //     return named_pipelines.at(name);
+    // }
+
+    pipeline_data& pipelines_manager::operator[](pipeline& existing_pipeline)
+    {
+        return existing_pipeline._data;
     }
 
 }
 
-pipeline_ref::pipeline_ref(detail::pipeline_data& data)
-    : _data(data)
+// pipeline_ref::pipeline_ref(detail::pipeline_data& data)
+//     : _data(data)
+// {
+// }
+
+pipeline& pipeline::attach_window(void* native_window)
 {
+	(void)native_window;
+    // setup_global_if_required();
+    return *this;
 }
 
 template <>
-pipeline_ref make_pipeline_ref<renderer_backend::directx11>(const std::string& name)
+pipeline& pipeline::make_renderer<renderer_backend::directx11>()
 {
-	detail::setup_global_if_required();
-    return detail::global().pipelines.create_directx11(name);
+#if BUNGEEGUM_USE_DIRECTX
+    if (!has_window()) {
+        // throw
+    }
+    if (has_renderer()) {
+        destroy_renderer();
+    }
+    _data.pipeline_renderer.create_directx11(_data.pipeline_window);
+#if BUNGEEGUM_USE_OVERLAY
+        detail::setup_overlay(); // loads fonts pr linstant ici
+#endif
+	_data.pipeline_renderer.rebuild_fonts();
+	_data.viewport_size = _data.pipeline_window.get_size();
+#endif
+    return *this;
 }
 
 template <>
-pipeline_ref make_pipeline_ref<renderer_backend::directx12>(const std::string& name)
+pipeline& pipeline::make_renderer<renderer_backend::opengl>()
 {
-	detail::setup_global_if_required();
-    return detail::global().pipelines.create_directx12(name);
+    if (!has_window()) {
+        // throw
+    }
+    if (has_renderer()) {
+        destroy_renderer();
+    }
+    _data.pipeline_renderer.create_opengl(_data.pipeline_window);
+#if BUNGEEGUM_USE_OVERLAY
+        detail::setup_overlay(); // loads fonts pr linstant ici
+#endif
+	_data.pipeline_renderer.rebuild_fonts();
+	_data.viewport_size = _data.pipeline_window.get_size();
+    return *this;
 }
 
 template <>
-pipeline_ref make_pipeline_ref<renderer_backend::opengl>(const std::string& name)
+pipeline& pipeline::make_window_and_renderer<renderer_backend::directx11>()
 {
-	detail::setup_global_if_required();
-    return detail::global().pipelines.create_opengl(name);
+#if BUNGEEGUM_USE_DIRECTX
+	_data.pipeline_window.create();
+    _data.pipeline_renderer.create_directx11(_data.pipeline_window);
+#if BUNGEEGUM_USE_OVERLAY
+        detail::setup_overlay(); // loads fonts pr linstant ici
+#endif
+	_data.pipeline_renderer.rebuild_fonts();
+	_data.viewport_size = _data.pipeline_window.get_size();
+#else
+	// throw error
+#endif
+	return *this;
 }
 
 template <>
-pipeline_ref make_pipeline_ref<renderer_backend::vulkan>(const std::string& name)
+pipeline& pipeline::make_window_and_renderer<renderer_backend::opengl>()
 {
-	detail::setup_global_if_required();
-    return detail::global().pipelines.create_vulkan(name);
+	_data.pipeline_window.create();
+    _data.pipeline_renderer.create_opengl(_data.pipeline_window);
+#if BUNGEEGUM_USE_OVERLAY
+        detail::setup_overlay(); // loads fonts pr linstant ici
+#endif
+	_data.pipeline_renderer.rebuild_fonts();
+	_data.viewport_size = _data.pipeline_window.get_size();
+	return *this;
 }
+
+pipeline& pipeline::destroy_renderer()
+{
+    // _data.value.pipeline_renderer.destroy();
+    return *this;
+}
+
+pipeline& pipeline::destroy_window_and_renderer()
+{
+    // _data.value.pipeline_window.destroy();
+    return *this;
+}
+
+bool pipeline::has_renderer() const
+{
+    // return _data.value.pipeline_renderer.is
+    return true;
+}
+
+bool pipeline::has_window() const
+{
+
+    return true;
+}
+
+// template <>
+// pipeline_ref make_pipeline_ref<renderer_backend::directx11>(const std::string& name)
+// {
+// 	detail::setup_global_if_required();
+//     return detail::global().pipelines.create_directx11(name);
+// }
+
+// template <>
+// pipeline_ref make_pipeline_ref<renderer_backend::directx12>(const std::string& name)
+// {
+// 	detail::setup_global_if_required();
+//     return detail::global().pipelines.create_directx12(name);
+// }
+
+// template <>
+// pipeline_ref make_pipeline_ref<renderer_backend::opengl>(const std::string& name)
+// {
+// 	detail::setup_global_if_required();
+//     return detail::global().pipelines.create_opengl(name);
+// }
+
+// template <>
+// pipeline_ref make_pipeline_ref<renderer_backend::vulkan>(const std::string& name)
+// {
+// 	detail::setup_global_if_required();
+//     return detail::global().pipelines.create_vulkan(name);
+// }
 
 // template <>
 // pipeline& pipeline::create<renderer_backend::directx12>()
@@ -285,31 +324,31 @@ pipeline_ref make_pipeline_ref<renderer_backend::vulkan>(const std::string& name
 //     return _pipeline;
 // }
 
-void pipeline_ref::process_loop(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
+void pipeline::process_loop(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
 {
-		std::cout << "before loop\n";
+    // std::cout << "before loop\n";
     (void)force_rendering;
-    if (!_data.get().raw_root.has_value()) {
+    if (!_data.raw_root.has_value()) {
         // throw
     }
-		std::cout << "before loop 2\n";
-    _data.get().pipeline_window.update_loop(frames_per_second);
+    // std::cout << "before loop 2\n";
+    _data.pipeline_window.update_loop(frames_per_second);
 }
 
-pipeline_ref& pipeline_ref::process_once(const bool force_rendering)
+pipeline& pipeline::process_once(const bool force_rendering)
 {
     (void)force_rendering;
-    if (!_data.get().raw_root.has_value()) {
+    if (!_data.raw_root.has_value()) {
         // throw
     }
     // _data.pipeline_window.process_once();
     return *this;
 }
 
-pipeline_ref& pipeline_ref::root(const widget_id& widget)
+pipeline& pipeline::root(const widget_id& widget)
 {
-		std::cout << "before root\n";
-    _data.get().raw_root = detail::global().widgets.raw(widget);
+    // std::cout << "before root\n";
+    _data.raw_root = detail::global().widgets.raw(widget);
     // _data.root_widget = detail::global().widgets.raw(widget);
     // detail::global().widgets.root() = detail::global().widgets.raw(widget);
     return *this;
@@ -319,9 +358,9 @@ pipeline_ref& pipeline_ref::root(const widget_id& widget)
 // {
 // }
 
-pipeline_ref& pipeline_ref::window_title(const std::string& description)
+pipeline& pipeline::window_title(const std::string& description)
 {
-    _data.get().pipeline_window.title(description);
+    _data.pipeline_window.title(description);
     return *this;
 }
 

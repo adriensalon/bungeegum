@@ -1,0 +1,101 @@
+#pragma once
+
+#include <unordered_map>
+#include <optional>
+
+namespace bungeegum {
+namespace detail {
+
+/// @brief This contract allows 
+/// @tparam value_t 
+/// @tparam watcher_t 
+template <typename value_t, typename watcher_t>
+struct value_contract {
+
+	/// @brief 
+	using watch_map_t = typename std::unordered_map<std::uintptr_t, watcher_t>;
+
+	/// @brief Default contructor
+	value_contract();
+
+    /// @brief Deep copy
+    /// @details Behaves like a value copy constructor to the user. To the library a new watcher_t
+	/// will be created in the watch map if other is being watched.
+    value_contract(const value_contract& other);
+
+    /// @brief Mirror copy on the updater if watching
+    /// @param other
+    value_contract& operator=(const value_contract& other);
+
+    /// @brief Deep copy + invalidate
+    /// @param other
+    value_contract(value_contract&& other);
+
+    /// @brief Mirror move on the updater if watching
+    /// @param other
+    value_contract& operator=(value_contract&& other);
+
+	/// @brief 
+	~value_contract();
+
+	/// @brief 
+	/// @return 
+	[[nodiscard]] bool is_watched() const;
+
+    /// @brief 
+    void unwatch();
+
+    /// @brief 
+    /// @param map 
+    void watch(watch_map_t& map);
+
+	/// @brief 
+	value_t value = {};
+
+private:
+    std::uintptr_t _raw_data_ptr = 0u;
+    std::optional<std::reference_wrapper<watch_map_t>> _watch_map = std::nullopt;
+};
+
+/// @brief 
+/// @tparam value_t 
+/// @tparam watcher_t 
+template <typename value_t, typename watcher_t>
+struct ptr_contract {
+
+	/// @brief 
+	using ptr_t = typename std::optional<std::reference_wrapper<value_t>>;
+	
+	/// @brief 
+	using watch_map_t = typename std::unordered_map<std::uintptr_t, watcher_t>;
+
+	ptr_contract();
+
+	ptr_contract(const ptr_contract& other);
+
+	// shallow copy
+	ptr_contract& operator=(const ptr_contract& other);
+
+	ptr_contract(ptr_contract&& other);
+
+	// shallow copy + invalidate
+	ptr_contract& operator=(ptr_contract&& other);
+
+	/// @brief 
+	/// @return 
+	[[nodiscard]] bool is_watched() const;
+
+    /// @brief 
+    void unwatch(watch_map_t& map);
+
+    /// @brief 
+    /// @param map 
+    void watch(value_t& ref, watch_map_t& map); // ref -> std::uintptr_t -> 
+
+	ptr_t ptr = std::nullopt;
+};
+
+}
+}
+
+#include <bungeegum/glue/contract.inl>

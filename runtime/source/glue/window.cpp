@@ -41,7 +41,11 @@ namespace detail {
         inline static std::vector<std::string> keys_up = {};
         inline static std::vector<unsigned int> mouse_buttons_down = {};
         inline static std::vector<unsigned int> mouse_buttons_up = {};
-        inline static float2 mouse_position_delta = { 0.f, 0.f };
+        inline static float2 mouse_position = zero<float2>;
+        inline static float2 mouse_position_delta = zero<float2>;
+        inline static std::function<void(int32_t, const EmscriptenMouseEvent*)> mouse_event_callback = nullptr;
+        inline static std::function<void(int32_t, const EmscriptenWheelEvent*)> wheel_event_callback = nullptr;
+        inline static std::function<void(int32_t, const EmscriptenKeyboardEvent*)> key_event_callback = nullptr;
 
         [[nodiscard]] static std::string result_to_string(EMSCRIPTEN_RESULT result)
         {
@@ -99,29 +103,33 @@ namespace detail {
 
         [[nodiscard]] static EM_BOOL key_callback(int event_type, const EmscriptenKeyboardEvent* event, void* user_data)
         {
+			if (key_event_callback) {
+				key_event_callback(event_type, event);
+			}
             if (event_type == EMSCRIPTEN_EVENT_KEYDOWN) {
-                keys_down.emplace_back(event->key);
+                keys_down.push_back(event->key);
             } else if (event_type == EMSCRIPTEN_EVENT_KEYUP) {
-                keys_up.emplace_back(event->key);
+                keys_up.push_back(event->key);
             }
             return 0;
         }
 
         [[nodiscard]] static EM_BOOL mouse_callback(int event_type, const EmscriptenMouseEvent* event, void* user_data)
         {
+			if (mouse_event_callback) {
+				mouse_event_callback(event_type, event);
+			}
             // https://github.com/emscripten-core/emscripten/blob/main/test/test_html5_core.c
             if (event_type == EMSCRIPTEN_EVENT_MOUSEMOVE) {
-                // detail::mouse_position_delta = glm::vec2((float)event->movementX, (float)event->movementY);
-                // detail::mouse_position = glm::vec2((float)event->clientX, (float)event->clientY);
+                mouse_position = float2 { event->clientX, event->clientY };
+                mouse_position_delta = float2 { event->movementX, event->movementY };
             }
             if (event_type == EMSCRIPTEN_EVENT_MOUSEDOWN) {
                 unsigned int _button = event->button;
-                // detail::buttons[_button] = true;
-                // detail::buttons_changed.emplace_back(_button);
+                mouse_buttons_down.push_back(_button);
             } else if (event_type == EMSCRIPTEN_EVENT_MOUSEUP) {
                 unsigned int _button = event->button;
-                // detail::buttons[_button] = false;
-                // detail::buttons_changed.emplace_back(_button);
+                mouse_buttons_up.push_back(_button);
             }
             if (event_type == EMSCRIPTEN_EVENT_CLICK) // we lock / unlock the pointer on click
             {
@@ -318,12 +326,30 @@ namespace detail {
         // }
     }
 
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+	void window::on_emscripten_mouse_event(const std::function<void(int32_t, const EmscriptenMouseEvent*)>& emscripten_event_callback)
+	{
+		window_data::mouse_event_callback = emscripten_event_callback;
+	}
+	
+	void window::on_emscripten_wheel_event(const std::function<void(int32_t, const EmscriptenWheelEvent*)>& emscripten_event_callback)
+	{
+		window_data::wheel_event_callback = emscripten_event_callback;
+	}	
+	
+	void window::on_emscripten_key_event(const std::function<void(int32_t, const EmscriptenKeyboardEvent*)>& emscripten_event_callback)
+	{
+		window_data::key_event_callback = emscripten_event_callback;
+	}
+        
+#endif
+
     void window::on_exit(const std::function<void()>& exit_callback)
     {
         _exit_callbacks.push_back(exit_callback);
     }
 
-    void window::on_update(const std::function<void()>& update_callback)
+    void window::on_update(const std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>& update_callback)
     {
         _update_callbacks.push_back(update_callback);
     }
@@ -364,7 +390,33 @@ namespace detail {
     {
         bool _polled = false;
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        for (const unsigned int _button : window_data::mouse_buttons_down) {
+            mouse_down_event _mouse_down_event;
+            _mouse_down_event.button_index = _button;
+            _mouse_down_events.stashed.push_back(_mouse_down_event);
+        }
+        window_data::mouse_buttons_down.clear();
+        for (const unsigned int _button : window_data::mouse_buttons_up) {
+            mouse_up_event _mouse_up_event;
+            _mouse_up_event.button_index = _button;
+            _mouse_up_events.stashed.push_back(_mouse_up_event);
+        }
+        window_data::mouse_buttons_up.clear();
+        if (math::abs(window_data::mouse_position_delta.x) > 0.f && math::abs(window_data::mouse_position_delta.y) > 0.f) {
+			mouse_moved_event _mouse_moved_event;
+			_mouse_moved_event.absolute_position = window_data::mouse_position;
+			_mouse_moved_event.relative_position = window_data::mouse_position_delta;
+			_mouse_moved_events.stashed.push_back(_mouse_moved_event);
+        }
+		window_data::mouse_position_delta = zero<float2>;
+
+        float2 _window_size_memory = _data->window_size;
         _data->window_size = float2 { canvas_get_width(), canvas_get_height() };
+        if (_window_size_memory != _data->window_size) {
+            window_resized_event _window_resized_event;
+            _window_resized_event.new_size = _data->window_size;
+            _resized_events.stashed.push_back(_window_resized_event);
+        }
 #else
         // poll device
         if constexpr (!is_platform_emscripten) { // emscripten events already stashed
@@ -413,31 +465,31 @@ namespace detail {
 
         // poll simulated
         if (poll_simulated) {
-            _mouse_down_events.stashed.insert(
-                _mouse_down_events.stashed.end(),
-                _mouse_down_events.simulated.begin(),
-                _mouse_down_events.simulated.end());
-            _mouse_moved_events.stashed.insert(
-                _mouse_moved_events.stashed.end(),
-                _mouse_moved_events.simulated.begin(),
-                _mouse_moved_events.simulated.end());
-            _mouse_up_events.stashed.insert(
-                _mouse_up_events.stashed.end(),
-                _mouse_up_events.simulated.begin(),
-                _mouse_up_events.simulated.end());
-            _mouse_pressed_events.stashed.insert(
-                _mouse_pressed_events.stashed.end(),
-                _mouse_pressed_events.simulated.begin(),
-                _mouse_pressed_events.simulated.end());
-            _resized_events.stashed.insert(
-                _resized_events.stashed.end(),
-                _resized_events.simulated.begin(),
-                _resized_events.simulated.end());
-            _mouse_down_events.simulated.clear();
-            _mouse_moved_events.simulated.clear();
-            _mouse_up_events.simulated.clear();
-            _mouse_pressed_events.simulated.clear();
-            _resized_events.simulated.clear();
+            // _mouse_down_events.stashed.insert(
+            //     _mouse_down_events.stashed.end(),
+            //     _mouse_down_events.simulated.begin(),
+            //     _mouse_down_events.simulated.end());
+            // _mouse_moved_events.stashed.insert(
+            //     _mouse_moved_events.stashed.end(),
+            //     _mouse_moved_events.simulated.begin(),
+            //     _mouse_moved_events.simulated.end());
+            // _mouse_up_events.stashed.insert(
+            //     _mouse_up_events.stashed.end(),
+            //     _mouse_up_events.simulated.begin(),
+            //     _mouse_up_events.simulated.end());
+            // _mouse_pressed_events.stashed.insert(
+            //     _mouse_pressed_events.stashed.end(),
+            //     _mouse_pressed_events.simulated.begin(),
+            //     _mouse_pressed_events.simulated.end());
+            // _resized_events.stashed.insert(
+            //     _resized_events.stashed.end(),
+            //     _resized_events.simulated.begin(),
+            //     _resized_events.simulated.end());
+            // _mouse_down_events.simulated.clear();
+            // _mouse_moved_events.simulated.clear();
+            // _mouse_up_events.simulated.clear();
+            // _mouse_pressed_events.simulated.clear();
+            // _resized_events.simulated.clear();
         }
 
         // fire callbacks
@@ -446,11 +498,13 @@ namespace detail {
                 _callback(_event);
             }
         }
-        // if (_mouse_moved_events.callback) {
-        //     for (const mouse_moved_event& _event : _mouse_moved_events.stashed) {
-        //         _mouse_moved_events.callback(_event);
-        //     }
-        // }
+		if (!_mouse_moved_events.stashed.empty()) {
+			for (const std::function<void(const mouse_moved_event&)>& _callback : _mouse_moved_events.callbacks) {
+				const mouse_moved_event& _event = _mouse_moved_events.stashed.back(); // only the last resize is relevant
+				_callback(_event);
+			}
+		}
+			
         // if (_mouse_up_events.callback) {
         //     for (const mouse_up_event& _event : _mouse_up_events.stashed) {
         //         _mouse_up_events.callback(_event);
@@ -461,9 +515,13 @@ namespace detail {
         //         _mouse_pressed_events.callback(_event);
         //     }
         // }
-        // if (_resized_events.callback) { // only the last resize is relevant
-        //     _resized_events.callback(_resized_events.stashed.back());
-        // }
+		if (!_resized_events.stashed.empty()) {
+			for (const std::function<void(const window_resized_event&)>& _callback : _resized_events.callbacks) {
+				const window_resized_event& _event = _resized_events.stashed.back(); // only the last resize is relevant
+				_callback(_event);
+			}
+		}
+        
         _mouse_down_events.stashed.clear();
         _mouse_moved_events.stashed.clear();
         _mouse_up_events.stashed.clear();
@@ -472,34 +530,47 @@ namespace detail {
         return _polled;
     }
 
-    void window::update_once()
+    void window::update_once(const BUNGEEGUM_USE_TIME_UNIT& delta_time)
     {
-		
-        for (const std::function<void()>& _callback : _update_callbacks) {
-std::cout << "hiiiii\n";
-            _callback();
+        for (const std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>& _callback : _update_callbacks) {
+            // std::cout << "hiiiii\n";
+            _callback(delta_time); // en vrai compter ici pareil que lautre mais avec un timer
         }
     }
 
-	static void fake_loop(void* window_ptr)
-	{
-		static_cast<window*>(window_ptr)->update_once();
-	}
+    struct fake_loop_data {
+        window* window_ptr;
+        BUNGEEGUM_USE_TIME_UNIT target_fps;
+    };
+
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+    static void fake_loop(void* window_ptr)
+    {
+        fake_loop_data* _typed_data = static_cast<fake_loop_data*>(window_ptr);
+        _typed_data->window_ptr->update_once(_typed_data->target_fps);
+    }
+#endif
 
     void window::update_loop(const std::optional<unsigned int> max_framerate)
     {
-        (void)max_framerate;
-        if constexpr (is_platform_emscripten) {
-            int _fps = max_framerate.has_value() ? max_framerate.value() : 0;
-std::cout << "before22\n";
-
-            emscripten_set_main_loop_arg(fake_loop, this, _fps, EM_TRUE);
+        BUNGEEGUM_USE_TIME_UNIT _target_frame_duration;
+        if (max_framerate.has_value()) {
+			BUNGEEGUM_USE_TIME_UNIT _one_second = std::chrono::duration_cast<BUNGEEGUM_USE_TIME_UNIT>(std::chrono::seconds(1));
+            _target_frame_duration = BUNGEEGUM_USE_TIME_UNIT(static_cast<unsigned int>(math::floor(_one_second.count() / 60.f)));
         } else {
-            _is_running = true;
-            while (_is_running) {
-                update_once();
-            }
+            _target_frame_duration = BUNGEEGUM_USE_TIME_UNIT(0);
         }
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        fake_loop_data _data { this, _target_frame_duration };
+        int _fps = max_framerate.has_value() ? max_framerate.value() : 0;
+        emscripten_set_main_loop_arg(fake_loop, static_cast<void*>(&_data), _fps, EM_TRUE);
+#else
+        _is_running = true;
+        while (_is_running) {
+            BUNGEEGUM_USE_TIME_UNIT _delta_time = _loop_watch.lap_at_least(_target_frame_duration);
+            update_once(_delta_time);
+        }
+#endif
     }
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN

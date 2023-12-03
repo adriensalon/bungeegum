@@ -47,12 +47,8 @@ namespace detail {
         detail::global().pipelines.profiler_frame_chronometer.begin_task("resolve widgets");
         bool _resolve_done = false;
         while (!_resolve_done) {
-            // std::for_each(
-            //     std::execution::seq, // go parallel
-            //     global().widgets.resolvables.begin(),
-            //     global().widgets.resolvables.end(),
+			std::size_t _iteration_size = global().widgets.resolvables.size();
             for (const std::uintptr_t _raw_widget : global().widgets.resolvables)
-            // [](const std::uintptr_t _raw_widget)
             {
                 widget_update_data& _widget_data = global().widgets[_raw_widget];
                 resolve_command& _resolve_command = _widget_data.resolver_command;
@@ -74,11 +70,10 @@ namespace detail {
 #if BUNGEEGUM_USE_OVERLAY
                 global().pipelines.profiler_resolve_chronometer.end_task(_widget_data.resolver_command._data.clean_typename);
 #endif
-                // });
             };
             global().widgets.resolvables.erase(
                 global().widgets.resolvables.begin(),
-                global().widgets.resolvables.end());
+                global().widgets.resolvables.begin() + _iteration_size);
             _resolve_done = global().widgets.resolvables.empty();
         }
         detail::global().pipelines.profiler_frame_chronometer.end_task("resolve widgets");
@@ -138,12 +133,12 @@ namespace detail {
     bool process_manager::update(const std::chrono::milliseconds& delta_time)
     {
         detail::global().pipelines.profiler_frame_chronometer.begin_task("animations");
-		std::cout << "before animations\n";
+		// std::cout << "before animations\n";
         global().animations.update(delta_time);
         // std::this_thread::sleep_for(std::chrono::milliseconds(2));
         detail::global().pipelines.profiler_frame_chronometer.end_task("animations");
         detail::global().pipelines.profiler_frame_chronometer.begin_task("events");
-		std::cout << "before events\n";
+		// std::cout << "before events\n";
         global().events.update();
         // std::this_thread::sleep_for(std::chrono::milliseconds(2));
         detail::global().pipelines.profiler_frame_chronometer.end_task("events");
@@ -157,9 +152,9 @@ namespace detail {
         // debug only !
 
         // context::_process_interact();
-		std::cout << "before pr\n";
+		// std::cout << "before pr\n";
         // _process_resolve();
-		std::cout << "after pr\n";
+		// std::cout << "after pr\n";
         // return (has_userspace_thrown() || !global().widgets.drawables.empty());
 
 #if BUNGEEGUM_USE_OVERLAY
