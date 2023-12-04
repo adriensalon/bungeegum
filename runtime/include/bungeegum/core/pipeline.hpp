@@ -76,16 +76,30 @@ struct pipeline {
     pipeline(pipeline&& other) = default;
     pipeline& operator=(pipeline&& other) = default;
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
     /// @brief
     /// @param native_window
-    pipeline& attach_window(void* native_window);
+    pipeline& attach_native_window(void* native_window);
 
     /// @brief
     /// @tparam backend_t
     /// @param native_window
     /// @param embedders
     template <renderer_backend backend_t = preferred_renderer_backend>
-    pipeline& attach_window_and_renderer(void* native_window, const pipeline_embedders<backend_t>& embedders);
+    pipeline& attach_native_window_and_renderer(void* native_window, const pipeline_embedders<backend_t>& embedders);
+
+    /// @brief
+    /// @return
+    [[nodiscard]] bool has_native_window() const;
+
+    /// @brief
+    /// @param native_window
+    pipeline& make_native_window();
+#endif
+
+    /// @brief
+    /// @param native_window
+    pipeline& make_native_window_if_native();
 
     /// @brief
     /// @tparam backend_t
@@ -93,29 +107,13 @@ struct pipeline {
     pipeline& make_renderer();
 
     /// @brief
-    /// @tparam backend_t
-    /// @param native_window
-    template <renderer_backend backend_t = preferred_renderer_backend>
-    pipeline& make_window_and_renderer();
-
-    /// @brief
-    pipeline& destroy_renderer();
-
-    /// @brief
-    pipeline& destroy_window_and_renderer();
-
-    /// @brief
     /// @return
     [[nodiscard]] bool has_renderer() const;
 
     /// @brief
-    /// @return
-    [[nodiscard]] bool has_window() const;
-
-    /// @brief
     /// @param frames_per_second
     /// @param force_rendering
-    void process_loop(const std::optional<unsigned int> frames_per_second = std::nullopt, const bool force_rendering = false);
+    void process_loop_and_reset(const std::optional<unsigned int> frames_per_second = std::nullopt, const bool force_rendering = false);
 
     /// @brief Processes the frame. If force_rendering is set to true the draw pass will be
     /// executed even if no changes were requested. When set to false only the required portions
@@ -128,24 +126,9 @@ struct pipeline {
     pipeline& root(const widget_id& widget);
 
     /// @brief
-    pipeline& simulate_mouse_down(const mouse_down_interaction& interaction);
+    /// @param widget
+    pipeline& reset();
 
-    /// @brief Sends a mouse moved interaction event
-    pipeline& simulate_mouse_moved(const mouse_moved_interaction& interaction);
-
-    /// @brief Sends a mouse moved interaction event
-    pipeline& simulate_mouse_moved_relative(const mouse_moved_interaction& interaction);
-
-    /// @brief Sends a mouse moved interaction event
-    pipeline& simulate_mouse_pressed(const mouse_moved_interaction& interaction);
-
-    /// @brief
-    pipeline& simulate_mouse_up(const mouse_up_interaction& interaction);
-
-    /// @brief Resizes the swapchain
-    /// @details This has the same effect as
-    pipeline& simulate_resize(const float2 size);
-    // EVENTS...
 
     /// @brief
     pipeline& window_color(const float4 rgba);

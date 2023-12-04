@@ -130,12 +130,11 @@ int main()
     // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
     // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
 
-    // bungeegum::pipeline_ref p = (bungeegum::make_pipeline_ref<bungeegum::renderer_backend::directx11>("mypipe"));
-    // bungeegum::pipeline_ref p = bungeegum::make_pipeline_ref("mypipe");
+	bungeegum::pipeline _my_pipeline;
+	_my_pipeline.make_native_window_if_native();
+	_my_pipeline.make_renderer();
 
-	bungeegum::pipeline p;
-	auto p2 = std::move(p);
-	p2.make_window_and_renderer();
+	auto p2 = std::move(_my_pipeline);
 	p2.root(bungeegum::make<Title>().title("mytitle"));
     // p.root(bungeegum::widget_id( bungeegum::make<Title>()
     //            .title("my title !!!")
@@ -220,7 +219,7 @@ int main()
 
     //     //   )
     // ));
-    p2.process_loop(60, true);
+    p2.process_loop_and_reset(60, true);
 
     return 0;
 }

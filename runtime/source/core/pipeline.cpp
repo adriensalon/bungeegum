@@ -11,57 +11,6 @@ namespace detail {
         generated_id = global().pipelines.generator.generate();
         global().pipelines.updatables.emplace(generated_id, std::ref(*this));
         pipeline_renderer.clear_color = float4 { 1.f, 1.f, 1.f, 1.f };
-        std::uintptr_t _copyable_id = generated_id;
-        pipeline_window.on_mouse_down([_copyable_id](const mouse_down_event& event) {
-            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
-            _data.mouse_down_events.push_back(event);
-        });
-        pipeline_window.on_mouse_moved([_copyable_id](const mouse_moved_event& event) {
-            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
-            _data.mouse_moved_events.push_back(event);
-        });
-        pipeline_window.on_mouse_pressed([_copyable_id](const mouse_pressed_event& event) {
-            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
-            _data.mouse_pressed_events.push_back(event);
-        });
-        pipeline_window.on_mouse_up([_copyable_id](const mouse_up_event& event) {
-            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
-            _data.mouse_up_events.push_back(event);
-        });
-        pipeline_window.on_resized([_copyable_id](const window_resized_event& event) {
-            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
-            _data.window_resized_events.push_back(event);
-        });
-        pipeline_window.on_update([_copyable_id](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
-            pipeline_data& _data = global().pipelines.updatables.at(_copyable_id).get();
-            _data.viewport_size = _data.pipeline_window.get_size();
-			
-            // global().logs.protect_library([&]() {
-            bool _has_polled = _data.pipeline_window.poll();
-            (void)_has_polled;
-            global().pipelines.profiler_frame_chronometer.new_frame();
-            global().pipelines.profiler_resolve_chronometer.new_frame();
-            global().pipelines.profiler_interact_chronometer.new_frame();
-            global().pipelines.profiler_draw_chronometer.new_frame();
-            bool _has_ticked = global().process.update(delta_time);
-            if (_has_ticked) {
-                global().pipelines.profiler_frame_chronometer.begin_task("draw widgets");
-                _data.pipeline_renderer.new_frame();
-                global().process.render();
-                _data.pipeline_renderer.present();
-                global().pipelines.profiler_frame_chronometer.end_task("draw widgets");
-            }
-#if BUNGEEGUM_USE_HOTSWAP
-            // FAIRE PAREIL AVANT / APRES FORCE UPDATE
-            std::wstringstream _sstream;
-            reload_state _reload_result = global().hotswap.reload_manager->update(_sstream.rdbuf());
-            if (_reload_result == reload_state::started_compiling) {
-                global().hotswap.save_widgets("C:/Users/adri/desktop/ok.json");
-            } else if (_reload_result == reload_state::performed_swap) {
-                global().hotswap.load_widgets("C:/Users/adri/desktop/ok.json");
-            }
-#endif
-        });
     }
 
     pipeline_data::pipeline_data(pipeline_data&& other)
@@ -113,12 +62,8 @@ namespace detail {
 
 }
 
-// pipeline_ref::pipeline_ref(detail::pipeline_data& data)
-//     : _data(data)
-// {
-// }
-
-pipeline& pipeline::attach_window(void* native_window)
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+pipeline& pipeline::attach_native_window(void* native_window)
 {
 	(void)native_window;
     // setup_global_if_required();
@@ -126,14 +71,96 @@ pipeline& pipeline::attach_window(void* native_window)
 }
 
 template <>
+pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::directx11>(void* native_window, const pipeline_embedders<renderer_backend::directx11>& embedders)
+{
+	if (has_native_window()) {
+        // throw
+    }
+	if (has_renderer()) {
+        // throw
+    }
+	
+    return *this;
+}
+
+template <>
+pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::directx12>(void* native_window, const pipeline_embedders<renderer_backend::directx12>& embedders)
+{
+	if (has_native_window()) {
+        // throw
+    }
+	if (has_renderer()) {
+        // throw
+    }
+	
+    return *this;
+}
+
+template <>
+pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::opengl>(void* native_window, const pipeline_embedders<renderer_backend::opengl>& embedders)
+{
+	if (has_native_window()) {
+        // throw
+    }
+	if (has_renderer()) {
+        // throw
+    }
+	
+    return *this;
+}
+
+template <>
+pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::vulkan>(void* native_window, const pipeline_embedders<renderer_backend::vulkan>& embedders)
+{
+	if (has_native_window()) {
+        // throw
+    }
+	if (has_renderer()) {
+        // throw
+    }
+	
+    return *this;
+}
+
+bool pipeline::has_native_window() const
+{
+
+    return true;
+}
+
+pipeline& pipeline::make_native_window()
+{
+	if (has_native_window()) {
+        // throw
+    }
+	if (has_renderer()) {
+        // throw
+    }
+
+	_data.pipeline_window.create_native();
+    return *this;
+}
+#endif
+
+pipeline& pipeline::make_native_window_if_native()
+{	
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+	make_native_window();
+#endif
+	return *this;
+}
+
+template <>
 pipeline& pipeline::make_renderer<renderer_backend::directx11>()
 {
 #if BUNGEEGUM_USE_DIRECTX
-    if (!has_window()) {
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+    if (!has_native_window()) {
         // throw
     }
+#endif
     if (has_renderer()) {
-        destroy_renderer();
+        // throw
     }
     _data.pipeline_renderer.create_directx11(_data.pipeline_window);
 #if BUNGEEGUM_USE_OVERLAY
@@ -148,11 +175,13 @@ pipeline& pipeline::make_renderer<renderer_backend::directx11>()
 template <>
 pipeline& pipeline::make_renderer<renderer_backend::opengl>()
 {
-    if (!has_window()) {
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+    if (!has_native_window()) {
         // throw
     }
+#endif
     if (has_renderer()) {
-        destroy_renderer();
+        // throw
     }
     _data.pipeline_renderer.create_opengl(_data.pipeline_window);
 #if BUNGEEGUM_USE_OVERLAY
@@ -160,179 +189,73 @@ pipeline& pipeline::make_renderer<renderer_backend::opengl>()
 #endif
 	_data.pipeline_renderer.rebuild_fonts();
 	_data.viewport_size = _data.pipeline_window.get_size();
-    return *this;
-}
-
-template <>
-pipeline& pipeline::make_window_and_renderer<renderer_backend::directx11>()
-{
-#if BUNGEEGUM_USE_DIRECTX
-	_data.pipeline_window.create();
-    _data.pipeline_renderer.create_directx11(_data.pipeline_window);
-#if BUNGEEGUM_USE_OVERLAY
-        detail::setup_overlay(); // loads fonts pr linstant ici
-#endif
-	_data.pipeline_renderer.rebuild_fonts();
-	_data.viewport_size = _data.pipeline_window.get_size();
-#else
-	// throw error
-#endif
-	return *this;
-}
-
-template <>
-pipeline& pipeline::make_window_and_renderer<renderer_backend::opengl>()
-{
-	_data.pipeline_window.create();
-    _data.pipeline_renderer.create_opengl(_data.pipeline_window);
-#if BUNGEEGUM_USE_OVERLAY
-        detail::setup_overlay(); // loads fonts pr linstant ici
-#endif
-	_data.pipeline_renderer.rebuild_fonts();
-	_data.viewport_size = _data.pipeline_window.get_size();
-	return *this;
-}
-
-pipeline& pipeline::destroy_renderer()
-{
-    // _data.value.pipeline_renderer.destroy();
-    return *this;
-}
-
-pipeline& pipeline::destroy_window_and_renderer()
-{
-    // _data.value.pipeline_window.destroy();
     return *this;
 }
 
 bool pipeline::has_renderer() const
 {
-    // return _data.value.pipeline_renderer.is
-    return true;
+	return _data.pipeline_renderer.has_renderer();
 }
 
-bool pipeline::has_window() const
+void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
 {
-
-    return true;
-}
-
-// template <>
-// pipeline_ref make_pipeline_ref<renderer_backend::directx11>(const std::string& name)
-// {
-// 	detail::setup_global_if_required();
-//     return detail::global().pipelines.create_directx11(name);
-// }
-
-// template <>
-// pipeline_ref make_pipeline_ref<renderer_backend::directx12>(const std::string& name)
-// {
-// 	detail::setup_global_if_required();
-//     return detail::global().pipelines.create_directx12(name);
-// }
-
-// template <>
-// pipeline_ref make_pipeline_ref<renderer_backend::opengl>(const std::string& name)
-// {
-// 	detail::setup_global_if_required();
-//     return detail::global().pipelines.create_opengl(name);
-// }
-
-// template <>
-// pipeline_ref make_pipeline_ref<renderer_backend::vulkan>(const std::string& name)
-// {
-// 	detail::setup_global_if_required();
-//     return detail::global().pipelines.create_vulkan(name);
-// }
-
-// template <>
-// pipeline& pipeline::create<renderer_backend::directx12>()
-// {
-// #if ((TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP) && BUNGEEGUM_USE_DIRECTX)
-//     _data.pipeline_window.create();
-//     _data.renderer_backend.create_directx12(_data.pipeline_window);
-//     _data.setup();
-//     return *this;
-// #else
-//     static_assert(false, "DirectX renderer is not available.");
-// #endif
-// }
-
-// template <>
-// pipeline& pipeline::create<renderer_backend::opengl>()
-// {
-// #if BUNGEEGUM_USE_OPENGL
-//     _data.pipeline_window.create();
-//     _data.renderer_backend.create_opengl(_data.pipeline_window);
-//     _data.setup();
-//     return *this;
-// #else
-//     static_assert(false, "OpenGL renderer is not available.");
-// #endif
-// }
-
-// template <>
-// pipeline& pipeline::create<renderer_backend::vulkan>()
-// {
-// #if BUNGEEGUM_USE_VULKAN
-//     _data.pipeline_window.create();
-//     // _data.renderer_backend = std::make_unique<detail::renderer>(detail::renderer::create_vulkan(*(_pipeline._data.pipeline_window.get())));
-//     _data.setup();
-//     return *this;
-// #else
-//     static_assert(false, "Vulkan renderer is not available.");
-// #endif
-// }
-
-// template <renderer_backend backend_t>
-// pipeline pipeline::attach(const pipeline_embedders<backend_t>& embedders)
-// {
-//     pipeline _pipeline;
-//     _pipeline._data.pipeline_window = std::make_unique<window>(window::attach_native(native_window));
-//     if constexpr (backend_t == renderer_backend::directx11) {
-// #if ((TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP) && BUNGEEGUM_USE_DIRECTX)
-//         _pipeline._data.renderer_backend = std::make_unique<renderer>(renderer::attach_directx11(
-//             embedders.native_window,
-//             embedders.directx_device,
-//             embedders.directx_swapchain));
-// #else
-//         static_assert(false, "DirectX renderer is not available.");
-// #endif
-//     } else if constexpr (backend_t == renderer_backend::directx12) {
-// #if ((TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP) && BUNGEEGUM_USE_DIRECTX)
-//         _pipeline._data.renderer_backend = std::make_unique<renderer>(renderer::attach_directx12(
-//             embedders.native_window,
-//             embedders.directx_device,
-//             embedders.directx_swapchain));
-// #else
-//         static_assert(false, "DirectX renderer is not available.");
-// #endif
-//     } else if constexpr (backend_t == renderer_backend::opengl) {
-// #if BUNGEEGUM_USE_OPENGL
-//         // todo
-// #else
-//         static_assert(false, "OpenGL renderer is not available.");
-// #endif
-//     } else if constexpr (backend_t == renderer_backend::vulkan) {
-// #if BUNGEEGUM_USE_VULKAN
-//         // todo
-// #else
-//         static_assert(false, "Vulkan renderer is not available.");
-// #endif
-//     }
-//     _pipeline._data.setup();
-//     return _pipeline;
-// }
-
-void pipeline::process_loop(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
-{
-    // std::cout << "before loop\n";
     (void)force_rendering;
     if (!_data.raw_root.has_value()) {
         // throw
     }
-    // std::cout << "before loop 2\n";
-    _data.pipeline_window.update_loop(frames_per_second);
+	std::uintptr_t _copyable_id = _data.generated_id;	
+	std::cout << "hello \n";
+    _data.pipeline_window.update_loop(frames_per_second, [_copyable_id] (const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
+			
+		detail::pipeline_data& _pipeline_data = detail::global().pipelines.updatables.at(_copyable_id).get();
+		_pipeline_data.viewport_size = _pipeline_data.pipeline_window.get_size();
+	
+		// global().logs.protect_library([&]() {
+		_pipeline_data.pipeline_window.poll();
+
+		if (!_pipeline_data.pipeline_window.window_resized_events.empty()) {
+			_pipeline_data.pipeline_renderer.resize(_pipeline_data.pipeline_window.window_resized_events.back().new_size);
+		}
+
+#if BUNGEEGUM_USE_OVERLAY
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+		_pipeline_data.pipeline_renderer.consume_emscripten_key_events(_pipeline_data.pipeline_window.get_emscripten_key_events());
+		_pipeline_data.pipeline_renderer.consume_emscripten_mouse_events(_pipeline_data.pipeline_window.get_emscripten_mouse_events());
+		_pipeline_data.pipeline_renderer.consume_emscripten_wheel_events(_pipeline_data.pipeline_window.get_emscripten_wheel_events());
+#else
+		_pipeline_data.pipeline_renderer.consume_sdl_events(_pipeline_data.pipeline_window.get_sdl_events());
+#endif
+#endif
+
+		// store events in _pipeline_data ig
+
+		detail::global().pipelines.profiler_frame_chronometer.new_frame();
+		detail::global().pipelines.profiler_resolve_chronometer.new_frame();
+		detail::global().pipelines.profiler_interact_chronometer.new_frame();
+		detail::global().pipelines.profiler_draw_chronometer.new_frame();
+		bool _has_ticked = detail::global().process.update(delta_time);
+		if (_has_ticked) {
+			detail::global().pipelines.profiler_frame_chronometer.begin_task("draw widgets");
+			_pipeline_data.pipeline_renderer.new_frame();
+			detail::global().process.render();
+			_pipeline_data.pipeline_renderer.present();
+			detail::global().pipelines.profiler_frame_chronometer.end_task("draw widgets");
+		}
+#if BUNGEEGUM_USE_HOTSWAP
+		// FAIRE PAREIL AVANT / APRES FORCE UPDATE
+		std::wstringstream _sstream;
+		detail::reload_state _reload_result = detail::global().hotswap.reload_manager->update(_sstream.rdbuf());
+		if (_reload_result == detail::reload_state::started_compiling) {
+			detail::global().hotswap.save_widgets("C:/Users/adri/desktop/ok.json");
+		} else if (_reload_result == detail::reload_state::performed_swap) {
+			detail::global().hotswap.load_widgets("C:/Users/adri/desktop/ok.json");
+		}
+#endif
+
+
+
+
+	});
 }
 
 pipeline& pipeline::process_once(const bool force_rendering)
@@ -360,7 +283,8 @@ pipeline& pipeline::root(const widget_id& widget)
 
 pipeline& pipeline::window_title(const std::string& description)
 {
-    _data.pipeline_window.title(description);
+	(void)description;
+    // _data.pipeline_window.title(description);
     return *this;
 }
 

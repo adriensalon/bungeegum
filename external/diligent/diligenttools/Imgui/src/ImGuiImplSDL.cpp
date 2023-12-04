@@ -71,7 +71,7 @@ void ImGuiImplSDL::NewFrame(Uint32 RenderSurfaceWidth, Uint32 RenderSurfaceHeigh
 }
 
 
-bool ImGuiImplSDL::ProcessEvent(const SDL_Event* event)
+bool ImGuiImplSDL::OnEvent(const SDL_Event& event)
 {
     if (ImGui::GetCurrentContext() == NULL)
         return 0;
@@ -79,7 +79,7 @@ bool ImGuiImplSDL::ProcessEvent(const SDL_Event* event)
     ImGui_ImplSDL2_ProcessEvent(event);
 
     ImGuiIO& io = ImGui::GetIO();
-    switch (event->type)
+    switch (event.type)
     {
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:

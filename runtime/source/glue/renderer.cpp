@@ -8,6 +8,7 @@
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 // imgui emscripten ?
 #else
+#include <SDL_events.h>
 #include <imgui_impl_sdl2.h>
 #endif
 #include <implot.h>
@@ -51,11 +52,11 @@ namespace bungeegum {
 namespace detail {
 
     struct renderer::renderer_data {
-
         Diligent::RefCntAutoPtr<Diligent::IRenderDevice> render_device = {};
         Diligent::RefCntAutoPtr<Diligent::IDeviceContext> device_context = {};
         Diligent::RefCntAutoPtr<Diligent::ISwapChain> swap_chain = {};
         window* existing_window = nullptr;
+		
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         std::shared_ptr<Diligent::ImGuiImplEmscripten> imgui_renderer = nullptr;
 #else
@@ -63,29 +64,7 @@ namespace detail {
         SDL_Window* sdl_window = nullptr;
 #endif
     };
-
-    //     renderer::renderer(const window& existing_window)
-    //     {
-    //         // _data = std::make_shared<renderer_data>();
-    //         // _data->sdl_window = existing_window.get_sdl();
-    //         // Diligent::SwapChainDesc _swap_chain_descriptor;
-    // #if BUNGEEGUM_USE_RENDERER_VULKAN
-    //         Diligent::IEngineFactoryVk* _factory_ptr = Diligent::GetEngineFactoryVk();
-    //         Diligent::EngineVkCreateInfo _engine_create_info;
-    //         // _engine_create_info. TODO
-    //         // _factory_ptr->
-    // #elif BUNGEEGUM_USE_RENDERER_OPENGL
-    //         Diligent::IEngineFactoryOpenGL* _factory_ptr = Diligent::GetEngineFactoryOpenGL();
-    //         Diligent::EngineGLCreateInfo _engine_create_info;
-    //         _engine_create_info.Window = { existing_window.get_native() };
-    //         // kidnap std::cout ? => go dans libconsole ?
-    //         _factory_ptr->CreateDeviceAndSwapChainGL(_engine_create_info, &(_data->render_device), &(_data->device_context), _swap_chain_descriptor, &(_data->swap_chain));
-    // #endif
-    //         const auto& SCDesc = _data->swap_chain->GetDesc();
-    //         _data->imgui_renderer = std::make_shared<Diligent::ImGuiImplSDL>(existing_window.get_sdl(), _data->render_device, SCDesc.ColorBufferFormat, SCDesc.DepthBufferFormat);
-    //         ImPlot::CreateContext();
-    //     }
-
+	
     void setup_implot_if_needed()
     {
         static ImPlotContext* _context = nullptr;
@@ -107,28 +86,6 @@ namespace detail {
             _data->render_device,
             swapchain_descriptor.ColorBufferFormat,
             swapchain_descriptor.DepthBufferFormat);
-#endif
-        _data->existing_window->on_resized([&](const window_resized_event& _event) {
-            float2 _rounded = math::round(_event.new_size);
-            _data->swap_chain->Resize(
-                static_cast<unsigned int>(_rounded.x),
-                static_cast<unsigned int>(_rounded.y),
-                Diligent::SURFACE_TRANSFORM_OPTIMAL);
-        });
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-		_data->existing_window->on_emscripten_mouse_event([&](int32_t _event_type, const EmscriptenMouseEvent* _event) {
-            _data->imgui_renderer->OnMouseEvent(_event_type, _event);
-        });
-		_data->existing_window->on_emscripten_wheel_event([&](int32_t _event_type, const EmscriptenWheelEvent* _event) {
-            _data->imgui_renderer->OnWheelEvent(_event_type, _event);
-        });
-		_data->existing_window->on_emscripten_key_event([&](int32_t _event_type, const EmscriptenKeyboardEvent* _event) {
-            _data->imgui_renderer->OnKeyEvent(_event_type, _event);
-        });
-#else
-        _data->existing_window->on_sdl_event([&](const SDL_Event* _event) {
-            _data->imgui_renderer->ProcessEvent(_event);
-        });		
 #endif
     }
 
@@ -213,16 +170,11 @@ namespace detail {
     {
         _data->imgui_renderer->CreateDeviceObjects();
     }
-
-    window& renderer::get_window()
-    {
-        return *(_data->existing_window);
-    }
-
-    const window& renderer::get_window() const
-    {
-        return *(_data->existing_window);
-    }
+	
+	bool renderer::has_renderer() const
+	{
+		return _data.operator bool();
+	}
 
     void renderer::new_frame()
     {
@@ -239,6 +191,40 @@ namespace detail {
         _data->imgui_renderer->NewFrame(_swap_chain_desc.Width, _swap_chain_desc.Height, _swap_chain_desc.PreTransform);
         _is_rendering = true;
     }
+	
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+	void renderer::consume_emscripten_key_events(std::vector<emscripten_key_event>& events)
+	{
+		for (const emscripten_key_event& _event : events) {
+			_data->imgui_renderer->OnKeyEvent(_event.event_type, _event.event);
+		}
+		events.clear();
+	}
+
+	void renderer::consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events)
+	{
+		for (const emscripten_mouse_event& _event : events) {
+			_data->imgui_renderer->OnMouseEvent(_event.event_type, _event.event);
+		}
+		events.clear();
+	}
+
+	void renderer::consume_emscripten_wheel_events(std::vector<emscripten_wheel_event>& events)
+	{
+		for (const emscripten_wheel_event& _event : events) {
+			_data->imgui_renderer->OnWheelEvent(_event.event_type, _event.event);
+		}
+		events.clear();
+	}
+#else		
+	void renderer::consume_sdl_events(std::vector<SDL_Event>& events)
+	{
+		for (const SDL_Event& _event : events) {
+			_data->imgui_renderer->OnEvent(_event);
+		}
+		events.clear();
+	}
+#endif
 
     void renderer::present()
     {
@@ -250,6 +236,15 @@ namespace detail {
         _data->swap_chain->Present();
 #endif
         _is_rendering = false;
-    }
+    }	
+
+	void renderer::resize(const float2 display_size)
+	{
+		float2 _rounded = math::round(display_size);
+		_data->swap_chain->Resize(
+			static_cast<unsigned int>(_rounded.x),
+			static_cast<unsigned int>(_rounded.y),
+			Diligent::SURFACE_TRANSFORM_OPTIMAL);
+	}
 }
 }

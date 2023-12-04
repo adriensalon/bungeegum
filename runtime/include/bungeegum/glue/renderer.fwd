@@ -56,22 +56,32 @@ namespace detail {
         void create_vulkan(window& existing_window);
 #endif
 
-        /// @brief
-        [[nodiscard]] window& get_window();
-
-        /// @brief
-        [[nodiscard]] const window& get_window() const;
+		/// @brief 
+		/// @return 
+		[[nodiscard]] bool has_renderer() const;
 
         /// @brief Begins a new frame, enabling all drawing commands.
         /// @exception Throws a backtraced exception if a new frame has already begun.
         void new_frame();
+		
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+		void consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events);
+
+		void consume_emscripten_wheel_events(std::vector<emscripten_wheel_event>& events);
+
+		void consume_emscripten_key_events(std::vector<emscripten_key_event>& events);
+#else		
+		void consume_sdl_events(std::vector<SDL_Event>& events);
+#endif
 
         /// @brief Ends the frame, disabling all drawing commands. Swaps the window buffers.
         /// @exception Throws a backtraced exception if the frame has already been ended.
         void present();
 
-        /// @brief Rebuilds the ImGui fonts. (To be removed)
+        /// @brief Rebuilds the ImGui fonts.
         void rebuild_fonts();
+
+		void resize(const float2 display_size);
 
         /// @brief The color to use when clearing the screen.
         float4 clear_color = { 0.f, 0.f, 0.f, 1.f };
