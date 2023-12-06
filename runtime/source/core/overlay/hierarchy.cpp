@@ -124,7 +124,7 @@ namespace detail {
                         int _index = 1;
                         for (const std::string& _clean_typename : _clean_typenames) {
                             ImGui::TableSetColumnIndex(_index);
-                            ImGui::Text(_clean_typename.c_str());
+                            ImGui::Text(_clean_typename);
                             _index++;
                         }
                     }
@@ -166,7 +166,7 @@ namespace detail {
                             }
                         }
                         ImGui::TableSetColumnIndex(1);
-                        ImGui::Text(_animation_data.second.clean_typename.c_str());
+                        ImGui::Text(_animation_data.second.clean_typename);
                     }
                     ImGui::EndTable();
                 }

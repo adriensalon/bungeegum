@@ -5,6 +5,42 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+namespace ImGui {
+
+	inline void Text(const std::string& fmt, ...)
+	{		
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-security"
+#endif
+		// va_list args;
+		// va_start(args, &fmt);
+		// ImGui::Text(fmt.c_str(), args);	
+		ImGui::Text(fmt.c_str(), 0);	
+		// va_end(args);	
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic pop
+#endif
+	}
+
+	inline void SetTooltip(const std::string& fmt, ...)
+	{		
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-security"
+#endif
+		// va_list args;
+		// va_start(args, &fmt);
+		// ImGui::Text(fmt.c_str(), args);	
+		ImGui::SetTooltip(fmt.c_str(), 0);	
+		// va_end(args);	
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic pop
+#endif
+	}
+
+}
+
 namespace bungeegum {
 namespace detail {
 
@@ -19,8 +55,8 @@ namespace detail {
     template <typename value_t>
     void edit_field(const std::string& name, value_t& value)
     {
-        (value);
-        ImGui::Text(name.c_str());
+        (void)value;
+        ImGui::Text(name);
     }
 
 }

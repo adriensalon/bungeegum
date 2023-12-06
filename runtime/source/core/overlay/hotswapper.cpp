@@ -12,6 +12,11 @@
 #include <bungeegum/glue/dialog.fwd>
 #include <bungeegum/glue/imutil.fwd>
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused"
+#endif
+
 namespace bungeegum {
 namespace detail {
 
@@ -22,37 +27,37 @@ namespace detail {
             return "###__bungeegum_overlay_hotswapper_" + name + "__";
         }
 
-        constexpr float multiline_text_input_height = 50.f;
+        // constexpr float multiline_text_input_height = 50.f;
 
         static std::string current_tab = {};
         static std::vector<bool> selected_items = {};
         static std::size_t selected_count = 0;
 
-        void draw_definition(const std::string& text)
-        {
-            ImGui::Text(text.c_str());
-        }
+        // void draw_definition(const std::string& text)
+        // {
+        //     ImGui::Text(text);
+        // }
 
-        void draw_path(const std::filesystem::path& path)
-        {
-            std::string _pathname = path.generic_string();
-            std::string _filename;
-            if (std::filesystem::is_regular_file(path)) {
-                _filename = path.filename().generic_string();
-            } else {
-                _filename = path.generic_string();
-                if (_filename.back() == '/') {
-                    _filename = _filename.substr(0, _filename.length() - 1);
-                } else {
-                    _pathname += "/";
-                }
-                _filename = std::filesystem::path(_filename).filename().generic_string() + "/";
-            }
-            ImGui::Text(_filename.c_str());
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip(_pathname.c_str());
-            }
-        }
+        // void draw_path(const std::filesystem::path& path)
+        // {
+        //     std::string _pathname = path.generic_string();
+        //     std::string _filename;
+        //     if (std::filesystem::is_regular_file(path)) {
+        //         _filename = path.filename().generic_string();
+        //     } else {
+        //         _filename = path.generic_string();
+        //         if (_filename.back() == '/') {
+        //             _filename = _filename.substr(0, _filename.length() - 1);
+        //         } else {
+        //             _pathname += "/";
+        //         }
+        //         _filename = std::filesystem::path(_filename).filename().generic_string() + "/";
+        //     }
+        //     ImGui::Text(_filename);
+        //     if (ImGui::IsItemHovered()) {
+        //         ImGui::SetTooltip(_pathname);
+        //     }
+        // }
 
         template <typename item_t>
         void draw_items_cards(const std::string& name, std::vector<item_t>& items, const float frame_height_without_padding, const float footer_height)
@@ -155,35 +160,35 @@ namespace detail {
             selected_count = 0;
         }
 
-        void draw_defines_buttons(std::vector<std::string>& defines)
-        {
-            static std::string _name_str = {};
-            static std::string _value_str = {};
-            float _available_width = ImGui::GetContentRegionAvail().x;
-            ImGui::PushItemWidth(_available_width);
-            ImGui::InputTextWithHint(tag("defines_name_input").c_str(), "type here a definition and below its value...", &_name_str);
-            ImGui::PopItemWidth();
-            ImGui::InputTextMultiline(tag("defines_value_input").c_str(), &_value_str, ImVec2(_available_width, multiline_text_input_height));
-            float _button_width = 0.5f * (_available_width - ImGui::GetStyle().ItemSpacing.x);
-            if (ImGui::Button("add definition", ImVec2(_button_width, 0.f))) {
-                std::string _definition = _name_str;
-                if (!_value_str.empty()) {
-                    _definition += "=" + _value_str;
-                }
-                defines.push_back(_definition);
-            }
-            ImGui::SameLine();
-            bool _disabled = selected_count == 0;
-            if (_disabled) {
-                ImGui::BeginDisabled();
-            }
-            if (ImGui::Button("remove definitions", ImVec2(_button_width, 0.f))) {
-                remove_selected<std::string>(defines);
-            }
-            if (_disabled) {
-                ImGui::EndDisabled();
-            }
-        }
+        // void draw_defines_buttons(std::vector<std::string>& defines)
+        // {
+        //     static std::string _name_str = {};
+        //     static std::string _value_str = {};
+        //     float _available_width = ImGui::GetContentRegionAvail().x;
+        //     ImGui::PushItemWidth(_available_width);
+        //     ImGui::InputTextWithHint(tag("defines_name_input").c_str(), "type here a definition and below its value...", &_name_str);
+        //     ImGui::PopItemWidth();
+        //     ImGui::InputTextMultiline(tag("defines_value_input").c_str(), &_value_str, ImVec2(_available_width, multiline_text_input_height));
+        //     float _button_width = 0.5f * (_available_width - ImGui::GetStyle().ItemSpacing.x);
+        //     if (ImGui::Button("add definition", ImVec2(_button_width, 0.f))) {
+        //         std::string _definition = _name_str;
+        //         if (!_value_str.empty()) {
+        //             _definition += "=" + _value_str;
+        //         }
+        //         defines.push_back(_definition);
+        //     }
+        //     ImGui::SameLine();
+        //     bool _disabled = selected_count == 0;
+        //     if (_disabled) {
+        //         ImGui::BeginDisabled();
+        //     }
+        //     if (ImGui::Button("remove definitions", ImVec2(_button_width, 0.f))) {
+        //         remove_selected<std::string>(defines);
+        //     }
+        //     if (_disabled) {
+        //         ImGui::EndDisabled();
+        //     }
+        // }
 
 #if BUNGEEGUM_USE_DIALOG
         template <bool is_folder_t>
@@ -219,29 +224,29 @@ namespace detail {
         }
 #endif
 
-        void draw_hotswap_button()
-        {
-#if BUNGEEGUM_USE_HOTSWAP
-            color_guard _cg_button(ImGuiCol_Button, { 0.627f, 0.627f, 0.627f, 1.f });
-            if (ImGui::Button("force update", ImVec2(ImGui::GetContentRegionAvail().x, 0.f))) {
-                detail::global().hotswap.save_widgets("TODO"); // CREATE TEMP FILE HERE
-                detail::global().hotswap.reload_manager->force_update();
-                detail::global().hotswap.load_widgets("TODO"); // FIND TEMP FILE HERE AND DELETE
-            }
-#endif
-        }
+//         void draw_hotswap_button()
+//         {
+// #if BUNGEEGUM_USE_HOTSWAP
+//             color_guard _cg_button(ImGuiCol_Button, { 0.627f, 0.627f, 0.627f, 1.f });
+//             if (ImGui::Button("force update", ImVec2(ImGui::GetContentRegionAvail().x, 0.f))) {
+//                 detail::global().hotswap.save_widgets("TODO"); // CREATE TEMP FILE HERE
+//                 detail::global().hotswap.reload_manager->force_update();
+//                 detail::global().hotswap.load_widgets("TODO"); // FIND TEMP FILE HERE AND DELETE
+//             }
+// #endif
+//         }
 
-        void draw_defines(std::vector<std::string>& defines, const float frame_height_without_padding)
-        {
-            std::string _title = "defines (" + std::to_string(defines.size()) + ")" + tag("defines_tab");
-            if (ImGui::BeginTabItem(_title.c_str())) {
-                ImGui::Spacing();
-                float _footer_height = multiline_text_input_height + 3.f * ImGui::GetFrameHeightWithSpacing() + ImGui::GetStyle().ItemSpacing.y;
-                draw_items_cards<std::string>("defines", defines, frame_height_without_padding, _footer_height);
-                draw_defines_buttons(defines);
-                ImGui::EndTabItem();
-            }
-        }
+        // void draw_defines(std::vector<std::string>& defines, const float frame_height_without_padding)
+        // {
+        //     std::string _title = "defines (" + std::to_string(defines.size()) + ")" + tag("defines_tab");
+        //     if (ImGui::BeginTabItem(_title.c_str())) {
+        //         ImGui::Spacing();
+        //         float _footer_height = multiline_text_input_height + 3.f * ImGui::GetFrameHeightWithSpacing() + ImGui::GetStyle().ItemSpacing.y;
+        //         draw_items_cards<std::string>("defines", defines, frame_height_without_padding, _footer_height);
+        //         draw_defines_buttons(defines);
+        //         ImGui::EndTabItem();
+        //     }
+        // }
 
         template <bool is_folder_t>
         void draw_paths(const std::string& name, std::vector<std::filesystem::path>& paths, const float frame_height_without_padding, const std::vector<dialog_extensions_filter>& filters = {})
@@ -265,11 +270,11 @@ namespace detail {
         {
             if (ImGui::BeginTabBar(tag("tabs").c_str())) {
 #if BUNGEEGUM_USE_HOTSWAP
-                draw_defines(hotswap::get_defines(), frame_height_without_padding);
-                draw_paths<true>("include dirs", hotswap::get_include_directories(), frame_height_without_padding);
-                draw_paths<true>("source dirs", hotswap::get_source_directories(), frame_height_without_padding);
-                draw_paths<false>("source files", hotswap::get_force_compiled_source_files(), frame_height_without_padding, { { "Source File", { "c", "cpp", "cxx", "c++", "cc" } } });
-                draw_paths<false>("libraries", hotswap::get_libraries(), frame_height_without_padding, { { "Library", { "lib", "dll" } } });
+                // draw_defines(hotswap::get_defines(), frame_height_without_padding);
+                // draw_paths<true>("include dirs", hotswap::get_include_directories(), frame_height_without_padding);
+                // draw_paths<true>("source dirs", hotswap::get_source_directories(), frame_height_without_padding);
+                // draw_paths<false>("source files", hotswap::get_force_compiled_source_files(), frame_height_without_padding, { { "Source File", { "c", "cpp", "cxx", "c++", "cc" } } });
+                // draw_paths<false>("libraries", hotswap::get_libraries(), frame_height_without_padding, { { "Library", { "lib", "dll" } } });
 #endif
             }
             ImGui::EndTabBar();
@@ -285,10 +290,15 @@ namespace detail {
             color_guard _cg_button(ImGuiCol_Button, { 0.58f, 0.58f, 0.58f, 0.40f });
             // draw_tabs(30.f);
             draw_tabs(ImGui::GetFrameHeight());
-            draw_hotswap_button();
+            // draw_hotswap_button();
         }
         ImGui::End();
 #endif
     }
 }
 }
+
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

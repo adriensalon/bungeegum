@@ -14,7 +14,7 @@ namespace detail {
     void DebugNodeDrawCmdShowMeshAndBoundingBox(ImDrawList* out_draw_list, const ImDrawList* draw_list, const ImDrawCmd* draw_cmd)
     {
         using namespace ImGui;
-        ImRect clip_rect = draw_cmd->ClipRect;
+        // ImRect clip_rect = draw_cmd->ClipRect;
         ImRect vtxs_rect(FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX);
         ImDrawListFlags backup_flags = out_draw_list->Flags;
         out_draw_list->Flags &= ~ImDrawListFlags_AntiAliasedLines; // Disable AA on triangle outlines is more readable for very large and thin triangles.
@@ -43,9 +43,9 @@ namespace detail {
     {
         using namespace ImGui;
         ImGuiContext& g = *GImGui;
-        int drawlist_count = 0;
-        for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++)
-            drawlist_count += g.Viewports[viewport_i]->DrawDataBuilder.GetDrawListCount();
+        // int drawlist_count = 0;
+        // for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++)
+        //     drawlist_count += g.Viewports[viewport_i]->DrawDataBuilder.GetDrawListCount();
         for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++) {
             ImGuiViewportP* viewport = g.Viewports[viewport_i];
             DebugNodeDrawList(viewport, ImGui::GetBackgroundDrawList(viewport));

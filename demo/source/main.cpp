@@ -92,8 +92,8 @@ int main()
     // #if BUNGEEGUM_USE_HOTSWAP
     //     bungeegum::detail::setup_global();
     // #endif
-    constexpr auto ii = bungeegum::is_finite<bungeegum::float2>({ 44.f, 0.f });
-    static std::wostringstream _osstream2;
+    // constexpr auto ii = bungeegum::is_finite<bungeegum::float2>({ 44.f, 0.f });
+    // static std::wostringstream _osstream2;
 
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_DIRECTX");
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_BACKTRACE");

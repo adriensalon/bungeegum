@@ -84,15 +84,15 @@ namespace detail {
                             }
 
                             ImGui::TableSetColumnIndex(1);
-                            ImGui::Text(_log_description.c_str());
+                            ImGui::Text(_log_description);
                             if (!_results.empty()) {
                                 const backtraced_result& _last_result = _results.front();
                                 ImGui::TableSetColumnIndex(2);
-                                ImGui::Text(_last_result.primary.file.filename().generic_string().c_str());
+                                ImGui::Text(_last_result.primary.file.filename().generic_string());
                                 ImGui::TableSetColumnIndex(3);
-                                ImGui::Text(("Ln " + std::to_string(_last_result.primary.line)).c_str());
+                                ImGui::Text(("Ln " + std::to_string(_last_result.primary.line)));
                                 ImGui::TableSetColumnIndex(4);
-                                ImGui::Text(("Col " + std::to_string(_last_result.primary.column)).c_str());
+                                ImGui::Text(("Col " + std::to_string(_last_result.primary.column)));
                             } else {
 
                                 ImGui::TableSetColumnIndex(2);

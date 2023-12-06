@@ -1,5 +1,8 @@
-// File: 'C:\Users\adri\Downloads\inter\inter_extrabold.ttf' (316716 bytes)
-// Exported using binary_to_compressed_c.cpp
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-const-variable"
+#endif
+
 static const unsigned int inter_extrabold_compressed_size = 210609;
 static const unsigned int inter_extrabold_compressed_data[210612/4] =
 {
@@ -4392,3 +4395,7 @@ static const unsigned int inter_extrabold_compressed_data[210612/4] =
     0x0b827787, 0x2210c170, 0x829b058e, 0x00012813, 0x00020008, 0x84140000, 0x00243005, 0x68677702, 0x000f0174, 0x6e6c7300, 0x82100174, 0x00042121,
     0x22820583, 0x031f0123, 0x20068220, 0x2a138203, 0x00170102, 0xff000000, 0x050000f6, 0xf268c2fa, 0x00000082,
 };
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

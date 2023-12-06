@@ -1,12 +1,7 @@
 #pragma once
 
-#include <bungeegum/assets/font.hpp>
-#include <bungeegum/assets/image.hpp>
-#include <bungeegum/assets/shader.hpp>
-
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/config.hpp>
-#include <bungeegum/core/context.hpp> // remove
 #include <bungeegum/core/curve.hpp>
 #include <bungeegum/core/draw.hpp>
 #include <bungeegum/core/event.hpp>

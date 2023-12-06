@@ -248,11 +248,11 @@ namespace detail {
         sdl_check_main_ready();
         SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
         _sdl_window = SDL_CreateWindow(
-            default_sdl_window_title.data(),
+            default_native_window_title.data(),
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
-            static_cast<int>(math::floor(default_sdl_window_size.x)),
-            static_cast<int>(math::floor(default_sdl_window_size.y)),
+            static_cast<int>(math::floor(default_native_window_size.x)),
+            static_cast<int>(math::floor(default_native_window_size.y)),
             _window_flags);
         sdl_check_errors();
     }
@@ -391,13 +391,21 @@ namespace detail {
             } else {
                 if (poll_device) {
                     switch (_event.type) {
+                    case SDL_MOUSEBUTTONDOWN:
+						mouse_down_event _mouse_down_event;
+						_mouse_down_event.button_index = _event.button.button;
+						mouse_down_events.push_back(_mouse_down_event);
+                        break;
                     case SDL_MOUSEMOTION:
-                        if (poll_device) {
-                            mouse_moved_event _mouse_moved_event;
-                            _mouse_moved_event.absolute_position = { _event.motion.x, _event.motion.y };
-                            _mouse_moved_event.relative_position = { _event.motion.xrel, _event.motion.yrel };
-                            _mouse_moved_events.stashed.push_back(_mouse_moved_event);
-                        }
+						mouse_moved_event _mouse_moved_event;
+						_mouse_moved_event.absolute_position = { _event.motion.x, _event.motion.y };
+						_mouse_moved_event.relative_position = { _event.motion.xrel, _event.motion.yrel };
+						mouse_moved_events.push_back(_mouse_moved_event);
+                        break;
+                    case SDL_MOUSEBUTTONUP:
+						mouse_up_event _mouse_up_event;
+						_mouse_up_event.button_index = _event.button.button;
+						mouse_up_events.push_back(_mouse_up_event);
                         break;
 
                         // todo
@@ -407,7 +415,7 @@ namespace detail {
                             window_resized_event _window_resized_event;
                             _window_resized_event.is_fullscreen = false;
                             _window_resized_event.new_size = { _event.window.data1, _event.window.data2 };
-                            _window_resized_events.stashed.push_back(_window_resized_event);
+                            window_resized_events.push_back(_window_resized_event);
                         }
                         break;
 

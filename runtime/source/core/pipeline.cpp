@@ -70,57 +70,57 @@ pipeline& pipeline::attach_native_window(void* native_window)
     return *this;
 }
 
-template <>
-pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::directx11>(void* native_window, const pipeline_embedders<renderer_backend::directx11>& embedders)
-{
-	if (has_native_window()) {
-        // throw
-    }
-	if (has_renderer()) {
-        // throw
-    }
+// template <>
+// pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::directx11>(void* native_window, const pipeline_embedders<renderer_backend::directx11>& embedders)
+// {
+// 	if (has_native_window()) {
+//         // throw
+//     }
+// 	if (has_renderer()) {
+//         // throw
+//     }
 	
-    return *this;
-}
+//     return *this;
+// }
 
-template <>
-pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::directx12>(void* native_window, const pipeline_embedders<renderer_backend::directx12>& embedders)
-{
-	if (has_native_window()) {
-        // throw
-    }
-	if (has_renderer()) {
-        // throw
-    }
+// template <>
+// pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::directx12>(void* native_window, const pipeline_embedders<renderer_backend::directx12>& embedders)
+// {
+// 	if (has_native_window()) {
+//         // throw
+//     }
+// 	if (has_renderer()) {
+//         // throw
+//     }
 	
-    return *this;
-}
+//     return *this;
+// }
 
-template <>
-pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::opengl>(void* native_window, const pipeline_embedders<renderer_backend::opengl>& embedders)
-{
-	if (has_native_window()) {
-        // throw
-    }
-	if (has_renderer()) {
-        // throw
-    }
+// template <>
+// pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::opengl>(void* native_window, const pipeline_embedders<renderer_backend::opengl>& embedders)
+// {
+// 	if (has_native_window()) {
+//         // throw
+//     }
+// 	if (has_renderer()) {
+//         // throw
+//     }
 	
-    return *this;
-}
+//     return *this;
+// }
 
-template <>
-pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::vulkan>(void* native_window, const pipeline_embedders<renderer_backend::vulkan>& embedders)
-{
-	if (has_native_window()) {
-        // throw
-    }
-	if (has_renderer()) {
-        // throw
-    }
+// template <>
+// pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::vulkan>(void* native_window, const pipeline_embedders<renderer_backend::vulkan>& embedders)
+// {
+// 	if (has_native_window()) {
+//         // throw
+//     }
+// 	if (has_renderer()) {
+//         // throw
+//     }
 	
-    return *this;
-}
+//     return *this;
+// }
 
 bool pipeline::has_native_window() const
 {

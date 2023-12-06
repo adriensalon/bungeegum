@@ -42,7 +42,7 @@ namespace widgets {
         // auto& pp = bungeegum::make<Padding>();
         // must_resolve(pp);
 
-        log_message("is contextual = " + std::to_string(bungeegum::is_contextual<float>("myfloat")));
+        // log_message("is contextual = " + std::to_string(bungeegum::is_contextual<float>("myfloat")));
 
         // bungeegum::adopt(this, bungeegum::make<Padding>().padding(EdgeInsets::fromLTRB(0.f, 100.f, 0.f, 50.f)));
         // bungeegum::adopt(this, bungeegum::make<int>());

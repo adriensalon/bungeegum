@@ -20,10 +20,18 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 	set(HSCPP_BUILD_EXTENSION_MEM ON)
 endif()
 
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
-set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-add_subdirectory("googletest")
+if(BUNGEEGUM_BUILD_TEST OR BUNGEEGUM_BUILD_PERF)
+	set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+	set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+	set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+	add_subdirectory("googletest")
+endif()
+
+if(BUNGEEGUM_BUILD_PERF)
+	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+	set(GOOGLETEST_PATH "${CMAKE_CURRENT_LIST_DIR}/googletest" CACHE PATH "" FORCE)
+	add_subdirectory("benchmark")
+endif()
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 	add_subdirectory("sdl")
@@ -51,8 +59,8 @@ else()
 endif()
 
 set(DILIGENT_NO_FORMAT_VALIDATION ON CACHE BOOL "" FORCE)
-set(DILIGENT_NO_ARCHIVER ON CACHE BOOL "" FORCE) # implement later
-add_subdirectory("diligent")
+set(DILIGENT_NO_ARCHIVER ON CACHE BOOL "" FORCE)
+add_subdirectory("diligentcore")
 
 
 if(DEFINED BUNGEEGUM_INSTALL_DIR)

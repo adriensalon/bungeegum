@@ -162,11 +162,11 @@ namespace detail {
                 float _metrics_size_2 = ImGui::CalcTextSize(_metrics_text_2.c_str()).x;
                 ImVec2 _cursor_pos_mem = ImGui::GetCursorPos();
                 ImGui::SetCursorPosX(_cursor_pos_mem.x + ImGui::GetContentRegionAvail().x - _metrics_size_1 - _metrics_size_2 - ImGui::GetStyle().ItemSpacing.x);
-                ImGui::Text(_metrics_text_1.c_str());
+                ImGui::Text(_metrics_text_1);
                 ImGui::SetCursorPosY(_cursor_pos_mem.y);
                 {
                     font_guard _fglast(extrabold_font);
-                    ImGui::Text(_metrics_text_2.c_str());
+                    ImGui::Text(_metrics_text_2);
                 }
                 ImGui::EndMenuBar();
             }
@@ -221,9 +221,9 @@ namespace detail {
 
         using namespace ImGui;
         ImGuiContext& g = *GImGui;
-        int drawlist_count = 0;
-        for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++)
-            drawlist_count += g.Viewports[viewport_i]->DrawDataBuilder.GetDrawListCount();
+        // int drawlist_count = 0;
+        // for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++)
+        //     drawlist_count += g.Viewports[viewport_i]->DrawDataBuilder.GetDrawListCount();
         for (int viewport_i = 0; viewport_i < g.Viewports.Size; viewport_i++) {
             ImGuiViewportP* viewport = g.Viewports[viewport_i];
             for (int layer_i = 0; layer_i < IM_ARRAYSIZE(viewport->DrawDataBuilder.Layers); layer_i++)

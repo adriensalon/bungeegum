@@ -81,7 +81,7 @@ namespace detail {
     void logs_manager::protect_library(const std::function<void()>& try_callback)
     {
         protect_seh(
-            [this, &try_callback]() {
+            [&try_callback]() {
                 try {
                     try_callback();
 
@@ -104,7 +104,7 @@ namespace detail {
                     console_log_error(detail::backtraced_exception("Unknown exception occured.", 0u, 0u));
                 }
             },
-            [this]() {
+            []() {
                 console_log_error(detail::backtraced_exception("Unknown Windows SEH occured.", 0u, 0u));
             });
     }

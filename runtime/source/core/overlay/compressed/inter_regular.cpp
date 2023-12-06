@@ -1,5 +1,8 @@
-// File: 'C:\Users\adri\Downloads\inter\inter_regular.ttf' (309828 bytes)
-// Exported using binary_to_compressed_c.cpp
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-const-variable"
+#endif
+
 static const unsigned int inter_regular_compressed_size = 201664;
 static const unsigned int inter_regular_compressed_data[201664/4] =
 {
@@ -4206,3 +4209,7 @@ static const unsigned int inter_regular_compressed_data[201664/4] =
     0x24300584, 0x67770200, 0x0f017468, 0x6c730000, 0x1001746e, 0x04202182, 0x03201b82, 0x02282182, 0x90011701, 0xbc020000, 0x03200b82, 0x022a1782,
     0x00001701, 0xf6ff0000, 0xfa050000, 0x99b8d83f,
 };
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
