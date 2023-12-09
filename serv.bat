@@ -1,3 +1,3 @@
-cd build/demo
+cd build/
 python -m http.server
 cd ../../

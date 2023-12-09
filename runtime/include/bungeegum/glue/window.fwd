@@ -9,6 +9,7 @@
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/glue/toolchain.fwd>
 #include <bungeegum/glue/time.fwd>
+#include <bungeegum/glue/dialog.fwd>
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 struct EmscriptenMouseEvent;
@@ -201,6 +202,5 @@ namespace detail {
         SDL_Window* _sdl_window = nullptr;
 #endif
     };
-
 }
 }

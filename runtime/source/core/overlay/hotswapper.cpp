@@ -248,23 +248,23 @@ namespace detail {
         //     }
         // }
 
-        template <bool is_folder_t>
-        void draw_paths(const std::string& name, std::vector<std::filesystem::path>& paths, const float frame_height_without_padding, const std::vector<dialog_extensions_filter>& filters = {})
-        {
-            std::string _title = name + " (" + std::to_string(paths.size()) + ")" + tag(name + "_tab");
-            if (ImGui::BeginTabItem(_title.c_str())) {
-                ImGui::Spacing();
-                float _footer_height = 2.f * ImGui::GetFrameHeightWithSpacing();
-                // float _footer_height = 2.f * frame_height_without_padding + 3.f * ImGui::GetStyle().FramePadding.y;
-                draw_items_cards<std::filesystem::path>(name, paths, frame_height_without_padding, _footer_height);
-#if BUNGEEGUM_USE_DIALOG
-                draw_paths_buttons<is_folder_t>(paths, filters);
-#else
-                (void)filters;
-#endif
-                ImGui::EndTabItem();
-            }
-        }
+//         template <bool is_folder_t>
+//         void draw_paths(const std::string& name, std::vector<std::filesystem::path>& paths, const float frame_height_without_padding, const std::vector<dialog_extensions_filter>& filters = {})
+//         {
+//             std::string _title = name + " (" + std::to_string(paths.size()) + ")" + tag(name + "_tab");
+//             if (ImGui::BeginTabItem(_title.c_str())) {
+//                 ImGui::Spacing();
+//                 float _footer_height = 2.f * ImGui::GetFrameHeightWithSpacing();
+//                 // float _footer_height = 2.f * frame_height_without_padding + 3.f * ImGui::GetStyle().FramePadding.y;
+//                 draw_items_cards<std::filesystem::path>(name, paths, frame_height_without_padding, _footer_height);
+// #if BUNGEEGUM_USE_DIALOG
+//                 draw_paths_buttons<is_folder_t>(paths, filters);
+// #else
+//                 (void)filters;
+// #endif
+//                 ImGui::EndTabItem();
+//             }
+//         }
 
         void draw_tabs(const float frame_height_without_padding = ImGui::GetFontSize())
         {
