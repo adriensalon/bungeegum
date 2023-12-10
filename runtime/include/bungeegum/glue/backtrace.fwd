@@ -60,5 +60,7 @@ namespace detail {
     private:
         std::string _what;
     };
+
+	// std::optional<backtraced_exception> protect(const std::function<void()>& callback);
 }
 }

@@ -30,13 +30,6 @@ namespace detail {
         canvas.height = canvas.getBoundingClientRect().height;
         return canvas.getBoundingClientRect().height;
     });
-	
-	EM_JS(void, emscripten_download_file, (const char  *filename, const char  *mime_type, void const *buffer, size_t buffer_size), {
-		var a = document.createElement('a');
-		a.download = UTF8ToString(filename);
-		a.href = URL.createObjectURL(new Blob([new Uint8Array(Module.HEAPU8.buffer, buffer, buffer_size)], {type: UTF8ToString(mime_type)}));
-		a.click();
-	});
 
     struct emscripten_loop_data {
         std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)> callback;

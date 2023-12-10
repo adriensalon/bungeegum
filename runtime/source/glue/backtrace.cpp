@@ -70,5 +70,6 @@ namespace detail {
     {
         return _what.c_str();
     }
+	
 }
 }

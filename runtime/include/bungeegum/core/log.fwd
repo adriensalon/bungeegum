@@ -9,6 +9,7 @@
 
 namespace bungeegum {
 namespace detail {
+	void protect_em(const std::function<void()>& try_callback, const std::function<void(const backtraced_exception&)>& catch_callback);
 
     void console_log_error(const backtraced_exception& exception);
 

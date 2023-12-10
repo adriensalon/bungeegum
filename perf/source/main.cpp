@@ -3,6 +3,10 @@
 
 #include <fstream>
 
+
+#include <emscripten/emscripten.h>
+#include <emscripten/html5.h>
+
 static void BM_memcpy(benchmark::State& state) {
   char* src = new char[state.range(0)];
   char* dst = new char[state.range(0)];
@@ -16,6 +20,22 @@ static void BM_memcpy(benchmark::State& state) {
 }
 BENCHMARK(BM_memcpy)->Arg(8)->Arg(64)->Arg(512)->Arg(4<<10)->Arg(8<<10);
 
+
+
+EM_JS(char*, emscripten_get_stacktrace, (), {
+	console.log('trace = ');
+	console.log(stackTrace());
+	return Module.stringToNewUTF8(stackTrace());
+
+	// return "okok";
+});
+
+// EM_JS(int, emscripten_get_canvas_width2, (), {
+// 	var canvas = document.getElementById('canvas');
+// 	canvas.width = canvas.getBoundingClientRect().width;
+// 	return canvas.getBoundingClientRect().width;
+// });
+
 int main(int argc, char** argv)
 {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
@@ -26,6 +46,22 @@ int main(int argc, char** argv)
 	argv = const_cast<char**>(new_argv.data());
 	argc = argc + 2;
 #endif
+
+	bungeegum::pipeline p;
+	p.make_renderer();
+
+	char* str = emscripten_get_stacktrace();
+	printf("UTF8 string says: %s\n", str);
+	// Each call to _malloc() must be paired with free(), or heap memory will leak!
+	free(str);
+
+	
+	// bungeegum::detail::protect_em([] () {
+	// 	// std::cout <<"hey";
+	// 	throw "plpl";
+	// }, [] (const bungeegum::detail::backtraced_exception& e) {
+	// 	std::cout << e.what();
+	// });
 
     benchmark::Initialize(&argc, argv);
     if (benchmark::ReportUnrecognizedArguments(argc, argv)) {

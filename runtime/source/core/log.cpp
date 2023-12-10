@@ -8,8 +8,56 @@
 #include <Windows.h>
 #endif
 
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#include <emscripten/emscripten.h>
+#endif
+
+// extern "C" {
+// void EMSCRIPTEN_KEEPALIVE bungegum_emscripten_try_from_js(int try_cpp_function)
+// {
+//     const std::function<void()>& _try_cpp_function = *(const std::function<void()>*)(try_cpp_function);
+//     _try_cpp_function();
+// }
+
+// void EMSCRIPTEN_KEEPALIVE bungegum_emscripten_catch_from_js(int catch_cpp_function, const char* what, const char* stacktrace)
+// {
+//     const std::function<void(const bungeegum::detail::backtraced_exception&)>& _catch_cpp_function = *(const std::function<void(const bungeegum::detail::backtraced_exception&)>*)(catch_cpp_function);
+//     const bungeegum::detail::backtraced_exception _exception(what);
+// 	_catch_cpp_function(_exception); // + stacktrae
+// }
+// }
+
+// EM_JS(void, emscripten_protect, (int try_callback, int catch_callback), {
+//     try {
+//         Module.ccall('bungegum_emscripten_try_from_js',
+//             'void',
+//             ['number'],
+//             [try_callback]);
+//     } catch (e) {
+// 		console.log(e);
+// 		console.log(stackTrace());
+
+// 		Module.ccall('bungegum_emscripten_catch_from_js',
+//             'void',
+//             ['number', 'string', 'string'],
+//             [catch_callback, e.name, stackTrace()]);
+//     }
+// });
+
 namespace bungeegum {
 namespace detail {
+	
+
+	// void protect_em(const std::function<void()>& try_callback, const std::function<void(const backtraced_exception&)>& catch_callback)
+	// {
+	// 	int _try_callback = (int)(&try_callback);
+	// 	int _catch_callback = (int)(&catch_callback);
+	// 	// try {
+	// 		// emscripten_protect(_try_callback, _catch_callback);
+	// 	// } catch (const backtraced_exception& _exception) {
+	// 	// 	catch_callback(_exception);
+	// 	// }
+	// }
 
     namespace {
 
@@ -98,7 +146,7 @@ namespace detail {
                     console_log_error(detail::backtraced_exception(_what, 0u, 0u));
 
                 } catch (const std::exception& _exception) {
-                    console_log_error(detail::backtraced_exception(_exception.what(), 0u, 0u));
+                    console_log_error(detail::backtraced_exception(_exception, 0u, 0u));
 
                 } catch (...) {
                     console_log_error(detail::backtraced_exception("Unknown exception occured.", 0u, 0u));
@@ -129,7 +177,7 @@ namespace detail {
                     console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
 
                 } catch (const std::exception& _exception) {
-                    console_log_error_or_push_back(detail::backtraced_exception(_exception.what(), 0u, 0u), userspace_errors);
+                    console_log_error_or_push_back(detail::backtraced_exception(_exception, 0u, 0u), userspace_errors);
 
                 } catch (...) {
                     console_log_error_or_push_back(detail::backtraced_exception("Unknown exception occured.", 0u, 0u), userspace_errors);
