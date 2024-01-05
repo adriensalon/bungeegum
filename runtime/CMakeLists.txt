@@ -80,11 +80,10 @@ target_link_libraries(bungeegum_runtime Diligent-Common)
 target_link_libraries(bungeegum_runtime Diligent-PlatformInterface)
 target_link_libraries(bungeegum_runtime Diligent-Primitives)
 target_link_libraries(bungeegum_runtime Diligent-GraphicsEngineInterface)
-target_link_libraries(bungeegum_runtime Diligent-GraphicsEngine)
+# target_link_libraries(bungeegum_runtime Diligent-GraphicsEngine)
 target_link_libraries(bungeegum_runtime Diligent-GraphicsTools)
 target_link_libraries(bungeegum_runtime Diligent-ShaderTools)
 target_link_libraries(bungeegum_runtime Diligent-TargetPlatform)
-# target_link_libraries(bungeegum_runtime Diligent-Imgui)
 
 if(BUNGEEGUM_ENABLE_BACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND CMAKE_BUILD_TYPE MATCHES "Debug")
 	target_link_libraries(bungeegum_runtime backward)
@@ -98,7 +97,14 @@ if(BUNGEEGUM_ENABLE_OVERLAY OR BUNGEEGUM_ENABLE_HOTSWAP)
 	target_link_libraries(bungeegum_runtime cereal)
 endif()
 
-
+if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+	target_link_options(bungeegum_runtime PUBLIC "--std=c++17") 
+	# target_link_options(bungeegum_runtime PUBLIC "-sMAX_WEBGL_VERSION=2") 
+	# target_link_options(bungeegum_runtime PUBLIC "-sUSE_WEBGL2=1") 
+	target_link_options(bungeegum_runtime PUBLIC "-sALLOW_MEMORY_GROWTH=1") 
+	target_link_options(bungeegum_runtime PUBLIC "-sEXPORTED_RUNTIME_METHODS=['ccall','stackTrace','stringToNewUTF8']") 
+	# -sGL_DEBUG=1
+endif()
 
 if(BUNGEEGUM_ENABLE_HOTSWAP AND BUNGEEGUM_ENABLE_OVERLAY AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 	target_link_libraries(bungeegum_runtime nfd)

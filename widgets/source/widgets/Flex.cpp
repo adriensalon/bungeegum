@@ -94,12 +94,12 @@ namespace widgets {
         // flex factor of 1.f.
 
         float _sumFactors = zero<float>;
-        unsigned int _countFactors = zero<unsigned int>;
+        // unsigned int _countFactors = zero<unsigned int>;
         for (std::size_t _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
             if (_childData.flexFactor.has_value()) {
                 _sumFactors += _childData.flexFactor.value();
-                _countFactors++;
+                // _countFactors++;
             }
         }
         for (std::size_t _k = 0; _k < _children.size(); _k++) {

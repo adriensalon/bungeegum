@@ -4,76 +4,9 @@
 #include <bungeegum/glue/backtrace.fwd>
 #include <bungeegum/glue/console.fwd>
 
-#if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
-#include <Windows.h>
-#endif
-
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-#include <emscripten/emscripten.h>
-#endif
-
-// extern "C" {
-// void EMSCRIPTEN_KEEPALIVE bungegum_emscripten_try_from_js(int try_cpp_function)
-// {
-//     const std::function<void()>& _try_cpp_function = *(const std::function<void()>*)(try_cpp_function);
-//     _try_cpp_function();
-// }
-
-// void EMSCRIPTEN_KEEPALIVE bungegum_emscripten_catch_from_js(int catch_cpp_function, const char* what, const char* stacktrace)
-// {
-//     const std::function<void(const bungeegum::detail::backtraced_exception&)>& _catch_cpp_function = *(const std::function<void(const bungeegum::detail::backtraced_exception&)>*)(catch_cpp_function);
-//     const bungeegum::detail::backtraced_exception _exception(what);
-// 	_catch_cpp_function(_exception); // + stacktrae
-// }
-// }
-
-// EM_JS(void, emscripten_protect, (int try_callback, int catch_callback), {
-//     try {
-//         Module.ccall('bungegum_emscripten_try_from_js',
-//             'void',
-//             ['number'],
-//             [try_callback]);
-//     } catch (e) {
-// 		console.log(e);
-// 		console.log(stackTrace());
-
-// 		Module.ccall('bungegum_emscripten_catch_from_js',
-//             'void',
-//             ['number', 'string', 'string'],
-//             [catch_callback, e.name, stackTrace()]);
-//     }
-// });
-
 namespace bungeegum {
 namespace detail {
-	
-
-	// void protect_em(const std::function<void()>& try_callback, const std::function<void(const backtraced_exception&)>& catch_callback)
-	// {
-	// 	int _try_callback = (int)(&try_callback);
-	// 	int _catch_callback = (int)(&catch_callback);
-	// 	// try {
-	// 		// emscripten_protect(_try_callback, _catch_callback);
-	// 	// } catch (const backtraced_exception& _exception) {
-	// 	// 	catch_callback(_exception);
-	// 	// }
-	// }
-
     namespace {
-
-        void protect_seh(const std::function<void()>& try_callback, const std::function<void()>& catch_callback)
-        {
-#if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
-            __try {
-                try_callback();
-            } __except (EXCEPTION_EXECUTE_HANDLER) {
-                catch_callback();
-            }
-#else
-            try_callback();
-            (void)catch_callback;
-#endif
-        }
 
         void console_log_exception(const backtraced_exception& exception, const console_color color)
         {
@@ -128,75 +61,49 @@ namespace detail {
 
     void logs_manager::protect_library(const std::function<void()>& try_callback)
     {
-        protect_seh(
-            [&try_callback]() {
-                try {
-                    try_callback();
+		detail::protect(try_callback, [] (const std::string& _what) {
+       	 	console_log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", console_color::red);
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
-                } catch (const detail::backtraced_exception& _exception) {
-                    console_log_error(_exception);
-
-                } catch (const char* _what) {
-                    console_log_error(detail::backtraced_exception(std::string(_what, 0u, 0u)));
-
-                } catch (const std::string& _what) {
-                    console_log_error(detail::backtraced_exception(_what, 0u, 0u));
-
-                } catch (const std::wstring& _what) {
-                    console_log_error(detail::backtraced_exception(_what, 0u, 0u));
-
-                } catch (const std::exception& _exception) {
-                    console_log_error(detail::backtraced_exception(_exception, 0u, 0u));
-
-                } catch (...) {
-                    console_log_error(detail::backtraced_exception("Unknown exception occured.", 0u, 0u));
-                }
-            },
-            []() {
-                console_log_error(detail::backtraced_exception("Unknown Windows SEH occured.", 0u, 0u));
-            });
+#else
+			std::terminate();
+#endif
+		});
     }
 
     void logs_manager::protect_userspace(const std::function<void()>& try_callback)
-    {
-        protect_seh(
-            [this, &try_callback]() {
-                try {
-                    try_callback();
-
-                } catch (const detail::backtraced_exception& _exception) {
-                    console_log_error_or_push_back(_exception, userspace_errors);
-
-                } catch (const char* _what) {
-                    console_log_error_or_push_back(detail::backtraced_exception(std::string(_what), 0u, 0u), userspace_errors);
-
-                } catch (const std::string& _what) {
-                    console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
-
-                } catch (const std::wstring& _what) {
-                    console_log_error_or_push_back(detail::backtraced_exception(_what, 0u, 0u), userspace_errors);
-
-                } catch (const std::exception& _exception) {
-                    console_log_error_or_push_back(detail::backtraced_exception(_exception, 0u, 0u), userspace_errors);
-
-                } catch (...) {
-                    console_log_error_or_push_back(detail::backtraced_exception("Unknown exception occured.", 0u, 0u), userspace_errors);
-                }
-            },
-            [this]() {
-                console_log_error_or_push_back(detail::backtraced_exception("Unknown Windows SEH occured.", 0u, 0u), userspace_errors);
-            });
+    {		
+		detail::protect(try_callback, [this] (const std::string& _what) {
+			// uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
+			console_log_error_or_push_back(backtraced_exception(_what, 0, 0), userspace_errors);
+		});
     }
 }
 
-void log_error(const std::string& what)
+void log_error(const std::string& what, const bool must_throw)
 {
-    throw detail::backtraced_exception(what, 1u);
+    detail::backtraced_exception _exception(what, 1u);	
+#if BUNGEEGUM_USE_OVERLAY
+    detail::global().logs.userspace_errors.push_back(_exception);
+#else
+    detail::console_log_error(_exception);
+#endif
+	if (must_throw) {
+		throw _exception;
+	}
 }
 
-void log_error(const std::wstring& what)
+void log_error(const std::wstring& what, const bool must_throw)
 {
-    throw detail::backtraced_exception(what, 1u);
+	detail::backtraced_exception _exception(what, 1u);	
+#if BUNGEEGUM_USE_OVERLAY
+    detail::global().logs.userspace_errors.push_back(_exception);
+#else
+    detail::console_log_error(_exception);
+#endif
+	if (must_throw) {
+		throw _exception;
+	}
 }
 
 void log_warning(const std::string& what)

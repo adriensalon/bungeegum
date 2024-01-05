@@ -207,6 +207,16 @@ void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_p
 	std::cout << "hello \n";
     _data.pipeline_window.update_loop(frames_per_second, [_copyable_id] (const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
 			
+		// try
+		// {
+		// 	throw "lolol";
+		// }
+		// catch(const std::exception& e)
+		// {
+		// 	std::cout << e.what() << '\n';
+		// }
+		
+		
 		detail::pipeline_data& _pipeline_data = detail::global().pipelines.updatables.at(_copyable_id).get();
 		_pipeline_data.viewport_size = _pipeline_data.pipeline_window.get_size();
 	
