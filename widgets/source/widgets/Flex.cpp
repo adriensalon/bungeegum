@@ -71,8 +71,8 @@ namespace widgets {
         }
         for (std::size_t _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
-            resolve_command& _childCommand = get_resolve_command(_children[_k]);
-            (void)_childCommand;
+            // resolve_command& _childCommand = get_resolve_command(_children[_k]);
+            // (void)_childCommand;
             // _childData.flexFactor = _childCommand.properties<float>("flexFactor");
             // _childData.flexFit = _childCommand.properties<FlexFit>("flexFit");
             if (!_childData.flexFactor.has_value()) {

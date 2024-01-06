@@ -15,6 +15,12 @@ namespace detail {
         return reinterpret_cast<std::uintptr_t>(static_cast<void*>(std::addressof(value)));
     }
 
+    // template <typename value_t>
+    // constexpr std::uintptr_t raw_cast(const value_t& value)
+    // {
+    //     return reinterpret_cast<std::uintptr_t>(static_cast<void*>(const_cast<const value_t*>(std::addressof(value))));
+    // }
+
     template <typename value_t>
     constexpr value_t& raw_cast(const std::uintptr_t raw_value)
     {

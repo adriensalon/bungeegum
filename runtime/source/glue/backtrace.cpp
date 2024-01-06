@@ -114,7 +114,7 @@ namespace detail {
 		int _catch_ccallback = (int)(&catch_callback);
 		emscripten_protect(_try_ccallback, _catch_ccallback);
 #else
-		std::function<void()> _impl = [] () {
+		std::function<void()> _impl = [&try_callback, &catch_callback] () {
 			try {
 				try_callback();
 			} catch (const std::exception& _exception) {
@@ -129,15 +129,15 @@ namespace detail {
 				catch_callback(std::string("Unknown exception occured."));
 			}
 		};		
-#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
-        __try {
-			_impl();
-        } __except (EXCEPTION_EXECUTE_HANDLER) {
-            catch_callback(std::string("Unknown SEH exception occured."));
-        }
-#else
+// #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
+//         __try {
+// 			_impl();
+//         } __except (EXCEPTION_EXECUTE_HANDLER) {
+//             catch_callback(std::string("Unknown SEH exception occured."));
+//         }
+// #else
 		_impl();
-#endif
+// #endif
 #endif
     }
 

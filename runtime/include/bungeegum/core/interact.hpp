@@ -142,9 +142,4 @@ private:
 #endif
 };
 
-/// @brief
-/// @param widget
-/// @param interact_callback
-void on_interact(const widget_id& widget, const std::function<void(interact_command&)>& interact_callback);
-
 }

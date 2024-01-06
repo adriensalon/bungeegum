@@ -49,7 +49,7 @@ struct Composed {
     Composed& build()
     {
         bungeegum::adopt(this, _box.get());
-        bungeegum::widget_reference<ColoredBox> _box3 = std::move(_box2);
+        bungeegum::widget_ref<ColoredBox> _box3 = std::move(_box2);
         _box2 = std::move(_box3);
         bungeegum::adopt(_box.get(), _box2.get());
         return *this;
@@ -81,8 +81,8 @@ struct Composed {
 
     // ColoredBox _box;
     // ColoredBox _box2;
-    bungeegum::widget_reference<ColoredBox> _box = bungeegum::make_reference<ColoredBox>();
-    bungeegum::widget_reference<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>();
+    bungeegum::widget_ref<ColoredBox> _box = bungeegum::make_ref<ColoredBox>();
+    bungeegum::widget_ref<ColoredBox> _box2 = bungeegum::make_ref<ColoredBox>();
 };
 
 int main()

@@ -131,13 +131,5 @@ private:
 
 /// @brief
 /// @param widget
-/// @param draw_callback
-void on_draw(const widget_id& widget, const std::function<void(draw_command&)>& draw_callback);
-
-/// @brief
-void must_draw();
-
-/// @brief
-/// @param widget
 void must_draw(const widget_id& widget);
 }

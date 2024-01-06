@@ -56,7 +56,7 @@ namespace detail {
     }
 
     template <typename value_t>
-    value_t& get_global_data()
+    value_t& get_global()
     {
         return *(hscpp::GlobalUserData::GetAs<value_t>());
     }

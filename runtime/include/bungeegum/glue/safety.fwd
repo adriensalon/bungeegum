@@ -1,0 +1,64 @@
+#pragma once
+
+namespace bungeegum {
+namespace detail {
+
+	/// @brief 
+	/// @tparam value_t 
+	template <typename value_t>
+	struct immutable_optional {
+		immutable_optional()
+		{
+			// assert default constructible etc
+		}
+
+		immutable_optional(const immutable_optional& other) = delete;
+		immutable_optional& operator=(const immutable_optional& other) = delete;
+		immutable_optional(immutable_optional&& other) = delete;
+		immutable_optional& operator=(immutable_optional&& other) = delete;
+
+		value_t& emplace()
+		{
+			if (_has_value) {
+				reset();
+			} 
+			_has_value = true;	
+		}
+
+		bool has_value() const
+		{
+			return _has_value;
+		}
+
+		void reset()
+		{
+			if (_has_value) {
+				_value = value_t();
+				_has_value = false;
+			}
+		}
+
+		value_t& value()
+		{
+			if (!_has_value) {
+				// throw
+			}
+			return _value;
+		}
+
+		const value_t& value() const
+		{
+			if (!_has_value) {
+				// throw
+			}
+			return _value;
+		}
+
+	private:
+		value_t _value = {};
+		bool _has_value = false;
+	};
+
+}
+
+}

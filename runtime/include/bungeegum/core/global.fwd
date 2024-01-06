@@ -5,7 +5,6 @@
 #include <bungeegum/core/hotswap.fwd>
 #include <bungeegum/core/log.fwd>
 #include <bungeegum/core/pipeline.fwd>
-#include <bungeegum/core/process.fwd>
 #include <bungeegum/core/widget.fwd>
 
 namespace bungeegum {
@@ -19,11 +18,10 @@ namespace detail {
         global_manager& operator=(global_manager&& other) = delete;
 
         pipelines_manager pipelines = {};
-        hotswap_manager hotswap = {};
+        hotswap_manager_data hotswap = {};
         animations_manager animations = {};
         events_manager events = {};
         logs_manager logs = {};
-        process_manager process = {};
         widgets_manager widgets = {};
         context_manager context = {};
     };
@@ -33,7 +31,7 @@ namespace detail {
 #if BUNGEEGUM_USE_HOTSWAP
     inline global_manager& global() // This has to be inline for reload (?)
     {
-        return get_global_data<global_manager>();
+        return get_global<global_manager>();
     }
 #else
     global_manager& global();

@@ -83,9 +83,9 @@ namespace detail {
         [[nodiscard]] value_t& get() const;
 
     private:
+        friend struct reloader;
         hscpp::mem::UniqueRef<value_t> _ref;
         reloaded(hscpp::mem::UniqueRef<value_t>&& ref);
-        friend struct reloader;
     };
 
     /// @brief Current state of the hotswapping.
@@ -117,36 +117,36 @@ namespace detail {
         template <typename value_t>
         [[nodiscard]] reloaded<value_t> allocate();
 
-        /// @brief Gets a modifiable list of the preprocessor definitions for recompilation.
-        [[nodiscard]] std::vector<std::string>& defines();
-
-        /// @brief Gets a modifiable list of the include directories for recompilation.
-        [[nodiscard]] std::vector<std::filesystem::path>& include_directories();
-
-        /// @brief Gets a modifiable list of the source directories for recompilation.
-        [[nodiscard]] std::vector<std::filesystem::path>& source_directories();
-
-        /// @brief Gets a modifiable list of the force compiled source files for recompilation.
-        [[nodiscard]] std::vector<std::filesystem::path>& force_compiled_source_files();
-
-        /// @brief Gets a modifiable list of the libraries for recompilation.
-        [[nodiscard]] std::vector<std::filesystem::path>& libraries();
-
-        /// @brief Gets the amount of memory blocks currently allocated.
-        [[nodiscard]] std::size_t allocated_blocks_count();
-
-        /// @brief Forces an update, blocking the thread until recompilation has finished.
-        void force_update();
-
         /// @brief Asynchronously waits for changes in the provided files and folders, triggers
         /// recompilation when needed and hotswaps allocated objects. It takes a std::wstreambuf
         /// to be filled with what would go to std::wcout otherwise.
-        reload_state update(std::wstreambuf* buffer);
+        reload_state auto_update(std::wstreambuf* buffer);
+
+        /// @brief Forces an update, blocking the thread until recompilation has finished.
+        void force_update(std::wstreambuf* buffer);
+
+        /// @brief Gets the amount of memory blocks currently allocated.
+        [[nodiscard]] std::size_t get_allocated_blocks_count() const;
+
+        /// @brief Gets a modifiable list of the preprocessor definitions for recompilation.
+        [[nodiscard]] std::vector<std::string>& get_defines();
+
+        /// @brief Gets a modifiable list of the force compiled source files for recompilation.
+        [[nodiscard]] std::vector<std::filesystem::path>& get_force_compiled_source_files();
+
+        /// @brief Gets a modifiable list of the include directories for recompilation.
+        [[nodiscard]] std::vector<std::filesystem::path>& get_include_directories();
+
+        /// @brief Gets a modifiable list of the libraries for recompilation.
+        [[nodiscard]] std::vector<std::filesystem::path>& get_libraries();
+
+        /// @brief Gets a modifiable list of the source directories for recompilation.
+        [[nodiscard]] std::vector<std::filesystem::path>& get_source_directories();
 
         /// @brief Sets an instance of any object as the global data. This instance will be shared
-        /// with the hotswapped modules, and can be accessed anywhere with the get_global_data()
+        /// with the hotswapped modules, and can be accessed anywhere with the get_global()
         /// function.
-        void set_global_data(void* data_ptr);
+        void register_global(void* data_ptr);
 
     private:
         std::pair<std::size_t, std::vector<std::string>> _defines = { false, {} };
@@ -217,7 +217,7 @@ namespace detail {
     /// @brief Gets
     /// @tparam value_t
     template <typename value_t>
-    [[nodiscard]] value_t& get_global_data();
+    [[nodiscard]] value_t& get_global();
 }
 }
 

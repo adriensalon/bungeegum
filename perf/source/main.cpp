@@ -12,7 +12,7 @@ struct okok {
 
 	int h;
 	int i;
-	void* okok = nullptr;
+	// void* okok = nullptr;
 
 	virtual void serialize(cereal::BinaryInputArchive& archive)
 	{

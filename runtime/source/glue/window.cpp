@@ -310,6 +310,11 @@ namespace detail {
     }
 #endif
 
+	frame_events& window::get_frame_events()
+	{
+		return _frame_events;
+	}
+
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
     void* window::get_native() const
     {
@@ -354,20 +359,20 @@ namespace detail {
             for (const unsigned int _button : emscripten_static_data.mouse_buttons_down) {
                 mouse_down_event _mouse_down_event;
                 _mouse_down_event.button_index = _button;
-                mouse_down_events.push_back(_mouse_down_event);
+                _frame_events.mouse_down_events.push_back(_mouse_down_event);
             }
             emscripten_static_data.mouse_buttons_down.clear();
             for (const unsigned int _button : emscripten_static_data.mouse_buttons_up) {
                 mouse_up_event _mouse_up_event;
                 _mouse_up_event.button_index = _button;
-                mouse_up_events.push_back(_mouse_up_event);
+                _frame_events.mouse_up_events.push_back(_mouse_up_event);
             }
             emscripten_static_data.mouse_buttons_up.clear();
             if (math::abs(emscripten_static_data.mouse_position_delta.x) > 0.f && math::abs(emscripten_static_data.mouse_position_delta.y) > 0.f) {
                 mouse_moved_event _mouse_moved_event;
                 _mouse_moved_event.absolute_position = emscripten_static_data.mouse_position;
                 _mouse_moved_event.relative_position = emscripten_static_data.mouse_position_delta;
-                mouse_moved_events.push_back(_mouse_moved_event);
+                _frame_events.mouse_moved_events.push_back(_mouse_moved_event);
             }
             emscripten_static_data.mouse_position_delta = zero<float2>;
             float2 _window_size_memory = _display_size;
@@ -375,7 +380,7 @@ namespace detail {
             if (_window_size_memory != _display_size) {
                 window_resized_event _window_resized_event;
                 _window_resized_event.new_size = _display_size;
-                window_resized_events.push_back(_window_resized_event);
+                _frame_events.window_resized_events.push_back(_window_resized_event);
             }
         }
 #else
@@ -394,18 +399,18 @@ namespace detail {
                     case SDL_MOUSEBUTTONDOWN:
 						mouse_down_event _mouse_down_event;
 						_mouse_down_event.button_index = _event.button.button;
-						mouse_down_events.push_back(_mouse_down_event);
+						_frame_events.mouse_down_events.push_back(_mouse_down_event);
                         break;
                     case SDL_MOUSEMOTION:
 						mouse_moved_event _mouse_moved_event;
 						_mouse_moved_event.absolute_position = { _event.motion.x, _event.motion.y };
 						_mouse_moved_event.relative_position = { _event.motion.xrel, _event.motion.yrel };
-						mouse_moved_events.push_back(_mouse_moved_event);
+						_frame_events.mouse_moved_events.push_back(_mouse_moved_event);
                         break;
                     case SDL_MOUSEBUTTONUP:
 						mouse_up_event _mouse_up_event;
 						_mouse_up_event.button_index = _event.button.button;
-						mouse_up_events.push_back(_mouse_up_event);
+						_frame_events.mouse_up_events.push_back(_mouse_up_event);
                         break;
 
                         // todo
@@ -415,7 +420,7 @@ namespace detail {
                             window_resized_event _window_resized_event;
                             _window_resized_event.is_fullscreen = false;
                             _window_resized_event.new_size = { _event.window.data1, _event.window.data2 };
-                            window_resized_events.push_back(_window_resized_event);
+                            _frame_events.window_resized_events.push_back(_window_resized_event);
                         }
                         break;
 

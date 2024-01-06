@@ -32,21 +32,13 @@ struct resolve_command {
     void position_children(const float2 position);
 
 private:
-    detail::resolve_command_data _data;
-    friend struct detail::process_manager;
+    friend struct detail::widgets_processor_data;
 #if BUNGEEGUM_USE_OVERLAY
     friend struct detail::pipelines_manager; // to set clean typename
     friend struct detail::widget_inspector;
 #endif
+    detail::resolve_command_data _data;
 };
-
-/// @brief
-/// @param widget
-/// @param resolve_callback
-void on_resolve(const widget_id& widget, const std::function<void(resolve_command&)>& resolve_callback);
-
-/// @brief
-void must_resolve();
 
 /// @brief
 /// @param widget

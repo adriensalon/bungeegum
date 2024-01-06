@@ -85,6 +85,24 @@ namespace detail {
     struct mouse_pressed_event {
         unsigned int button_index;
     };
+
+	struct frame_events {
+
+		/// @brief 
+		std::vector<mouse_down_event> mouse_down_events = {};
+
+		/// @brief 
+		std::vector<mouse_moved_event> mouse_moved_events = {};
+
+		/// @brief 
+		std::vector<mouse_pressed_event> mouse_pressed_events = {};
+
+		/// @brief 
+		std::vector<mouse_up_event> mouse_up_events = {};
+
+		/// @brief 
+		std::vector<window_resized_event> window_resized_events = {};
+	};
 	
     /// @brief Instances of this struct represent cross-platform OS windows that can be modified
     /// at runtime, collect OS events such as input, and swap buffers after rendering has finished.
@@ -136,6 +154,8 @@ namespace detail {
 		/// @return 
 		[[nodiscard]] static std::vector<emscripten_wheel_event>& get_emscripten_wheel_events();
 #endif
+
+		[[nodiscard]] frame_events& get_frame_events();
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         /// @brief Gets an opaque pointer to the OS window struct.
@@ -194,6 +214,7 @@ namespace detail {
     private:
         float2 _display_size = { 0, 0 };
 		stopwatch _loop_watch = {};
+		frame_events _frame_events = {};
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         bool _is_created = false;

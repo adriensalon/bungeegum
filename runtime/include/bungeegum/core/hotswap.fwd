@@ -12,26 +12,71 @@
 namespace bungeegum {
 namespace detail {
 
-    struct hotswap_manager {
-        hotswap_manager() = default;
-        hotswap_manager(const hotswap_manager& other) = delete;
-        hotswap_manager& operator=(const hotswap_manager& other) = delete;
-        hotswap_manager(hotswap_manager&& other) = delete;
-        hotswap_manager& operator=(hotswap_manager&& other) = delete;
+    struct hotswap_manager_data {
+        hotswap_manager_data();
+        hotswap_manager_data(const hotswap_manager_data& other) = delete;
+        hotswap_manager_data& operator=(const hotswap_manager_data& other) = delete;
+        hotswap_manager_data(hotswap_manager_data&& other) = delete;
+        hotswap_manager_data& operator=(hotswap_manager_data&& other) = delete;
 
 #if BUNGEEGUM_USE_HOTSWAP
-        void setup_if_required();
 
-        void save_widgets(const std::filesystem::path& archive_path);
+		template <typename widget_t>
+		[[nodiscard]] reloaded<widget_t> allocate()
+		{
+			return _reloader->allocate<widget_t>();
+		}
 
-        void load_widgets(const std::filesystem::path& archive_path);
+		/// @brief 
+		/// @param archive_path 
+		/// @param root_id 
+		void auto_reload(const std::filesystem::path& archive_path, std::unique_ptr<widget_update_data>& root_updatable);
+		
+		/// @brief 
+		/// @param archive_path 
+		/// @param root_id 
+		void force_reload(const std::filesystem::path& archive_path, std::unique_ptr<widget_update_data>& root_updatable);
 
-        std::optional<std::string> inspect_reloadable_widget(const widget_update_data& update_data);
+		/// @brief 
+		/// @return 
+		[[nodiscard]] std::vector<std::string>& get_defines();
+		
+		/// @brief 
+		/// @return 
+		[[nodiscard]] std::vector<std::filesystem::path>& get_include_directories();
+		
+		/// @brief 
+		/// @return 
+		[[nodiscard]] std::vector<std::filesystem::path>& get_libraries();
 
-        void update_reloadable_widget(widget_update_data& update_data, const std::string& serialized);
+		/// @brief 
+		/// @return 
+		[[nodiscard]] std::vector<std::filesystem::path>& get_source_directories();
 
-        std::unique_ptr<reloader> reload_manager = nullptr;
-        std::wstring reload_initialization_message = {}; // Degager ptetre direct submit dans standalone.cpp
+		/// @brief 
+		/// @return 
+		[[nodiscard]] std::vector<std::filesystem::path>& get_force_compiled_source_files();
+
+        /// @brief Serializes one widget if possible.
+        /// @param id
+        /// @return
+        [[nodiscard]] std::string inspect_updatable(const std::unique_ptr<widget_update_data>& updatable);
+		
+        /// @brief Deserializes one widget with the provided data if possible.
+        /// @param id 
+        /// @param serialized 
+        void patch_updatable(std::unique_ptr<widget_update_data>& updatable, const std::string& serialized);
+
+		/// @brief 
+		/// @param data 
+		void register_global(void* data);
+
+	private:
+		void _emplace_msg(const std::wstringstream& msg);
+        void _recursive_load(const std::filesystem::path& archive_path, std::unique_ptr<widget_update_data>& updatable);
+		void _recursive_save(const std::filesystem::path& archive_path, std::unique_ptr<widget_update_data>& updatable);
+        std::unique_ptr<reloader> _reloader = nullptr;
+        std::vector<std::string> _logs = {};
 #endif
     };
 }

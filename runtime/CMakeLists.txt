@@ -48,7 +48,6 @@ set(bungeegum_runtime_source
 	"source/core/interact.cpp"
 	"source/core/log.cpp"
 	"source/core/pipeline.cpp"
-	"source/core/process.cpp"
 	"source/core/resolve.cpp"
 	"source/core/widget.cpp"
 

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <any>
 #include <functional>
 #include <optional>
 #include <typeindex>
 
+#include <bungeegum/config/features.hpp>
 #include <bungeegum/core/draw.hpp>
 #include <bungeegum/core/interact.hpp>
 #include <bungeegum/core/overlay.fwd>
@@ -12,89 +14,282 @@
 #include <bungeegum/glue/raw.fwd>
 #include <bungeegum/glue/registry.fwd>
 #include <bungeegum/glue/reload.fwd>
+#include <bungeegum/glue/safety.fwd>
 
 struct ImDrawList;
 
 namespace bungeegum {
 
+struct access;
+
 struct widget_id;
 
 template <typename widget_t>
-struct widget_reference;
+struct widget_ref;
 
 template <typename property_t>
 struct property_reference;
 
 namespace detail {
 
-    namespace traits {
+    struct widget_id_data;
+    struct widget_update_data;
+	
+	/// @brief Access public struct
+	/// @tparam widget_t 
+	template <typename widget_t>
+	struct widget_ref_access;
 
+	/// @brief Access public struct
+	struct widget_id_access;
+
+    namespace traits {
+		
+        /// @brief 
+        /// @tparam widget_t 
         template <typename widget_t>
         using detected_resolve_function = decltype(std::declval<widget_t>().resolve(std::declval<resolve_command&>()));
 
+        /// @brief 
+        /// @tparam widget_t 
         template <typename widget_t>
         constexpr static bool has_resolve_function_v = is_detected_exact_v<void, detected_resolve_function, widget_t>;
 
+        /// @brief 
+        /// @tparam widget_t 
         template <typename widget_t>
         using detected_interact_function = decltype(std::declval<widget_t>().interact(std::declval<interact_command&>()));
 
+        /// @brief 
+        /// @tparam widget_t 
         template <typename widget_t>
         constexpr static bool has_interact_function_v = is_detected_exact_v<void, detected_interact_function, widget_t>;
 
+        /// @brief 
+        /// @tparam widget_t 
         template <typename widget_t>
         using detected_draw_function = decltype(std::declval<widget_t>().draw(std::declval<draw_command&>()));
 
+        /// @brief 
+        /// @tparam widget_t 
         template <typename widget_t>
         constexpr static bool has_draw_function_v = is_detected_exact_v<void, detected_draw_function, widget_t>;
 
     }
 
-    struct widget_id_data {
-        std::uintptr_t raw_widget;
-    };
+    /// @brief Store the id of a widget good id whether it is reloadable or not
+	struct widget_id_data {
+		widget_id_data() = default;
+		widget_id_data(const widget_id_data& other) = default;
+		widget_id_data& operator=(const widget_id_data& other) = default;
+		widget_id_data(widget_id_data&& other) = default;
+		widget_id_data& operator=(widget_id_data&& other) = default;
+		
+		/// @brief 
+		/// @tparam widget_t 
+		/// @param widget 
+		template <typename widget_t>
+		widget_id_data(widget_t& widget);
+		
+		/// @brief 
+		/// @return 
+		operator std::uintptr_t() const;
 
-	struct widget_connector_data {
-        std::optional<resolve_command> resolver_command;
-        std::optional<interact_command> interactor_command = std::nullopt;
-        std::optional<draw_command> drawer_command = std::nullopt;
-        std::function<void()> resolver = nullptr;
-        std::function<void()> interactor = nullptr;
-        std::function<void()> drawer = nullptr;
+	private:
+		std::uintptr_t _raw = 0u;
 	};
 
+    /// @brief 
+    /// @tparam widget_t 
+    template <typename widget_t>
+    struct widget_ref_data {
+		widget_ref_data() = delete;
+		widget_ref_data(const widget_ref_data& other) = default;
+		widget_ref_data& operator=(const widget_ref_data& other) = default;
+		widget_ref_data(widget_ref_data&& other) = default;
+		widget_ref_data& operator=(widget_ref_data&& other) = default;
+
+        /// @brief 
+        /// @param value 
+        widget_ref_data(value_type_t<widget_t>& value);
+
+        /// @brief 
+        /// @return 
+        widget_t& get();
+
+		/// @brief 
+        /// @return 
+		widget_id_data get_id() const;
+
+    private:
+        widget_id_data _id;
+        reference_type_t<widget_t> _reference;
+    };
+
+    /// @brief 
+    struct widget_connector_data {
+
+        /// @brief
+        void draw();
+
+        /// @brief
+        /// @tparam widget_t
+        /// @param update_data
+        /// @return
+        template <typename widget_t>
+        widget_ref_data<widget_t> emplace();
+
+		/// @brief 
+		/// @return 
+		[[nodiscard]] widget_id_data get_id();
+		
+        /// @brief 
+        /// @tparam widget_t 
+        /// @return 
+        template <typename widget_t>
+		[[nodiscard]] widget_ref_data<widget_t> get_ref();
+
+		/// @brief 
+		/// @return 
+		[[nodiscard]] resolve_command& get_resolve_command();
+
+        /// @brief
+        void interact();
+
+#if LIBUIWIDGET_USE_HOTSWAP
+        /// @brief
+		[[nodiscard]] bool is_reloadable() const;
+		
+        /// @brief
+        /// @param loader
+        void load(reloaded_loader& loader);
+#endif
+
+        /// @brief
+        void resolve();
+
+#if LIBUIWIDGET_USE_HOTSWAP
+        /// @brief
+        /// @param saver
+        void save(reloaded_saver& saver) const;
+#endif
+
+#if (LIBUIWIDGET_USE_HOTSWAP && LIBUIWIDGET_USE_OVERLAY)
+        /// @brief
+        /// @return
+        std::uintptr_t true_ptr() const;
+
+        /// @brief
+        /// @return
+        std::size_t true_sizeof() const;
+#endif
+
+#if LIBUIWIDGET_USE_OVERLAY		
+		/// @brief 
+		/// @return 
+		const std::type_info& type() const;
+#endif
+
+    private:
+        friend struct bungeegum::access;
+		bool _is_constructed = false;
+		bool _is_reloadable = false;
+        widget_id_data _id = {};
+        std::any _widget_data = {};
+        resolve_command _resolver_command = {};
+        immutable_optional<interact_command> _interactor_command = {};
+        immutable_optional<draw_command> _drawer_command = {};
+        std::function<void()> _resolver_method = {};
+        std::function<void()> _interactor_method = {};
+        std::function<void()> _drawer_method = {};
+
+#if LIBUIWIDGET_USE_HOTSWAP
+        std::function<void(reloaded_loader&)> _loader_method = {};
+        std::function<void(reloaded_saver&)> _saver_method = {};
+#endif
+
+#if LIBUIWIDGET_USE_OVERLAY
+		std::unique_ptr<std::type_info> _widget_kind = {};
+#endif
+
+#if (LIBUIWIDGET_USE_HOTSWAP && LIBUIWIDGET_USE_OVERLAY)
+        std::function<std::uintptr_t()> _true_ptr_method = {};
+        std::function<std::size_t()> _true_sizeof_method = {};
+#endif
+    };
+
+    /// @brief 
+    struct widget_hierarchy_data {
+
+        void emplace_child(const std::uintptr_t child_id, widget_update_data& child_update_data);
+
+        /// @brief
+        void erase_child(const std::uintptr_t child_id);
+
+        /// @brief
+        std::unique_ptr<widget_update_data>& get_owner() const;
+
+        widget_update_data& get_parent();
+		
+		std::unordered_map<std::uintptr_t, std::unique_ptr<widget_update_data>>& get_children();
+
+        bool has_parent() const;
+
+        void parent();
+
+        void parent(widget_update_data& parent_update_data, const std::uintptr_t child_id);
+
+    private:
+        std::optional<std::reference_wrapper<widget_update_data>> _parent_widget = std::nullopt;
+        std::unordered_map<std::uintptr_t, std::unique_ptr<widget_update_data>> _children_widgets = {};
+    };
+
+    /// @brief 
     struct widget_update_data {
-        registry_entity entity = {}; // only used by properties
-        std::uintptr_t raw_widget = {};
-        std::unique_ptr<std::type_index> kind = nullptr;
-        std::string kind_debug = ""; // to show type in debugger TODO REMOVE
-        std::optional<std::reference_wrapper<widget_update_data>> parent = std::nullopt;
-        std::vector<std::reference_wrapper<widget_update_data>> children = {};
-        resolve_command resolver_command;
-        std::function<void(resolve_command&)> resolver = nullptr;
-        std::optional<interact_command> interactor_command = std::nullopt;
-        std::function<void(interact_command&)> interactor = nullptr;
-        std::optional<draw_command> drawer_command = std::nullopt;
-        std::function<void(draw_command&)> drawer = nullptr;
-
-#if BUNGEEGUM_USE_HOTSWAP
-        std::function<void(reloaded_loader&)> loader = nullptr;
-        std::unordered_map<std::uintptr_t, std::function<void(reloaded_loader&)>> property_loaders = {};
-        std::function<void(reloaded_saver&)> saver = nullptr;
-        std::unordered_map<std::uintptr_t, std::function<void(reloaded_saver&)>> property_savers = {};
-#endif
-
-#if BUNGEEGUM_USE_OVERLAY
-        std::string clean_typename = {};
-        std::function<std::uintptr_t()> true_ptr = nullptr;
-        std::function<std::size_t()> true_sizeof = nullptr;
-#endif
+        widget_connector_data connector;
+        widget_hierarchy_data hierarchy;
     };
 
-	struct widgets_registry {
-		std::vector<std::unique_ptr<widget_update_data>> _toplevel_widgets = {};
-        std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> _indexed_updatables = {};		
+    /// @brief 
+    struct widgets_registry_data {
+
+		[[nodiscard]] bool contains(const widget_id_data& id) const;
+
+		///
+        void emplace(const widget_id_data& id, std::unique_ptr<widget_update_data>&& updatable);
+		
+        [[nodiscard]] std::unique_ptr<widget_update_data>& get_updatable(const widget_id_data& id);
+
+		void traverse_updatables(std::unique_ptr<widget_update_data>& root_updatable, const std::function<void(std::unique_ptr<widget_update_data>&)>& callback);
+
+	private:
+        std::unordered_map<std::uintptr_t, std::unique_ptr<widget_update_data>> _toplevel_ptrs = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<std::unique_ptr<widget_update_data>>> _all_strongs = {};
+    };
+
+	/// @brief 
+	struct widgets_processor_data {		
+
+		///
+		void must_draw(std::unique_ptr<widget_update_data>& updatable);
+
+		void must_resolve(std::unique_ptr<widget_update_data>& updatable);
+
+		///
+		bool update(const widget_id_data& root_updatable, const float2 viewport_size, frame_events& events, const std::chrono::milliseconds& delta_time);
+
+		void render(const bool force_rendering);
+
+	private:
+        void _process_draw(ImDrawList* imgui_drawlist, const bool force_rendering);
+		void _process_interact();
+        void _process_resolve(const widget_id_data& root_id, const float2 viewport_size);
+        std::vector<std::reference_wrapper<widget_update_data>> _resolvable_weaks = {};
+        std::vector<std::reference_wrapper<widget_update_data>> _interactable_weaks = {};
+        std::vector<std::reference_wrapper<widget_update_data>> _drawable_weaks = {};
 	};
 
+	///
     struct widgets_manager {
         widgets_manager() = default;
         widgets_manager(const widgets_manager& other) = delete;
@@ -102,50 +297,8 @@ namespace detail {
         widgets_manager(widgets_manager&& other) = delete;
         widgets_manager& operator=(widgets_manager&& other) = delete;
 
-        [[nodiscard]] bool contains(const std::uintptr_t raw_widget) const;
-
-        template <typename widget_t>
-        [[nodiscard]] widget_reference<widget_t> create_reference_widget(detail::value_type_t<widget_t>& reference);
-
-        template <typename property_t>
-        [[nodiscard]] property_reference<property_t> create_property_reference(detail::value_type_t<property_t>& reference);
-
-        widget_id create_runtime_widget(widget_update_data& widget_data);
-
-        void notify_erase(const std::uintptr_t raw_widget);
-
-        [[nodiscard]] widget_update_data& operator[](const std::uintptr_t raw_widget);
-
-        [[nodiscard]] widget_update_data& operator[](const widget_id& widget);
-
-        [[nodiscard]] std::uintptr_t raw(const widget_id& widget);
-
-        template <typename widget_t>
-        [[nodiscard]] std::uintptr_t raw(widget_t& widget);
-
-        template <typename widget_t>
-        void set_reloadable_raw(widget_t& widget, const std::uintptr_t raw_widget);
-
-        [[nodiscard]] std::uintptr_t& root();
-
-        [[nodiscard]] std::uintptr_t root() const;
-
-        [[nodiscard]] widget_update_data& root_update_data();
-
-        void traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback);
-
-        void traverse(widget_update_data& iterate_root, const std::function<bool(widget_update_data&)>& iterate_callback,
-            const std::function<void(widget_update_data&)>& tail_iterate_callback);
-
-        registry<registry_entity> widgets = {};
-        std::vector<std::uintptr_t> resolvables = {};
-        std::vector<std::uintptr_t> interactables = {};
-        std::vector<std::uintptr_t> drawables = {};
-
-    private:
-        std::unordered_map<std::uintptr_t, widget_update_data> _updatables = {};
-        std::vector<std::uintptr_t> _updatables_to_erase = {};
-        std::uintptr_t _root = {};
+        widgets_registry_data registry;
+		widgets_processor_data processor;
     };
 }
 }

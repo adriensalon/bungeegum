@@ -27,48 +27,48 @@ namespace detail {
 
         void draw_tree_widgets_tab()
         {
-            const widgets_manager& _widgets_manager = global().widgets;
-            std::size_t _tree_widgets_count = _widgets_manager.widgets.size(); // NON ALL WIDGETS
+            // const widgets_manager& _widgets_manager = global().widgets;
+            std::size_t _tree_widgets_count = 4;//_widgets_manager.widgets.size(); // NON ALL WIDGETS
             std::string _title = "tree widgets (" + std::to_string(_tree_widgets_count) + ")";
 
             bool _tab_open = ImGui::BeginTabItem((_title + tag("tree_widgets_tab")).c_str());
             if (_tab_open) {
                 ImVec2 _outer_size = ImVec2(0.0f, ImGui::GetContentRegionAvail().y - ImGui::GetStyle().WindowPadding.y - ImGui::GetFrameHeight());
                 ImGui::BeginChild(tag("child_tt").c_str(), _outer_size, false);
-                unsigned int _id = 0;
+                // unsigned int _id = 0;
                 std::function<void(const widget_update_data&)> _draw_tree_recursive = [&](const widget_update_data& _widget_data) {
-                    if (!filter_enabled || (regex_search(_widget_data.clean_typename, filter_text))) {
-                        _id++;
-                        std::string _clean_id_typename = _widget_data.clean_typename + "###__hierarchy__" + std::to_string(_id);
-                        // ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow ;
-                        style_guard _indent_guard(ImGuiStyleVar_IndentSpacing, 10.f);
-                        ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow;
-                        if (_widget_data.children.empty())
-                            _node_flags |= ImGuiTreeNodeFlags_Leaf;
-                        font_guard _fg0(extrabold_font);
+                    // if (!filter_enabled || (regex_search(_widget_data.clean_typename, filter_text))) {
+                    //     _id++;
+                    //     std::string _clean_id_typename = _widget_data.clean_typename + "###__hierarchy__" + std::to_string(_id);
+                    //     // ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow ;
+                    //     style_guard _indent_guard(ImGuiStyleVar_IndentSpacing, 10.f);
+                    //     ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow;
+                    //     if (_widget_data.children.empty())
+                    //         _node_flags |= ImGuiTreeNodeFlags_Leaf;
+                    //     font_guard _fg0(extrabold_font);
 
-                        bool _tree_open = ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags);
-                        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
-                            // // Do stuff on Selectable() double click.
-                            // selected = !selected;
-                            global().pipelines.inspector_selected = _widget_data.raw_widget;
-                        }
+                    //     bool _tree_open = ImGui::TreeNodeEx(_clean_id_typename.c_str(), _node_flags);
+                    //     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+                    //         // // Do stuff on Selectable() double click.
+                    //         // selected = !selected;
+                    //         global().pipelines.inspector_selected = _widget_data.raw_widget;
+                    //     }
 
-                        if (_tree_open) {
-                            _fg0.release();
+                    //     if (_tree_open) {
+                    //         _fg0.release();
 
-                            // if (!_widget_data.children.empty())
-                            // ImGui::Text((std::to_string(_widget_data.children.size()) + " children :").c_str());
-                            for (auto& _child_widget_data_ref : _widget_data.children)
-                                _draw_tree_recursive(_child_widget_data_ref.get());
-                            ImGui::TreePop();
-                        }
-                    } else {
-                        for (auto& _child_widget_data_ref : _widget_data.children)
-                            _draw_tree_recursive(_child_widget_data_ref.get());
-                    }
+                    //         // if (!_widget_data.children.empty())
+                    //         // ImGui::Text((std::to_string(_widget_data.children.size()) + " children :").c_str());
+                    //         for (auto& _child_widget_data_ref : _widget_data.children)
+                    //             _draw_tree_recursive(_child_widget_data_ref.get());
+                    //         ImGui::TreePop();
+                    //     }
+                    // } else {
+                    //     for (auto& _child_widget_data_ref : _widget_data.children)
+                    //         _draw_tree_recursive(_child_widget_data_ref.get());
+                    // }
                 };
-                _draw_tree_recursive(global().widgets.root_update_data());
+                // _draw_tree_recursive(global().widgets.root_update_data());
 
                 ImGui::EndChild();
                 ImGui::EndTabItem();

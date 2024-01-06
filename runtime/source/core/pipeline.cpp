@@ -1,5 +1,6 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/pipeline.hpp>
+#include <bungeegum/core/widget.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -24,12 +25,12 @@ namespace detail {
 		pipeline_window = std::move(other.pipeline_window);
 		pipeline_renderer = std::move(other.pipeline_renderer);
 		raw_root = std::move(other.raw_root);
-		window_resized_events = std::move(other.window_resized_events);
-		mouse_moved_events = std::move(other.mouse_moved_events);
-		mouse_down_events = std::move(other.mouse_down_events);
-		mouse_up_events = std::move(other.mouse_up_events);
-		mouse_pressed_events = std::move(other.mouse_pressed_events);
-		viewport_size = std::move(other.viewport_size);
+		// window_resized_events = std::move(other.window_resized_events);
+		// mouse_moved_events = std::move(other.mouse_moved_events);
+		// mouse_down_events = std::move(other.mouse_down_events);
+		// mouse_up_events = std::move(other.mouse_up_events);
+		// mouse_pressed_events = std::move(other.mouse_pressed_events);
+		// viewport_size = std::move(other.viewport_size);
 		global().pipelines.updatables.at(generated_id) = std::ref(*this);
         other.was_moved_from = true;
 		return *this;
@@ -167,7 +168,6 @@ pipeline& pipeline::make_renderer<renderer_backend::directx11>()
         detail::setup_overlay(); // loads fonts pr linstant ici
 #endif
 	_data.pipeline_renderer.rebuild_fonts();
-	_data.viewport_size = _data.pipeline_window.get_size();
 #endif
     return *this;
 }
@@ -188,7 +188,6 @@ pipeline& pipeline::make_renderer<renderer_backend::opengl>()
         detail::setup_overlay(); // loads fonts pr linstant ici
 #endif
 	_data.pipeline_renderer.rebuild_fonts();
-	_data.viewport_size = _data.pipeline_window.get_size();
     return *this;
 }
 
@@ -199,13 +198,12 @@ bool pipeline::has_renderer() const
 
 void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
 {
-    (void)force_rendering;
     if (!_data.raw_root.has_value()) {
         // throw
     }
 	std::uintptr_t _copyable_id = _data.generated_id;	
 	std::cout << "hello \n";
-    _data.pipeline_window.update_loop(frames_per_second, [_copyable_id] (const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
+    _data.pipeline_window.update_loop(frames_per_second, [force_rendering, _copyable_id] (const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
 			
 		// try
 		// {
@@ -218,7 +216,6 @@ void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_p
 		
 		
 		detail::pipeline_data& _pipeline_data = detail::global().pipelines.updatables.at(_copyable_id).get();
-		_pipeline_data.viewport_size = _pipeline_data.pipeline_window.get_size();
 	
 		// global().logs.protect_library([&]() {
 		_pipeline_data.pipeline_window.poll();
@@ -237,32 +234,30 @@ void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_p
 #endif
 #endif
 
-		// store events in _pipeline_data ig
+		// move events in _pipeline_data & clear in window
+
+		// update animations
+		// update events
 
 		detail::global().pipelines.profiler_frame_chronometer.new_frame();
 		detail::global().pipelines.profiler_resolve_chronometer.new_frame();
 		detail::global().pipelines.profiler_interact_chronometer.new_frame();
 		detail::global().pipelines.profiler_draw_chronometer.new_frame();
-		bool _has_ticked = detail::global().process.update(delta_time);
-		if (_has_ticked) {
+		const bungeegum::detail::widget_id_data& _root_id = _pipeline_data.root_id.value();
+		std::unique_ptr<detail::widget_update_data>& _root_updatable = detail::global().widgets.registry.get_updatable(_root_id);
+		float2 _wiewport_size = _pipeline_data.pipeline_window.get_size();
+		detail::frame_events& _frame_events = _pipeline_data.pipeline_window.get_frame_events();
+		bool _has_ticked = detail::global().widgets.processor.update(_root_id, _wiewport_size, _frame_events, delta_time);
+		if (_has_ticked || force_rendering) {
 			detail::global().pipelines.profiler_frame_chronometer.begin_task("draw widgets");
 			_pipeline_data.pipeline_renderer.new_frame();
-			detail::global().process.render();
+			detail::global().widgets.processor.render(force_rendering);
 			_pipeline_data.pipeline_renderer.present();
 			detail::global().pipelines.profiler_frame_chronometer.end_task("draw widgets");
 		}
 #if BUNGEEGUM_USE_HOTSWAP
-		// FAIRE PAREIL AVANT / APRES FORCE UPDATE
-		std::wstringstream _sstream;
-		detail::reload_state _reload_result = detail::global().hotswap.reload_manager->update(_sstream.rdbuf());
-		if (_reload_result == detail::reload_state::started_compiling) {
-			detail::global().hotswap.save_widgets("C:/Users/adri/desktop/ok.json");
-		} else if (_reload_result == detail::reload_state::performed_swap) {
-			detail::global().hotswap.load_widgets("C:/Users/adri/desktop/ok.json");
-		}
+		detail::global().hotswap.auto_reload("C:/Users/adri/desktop/ok.json", _root_updatable);
 #endif
-
-
 
 
 	});
@@ -281,7 +276,7 @@ pipeline& pipeline::process_once(const bool force_rendering)
 pipeline& pipeline::root(const widget_id& widget)
 {
     // std::cout << "before root\n";
-    _data.raw_root = detail::global().widgets.raw(widget);
+    _data.root_id = detail::widget_id_access::get_data(widget);
     // _data.root_widget = detail::global().widgets.raw(widget);
     // detail::global().widgets.root() = detail::global().widgets.raw(widget);
     return *this;

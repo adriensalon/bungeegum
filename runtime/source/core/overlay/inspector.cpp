@@ -249,7 +249,7 @@ namespace detail {
         //             //         rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
         //             //         _document.Accept(_json_writer);
         //             //         std::string _modified = _json_strbuf.GetString();
-        //             //         _backend_manager.update_reloadable_widget(update_data, _modified);
+        //             //         _backend_manager.patch_reloadable_widget(update_data, _modified);
         //             //         ImGui::EndTabItem();
         //             //     }
         //             // }

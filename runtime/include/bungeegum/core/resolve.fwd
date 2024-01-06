@@ -19,6 +19,9 @@ namespace detail {
     struct widget_inspector;
 #endif
 
+	struct widgets_registry_data;
+	struct widgets_processor_data;
+
     struct resolve_constraint_data {
         bool is_blocked = false;
         float2 min_size = zero<float2>;

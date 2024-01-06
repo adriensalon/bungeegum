@@ -110,9 +110,10 @@ void draw_command::draw_rect_filled(
 #endif
 }
 
-void must_draw()
+void must_draw(const widget_id& widget)
 {
-    const std::uintptr_t _root = detail::global().widgets.root();
-    detail::global().widgets.drawables.push_back(_root);
+    detail::widget_id_data _id = detail::widget_id_access::get_data(widget);
+    std::unique_ptr<detail::widget_update_data>& _updatable = detail::global().widgets.registry.get_updatable(_id);
+    detail::global().widgets.processor.must_draw(_updatable);
 }
 }

@@ -27,19 +27,15 @@ namespace detail {
 		pipeline_data(pipeline_data&& other);
 		pipeline_data& operator=(pipeline_data&& other);
 		~pipeline_data();
+		
+		window pipeline_window = {};
+        renderer pipeline_renderer = {};
+		std::optional<widget_id_data> root_id = std::nullopt;
+
 
 		bool was_moved_from = false;
 		std::uintptr_t generated_id = 0;
-		window pipeline_window = {};
-        renderer pipeline_renderer = {};
         std::optional<std::uintptr_t> raw_root = std::nullopt;
-        std::vector<window_resized_event> window_resized_events = {};
-        std::vector<mouse_moved_event> mouse_moved_events = {};
-        std::vector<mouse_down_event> mouse_down_events = {};
-        std::vector<mouse_up_event> mouse_up_events = {};
-        std::vector<mouse_pressed_event> mouse_pressed_events = {};
-        float2 viewport_size = {};
-        stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
 		
 #if BUNGEEGUM_USE_OVERLAY
 		std::string renderer_info = {};
@@ -91,9 +87,10 @@ namespace detail {
 
         inline void set_clean_typename(widget_update_data& update_data)
         {
-            std::string _clean_typename = to_clean_typename(update_data.kind->name());
-            update_data.resolver_command._data.clean_typename = _clean_typename;
-            update_data.clean_typename = _clean_typename;
+			(void)update_data;
+            // std::string _clean_typename = to_clean_typename(update_data.kind->name());
+            // // update_data.resolver_command._data.clean_typename = _clean_typename;
+            // update_data.clean_typename = _clean_typename;
         }
 #endif
     };
