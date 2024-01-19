@@ -45,6 +45,11 @@ float2 draw_command::resolved_size() const
 // #endif
 // }
 
+void draw_command::draw_children()
+{
+	
+}
+
 void draw_command::draw_line(
     const float2 first_point, const float2 second_point,
     const float4 color,
@@ -110,9 +115,12 @@ void draw_command::draw_rect_filled(
 #endif
 }
 
-void must_draw()
+void must_draw(const widget_id& id)
 {
-    const std::uintptr_t _root = detail::global().widgets.root();
-    detail::global().widgets.drawables.push_back(_root);
+    const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
+	detail::widget_manager_data& _manager = detail::global().widgets;
+	detail::widget_update_data& _updatable = _manager.updatables[_raw];
+    _manager.drawables.push_back(_updatable);
 }
+
 }

@@ -8,9 +8,6 @@ namespace bungeegum {
 /// @details
 struct draw_command {
 
-    /// @brief Stops propagation
-    void block();
-
     /// @brief
     [[nodiscard]] float2 resolved_position() const;
 
@@ -29,15 +26,19 @@ struct draw_command {
 
     void perspective_projection(const float fov);
 
+	/// @brief 
+	/// @param child_id 
+	void draw_child(const widget_id child_id);
+
+	/// @brief 
+	void draw_children();
+	
     /// @brief
     /// @param first_point
     /// @param second_point
     /// @param color
     /// @param thickness
-    void draw_line(
-        const float2 first_point, const float2 second_point,
-        const float4 color,
-        const float thickness = 1.f);
+    void draw_line(const float2 first_point, const float2 second_point, const float4 color, const float thickness = 1.f);
 
     /// @brief
     /// @param min_point
@@ -45,21 +46,14 @@ struct draw_command {
     /// @param color
     /// @param rounding_strength
     /// @param thickness
-    void draw_rect(
-        const float2 min_point, const float2 max_point,
-        const float4 color,
-        const float rounding_strength = 0.f,
-        const float thickness = 1.f);
+    void draw_rect(const float2 min_point, const float2 max_point, const float4 color, const float rounding_strength = 0.f, const float thickness = 1.f);
 
     /// @brief
     /// @param min_point
     /// @param max_point
     /// @param color
     /// @param rounding
-    void draw_rect_filled(
-        const float2 min_point, const float2 max_point,
-        const float4 color,
-        const float rounding = 0.f);
+    void draw_rect_filled(const float2 min_point, const float2 max_point, const float4 color, const float rounding = 0.f);
 
     /// @brief
     /// @param min_corner
@@ -68,10 +62,7 @@ struct draw_command {
     /// @param color_top_right
     /// @param color_bottom_left
     /// @param color_bottom_right
-    void draw_rect_filled_multi_color(
-        const float2 min_corner, const float2 max_corner,
-        const float4 color_top_left, const float4 color_top_right,
-        const float4 color_bottom_left, const float4 color_bottom_right);
+    void draw_rect_filled_multi_color(const float2 min_corner, const float2 max_corner, const float4 color_top_left, const float4 color_top_right, const float4 color_bottom_left, const float4 color_bottom_right);
 
     /// @brief
     /// @param top_left_corner
@@ -80,11 +71,7 @@ struct draw_command {
     /// @param bottom_right_corner
     /// @param color
     /// @param thickness
-    void draw_quad(
-        const float2 top_left_corner, const float2 top_right_corner,
-        const float2 bottom_left_corner, const float2 bottom_right_corner,
-        const float4 color,
-        const float thickness = 1.f);
+    void draw_quad(const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_left_corner, const float2 bottom_right_corner, const float4 color, const float thickness = 1.f);
 
     /// @brief
     /// @param top_left_corner
@@ -92,10 +79,7 @@ struct draw_command {
     /// @param bottom_left_corner
     /// @param bottom_right_corner
     /// @param color
-    void draw_quad_filled(
-        const float2 top_left_corner, const float2 top_right_corner,
-        const float2 bottom_left_corner, const float2 bottom_right_corner,
-        const float4 color);
+    void draw_quad_filled(const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_left_corner, const float2 bottom_right_corner, const float4 color);
 
     /// @brief
     /// @param first_corner
@@ -103,24 +87,18 @@ struct draw_command {
     /// @param third_corner
     /// @param color
     /// @param thickness
-    void draw_triangle(
-        const float2 first_corner, const float2 second_corner, const float2 third_corner,
-        const float4 color,
-        const float thickness = 1.f);
+    void draw_triangle(const float2 first_corner, const float2 second_corner, const float2 third_corner, const float4 color, const float thickness = 1.f);
 
     /// @brief
     /// @param first_corner
     /// @param second_corner
     /// @param third_corner
     /// @param color
-    void draw_triangle_filled(
-        const float2 first_corner, const float2 second_corner, const float2 third_corner,
-        const float4 color);
+    void draw_triangle_filled(const float2 first_corner, const float2 second_corner, const float2 third_corner, const float4 color);
 
     // draw bezier and bspline from points direct (sans curve)
 
-	// draw_child
-	// draw_children
+
 private:
     detail::draw_command_data _data;
     friend struct detail::process_manager;
@@ -131,13 +109,5 @@ private:
 
 /// @brief
 /// @param widget
-/// @param draw_callback
-void on_draw(const widget_id& widget, const std::function<void(draw_command&)>& draw_callback);
-
-/// @brief
-void must_draw();
-
-/// @brief
-/// @param widget
-void must_draw(const widget_id& widget);
+void must_draw(const widget_id& id);
 }

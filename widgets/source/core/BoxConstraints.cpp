@@ -17,8 +17,8 @@ namespace widgets {
 
     BoxConstraints::BoxConstraints(const resolve_command& command)
     {
-        _minSize = command.min_size();
-        _maxSize = command.max_size();
+        _minSize = command.get_min_size();
+        _maxSize = command.get_max_size();
     }
 
     BoxConstraints BoxConstraints::expand(const float width, const float height)

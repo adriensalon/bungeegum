@@ -347,7 +347,7 @@ namespace detail {
 
         // bool draw_inspected_widget(const std::uintptr_t raw_widget)
         // {
-        //     widgets_manager& _widgets_manager = global().widgets;
+        //     widget_manager_data& _widgets_manager = global().widgets;
         //     if (_widgets_manager.contains(raw_widget)) {
         //         widget_update_data& _update_data = _widgets_manager[raw_widget];
         //         if (ImGui::BeginTabBar(tag("widget_tabs").c_str())) {
@@ -377,7 +377,7 @@ namespace detail {
         //         if (!draw_inspected_widget(_raw_object)) {
         //             _opt_title = std::nullopt;
         //         } else {
-        //             widgets_manager& _widgets_manager = global().widgets;
+        //             widget_manager_data& _widgets_manager = global().widgets;
         //             widget_update_data& _update_data = _widgets_manager[_raw_object];
         //             _opt_title = _update_data.clean_typename;
         //         }

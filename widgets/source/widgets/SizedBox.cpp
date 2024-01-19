@@ -43,7 +43,7 @@ namespace widgets {
 
     void SizedBox::resolve(resolve_command& command)
     {
-        BoxConstraints _parentConstraints(command.min_size(), command.max_size());
+        BoxConstraints _parentConstraints(command.get_min_size(), command.get_max_size());
         Size _constrainedSize = _parentConstraints.constrain(_size);
         if (_childWidget.has_value()) {
             float2 _childSize = command.resolve_child(_childWidget.value(), _constrainedSize, _constrainedSize);

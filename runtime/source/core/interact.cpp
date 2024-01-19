@@ -5,11 +5,6 @@ namespace detail {
 
 }
 
-void interact_command::block()
-{
-    _data.is_blocked = true;
-}
-
 interaction_type interact_command::type() const
 {
     size_t _index = _data.command_data.index();
@@ -35,5 +30,10 @@ get_interaction_impl(mouse_up);
 get_interaction_impl(mouse_pressed);
 
 #undef get_interaction_impl
+
+void interact_command::interact_children()
+{
+	
+}
 
 }

@@ -122,8 +122,8 @@ struct pipeline {
     pipeline& process_once(const bool force_rendering = false);
 
     /// @brief
-    /// @param widget
-    pipeline& root(const widget_id& widget);
+    /// @param id
+    pipeline& root(const widget_id& root_id);
 
     /// @brief
     /// @param widget

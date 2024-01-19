@@ -16,30 +16,32 @@ namespace detail {
         }
     }
 
-    void hotswap_manager::save_widgets(const std::filesystem::path& archive_path)
+    void hotswap_manager::save_widgets(const std::filesystem::path& archive_path, const widget_update_data& root_updatable)
     {
         reloaded_saver _archiver(archive_path);
-        widget_update_data& _root_update_data = global().widgets.root_update_data();
-        global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-            if (_update_data.saver) {
-                _update_data.saver(_archiver);
+		std::function<void(const widget_update_data&)> _traverse_function = [&_archiver, &_traverse_function] (const widget_update_data& _updatable) {
+			if (_updatable.saver) {
+                _updatable.saver(_archiver);
             }
-            // TODO for loop on properties
-            return true;
-        });
+			for (const widget_update_data& _child_updatable : _updatable.children) {
+				_traverse_function(_child_updatable);
+			}
+		};
+		_traverse_function(root_updatable);
     }
 
-    void hotswap_manager::load_widgets(const std::filesystem::path& archive_path)
+    void hotswap_manager::load_widgets(const std::filesystem::path& archive_path, const widget_update_data& root_updatable)
     {
         reloaded_loader _archiver(archive_path);
-        widget_update_data& _root_update_data = global().widgets.root_update_data();
-        global().widgets.traverse(_root_update_data, [&_archiver](widget_update_data& _update_data) {
-            if (_update_data.loader) {
-                _update_data.loader(_archiver);
+		std::function<void(const widget_update_data&)> _traverse_function = [&_archiver, &_traverse_function] (const widget_update_data& _updatable) {
+			if (_updatable.loader) {
+                _updatable.loader(_archiver);
             }
-            // TODO for loop on properties
-            return true;
-        });
+			for (const widget_update_data& _child_updatable : _updatable.children) {
+				_traverse_function(_child_updatable);
+			}
+		};
+		_traverse_function(root_updatable);
     }
 
     std::optional<std::string> hotswap_manager::inspect_reloadable_widget(const widget_update_data& update_data)

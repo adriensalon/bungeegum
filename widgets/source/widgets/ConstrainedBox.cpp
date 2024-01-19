@@ -11,7 +11,7 @@ namespace widgets {
 
     void ConstrainedBox::resolve(resolve_command& command)
     {
-        BoxConstraints _parentConstraints(command.min_size(), command.max_size());
+        BoxConstraints _parentConstraints(command.get_min_size(), command.get_max_size());
         Size _constrainedMinSize = _parentConstraints.constrain(_constraints.smallest());
         if (_childWidget.has_value()) {
             Size _constrainedMaxSize = _parentConstraints.constrain(_constraints.biggest());

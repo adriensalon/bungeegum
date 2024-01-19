@@ -22,9 +22,9 @@ namespace detail {
 #if BUNGEEGUM_USE_HOTSWAP
         void setup_if_required();
 
-        void save_widgets(const std::filesystem::path& archive_path);
+        void save_widgets(const std::filesystem::path& archive_path, const widget_update_data& root_updatable);
 
-        void load_widgets(const std::filesystem::path& archive_path);
+        void load_widgets(const std::filesystem::path& archive_path, const widget_update_data& root_updatable);
 
         std::optional<std::string> inspect_reloadable_widget(const widget_update_data& update_data);
 

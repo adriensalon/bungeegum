@@ -42,95 +42,84 @@ namespace detail {
         detail::global().pipelines.profiler_frame_chronometer.end_task("interact");
     }
 
-    void process_manager::_process_resolve()
+    void process_manager::_process_resolve(const float2 viewport_size, widget_update_data& root_updatable)
     {
-        detail::global().pipelines.profiler_frame_chronometer.begin_task("resolve widgets");
+    	logs_manager& _log_manager = global().logs;
+    	pipelines_manager& _pipeline_manager = global().pipelines;
+    	widget_manager_data& _widget_manager = global().widgets;
+#if BUNGEEGUM_USE_OVERLAY
+        _pipeline_manager.profiler_frame_chronometer.begin_task("resolve widgets");
+#endif
         bool _resolve_done = false;
         while (!_resolve_done) {
-			std::size_t _iteration_size = global().widgets.resolvables.size();
-            for (const std::uintptr_t _raw_widget : global().widgets.resolvables)
+			std::size_t _iteration_size = _widget_manager.resolvables.size();
+            for (widget_update_data& _updatable : _widget_manager.resolvables)
             {
-                widget_update_data& _widget_data = global().widgets[_raw_widget];
-                resolve_command& _resolve_command = _widget_data.resolver_command;
-                if (_raw_widget == global().widgets.root()) {
-                    // _resolve_command._data.constraint.min_size = global().pipelines.standalone_pipeline->viewport_size; // PAS OUF -> GO ITERATE PIPELINES
-                    // _resolve_command._data.constraint.max_size = global().pipelines.standalone_pipeline->viewport_size; // PAS OUF -> GO ITERATE PIPELINES
+                resolve_command& _resolve_command = _updatable.resolver_command;
+                if (_updatable.raw == root_updatable.raw) {
+                    _resolve_command._data.constraint.min_size = viewport_size;
+                    _resolve_command._data.constraint.max_size = viewport_size;
                 } else {
-                    widget_update_data& _parent_widget_data_ptr = _widget_data.parent.value().get();
+                    widget_update_data& _parent_widget_data_ptr = _updatable.parent.value().get();
                     resolve_command& _parent_resolve_command = _parent_widget_data_ptr.resolver_command;
-                    _resolve_command._data.constraint.min_size = _parent_resolve_command.min_size();
-                    _resolve_command._data.constraint.max_size = _parent_resolve_command.max_size();
+                    _resolve_command._data.constraint.min_size = _parent_resolve_command.get_min_size();
+                    _resolve_command._data.constraint.max_size = _parent_resolve_command.get_max_size();
                 }
 #if BUNGEEGUM_USE_OVERLAY
-                global().pipelines.profiler_resolve_chronometer.begin_task(_widget_data.resolver_command._data.clean_typename);
+                _pipeline_manager.profiler_resolve_chronometer.begin_task(_resolve_command._data.clean_typename);
 #endif
-                global().logs.protect_userspace([&_widget_data]() {
-                    _widget_data.resolver(_widget_data.resolver_command);
+                _log_manager.protect_userspace([&_updatable, &_resolve_command]() {
+                    _updatable.resolver(_resolve_command);
                 });
 #if BUNGEEGUM_USE_OVERLAY
-                global().pipelines.profiler_resolve_chronometer.end_task(_widget_data.resolver_command._data.clean_typename);
+                _pipeline_manager.profiler_resolve_chronometer.end_task(_resolve_command._data.clean_typename);
 #endif
             };
-            global().widgets.resolvables.erase(
-                global().widgets.resolvables.begin(),
-                global().widgets.resolvables.begin() + _iteration_size);
-            _resolve_done = global().widgets.resolvables.empty();
+            _widget_manager.resolvables.erase(
+                _widget_manager.resolvables.begin(),
+                _widget_manager.resolvables.begin() + _iteration_size);
+            _resolve_done = _widget_manager.resolvables.empty();
         }
-        detail::global().pipelines.profiler_frame_chronometer.end_task("resolve widgets");
+#if BUNGEEGUM_USE_OVERLAY
+        _pipeline_manager.profiler_frame_chronometer.end_task("resolve widgets");
+#endif
     }
 
     void process_manager::_process_draw(ImDrawList* imgui_drawlist)
     {
+		global_manager& _global = global();
         bool _draw_done = false;
 
         while (!_draw_done) {
-            // std::for_each(
-            // std::execution::seq, // go parallel
-            // global().widgets.drawables.begin(),
-            // global().widgets.drawables.end(),
-            // [imgui_drawlist](const std::uintptr_t _raw_widget)
-            for (const std::uintptr_t _raw_widget : global().widgets.drawables) {
-                widget_update_data& _widget_data = global().widgets[_raw_widget];
-                global().widgets.traverse(_widget_data, [imgui_drawlist](widget_update_data& _widget_data) {
-                    // accumulate position anyway
-                    resolve_command& _widget_resolver_command = _widget_data.resolver_command;
-                    if (_widget_data.parent.has_value()) {
-                        resolve_command& _parent_resolver_command = _widget_data.parent.value().get().resolver_command;
+            for (widget_update_data& _updatable : _global.widgets.drawables) { // go default to draw_children()
+				resolve_command& _widget_resolver_command = _updatable.resolver_command;
+                    if (_updatable.parent.has_value()) {
+                        resolve_command& _parent_resolver_command = _updatable.parent.value().get().resolver_command;
                         _widget_resolver_command._data.accumulated_position = _widget_resolver_command._data.resolved_position + _parent_resolver_command._data.accumulated_position;
                     }
-
-                    // draw
-                    if (_widget_data.drawer_command.has_value()) {
-
-                        draw_command& _widget_drawer_command = _widget_data.drawer_command.value();
-                        _widget_drawer_command._data.resolved_size = _widget_resolver_command._data.resolved_size;
-                        _widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
-                        _widget_drawer_command._data.commands.clear();
-#if BUNGEEGUM_USE_OVERLAY
-                        _widget_drawer_command._data.commands_infos.clear();
-                        std::string _clean_typename = global().pipelines.to_clean_typename(_widget_data.kind->name());
-                        global().pipelines.profiler_draw_chronometer.begin_task(_clean_typename);
-#endif
-                        global().logs.protect_userspace([&_widget_data, &_widget_drawer_command]() {
-                            _widget_data.drawer(_widget_drawer_command);
-                        });
-#if BUNGEEGUM_USE_OVERLAY
-                        global().pipelines.profiler_draw_chronometer.end_task(_clean_typename);
-#endif
-                        _widget_drawer_command._data.draw(imgui_drawlist);
-                    }
-                    return true;
-                });
-                // });
+					draw_command& _widget_drawer_command = _updatable.drawer_command;
+					_widget_drawer_command._data.resolved_size = _widget_resolver_command._data.resolved_size;
+					_widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
+					_widget_drawer_command._data.commands.clear();
+// #if BUNGEEGUM_USE_OVERLAY
+//                         _widget_drawer_command._data.commands_infos.clear();
+//                         std::string _clean_typename = global().pipelines.to_clean_typename(_updatable.inplace_data.type().name());
+//                         global().pipelines.profiler_draw_chronometer.begin_task(_clean_typename);
+// #endif
+					_global.logs.protect_userspace([&_updatable, &_widget_drawer_command]() {
+						_updatable.drawer(_widget_drawer_command);
+					});
+// #if BUNGEEGUM_USE_OVERLAY
+//                         global().pipelines.profiler_draw_chronometer.end_task(_clean_typename);
+// #endif
+					_widget_drawer_command._data.draw(imgui_drawlist);
             };
-            global().widgets.drawables.erase(
-                global().widgets.drawables.begin(),
-                global().widgets.drawables.end());
-            _draw_done = global().widgets.drawables.empty();
+            _global.widgets.drawables.erase(_global.widgets.drawables.begin(), _global.widgets.drawables.end());
+            _draw_done = _global.widgets.drawables.empty();
         }
     }
 
-    bool process_manager::update(const std::chrono::milliseconds& delta_time)
+    bool process_manager::update(const float2 viewport_size, const std::chrono::milliseconds& delta_time, widget_update_data& root_updatable)
     {
         detail::global().pipelines.profiler_frame_chronometer.begin_task("animations");
 		// std::cout << "before animations\n";
@@ -147,13 +136,13 @@ namespace detail {
         ////
 
         // debug only !
-        must_resolve();
-        must_draw();
+        // must_resolve();
+        // must_draw();
         // debug only !
 
         // context::_process_interact();
 		// std::cout << "before pr\n";
-        // _process_resolve();
+        // _process_resolve(root_updatable);
 		// std::cout << "after pr\n";
         // return (has_userspace_thrown() || !global().widgets.drawables.empty());
 

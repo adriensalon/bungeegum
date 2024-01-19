@@ -51,11 +51,11 @@ namespace widgets {
     void StreamBuilder::resolve(resolve_command& command)
     {
         if (_childWidget.has_value()) {
-            float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
+            float2 _childSize = command.resolve_child(_childWidget.value(), command.get_min_size(), command.get_max_size());
             command.position_child(_childWidget.value(), zero<float2>);
             command.resize(_childSize);
         } else {
-            command.resize(command.max_size());
+            command.resize(command.get_max_size());
         }
     }
 
@@ -158,11 +158,11 @@ namespace widgets {
     void WideStreamBuilder::resolve(resolve_command& command)
     {
         if (_childWidget.has_value()) {
-            float2 _childSize = command.resolve_child(_childWidget.value(), command.min_size(), command.max_size());
+            float2 _childSize = command.resolve_child(_childWidget.value(), command.get_min_size(), command.get_max_size());
             command.position_child(_childWidget.value(), zero<float2>);
             command.resize(_childSize);
         } else {
-            command.resize(command.max_size());
+            command.resize(command.get_max_size());
         }
     }
 

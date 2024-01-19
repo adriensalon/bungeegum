@@ -28,10 +28,10 @@ namespace widgets {
                 //
 
             } else {
-                command.resize(command.max_size());
+                command.resize(command.get_max_size());
             }
         } else {
-            command.resize(command.max_size());
+            command.resize(command.get_max_size());
         }
     }
 

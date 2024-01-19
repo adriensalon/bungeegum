@@ -53,8 +53,8 @@ namespace widgets {
 
         float _mainAxisResolvedNoFlex = 0.f;
         float _maxCrossAxisResolvedNoFlex = 0.f;
-        float2 _minSizeNoFlex = command.min_size();
-        float2 _maxSizeNoFlex = command.max_size();
+        float2 _minSizeNoFlex = command.get_min_size();
+        float2 _maxSizeNoFlex = command.get_max_size();
         if (_direction == Axis::horizontal) { // unbounded main axis
             // _minSizeNoFlex.x = zero<float>;
             _maxSizeNoFlex.x = infinity<float>;
@@ -71,8 +71,8 @@ namespace widgets {
         }
         for (std::size_t _k = 0; _k < _children.size(); _k++) {
             childData& _childData = _childrenData[_k];
-            resolve_command& _childCommand = get_resolve_command(_children[_k]);
-            (void)_childCommand;
+            // resolve_command& _childCommand = get_resolve_command(_children[_k]);
+            // (void)_childCommand;
             // _childData.flexFactor = _childCommand.properties<float>("flexFactor");
             // _childData.flexFit = _childCommand.properties<FlexFit>("flexFit");
             if (!_childData.flexFactor.has_value()) {
@@ -108,10 +108,10 @@ namespace widgets {
                 float _factorFrac = _childData.flexFactor.value() / _sumFactors;
                 if (_direction == Axis::horizontal) {
                     // _childData.minMainAxisSpace = _factorFrac * (command.min_size().x - _mainAxisResolvedNoFlex);
-                    _childData.maxMainAxisSpace = _factorFrac * (command.max_size().x - _mainAxisResolvedNoFlex);
+                    _childData.maxMainAxisSpace = _factorFrac * (command.get_max_size().x - _mainAxisResolvedNoFlex);
                 } else {
                     // _childData.minMainAxisSpace = _factorFrac * command.min_size().y;
-                    _childData.maxMainAxisSpace = _factorFrac * (command.max_size().y - _mainAxisResolvedNoFlex);
+                    _childData.maxMainAxisSpace = _factorFrac * (command.get_max_size().y - _mainAxisResolvedNoFlex);
                 }
             }
         }
@@ -130,8 +130,8 @@ namespace widgets {
             if (_childData.flexFactor.has_value()) {
                 widget_id& _child = _children[_k];
 
-                float2 _minSizeFlexChild = command.min_size();
-                float2 _maxSizeFlexChild = command.max_size();
+                float2 _minSizeFlexChild = command.get_min_size();
+                float2 _maxSizeFlexChild = command.get_max_size();
 
                 if (_direction == Axis::horizontal) { // max axis constraints based on the amount of space allocated in step 2.
                     _maxSizeFlexChild.x = _childData.maxMainAxisSpace;
@@ -172,9 +172,9 @@ namespace widgets {
         float _flexMainAxisExtent;
         if (_mainAxisSize == MainAxisSize::max) {
             if (_direction == Axis::horizontal) {
-                _flexMainAxisExtent = command.max_size().x;
+                _flexMainAxisExtent = command.get_max_size().x;
             } else {
-                _flexMainAxisExtent = command.max_size().y;
+                _flexMainAxisExtent = command.get_max_size().y;
             }
         } else {
             _flexMainAxisExtent = _mainAxisResolvedNoFlex + _mainAxisResolvedFlex;

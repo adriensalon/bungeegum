@@ -24,7 +24,7 @@ namespace detail {
         events_manager events = {};
         logs_manager logs = {};
         process_manager process = {};
-        widgets_manager widgets = {};
+        widget_manager_data widgets = {};
         context_manager context = {};
     };
 

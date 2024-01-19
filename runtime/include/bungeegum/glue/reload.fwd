@@ -30,7 +30,7 @@
     friend struct bungeegum::access;                                                                                                                                                                \
     template <typename value_t>                                                                                                                                                                     \
     friend struct bungeegum::detail::reloaded_wrapper;                                                                                                                                              \
-    friend struct bungeegum::detail::widgets_manager;                                                                                                                                               \
+    friend struct bungeegum::detail::widget_manager_data;                                                                                                                                               \
     HSCPP_TRACK(classname, #classname)                                                                                                                                                              \
     std::uintptr_t _bungeegum_object_reference = 0;                                                                                                                                                 \
     hscpp_virtual std::uintptr_t _bungeegum_this()                                                                                                                                                  \
@@ -62,6 +62,7 @@ namespace mem {
     class MemoryManager;
 }
 }
+
 /// @endcond
 
 namespace bungeegum {
@@ -156,6 +157,7 @@ namespace detail {
         std::pair<std::size_t, std::vector<std::filesystem::path>> _libraries = { false, {} };
         std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
+		std::vector<std::string> _logs = {};
     };
 
     /// @brief Instances of this struct represent a cereal JSON input archive to load data agter

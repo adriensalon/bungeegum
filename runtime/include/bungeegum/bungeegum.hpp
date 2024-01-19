@@ -11,6 +11,5 @@
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/core/overlay.hpp>
 #include <bungeegum/core/pipeline.hpp>
-#include <bungeegum/core/property.hpp>
 #include <bungeegum/core/resolve.hpp>
 #include <bungeegum/core/widget.hpp>

@@ -103,9 +103,6 @@ private:
 /// @details
 struct interact_command {
 
-    /// @brief Stops propagation
-    void block();
-
     /// @brief
     /// @return
     [[nodiscard]] interaction_type type() const;
@@ -130,9 +127,12 @@ struct interact_command {
     /// @return
     [[nodiscard]] std::optional<mouse_pressed_interaction> mouse_pressed() const;
 
-	// interact_child()
+	/// @brief 
+	/// @param child_id 
+	void interact_child(const widget_id child_id);
 	
-	// interact_children()
+	/// @brief 
+	void interact_children();
 
 private:
     detail::interact_command_data _data;
@@ -141,10 +141,5 @@ private:
     friend struct detail::widget_inspector; // accessor in detail::process_manager
 #endif
 };
-
-/// @brief
-/// @param widget
-/// @param interact_callback
-void on_interact(const widget_id& widget, const std::function<void(interact_command&)>& interact_callback);
 
 }

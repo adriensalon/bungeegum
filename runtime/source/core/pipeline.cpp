@@ -23,7 +23,7 @@ namespace detail {
 		generated_id = std::move(other.generated_id);
 		pipeline_window = std::move(other.pipeline_window);
 		pipeline_renderer = std::move(other.pipeline_renderer);
-		raw_root = std::move(other.raw_root);
+		// raw_root = std::move(other.raw_root);
 		window_resized_events = std::move(other.window_resized_events);
 		mouse_moved_events = std::move(other.mouse_moved_events);
 		mouse_down_events = std::move(other.mouse_down_events);
@@ -200,7 +200,7 @@ bool pipeline::has_renderer() const
 void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
 {
     (void)force_rendering;
-    if (!_data.raw_root.has_value()) {
+    if (!_data.root_updatable.has_value()) {
         // throw
     }
 	std::uintptr_t _copyable_id = _data.generated_id;	
@@ -243,8 +243,10 @@ void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_p
 		detail::global().pipelines.profiler_resolve_chronometer.new_frame();
 		detail::global().pipelines.profiler_interact_chronometer.new_frame();
 		detail::global().pipelines.profiler_draw_chronometer.new_frame();
-		bool _has_ticked = detail::global().process.update(delta_time);
-		if (_has_ticked) {
+		bool _has_ticked = detail::global().process.update(_pipeline_data.viewport_size, delta_time, _pipeline_data.root_updatable.value());
+		// if (_has_ticked) {
+		(void)_has_ticked;
+		if (true) {
 			detail::global().pipelines.profiler_frame_chronometer.begin_task("draw widgets");
 			_pipeline_data.pipeline_renderer.new_frame();
 			detail::global().process.render();
@@ -256,9 +258,9 @@ void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_p
 		std::wstringstream _sstream;
 		detail::reload_state _reload_result = detail::global().hotswap.reload_manager->update(_sstream.rdbuf());
 		if (_reload_result == detail::reload_state::started_compiling) {
-			detail::global().hotswap.save_widgets("C:/Users/adri/desktop/ok.json");
+			detail::global().hotswap.save_widgets("C:/Users/adri/desktop/ok.json", _pipeline_data.root_updatable.value());
 		} else if (_reload_result == detail::reload_state::performed_swap) {
-			detail::global().hotswap.load_widgets("C:/Users/adri/desktop/ok.json");
+			detail::global().hotswap.load_widgets("C:/Users/adri/desktop/ok.json", _pipeline_data.root_updatable.value());
 		}
 #endif
 
@@ -271,19 +273,18 @@ void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_p
 pipeline& pipeline::process_once(const bool force_rendering)
 {
     (void)force_rendering;
-    if (!_data.raw_root.has_value()) {
+    if (!_data.root_updatable.has_value()) {
         // throw
     }
     // _data.pipeline_window.process_once();
     return *this;
 }
 
-pipeline& pipeline::root(const widget_id& widget)
-{
-    // std::cout << "before root\n";
-    _data.raw_root = detail::global().widgets.raw(widget);
-    // _data.root_widget = detail::global().widgets.raw(widget);
-    // detail::global().widgets.root() = detail::global().widgets.raw(widget);
+pipeline& pipeline::root(const widget_id& root_id)
+{	
+	detail::global_manager& _global = detail::global();
+	const std::uintptr_t _raw = detail::widget_id_access::get_data(root_id);
+    _data.root_updatable = _global.widgets.updatables[_raw];
     return *this;
 }
 

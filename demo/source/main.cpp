@@ -49,7 +49,7 @@ struct Composed {
     Composed& build()
     {
         bungeegum::adopt(this, _box.get());
-        bungeegum::widget_reference<ColoredBox> _box3 = std::move(_box2);
+        bungeegum::widget_ref<ColoredBox> _box3 = std::move(_box2);
         _box2 = std::move(_box3);
         bungeegum::adopt(_box.get(), _box2.get());
         return *this;
@@ -81,8 +81,8 @@ struct Composed {
 
     // ColoredBox _box;
     // ColoredBox _box2;
-    bungeegum::widget_reference<ColoredBox> _box = bungeegum::make_reference<ColoredBox>();
-    bungeegum::widget_reference<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>();
+    bungeegum::widget_ref<ColoredBox> _box = bungeegum::make_reference<ColoredBox>();
+    bungeegum::widget_ref<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>();
 };
 
 int main()
@@ -134,8 +134,8 @@ int main()
 	_my_pipeline.make_native_window_if_native();
 	_my_pipeline.make_renderer();
 
-	auto p2 = std::move(_my_pipeline);
-	p2.root(bungeegum::make<Title>().title("mytitle"));
+	// auto p2 = std::move(_my_pipeline);
+	_my_pipeline.root(bungeegum::make<Title>().title("mytitle"));
     // p.root(bungeegum::widget_id( bungeegum::make<Title>()
     //            .title("my title !!!")
     //            .child(bungeegum::make<Align>()
@@ -219,7 +219,7 @@ int main()
 
     //     //   )
     // ));
-    p2.process_loop_and_reset(60, true);
+    _my_pipeline.process_loop_and_reset(60, true);
 
     return 0;
 }

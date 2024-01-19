@@ -465,13 +465,13 @@ namespace detail {
     void renderer::create_directx11(window& existing_window)
     {
         Diligent::SwapChainDesc _swap_chain_descriptor;
-        Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
         Diligent::EngineD3D11CreateInfo _engine_create_info;
-#if defined(__DEBUG__)
-        _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
-#endif
+// #if defined(__DEBUG__)
+//         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
+// #endif
         _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_diligent_render_device, &_diligent_device_context);
+        Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
         _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
             Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
         
