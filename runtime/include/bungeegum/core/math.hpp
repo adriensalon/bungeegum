@@ -77,6 +77,11 @@ constexpr inline static value_t infinity = std::numeric_limits<value_t>::max();
 /// @brief
 /// @tparam value_t
 template <typename value_t>
+constexpr inline static value_t identity = "value_t must be a matrix type";
+
+/// @brief
+/// @tparam value_t
+template <typename value_t>
 constexpr bool is_zero(const value_t value);
 
 /// @brief
@@ -97,6 +102,13 @@ std::string to_string(const value_t& value);
 namespace math {
 
     using namespace glm;
+
+	/// @brief 
+	/// @param position 
+	/// @param rotation 
+	/// @param scale 
+	/// @return 
+	float4x4 transform(const float3 position, const float3 rotation, const float3 scale);
 
     /// @brief Linear interpolation between 2 values.
     /// @tparam value_t is a type that can be added to another value_t and multiplied by a float.

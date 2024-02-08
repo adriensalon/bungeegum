@@ -3,99 +3,61 @@
 #include <optional>
 #include <unordered_set>
 
-#include <bungeegum/core/config.hpp>
+#include <bungeegum/config/feature.hpp>
+#include <bungeegum/config/backend.hpp>
+#include <bungeegum/config/misc.hpp>
 #include <bungeegum/core/math.hpp>
-#include <bungeegum/core/widget.fwd>
-#include <bungeegum/glue/idgen.fwd>
-#include <bungeegum/glue/renderer.fwd>
-#include <bungeegum/glue/time.fwd>
-#include <bungeegum/glue/window.fwd>
+#include <bungeegum/core/widget.hpp>
+#include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/glue/time.hpp>
+#include <bungeegum/glue/window.hpp>
+
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#define BUNGEEGUM_USE_PREFERRED_PIPELINE_RENDERER bungeegum::renderer_backend::opengl
+#elif BUNGEEGUM_USE_DIRECTX
+#define BUNGEEGUM_USE_PREFERRED_PIPELINE_RENDERER bungeegum::renderer_backend::directx11
+#elif BUNGEEGUM_USE_VULKAN
+#define BUNGEEGUM_USE_PREFERRED_PIPELINE_RENDERER bungeegum::renderer_backend::vulkan
+#elif BUNGEEGUM_USE_OPENGL
+#define BUNGEEGUM_USE_PREFERRED_PIPELINE_RENDERER bungeegum::renderer_backend::opengl
+#else
+#error "No graphics backend available. Please define BUNGEEGUM_USE_DIRECTX, BUNGEEGUM_USE_VULKAN or BUNGEEGUM_USE_OPENGL."
+#endif
 
 namespace bungeegum {
 
 struct pipeline;
 
-namespace detail {
+namespace detail {	
 
     using frames_chronometer = chronometer<BUNGEEGUM_USE_TIME_UNIT>;
     using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_TIME_UNIT>;
 
     struct pipeline_data {
-		pipeline_data();
-		pipeline_data(const pipeline_data& other) = delete;
-		pipeline_data& operator=(const pipeline_data& other) = delete;
-		pipeline_data(pipeline_data&& other);
-		pipeline_data& operator=(pipeline_data&& other);
-		~pipeline_data();
-
-		bool was_moved_from = false;
-		std::uintptr_t generated_id = 0;
 		window pipeline_window = {};
         renderer pipeline_renderer = {};
 		std::optional<std::reference_wrapper<widget_update_data>> root_updatable = std::nullopt;
-        std::vector<window_resized_event> window_resized_events = {};
-        std::vector<mouse_moved_event> mouse_moved_events = {};
-        std::vector<mouse_down_event> mouse_down_events = {};
-        std::vector<mouse_up_event> mouse_up_events = {};
-        std::vector<mouse_pressed_event> mouse_pressed_events = {};
-        float2 viewport_size = {}; // no need to store
         stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
-		
 #if BUNGEEGUM_USE_OVERLAY
 		std::string renderer_info = {};
-#endif
-    };
-
-    struct pipelines_manager {
-        pipelines_manager() = default;
-        pipelines_manager(const pipelines_manager& other) = delete;
-        pipelines_manager& operator=(const pipelines_manager& other) = delete;
-        pipelines_manager(pipelines_manager&& other) = delete;
-        pipelines_manager& operator=(pipelines_manager&& other) = delete;
-
-        [[nodiscard]] bool contains(const std::string& name);
-
-        [[nodiscard]] pipeline_data& operator[](const std::string& name);
-
-        [[nodiscard]] pipeline_data& operator[](pipeline& existing_pipeline);
-
-		id_generator<pipelines_manager, std::uintptr_t> generator = {};
-
-        std::unordered_map<std::uintptr_t, std::reference_wrapper<pipeline_data>> updatables = {};
-
-#if BUNGEEGUM_USE_OVERLAY
+		// etc
         BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};
-        frames_chronometer profiler_frame_chronometer = {};
-        frames_chronometer profiler_resolve_chronometer = {};
-        frames_chronometer profiler_interact_chronometer = {};
-        frames_chronometer profiler_draw_chronometer = {};
-        std::optional<std::uintptr_t> inspector_selected = std::nullopt;
-
-        inline static std::string to_clean_typename(const std::string& raw_typename)
-        {
-            std::size_t _last_space = raw_typename.find_last_of(' ');
-            if (_last_space == raw_typename.npos) {
-                _last_space = 0;
-            }
-            std::size_t _last_column = raw_typename.find_last_of(':');
-            if (_last_column == raw_typename.npos) {
-                _last_column = 0;
-            }
-            if (_last_space == 0 && _last_column == 0) {
-                return raw_typename;
-            }
-            std::size_t _offset = std::max(_last_space, _last_column) + 1;
-            std::size_t _length = raw_typename.length() - _offset;
-            return raw_typename.substr(_offset, _length);
-        }
-
-        inline void set_clean_typename(widget_update_data& update_data)
-        {
-            std::string _clean_typename = to_clean_typename(update_data.inplace_data.type().name());
-            update_data.resolver_command._data.clean_typename = _clean_typename;
-            update_data.clean_typename = _clean_typename;
-        }
+        frames_chronometer steps_chronometer = {};
+        frames_chronometer widgets_chronometer = {};
 #endif
     };
+
+    struct pipeline_manager_data {
+#if BUNGEEGUM_USE_OVERLAY
+		std::optional<std::reference_wrapper<pipeline_data>> current = std::nullopt;
+        std::optional<std::uintptr_t> inspector_selected = std::nullopt;
+#endif
+    };
+	
+	struct pipeline_access {
+        [[nodiscard]] static pipeline make_from_data(const pipeline_data& data);
+        [[nodiscard]] static pipeline_data& get_data(pipeline& object);
+    };
+	
 }
 }

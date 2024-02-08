@@ -1,301 +1,398 @@
+#include <imgui.h>
+
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/pipeline.hpp>
+#include <bungeegum/glue/console.hpp>
 
 namespace bungeegum {
 namespace detail {
 
-    pipeline_data::pipeline_data()
-    {
-        setup_global_if_required(); // We only need to do this here
+#if BUNGEEGUM_USE_OVERLAY
+    extern void setup_overlay();
+    extern void draw_overlay();
+#endif
 
-        generated_id = global().pipelines.generator.generate();
-        global().pipelines.updatables.emplace(generated_id, std::ref(*this));
-        pipeline_renderer.clear_color = float4 { 1.f, 1.f, 1.f, 1.f };
+    void protect_library(const std::function<void()>& try_callback)
+    {
+        protect(try_callback, [](const std::string& _what) {
+            console_log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", console_color::red);
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+
+#else
+                std::terminate();
+#endif
+        });
     }
 
-    pipeline_data::pipeline_data(pipeline_data&& other)
+    void protect_userspace(std::vector<backtraced_exception>& container, const std::function<void()>& try_callback)
     {
-        *this = std::move(other);
+        protect(try_callback, [&container](const std::string& _what) {
+            // uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
+            backtraced_exception _exception(_what, 0, 0);
+#if BUNGEEGUM_USE_OVERLAY
+            container.push_back(_exception);
+#else
+                console_log_error(_exception);
+                (void)container;
+#endif
+        });
     }
 
-    pipeline_data& pipeline_data::operator=(pipeline_data&& other)
+    void save_widgets(const std::filesystem::path& archive_path, widget_update_data& root_updatable)
     {
-		generated_id = std::move(other.generated_id);
-		pipeline_window = std::move(other.pipeline_window);
-		pipeline_renderer = std::move(other.pipeline_renderer);
-		// raw_root = std::move(other.raw_root);
-		window_resized_events = std::move(other.window_resized_events);
-		mouse_moved_events = std::move(other.mouse_moved_events);
-		mouse_down_events = std::move(other.mouse_down_events);
-		mouse_up_events = std::move(other.mouse_up_events);
-		mouse_pressed_events = std::move(other.mouse_pressed_events);
-		viewport_size = std::move(other.viewport_size);
-		global().pipelines.updatables.at(generated_id) = std::ref(*this);
-        other.was_moved_from = true;
-		return *this;
+        reloaded_saver _archiver(archive_path);
+        std::function<void(widget_update_data&)> _traverse_function = [&_archiver, &_traverse_function](widget_update_data& _updatable) {
+            if (_updatable.saver) {
+                _updatable.saver(_archiver);
+            }
+            for (widget_update_data& _child_updatable : _updatable.children) {
+                _traverse_function(_child_updatable);
+            }
+        };
+        _traverse_function(root_updatable);
     }
 
-    pipeline_data::~pipeline_data()
+    void load_widgets(const std::filesystem::path& archive_path, widget_update_data& root_updatable)
     {
-        if (!was_moved_from) {
-			global().pipelines.updatables.erase(generated_id);
+        reloaded_loader _archiver(archive_path);
+        std::function<void(widget_update_data&)> _traverse_function = [&_archiver, &_traverse_function](widget_update_data& _updatable) {
+            if (_updatable.loader) {
+                _updatable.loader(_archiver);
+            }
+            for (widget_update_data& _child_updatable : _updatable.children) {
+                _traverse_function(_child_updatable);
+            }
+        };
+        _traverse_function(root_updatable);
+    }
+
+    //     void interact_widgets()
+    //     {
+    //         log_manager_data& _log_manager = global().logs;
+    //         detail::global().pipelines.profiler_frame_chronometer.begin_task("interact");
+    // #define traverse_interact_impl(interaction_name)                                                                           \
+//     for (const interaction_name##_event& _event : interaction_name##_events) {                                             \
+//         global_widgets_manager.traverse(global_widgets_manager.root.value(), [&_event](widget_update_data& _widget_data) { \
+//             if (_widget_data.interactor_command.has_value()) {                                                             \
+//                 _widget_data.interactor_command.value()._data.is_blocked = false;                                          \
+//                 _widget_data.interactor_command.value()._data.command_data = _event;                                       \
+//                 protect_userspace(_log_manager, [&_widget_data]() {                                                        \
+//                     _widget_data.interactor(_widget_data.interactor_command.value());                                      \
+//                 });                                                                                                        \
+//                 bool _retval = (!_widget_data.interactor_command.value()._data.is_blocked);                                \
+//                 return _retval;                                                                                            \
+//             }                                                                                                              \
+//             return true;                                                                                                   \
+//         });                                                                                                                \
+//     }                                                                                                                      \
+//     interaction_name##_events.clear();
+    //         // traverse_interact_impl(window_resized);
+    //         // traverse_interact_impl(mouse_moved);
+    //         // traverse_interact_impl(mouse_down);
+    //         // traverse_interact_impl(mouse_up);
+    //         // traverse_interact_impl(mouse_pressed);
+    // #undef traverse_interact_impl
+    //         detail::global().pipelines.profiler_frame_chronometer.end_task("interact");
+    //     }
+
+    void resolve_widgets(const float2 viewport_size, widget_update_data& root_updatable)
+    {
+        log_manager_data& _log_manager = global().logs;
+        pipeline_manager_data& _pipeline_manager = global().pipelines;
+        widget_manager_data& _widget_manager = global().widgets;
+#if BUNGEEGUM_USE_OVERLAY
+        _pipeline_manager.current.value().get().steps_chronometer.begin_task("resolve");
+#endif
+        bool _resolve_done = false;
+        while (!_resolve_done) {
+            std::size_t _iteration_size = _widget_manager.resolvables.size();
+            for (widget_update_data& _updatable : _widget_manager.resolvables) {
+                if (_updatable.raw == root_updatable.raw) {
+                    _updatable.local_min_size = viewport_size;
+                    _updatable.local_max_size = viewport_size;
+                } else {
+                    widget_update_data& _parent_updatable = _updatable.parent.value().get();
+                    _updatable.local_min_size = _parent_updatable.local_min_size;
+                    _updatable.local_max_size = _parent_updatable.local_max_size;
+                }
+#if BUNGEEGUM_USE_OVERLAY
+                _pipeline_manager.current.value().get().widgets_chronometer.begin_task(_updatable.clean_typename);
+#endif
+
+                protect_userspace(_log_manager.userspace_errors, [&_updatable]() {
+					resolve_command_data _data = { _updatable };
+                    resolve_command _command = detail::resolve_command_access::make_from_data(_data);
+                    _updatable.resolver(_command);
+                });
+#if BUNGEEGUM_USE_OVERLAY
+                _pipeline_manager.current.value().get().widgets_chronometer.end_task(_updatable.clean_typename);
+#endif
+            };
+            _widget_manager.resolvables.erase(
+                _widget_manager.resolvables.begin(),
+                _widget_manager.resolvables.begin() + _iteration_size);
+            _resolve_done = _widget_manager.resolvables.empty();
+        }
+#if BUNGEEGUM_USE_OVERLAY
+        _pipeline_manager.current.value().get().steps_chronometer.end_task("resolve");
+#endif
+    }
+
+    void draw_widgets(ImDrawList* imgui_drawlist)
+    {
+        global_manager_data& _global = global();
+        bool _draw_done = false;
+
+        while (!_draw_done) {
+            for (widget_update_data& _updatable : _global.widgets.drawables) { // go default to draw_children()
+                if (_updatable.parent.has_value()) {
+                    widget_update_data& _parent_updatable = _updatable.parent.value().get();
+                    _parent_updatable.local_position += _updatable.local_position;
+                }
+                // draw_command& _widget_drawer_command = _updatable.drawer_command;
+                // _widget_drawer_command._data.resolved_size = _widget_resolver_command._data.resolved_size;
+                // _widget_drawer_command._data.resolved_position = _widget_resolver_command._data.accumulated_position;
+                // _widget_drawer_command._data.commands.clear();
+                // #if BUNGEEGUM_USE_OVERLAY
+                //                         _widget_drawer_command._data.commands_infos.clear();
+                //                         std::string _clean_typename = global().pipelines.to_clean_typename(_updatable.inplace_data.type().name());
+                //                         global().pipelines.profiler_draw_chronometer.begin_task(_clean_typename);
+                // #endif
+                protect_userspace(_global.logs.userspace_errors, [&_updatable, imgui_drawlist]() {
+                    draw_command_data _data = { _updatable, imgui_drawlist };
+                    draw_command _command = detail::draw_command_access::make_from_data(_data);
+                    _updatable.drawer(_command);
+                });
+                // #if BUNGEEGUM_USE_OVERLAY
+                //                         global().pipelines.profiler_draw_chronometer.end_task(_clean_typename);
+                // #endif
+                // _widget_drawer_command._data.draw(imgui_drawlist);
+            };
+            _global.widgets.drawables.erase(_global.widgets.drawables.begin(), _global.widgets.drawables.end());
+            _draw_done = _global.widgets.drawables.empty();
         }
     }
 
-    // bool pipelines_manager::contains(const std::string& name)
-    // {
-    //     return named_pipelines.find(name) != named_pipelines.end();
-    // }
-
-    // pipeline_data& pipelines_manager::operator[](const std::string& name)
-    // {
-    //     if (!contains(name)) {
-    //         // throw
-    //     }
-    //     return named_pipelines.at(name);
-    // }
-
-    pipeline_data& pipelines_manager::operator[](pipeline& existing_pipeline)
+    bool process_widgets(const float2 viewport_size, const std::chrono::milliseconds& delta_time, widget_update_data& root_updatable)
     {
-        return existing_pipeline._data;
-    }
+        global_manager_data& _global = global();
 
-}
+        _global.pipelines.current.value().get().steps_chronometer.begin_task("animations");
+        _global.animations.update(delta_time);
+        _global.pipelines.current.value().get().steps_chronometer.end_task("animations");
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-pipeline& pipeline::attach_native_window(void* native_window)
-{
-	(void)native_window;
-    // setup_global_if_required();
-    return *this;
-}
+        _global.pipelines.current.value().get().steps_chronometer.begin_task("events");
+        _global.events.update();
+        _global.pipelines.current.value().get().steps_chronometer.end_task("events");
 
-// template <>
-// pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::directx11>(void* native_window, const pipeline_embedders<renderer_backend::directx11>& embedders)
-// {
-// 	if (has_native_window()) {
-//         // throw
-//     }
-// 	if (has_renderer()) {
-//         // throw
-//     }
-	
-//     return *this;
-// }
+        // interact_widgets();
+        resolve_widgets(viewport_size, root_updatable);
 
-// template <>
-// pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::directx12>(void* native_window, const pipeline_embedders<renderer_backend::directx12>& embedders)
-// {
-// 	if (has_native_window()) {
-//         // throw
-//     }
-// 	if (has_renderer()) {
-//         // throw
-//     }
-	
-//     return *this;
-// }
+        // return (has_userspace_thrown() || !global().widgets.drawables.empty());
 
-// template <>
-// pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::opengl>(void* native_window, const pipeline_embedders<renderer_backend::opengl>& embedders)
-// {
-// 	if (has_native_window()) {
-//         // throw
-//     }
-// 	if (has_renderer()) {
-//         // throw
-//     }
-	
-//     return *this;
-// }
-
-// template <>
-// pipeline& pipeline::attach_native_window_and_renderer<renderer_backend::vulkan>(void* native_window, const pipeline_embedders<renderer_backend::vulkan>& embedders)
-// {
-// 	if (has_native_window()) {
-//         // throw
-//     }
-// 	if (has_renderer()) {
-//         // throw
-//     }
-	
-//     return *this;
-// }
-
-bool pipeline::has_native_window() const
-{
-
-    return true;
-}
-
-pipeline& pipeline::make_native_window()
-{
-	if (has_native_window()) {
-        // throw
-    }
-	if (has_renderer()) {
-        // throw
-    }
-
-	_data.pipeline_window.create_native();
-    return *this;
-}
-#endif
-
-pipeline& pipeline::make_native_window_if_native()
-{	
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-	make_native_window();
-#endif
-	return *this;
-}
-
-template <>
-pipeline& pipeline::make_renderer<renderer_backend::directx11>()
-{
-#if BUNGEEGUM_USE_DIRECTX
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    if (!has_native_window()) {
-        // throw
-    }
-#endif
-    if (has_renderer()) {
-        // throw
-    }
-    _data.pipeline_renderer.create_directx11(_data.pipeline_window);
 #if BUNGEEGUM_USE_OVERLAY
-        detail::setup_overlay(); // loads fonts pr linstant ici
+        _global.pipelines.current.value().get().lifetime_duration += delta_time;
 #endif
-	_data.pipeline_renderer.rebuild_fonts();
-	_data.viewport_size = _data.pipeline_window.get_size();
-#endif
-    return *this;
-}
 
-template <>
-pipeline& pipeline::make_renderer<renderer_backend::opengl>()
-{
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    if (!has_native_window()) {
-        // throw
+        return !_global.widgets.drawables.empty();
     }
-#endif
-    if (has_renderer()) {
-        // throw
-    }
-    _data.pipeline_renderer.create_opengl(_data.pipeline_window);
+
+    void render_widgets()
+    {
+        ImDrawList* _drawlist = ImGui::GetBackgroundDrawList();
+        draw_widgets(_drawlist);
 #if BUNGEEGUM_USE_OVERLAY
-        detail::setup_overlay(); // loads fonts pr linstant ici
+        draw_overlay();
 #endif
-	_data.pipeline_renderer.rebuild_fonts();
-	_data.viewport_size = _data.pipeline_window.get_size();
-    return *this;
-}
-
-bool pipeline::has_renderer() const
-{
-	return _data.pipeline_renderer.has_renderer();
-}
-
-void pipeline::process_loop_and_reset(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
-{
-    (void)force_rendering;
-    if (!_data.root_updatable.has_value()) {
-        // throw
     }
-	std::uintptr_t _copyable_id = _data.generated_id;	
-	std::cout << "hello \n";
-    _data.pipeline_window.update_loop(frames_per_second, [_copyable_id] (const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
-			
-		// try
-		// {
-		// 	throw "lolol";
-		// }
-		// catch(const std::exception& e)
-		// {
-		// 	std::cout << e.what() << '\n';
-		// }
-		
-		
-		detail::pipeline_data& _pipeline_data = detail::global().pipelines.updatables.at(_copyable_id).get();
-		_pipeline_data.viewport_size = _pipeline_data.pipeline_window.get_size();
-	
-		// global().logs.protect_library([&]() {
-		_pipeline_data.pipeline_window.poll();
 
-		if (!_pipeline_data.pipeline_window.window_resized_events.empty()) {
-			_pipeline_data.pipeline_renderer.resize(_pipeline_data.pipeline_window.window_resized_events.back().new_size);
-		}
+    void setup_window(window& pipeline_window, const pipeline_provider& provider)
+    {
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        pipeline_window.attach_emscripten(provider.emscripten_canvas_id);
+#else
+        if (provider.native_window_ptr) {
+            pipeline_window.attach_native(provider.native_window_ptr);
+        } else {
+            pipeline_window.create_native();
+        }
+#endif
+    }
 
+    void update_hotswap_frame(const std::filesystem::path& serialize_path, widget_update_data& root_updatable)
+    {
+#if BUNGEEGUM_USE_HOTSWAP
+        global_manager_data& _global = global();
+        std::wstringstream _update_stream;
+        reload_state _reload_result = _global.widgets.hotswap_reloader->update(_update_stream.rdbuf());
+        std::string _update_str = narrow(_update_stream.str());
+        _global.logs.hotswap_output.push_back(std::move(_update_str));
+        if (_reload_result == reload_state::started_compiling) {
+            save_widgets(serialize_path, root_updatable);
+        } else if (_reload_result == reload_state::performed_swap) {
+            load_widgets(serialize_path, root_updatable);
+        }
+#endif
+    }
+
+    void update_input_frame(window& pipeline_window, renderer& pipeline_renderer)
+    {
+        pipeline_window.poll();
+        if (!pipeline_window.window_resized_events.empty()) {
+            pipeline_renderer.resize(pipeline_window.window_resized_events.back().new_size);
+        }
 #if BUNGEEGUM_USE_OVERLAY
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-		_pipeline_data.pipeline_renderer.consume_emscripten_key_events(_pipeline_data.pipeline_window.get_emscripten_key_events());
-		_pipeline_data.pipeline_renderer.consume_emscripten_mouse_events(_pipeline_data.pipeline_window.get_emscripten_mouse_events());
-		_pipeline_data.pipeline_renderer.consume_emscripten_wheel_events(_pipeline_data.pipeline_window.get_emscripten_wheel_events());
+        pipeline_renderer.consume_emscripten_key_events(pipeline_window.get_emscripten_key_events());
+        pipeline_renderer.consume_emscripten_mouse_events(pipeline_window.get_emscripten_mouse_events());
+        pipeline_renderer.consume_emscripten_wheel_events(pipeline_window.get_emscripten_wheel_events());
 #else
-		_pipeline_data.pipeline_renderer.consume_sdl_events(_pipeline_data.pipeline_window.get_sdl_events());
+        pipeline_renderer.consume_sdl_events(pipeline_window.get_sdl_events());
 #endif
 #endif
+    }
 
-		// store events in _pipeline_data ig
-
-		detail::global().pipelines.profiler_frame_chronometer.new_frame();
-		detail::global().pipelines.profiler_resolve_chronometer.new_frame();
-		detail::global().pipelines.profiler_interact_chronometer.new_frame();
-		detail::global().pipelines.profiler_draw_chronometer.new_frame();
-		bool _has_ticked = detail::global().process.update(_pipeline_data.viewport_size, delta_time, _pipeline_data.root_updatable.value());
-		// if (_has_ticked) {
-		(void)_has_ticked;
-		if (true) {
-			detail::global().pipelines.profiler_frame_chronometer.begin_task("draw widgets");
-			_pipeline_data.pipeline_renderer.new_frame();
-			detail::global().process.render();
-			_pipeline_data.pipeline_renderer.present();
-			detail::global().pipelines.profiler_frame_chronometer.end_task("draw widgets");
-		}
-#if BUNGEEGUM_USE_HOTSWAP
-		// FAIRE PAREIL AVANT / APRES FORCE UPDATE
-		std::wstringstream _sstream;
-		detail::reload_state _reload_result = detail::global().hotswap.reload_manager->update(_sstream.rdbuf());
-		if (_reload_result == detail::reload_state::started_compiling) {
-			detail::global().hotswap.save_widgets("C:/Users/adri/desktop/ok.json", _pipeline_data.root_updatable.value());
-		} else if (_reload_result == detail::reload_state::performed_swap) {
-			detail::global().hotswap.load_widgets("C:/Users/adri/desktop/ok.json", _pipeline_data.root_updatable.value());
-		}
-#endif
-
-
-
-
-	});
+    void update_process_frame(renderer& pipeline_renderer, widget_update_data& root_updatable, const float2 viewport_size, const BUNGEEGUM_USE_TIME_UNIT& delta_time, const bool force_rendering)
+    {
+        global_manager_data& _global = global();
+        _global.pipelines.current.value().get().steps_chronometer.new_frame();
+        _global.pipelines.current.value().get().widgets_chronometer.new_frame();
+        bool _must_render = BUNGEEGUM_USE_OVERLAY || force_rendering || process_widgets(viewport_size, delta_time, root_updatable);
+        if (_must_render) {
+            _global.pipelines.current.value().get().steps_chronometer.begin_task("draw widgets");
+            pipeline_renderer.new_frame();
+            render_widgets();
+            pipeline_renderer.present();
+            _global.pipelines.current.value().get().steps_chronometer.end_task("draw widgets");
+        }
+    }
 }
 
-pipeline& pipeline::process_once(const bool force_rendering)
+template <>
+pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& provider)
 {
-    (void)force_rendering;
-    if (!_data.root_updatable.has_value()) {
-        // throw
+#if !BUNGEEGUM_USE_DIRECTX
+    static_assert(false, "DirectX must be enabled");
+#endif
+    detail::setup_global_if_required();
+    detail::setup_window(_data.pipeline_window, provider);
+    if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
+        // _data.pipeline_renderer.attach_directx11(_data.pipeline_window,
+        //     provider.directx_device_ptr,
+        //     provider.directx_swapchain_ptr);
+    } else {
+        _data.pipeline_renderer.create_directx11(_data.pipeline_window);
     }
-    // _data.pipeline_window.process_once();
+#if BUNGEEGUM_USE_OVERLAY
+    detail::setup_overlay(); // loading fonts there ? fugly go renderer
+#endif
+    _data.pipeline_renderer.rebuild_fonts();
     return *this;
 }
 
-pipeline& pipeline::root(const widget_id& root_id)
-{	
-	detail::global_manager& _global = detail::global();
-	const std::uintptr_t _raw = detail::widget_id_access::get_data(root_id);
+template <>
+pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& provider)
+{
+#if !BUNGEEGUM_USE_DIRECTX
+    static_assert(false, "DirectX must be enabled");
+#endif
+    detail::setup_global_if_required();
+    detail::setup_window(_data.pipeline_window, provider);
+    if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
+        // _data.pipeline_renderer.attach_directx12(_data.pipeline_window,
+        //     provider.directx_device_ptr,
+        //     provider.directx_swapchain_ptr);
+    } else {
+        _data.pipeline_renderer.create_directx12(_data.pipeline_window);
+    }
+#if BUNGEEGUM_USE_OVERLAY
+    detail::setup_overlay(); // loading fonts there ? fugly go renderer
+#endif
+    _data.pipeline_renderer.rebuild_fonts();
+    return *this;
+}
+
+template <>
+pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& provider)
+{
+#if !BUNGEEGUM_USE_OPENGL
+    static_assert(false, "DirectX must be enabled");
+#endif
+    detail::setup_global_if_required();
+    detail::setup_window(_data.pipeline_window, provider);
+    if (provider.opengl_attach_to_existing) {
+        // _data.pipeline_renderer.attach_opengl(_data.pipeline_window);
+    } else {
+        _data.pipeline_renderer.create_opengl(_data.pipeline_window);
+    }
+#if BUNGEEGUM_USE_OVERLAY
+    detail::setup_overlay(); // loading fonts there ? fugly go renderer
+#endif
+    _data.pipeline_renderer.rebuild_fonts();
+    return *this;
+}
+
+template <>
+pipeline& pipeline::setup<renderer_backend::vulkan>(const pipeline_provider& provider)
+{
+    detail::setup_global_if_required();
+    detail::setup_window(_data.pipeline_window, provider);
+    // TODO
+    return *this;
+}
+
+void pipeline::run(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
+{
+    if (!_data.root_updatable.has_value()) {
+        // throw
+    }
+    _data.pipeline_window.update_loop(frames_per_second, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
+        detail::protect_library([this, &delta_time, force_rendering]() {
+			detail::global().pipelines.current = std::ref(_data);
+            detail::update_input_frame(_data.pipeline_window, _data.pipeline_renderer);
+            float2 _viewport_size = _data.pipeline_window.get_size();
+            detail::update_process_frame(_data.pipeline_renderer, _data.root_updatable.value(), _viewport_size, delta_time, force_rendering);
+            detail::update_hotswap_frame("C:/Users/adri/desktop/ok.json", _data.root_updatable.value());
+        });
+    });
+}
+
+pipeline& pipeline::run_once(const bool force_rendering)
+{
+    if (!_data.root_updatable.has_value()) {
+        // throw
+    }
+    _data.pipeline_window.update_once(9999u, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
+        detail::protect_library([this, &delta_time, force_rendering]() {			
+			detail::global().pipelines.current = std::ref(_data);
+            detail::update_input_frame(_data.pipeline_window, _data.pipeline_renderer);
+            float2 _viewport_size = _data.pipeline_window.get_size();
+            detail::update_process_frame(_data.pipeline_renderer, _data.root_updatable.value(), _viewport_size, delta_time, force_rendering);
+            detail::update_hotswap_frame("C:/Users/adri/desktop/ok.json", _data.root_updatable.value());
+        });
+    });
+    return *this;
+}
+
+pipeline& pipeline::root(const widget_id root_id)
+{
+    detail::setup_global_if_required();
+    detail::global_manager_data& _global = detail::global();
+    const std::uintptr_t _raw = detail::widget_id_access::get_data(root_id);
     _data.root_updatable = _global.widgets.updatables[_raw];
     return *this;
 }
 
-// pipeline& pipeline::window_color(const float4 rgba)
-// {
-// }
-
-pipeline& pipeline::window_title(const std::string& description)
+pipeline& pipeline::color(const float4 rgba)
 {
-	(void)description;
-    // _data.pipeline_window.title(description);
+    (void)rgba;
+    // _data.pipeline_window.color(rgba);
+    return *this;
+}
+
+pipeline& pipeline::title(const std::string& description)
+{
+    _data.pipeline_window.title(description);
     return *this;
 }
 

@@ -1,78 +1,77 @@
 #pragma once
 
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/core/hotswap.fwd>
 #include <bungeegum/core/log.fwd>
 
-namespace bungeegum {	
-
-struct access {	
-
-    template <typename widget_t>
-	constexpr static std::uintptr_t get_raw(widget_t& widget)
-	{
-		if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-			return widget._bungeegum_object_reference;
-		} else {
-			return detail::raw_cast<widget_t>(widget);
-		}
-	}
+namespace bungeegum {
+	
+struct access {
 
     template <typename widget_t>
-	constexpr static std::uintptr_t get_sizeof(widget_t& widget)
-	{
-		if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-			return widget._bungeegum_sizeof();
-		} else {
-			return sizeof(widget_t);
-		}
-	}
+    constexpr static std::uintptr_t get_raw(widget_t& widget)
+    {
+        if constexpr (detail::traits::is_reloadable_v<widget_t>) {
+            return widget._bungeegum_object_reference;
+        } else {
+            return detail::raw_cast<widget_t>(widget);
+        }
+    }
 
     template <typename widget_t>
-	constexpr static std::uintptr_t get_this(widget_t& widget)
-	{
-		if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-			return widget._bungeegum_this();
-		} else {
-			return detail::raw_cast<widget_t>(widget);
-		}
-	}
+    constexpr static std::uintptr_t get_sizeof(widget_t& widget)
+    {
+        if constexpr (detail::traits::is_reloadable_v<widget_t>) {
+            return widget._bungeegum_sizeof();
+        } else {
+            return sizeof(widget_t);
+        }
+    }
 
     template <typename widget_t>
-	constexpr static void invoke_draw(widget_t& widget, draw_command& command)
-	{
-		static_assert(detail::traits::has_draw_function_v<widget_t>);
-		widget.draw(command);
-	}
+    constexpr static std::uintptr_t get_this(widget_t& widget)
+    {
+        if constexpr (detail::traits::is_reloadable_v<widget_t>) {
+            return widget._bungeegum_this();
+        } else {
+            return detail::raw_cast<widget_t>(widget);
+        }
+    }
 
     template <typename widget_t>
-	constexpr static void invoke_interact(widget_t& widget, interact_command& command)
-	{
-		static_assert(detail::traits::has_interact_function_v<widget_t>);
-		widget.interact(command);
-	}
+    constexpr static void invoke_draw(widget_t& widget, draw_command& command)
+    {
+        static_assert(detail::traits::has_draw_function_v<widget_t>);
+        widget.draw(command);
+    }
 
     template <typename widget_t>
-	constexpr static void invoke_resolve(widget_t& widget, resolve_command& command)
-	{
-		static_assert(detail::traits::has_resolve_function_v<widget_t>);
-		widget.resolve(command);
-	}
+    constexpr static void invoke_interact(widget_t& widget, interact_command& command)
+    {
+        static_assert(detail::traits::has_interact_function_v<widget_t>);
+        widget.interact(command);
+    }
+
+    template <typename widget_t>
+    constexpr static void invoke_resolve(widget_t& widget, resolve_command& command)
+    {
+        static_assert(detail::traits::has_resolve_function_v<widget_t>);
+        widget.resolve(command);
+    }
 };
 
 namespace detail {
-	
+
     template <typename widget_t>
-	widget_ref<widget_t> widget_ref_access<widget_t>::make_from_data(const reference_type_t<widget_t>& data)
-	{
-		return widget_ref<widget_t>(data);
-	}
-    
-	template <typename widget_t>
-	reference_type_t<widget_t>& widget_ref_access<widget_t>::get_data(widget_ref<widget_t>& ref)
-	{
-		return ref._data;
-	}
+    widget_ref<widget_t> widget_ref_access<widget_t>::make_from_data(const reference_type_t<widget_t>& data)
+    {
+        return widget_ref<widget_t>(data);
+    }
+
+    template <typename widget_t>
+    reference_type_t<widget_t>& widget_ref_access<widget_t>::get_data(widget_ref<widget_t>& ref)
+    {
+        return ref._data;
+    }
 
     template <typename widget_t>
     constexpr void install_on_draw(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
@@ -82,10 +81,10 @@ namespace detail {
                 bungeegum::access::invoke_draw(reference.get(), command);
             };
         } else {
-			updatable.drawer = [](draw_command& command) {
+            updatable.drawer = [](draw_command& command) {
                 command.draw_children();
             };
-		}
+        }
     }
 
     template <typename widget_t>
@@ -95,11 +94,11 @@ namespace detail {
             updatable.interactor = [reference](interact_command& command) {
                 bungeegum::access::invoke_interact(reference.get(), command);
             };
-		} else {
-			updatable.interactor = [](interact_command& command) {
+        } else {
+            updatable.interactor = [](interact_command& command) {
                 command.interact_children();
             };
-		}
+        }
     }
 
     template <typename widget_t>
@@ -140,7 +139,7 @@ namespace detail {
     template <typename widget_t>
     constexpr void install_on_save(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
-		if constexpr (detail::traits::is_reloadable_v<widget_t>) {
+        if constexpr (detail::traits::is_reloadable_v<widget_t>) {
             updatable.saver = [&reference](detail::reloaded_saver& archiver) {
                 archiver.save<widget_t>(widget_ref_access<widget_t>::get_data(reference));
             };
@@ -150,25 +149,25 @@ namespace detail {
     template <typename widget_t>
     constexpr void install_on_sizeof(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
-		updatable.true_sizeof = [reference]() {
-			return bungeegum::access::get_sizeof<widget_t>(reference.get());
-		};
+        updatable.true_sizeof = [reference]() {
+            return bungeegum::access::get_sizeof<widget_t>(reference.get());
+        };
     }
 
     template <typename widget_t>
     constexpr void install_on_this(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
-		updatable.true_ptr = [reference]() {
-			return bungeegum::access::get_this<widget_t>(reference.get());
-		};
+        updatable.true_ptr = [reference]() {
+            return bungeegum::access::get_this<widget_t>(reference.get());
+        };
     }
 
-	template <typename widget_t>
-	constexpr void install_clean_typename(detail::widget_update_data& updatable)
-	{
+    template <typename widget_t>
+    constexpr void install_clean_typename(detail::widget_update_data& updatable)
+    {
 #if BUNGEEGUM_USE_OVERLAY
-		std::function<std::string(const std::string&)> _to_clean_typename = [] (const std::string raw_typename) {
-			std::size_t _last_space = raw_typename.find_last_of(' ');
+        std::function<std::string(const std::string&)> _to_clean_typename = [](const std::string raw_typename) {
+            std::size_t _last_space = raw_typename.find_last_of(' ');
             if (_last_space == raw_typename.npos) {
                 _last_space = 0;
             }
@@ -182,12 +181,12 @@ namespace detail {
             std::size_t _offset = std::max(_last_space, _last_column) + 1;
             std::size_t _length = raw_typename.length() - _offset;
             return raw_typename.substr(_offset, _length);
-		};
-		std::string _clean_typename = _to_clean_typename(typeid(widget_t).name());
-		// updatable.resolver_command._data.clean_typename = _clean_typename;
-		updatable.clean_typename = _clean_typename;
+        };
+        std::string _clean_typename = _to_clean_typename(typeid(widget_t).name());
+        // updatable.resolver_command._data.clean_typename = _clean_typename;
+        updatable.clean_typename = _clean_typename;
 #endif
-	}
+    }
 }
 
 template <typename widget_t>
@@ -210,7 +209,7 @@ widget_ref<widget_t>::widget_ref(const detail::widget_ref_data<widget_t>& data)
 
 template <typename widget_t>
 widget_id::widget_id(widget_t* widget)
-	: _data(bungeegum::access::get_raw(*widget))
+    : _data(access::get_raw(*widget))
 {
     // if (!detail::global().widgets.updatables.contains(_data)) {
     //     throw detail::backtraced_exception("Errorlol");
@@ -219,7 +218,7 @@ widget_id::widget_id(widget_t* widget)
 
 template <typename widget_t>
 widget_id::widget_id(widget_t& widget)
-	: _data(bungeegum::access::get_raw(widget))
+    : _data(access::get_raw(widget))
 {
     // if (!detail::global().widgets.updatables.contains(_data)) {
     //     throw detail::backtraced_exception("Errorlol");
@@ -228,33 +227,32 @@ widget_id::widget_id(widget_t& widget)
 
 template <typename widget_t>
 widget_id::widget_id(widget_ref<widget_t>& widget)
-	: _data(bungeegum::access::get_raw(widget.get()))
+    : _data(access::get_raw(widget.get()))
 {
     // if (!detail::global().widgets.updatables.contains(_data)) {
     //     throw detail::backtraced_exception("Errorlol");
     // }
 }
 
-
 template <typename widget_t>
 widget_ref<widget_t> make_reference()
 {
     detail::value_type_t<widget_t>* _widget_ptr;
     std::uintptr_t _raw_widget;
-	std::any _inplace_data;
+    std::any _inplace_data;
     if constexpr (detail::traits::is_reloadable_v<widget_t>) {
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>(
-            detail::global().hotswap.reload_manager->allocate<widget_t>()));
+            detail::global().widgets.hotswap_reloader->allocate<widget_t>()));
         _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
-		_widget_ptr->get()._bungeegum_object_reference = _raw_widget;
+        _widget_ptr->get()._bungeegum_object_reference = _raw_widget;
     } else {
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>());
         _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
     }
     detail::widget_update_data& _updatable = detail::global().widgets.updatables[_raw_widget];
     _updatable.raw = _raw_widget;
-	_updatable.inplace_data = std::move(_inplace_data);
-	widget_ref<widget_t> _reference = detail::widget_ref_access<widget_t>::make_from_data(*_widget_ptr);
+    _updatable.inplace_data = std::move(_inplace_data);
+    widget_ref<widget_t> _reference = detail::widget_ref_access<widget_t>::make_from_data(*_widget_ptr);
     detail::install_on_draw<widget_t>(_reference, _updatable);
     detail::install_on_interact<widget_t>(_reference, _updatable);
     detail::install_on_resolve<widget_t>(_reference, _updatable);
@@ -271,7 +269,6 @@ widget_t& make()
 {
     return make_reference<widget_t>().get();
 }
-
 
 template <typename widget_t>
 bool has_type(const widget_id& widget)

@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include <bungeegum/glue/serialize.fwd>
+#include <bungeegum/glue/serialize.hpp>
 
 namespace bungeegum {
 namespace detail {

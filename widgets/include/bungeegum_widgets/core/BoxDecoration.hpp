@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/core/draw.hpp>
+#include <bungeegum/bungeegum.hpp>
 #include <bungeegum_widgets/core/BlendMode.hpp>
 #include <bungeegum_widgets/core/Border.hpp>
 #include <bungeegum_widgets/core/BorderRadius.hpp>

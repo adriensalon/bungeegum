@@ -23,34 +23,6 @@ else()
 endif()
 
 set(bungeegum_runtime_source
-	"source/asset/font.cpp"
-	"source/asset/image.cpp"
-	"source/asset/shader.cpp"
-
-	"source/core/overlay/compressed/fa4.cpp"
-	"source/core/overlay/compressed/inter_extrabold.cpp"
-	"source/core/overlay/compressed/inter_regular.cpp"
-
-	"source/core/overlay/hierarchy.cpp"
-	"source/core/overlay/hotswapper.cpp"
-	"source/core/overlay/inspector.cpp"
-	"source/core/overlay/logger.cpp"
-	"source/core/overlay/overlay.cpp"
-	"source/core/overlay/profiler.cpp"
-	"source/core/overlay/wireframe.cpp"
-
-	"source/core/animation.cpp"
-	"source/core/curve.cpp"
-	"source/core/draw.cpp"
-	"source/core/event.cpp"
-	"source/core/global.cpp"
-	"source/core/hotswap.cpp"
-	"source/core/interact.cpp"
-	"source/core/log.cpp"
-	"source/core/pipeline.cpp"
-	"source/core/process.cpp"
-	"source/core/resolve.cpp"
-	"source/core/widget.cpp"
 
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"
@@ -62,6 +34,27 @@ set(bungeegum_runtime_source
 	"source/glue/time.cpp"
 	"source/glue/renderer.cpp"
 	"source/glue/window.cpp"
+
+	"source/core/animation.cpp"
+	"source/core/event.cpp"
+	"source/core/font.cpp"
+	"source/core/global.cpp"
+	"source/core/hotswap.cpp"
+	"source/core/log.cpp"
+	"source/core/pipeline.cpp"
+	"source/core/shader.cpp"
+	"source/core/texture.cpp"
+	"source/core/widget.cpp"
+	
+	"source/overlay/build.cpp"
+	"source/overlay/hierarchy.cpp"
+	"source/overlay/hotswap.cpp"
+	"source/overlay/menu.cpp"
+	"source/overlay/output.cpp"
+	"source/overlay/profiling.cpp"
+	
+	"source/overlay/compressed/inter_extrabold.cpp"
+	"source/overlay/compressed/inter_regular.cpp"
 )
 
 add_library(bungeegum_runtime ${bungeegum_runtime_source})
@@ -74,7 +67,6 @@ set_property(TARGET bungeegum_runtime PROPERTY CXX_STANDARD 17)
 target_link_libraries(bungeegum_runtime glm)
 target_link_libraries(bungeegum_runtime imgui)
 target_link_libraries(bungeegum_runtime tinysplinecxx)
-target_link_libraries(bungeegum_runtime EnTT)
 target_link_libraries(bungeegum_runtime Diligent-BuildSettings)
 target_link_libraries(bungeegum_runtime Diligent-Common)
 target_link_libraries(bungeegum_runtime Diligent-PlatformInterface)

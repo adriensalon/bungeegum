@@ -1,5 +1,5 @@
-#include <bungeegum/glue/backtrace.fwd>
-#include <bungeegum/glue/window.fwd>
+#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/window.hpp>
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <emscripten/emscripten.h>
@@ -19,14 +19,14 @@ namespace bungeegum {
 namespace detail {
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    EM_JS(int, emscripten_get_canvas_width, (), {
-        var canvas = document.getElementById('canvas');
+    EM_JS(int, emscripten_get_canvas_width, (const char* canvas_id), {
+        var canvas = document.getElementById(UTF8ToString(canvas_id));
         canvas.width = canvas.getBoundingClientRect().width;
         return canvas.getBoundingClientRect().width;
     });
 
-    EM_JS(int, emscripten_get_canvas_height, (), {
-        var canvas = document.getElementById('canvas');
+    EM_JS(int, emscripten_get_canvas_height, (const char* canvas_id), {
+        var canvas = document.getElementById(UTF8ToString(canvas_id));
         canvas.height = canvas.getBoundingClientRect().height;
         return canvas.getBoundingClientRect().height;
     });
@@ -219,14 +219,12 @@ namespace detail {
 #endif
     }
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    void window::attach_sdl(SDL_Window* sdl_window)
-    {
-		if (_sdl_window) {
-			// throw
-		}
-        _sdl_window = sdl_window;
-    }
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+	void attach_emscripten(const std::string& canvas_id)
+	{
+		_canvas_id = canvas_id;
+	}
+#else
 
     void window::attach_native(void* sdl_window)
     {
@@ -238,6 +236,14 @@ namespace detail {
 #endif
         _sdl_window = SDL_CreateWindowFrom(sdl_window);
         sdl_check_errors();
+    }
+
+    void window::attach_sdl(SDL_Window* sdl_window)
+    {
+		if (_sdl_window) {
+			// throw
+		}
+        _sdl_window = sdl_window;
     }
 
     void window::create_native()
@@ -350,6 +356,9 @@ namespace detail {
     void window::poll(const bool poll_device)
     {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+		if (!_canvas_id.has_value()) {
+			// throw
+		}
         if (poll_device) {
             for (const unsigned int _button : emscripten_static_data.mouse_buttons_down) {
                 mouse_down_event _mouse_down_event;
@@ -371,7 +380,8 @@ namespace detail {
             }
             emscripten_static_data.mouse_position_delta = zero<float2>;
             float2 _window_size_memory = _display_size;
-            _display_size = float2 { emscripten_get_canvas_width(), emscripten_get_canvas_height() };
+			const char* _ccanvas_id = _canvas_id.value().c_str();
+            _display_size = float2 { emscripten_get_canvas_width(_ccanvas_id), emscripten_get_canvas_height(_ccanvas_id) };
             if (_window_size_memory != _display_size) {
                 window_resized_event _window_resized_event;
                 _window_resized_event.new_size = _display_size;

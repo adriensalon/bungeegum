@@ -104,6 +104,21 @@ constexpr inline bool is_finite<float3>(const float3 value)
     return value.x != infinity<float> && value.y != infinity<float> && value.z != infinity<float>;
 }
 
+template <>
+constexpr inline float3x3 identity<float3x3> = {
+    1.f, zero<float>, zero<float>, 
+    zero<float>, 1.f, zero<float>, 
+    zero<float>, zero<float>, 1.f
+};
+
+template <>
+constexpr inline float4x4 identity<float4x4> = {
+    1.f, zero<float>, zero<float>, zero<float>,
+    zero<float>, 1.f, zero<float>, zero<float>,
+    zero<float>, zero<float>, 1.f, zero<float>,
+    zero<float>, zero<float>, zero<float>, 1.f
+};
+
 template <typename value_t>
 inline std::string to_string(const value_t& value)
 {

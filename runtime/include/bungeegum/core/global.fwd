@@ -2,41 +2,31 @@
 
 #include <bungeegum/core/animation.fwd>
 #include <bungeegum/core/context.fwd>
-#include <bungeegum/core/hotswap.fwd>
 #include <bungeegum/core/log.fwd>
 #include <bungeegum/core/pipeline.fwd>
-#include <bungeegum/core/process.fwd>
 #include <bungeegum/core/widget.fwd>
 
 namespace bungeegum {
 namespace detail {
 
-    struct global_manager {
-        global_manager() = default;
-        global_manager(const global_manager& other) = delete;
-        global_manager& operator=(const global_manager& other) = delete;
-        global_manager(global_manager&& other) = delete;
-        global_manager& operator=(global_manager&& other) = delete;
-
-        pipelines_manager pipelines = {};
-        hotswap_manager hotswap = {};
+    struct global_manager_data {
         animations_manager animations = {};
         events_manager events = {};
-        logs_manager logs = {};
-        process_manager process = {};
+        log_manager_data logs = {};
+        pipeline_manager_data pipelines = {};
         widget_manager_data widgets = {};
-        context_manager context = {};
     };
 
     void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)
 
 #if BUNGEEGUM_USE_HOTSWAP
-    inline global_manager& global() // This has to be inline for reload (?)
+    inline global_manager_data& global() // This has to be inline for reload (?)
     {
-        return get_global_data<global_manager>();
+        return get_global_data<global_manager_data>();
     }
 #else
-    global_manager& global();
+    global_manager_data& global();
 #endif
+
 }
 }

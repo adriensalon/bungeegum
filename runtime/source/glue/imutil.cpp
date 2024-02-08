@@ -1,7 +1,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include <bungeegum/glue/imutil.fwd>
+#include <bungeegum/glue/imutil.hpp>
 
 namespace bungeegum {
 namespace detail {

@@ -1,15 +1,15 @@
 #pragma once
 
+#include <bungeegum/config/backend.hpp>
+#include <bungeegum/config/feature.hpp>
+#include <bungeegum/config/misc.hpp>
+
 #include <bungeegum/core/animation.hpp>
-#include <bungeegum/core/config.hpp>
-#include <bungeegum/core/curve.hpp>
-#include <bungeegum/core/draw.hpp>
 #include <bungeegum/core/event.hpp>
-#include <bungeegum/core/hotswap.hpp>
-#include <bungeegum/core/interact.hpp>
+#include <bungeegum/core/font.hpp>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/math.hpp>
-#include <bungeegum/core/overlay.hpp>
 #include <bungeegum/core/pipeline.hpp>
-#include <bungeegum/core/resolve.hpp>
+#include <bungeegum/core/shader.hpp>
+#include <bungeegum/core/texture.hpp>
 #include <bungeegum/core/widget.hpp>

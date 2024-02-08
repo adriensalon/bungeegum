@@ -1,5 +1,5 @@
-#include <bungeegum/glue/console.fwd>
-#include <bungeegum/glue/reload.fwd>
+#include <bungeegum/glue/console.hpp>
+#include <bungeegum/glue/reload.hpp>
 
 #if BUNGEEGUM_USE_HOTSWAP
 

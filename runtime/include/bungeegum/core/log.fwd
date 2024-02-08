@@ -5,32 +5,18 @@
 #include <string>
 #include <vector>
 
-#include <bungeegum/glue/backtrace.fwd>
+#include <bungeegum/glue/backtrace.hpp>
 
 namespace bungeegum {
 namespace detail {
-	void protect_em(const std::function<void()>& try_callback, const std::function<void(const backtraced_exception&)>& catch_callback);
 
-    void console_log_error(const backtraced_exception& exception);
-
-    void console_log_warning(const backtraced_exception& exception);
-
-    void console_log_message(const backtraced_exception& exception);
-
-    struct logs_manager {
-        logs_manager() = default;
-        logs_manager(const logs_manager& other) = delete;
-        logs_manager& operator=(const logs_manager& other) = delete;
-        logs_manager(logs_manager&& other) = delete;
-        logs_manager& operator=(logs_manager&& other) = delete;
-
-        void protect_library(const std::function<void()>& try_callback);
-
-        void protect_userspace(const std::function<void()>& try_callback);
-
+    struct log_manager_data {
         std::vector<backtraced_exception> userspace_errors = {};
         std::vector<backtraced_exception> userspace_warnings = {};
         std::vector<backtraced_exception> userspace_messages = {};
+#if BUNGEEGUM_USE_HOTSWAP 
+        std::vector<std::string> hotswap_output = {};
+#endif
     };
 }
 }

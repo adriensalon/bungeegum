@@ -1,4 +1,4 @@
-#include <bungeegum/glue/dialog.fwd>
+#include <bungeegum/glue/dialog.hpp>
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <emscripten/emscripten.h>

@@ -1,8 +1,8 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/backtrace.fwd>
-#include <bungeegum/glue/console.fwd>
+#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/console.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -28,56 +28,52 @@ namespace detail {
 #else
             console_log(". \n", color);
 #endif
-        }
+        }		
 
-        void console_log_error_or_push_back(const backtraced_exception& exception, std::vector<backtraced_exception>& container)
-        {
-#if BUNGEEGUM_USE_OVERLAY
-            container.push_back(exception);
-#else
-            console_log_error(exception);
-            (void)container;
-#endif
-        }
+		void console_log_error(const backtraced_exception& exception)
+		{
+			console_log("Error ", console_color::red);
+			console_log_exception(exception, console_color::red);
+		}
+
+		void console_log_warning(const backtraced_exception& exception)
+		{
+			console_log("Warning ", console_color::yellow);
+			console_log_exception(exception, console_color::yellow);
+		}
+
+		void console_log_message(const backtraced_exception& exception)
+		{
+			console_log("Message ", console_color::blue);
+			console_log_exception(exception, console_color::blue);
+		}
     }
 
-    void console_log_error(const backtraced_exception& exception)
-    {
-        console_log("Error ", console_color::red);
-        console_log_exception(exception, console_color::red);
-    }
+//     void protect_library(const std::function<void()>& try_callback)
+//     {
+// 		protect(try_callback, [] (const std::string& _what) {
+//        	 	console_log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", console_color::red);
+// #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
-    void console_log_warning(const backtraced_exception& exception)
-    {
-        console_log("Warning ", console_color::yellow);
-        console_log_exception(exception, console_color::yellow);
-    }
+// #else
+// 			std::terminate();
+// #endif
+// 		});
+//     }
 
-    void console_log_message(const backtraced_exception& exception)
-    {
-        console_log("Message ", console_color::blue);
-        console_log_exception(exception, console_color::blue);
-    }
-
-    void logs_manager::protect_library(const std::function<void()>& try_callback)
-    {
-		detail::protect(try_callback, [] (const std::string& _what) {
-       	 	console_log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", console_color::red);
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-
-#else
-			std::terminate();
-#endif
-		});
-    }
-
-    void logs_manager::protect_userspace(const std::function<void()>& try_callback)
-    {		
-		detail::protect(try_callback, [this] (const std::string& _what) {
-			// uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
-			console_log_error_or_push_back(backtraced_exception(_what, 0, 0), userspace_errors);
-		});
-    }
+//     void protect_userspace(std::vector<backtraced_exception>& container, const std::function<void()>& try_callback)
+//     {		
+// 		protect(try_callback, [&container] (const std::string& _what) {
+// 			// uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
+// 			backtraced_exception _exception(_what, 0, 0);
+// #if BUNGEEGUM_USE_OVERLAY
+//             container.push_back(_exception);
+// #else
+//             console_log_error(_exception);
+//             (void)container;
+// #endif
+// 		});
+//     }
 }
 
 void log_error(const std::string& what, const bool must_throw)

@@ -1,7 +1,0 @@
-#pragma once
-
-#include <cstddef>
-#include <memory>
-#include <vector>
-
-#include <bungeegum/core/math.hpp>

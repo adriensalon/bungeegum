@@ -6,8 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include <bungeegum/core/overlay.fwd>
-#include <bungeegum/glue/typelist.fwd>
+#include <bungeegum/config/feature.hpp>
+#include <bungeegum/glue/typelist.hpp>
 
 namespace bungeegum {
 namespace detail {

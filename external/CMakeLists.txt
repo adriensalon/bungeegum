@@ -2,7 +2,6 @@ add_subdirectory("glm")
 add_subdirectory("imgui")
 add_subdirectory("implot")
 add_subdirectory("tinyspline")
-add_subdirectory("entt")
 add_subdirectory("cereal")
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
@@ -67,9 +66,6 @@ if(DEFINED BUNGEEGUM_INSTALL_DIR)
 	file(
 		COPY "${CMAKE_CURRENT_LIST_DIR}/cereal/include/cereal/"
 		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/cereal/")
-	file(
-		COPY "${CMAKE_CURRENT_LIST_DIR}/entt/src/entt/"
-		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/entt/")
 	file(
 		COPY "${CMAKE_CURRENT_LIST_DIR}/glm/glm/"
 		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/glm/")

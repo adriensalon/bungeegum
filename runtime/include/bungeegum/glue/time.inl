@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <thread>
 
-#include <bungeegum/glue/backtrace.fwd>
-#include <bungeegum/glue/toolchain.fwd>
+#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/toolchain.hpp>
 
 namespace bungeegum {
 namespace detail {

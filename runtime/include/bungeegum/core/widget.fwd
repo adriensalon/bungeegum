@@ -4,18 +4,22 @@
 #include <functional>
 #include <optional>
 #include <typeindex>
+#include <variant>
+#include <vector>
 
-#include <bungeegum/core/draw.hpp>
-#include <bungeegum/core/interact.hpp>
-#include <bungeegum/core/overlay.fwd>
-#include <bungeegum/core/resolve.hpp>
-#include <bungeegum/glue/detection.fwd>
-#include <bungeegum/glue/raw.fwd>
-#include <bungeegum/glue/registry.fwd>
-#include <bungeegum/glue/reload.fwd>
+#include <bungeegum/core/math.hpp>
+#include <bungeegum/glue/detection.hpp>
+#include <bungeegum/glue/raw.hpp>
+#include <bungeegum/glue/reload.hpp>
+#include <bungeegum/glue/window.hpp>
+
+struct ImDrawList;
 
 namespace bungeegum {
 
+struct draw_command;
+struct resolve_command;
+struct interact_command;
 struct widget_id;
 
 template <typename widget_t>
@@ -43,31 +47,17 @@ namespace detail {
         constexpr static bool has_resolve_function_v = is_detected_exact_v<void, detected_resolve_function, widget_t>;
     }
 
-    using widget_id_data = std::uintptr_t;
-
-    template <typename widget_t>
-    using widget_ref_data = reference_type_t<widget_t>;
-
-    struct widget_id_access {
-        [[nodiscard]] static widget_id make_from_data(const std::uintptr_t& data);
-        [[nodiscard]] static std::uintptr_t get_data(const widget_id& id);
-    };
-
-    template <typename widget_t>
-    struct widget_ref_access {
-        [[nodiscard]] static widget_ref<widget_t> make_from_data(const reference_type_t<widget_t>& data);
-        [[nodiscard]] static reference_type_t<widget_t>& get_data(widget_ref<widget_t>& ref);
-    };
-
     struct widget_update_data {
         std::uintptr_t raw = {};
         std::any inplace_data = {};
         std::optional<std::reference_wrapper<widget_update_data>> parent = std::nullopt;
-        std::vector<std::reference_wrapper<widget_update_data>> children = {};
-        resolve_command resolver_command = {};
-        interact_command interactor_command = {};
-        draw_command drawer_command = {};
-		// remplacer par du context !!
+        std::vector<std::reference_wrapper<widget_update_data>> children = {};		
+		float2 local_min_size = zero<float2>;
+        float2 local_max_size = infinity<float2>;
+		float3 local_position = zero<float3>;
+		float3 local_rotation = zero<float3>;
+		float2 resolved_size = zero<float2>;
+		float4x4 resolved_transform = identity<float4x4>;
         std::function<void(resolve_command&)> resolver = nullptr;
         std::function<void(interact_command&)> interactor = nullptr;
         std::function<void(draw_command&)> drawer = nullptr;
@@ -81,12 +71,60 @@ namespace detail {
         std::string clean_typename = {};
 #endif
     };
+
+	using interact_command_data = std::reference_wrapper<std::variant<
+            window_resized_event,
+            mouse_moved_event,
+            mouse_down_event,
+            mouse_up_event,
+            mouse_pressed_event>>;			
+
+	using resolve_command_data = std::reference_wrapper<widget_update_data>;
+	
+	struct draw_command_data {
+		std::reference_wrapper<widget_update_data> updatable;
+		ImDrawList* list = nullptr;
+	};
+
+    using widget_id_data = std::uintptr_t;
+
+    template <typename widget_t>
+    using widget_ref_data = reference_type_t<widget_t>;	
 	
     struct widget_manager_data {
+#if BUNGEEGUM_USE_HOTSWAP
+        std::unique_ptr<reloader> hotswap_reloader = nullptr;
+#endif
         std::unordered_map<std::uintptr_t, widget_update_data> updatables = {};
         std::vector<std::reference_wrapper<widget_update_data>> resolvables = {};
         std::vector<std::reference_wrapper<widget_update_data>> interactables = {};
         std::vector<std::reference_wrapper<widget_update_data>> drawables = {};
+    };
+
+    struct resolve_command_access {
+        [[nodiscard]] static resolve_command make_from_data(const resolve_command_data& data);
+        [[nodiscard]] static resolve_command_data& get_data(resolve_command& object);
+    };
+
+    struct draw_command_access {
+        [[nodiscard]] static draw_command make_from_data(const draw_command_data& data);
+        [[nodiscard]] static draw_command_data& get_data(draw_command& object);
+    };
+
+    struct interact_command_access {
+        [[nodiscard]] static interact_command make_from_data(const interact_command_data& data);
+        [[nodiscard]] static interact_command_data& get_data(interact_command& object);
+    };
+
+    struct widget_id_access {
+        [[nodiscard]] static widget_id make_from_data(const widget_id_data& data);
+        [[nodiscard]] static widget_id_data get_data(const widget_id& object);
+    };
+
+    template <typename widget_t>
+    struct widget_ref_access {
+        [[nodiscard]] static widget_ref<widget_t> make_from_data(const widget_ref_data<widget_t>& data);
+        [[nodiscard]] static widget_ref_data<widget_t>& get_data(widget_ref<widget_t>& object);
     };
 }
 }

@@ -1,6 +1,6 @@
 // #define PLATFORM_WIN32
-#include <bungeegum/glue/backtrace.fwd>
-#include <bungeegum/glue/renderer.fwd> // TOOLCHAIN HERE !
+#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/renderer.hpp> // TOOLCHAIN HERE !
 
 #include <array>
 

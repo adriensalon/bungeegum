@@ -1,7 +1,6 @@
 #pragma once
 
-#include <bungeegum/core/curve.hpp>
-#include <bungeegum/core/widget.hpp>
+#include <bungeegum/bungeegum.hpp>
 #include <bungeegum_widgets/core/Alignment.hpp>
 
 namespace bungeegum {

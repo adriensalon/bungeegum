@@ -130,9 +130,12 @@ int main()
     // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
     // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
 
+	bungeegum::pipeline_provider _provider;
+	_provider.emscripten_canvas_id = "canvas";
+	_provider.native_window_ptr = nullptr;
+
 	bungeegum::pipeline _my_pipeline;
-	_my_pipeline.make_native_window_if_native();
-	_my_pipeline.make_renderer();
+	_my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
 
 	// auto p2 = std::move(_my_pipeline);
 	_my_pipeline.root(bungeegum::make<Title>().title("mytitle"));
@@ -219,7 +222,7 @@ int main()
 
     //     //   )
     // ));
-    _my_pipeline.process_loop_and_reset(60, true);
+    _my_pipeline.run(60, true);
 
     return 0;
 }

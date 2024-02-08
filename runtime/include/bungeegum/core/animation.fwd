@@ -1,14 +1,23 @@
 #pragma once
 
-#include <array>
-#include <chrono>
+#include <tinysplinecxx.h> // replace by custom impl
 
-#include <bungeegum/core/curve.hpp>
+#include <array>
+#include <cstddef>
+#include <chrono>
+#include <memory>
+#include <vector>
+
+#include <bungeegum/core/math.hpp>
 #include <bungeegum/core/event.fwd>
-#include <bungeegum/core/overlay.fwd>
 
 namespace bungeegum {
+
+enum struct animation_mode;
+
 namespace detail {
+
+	using curve_data = tinyspline::BSpline;
 
     template <typename value_t>
     struct animation_data {
@@ -19,15 +28,16 @@ namespace detail {
         animation_data& operator=(animation_data&& other) = default;
         ~animation_data();
 
-        std::uintptr_t raw_animation = 0;
+        std::uintptr_t raw = 0;
         std::unique_ptr<value_t> min_value = nullptr;
         std::unique_ptr<value_t> max_value = nullptr;
         event_data<value_t> on_value_changed_event;
         event_data<> on_end_event;
-        curve eval_curve = { 0.f, 1.f, std::vector<float2> {} };
+        curve_data bspline = { 0.f, 1.f, std::vector<float2> {} };
         float duration_seconds = 0.f;
         bool is_playing = false;
         float playing_cursor_seconds = 0.f;
+		animation_mode mode = {};
     };
 
     struct animation_update_data {

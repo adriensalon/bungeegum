@@ -1,7 +1,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include <bungeegum/glue/time.fwd>
+#include <bungeegum/glue/time.hpp>
 
 namespace bungeegum {
 namespace detail {

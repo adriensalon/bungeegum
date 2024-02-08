@@ -31,7 +31,7 @@
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 
-#include <bungeegum/glue/foreach.fwd>
+#include <bungeegum/glue/foreach.hpp>
 
 namespace bungeegum {
 namespace detail {

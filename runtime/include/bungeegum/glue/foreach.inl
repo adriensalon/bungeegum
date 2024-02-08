@@ -2,7 +2,7 @@
 
 #include <variant>
 
-#include <bungeegum/glue/toolchain.fwd>
+#include <bungeegum/glue/toolchain.hpp>
 
 namespace bungeegum {
 namespace detail {

@@ -106,7 +106,7 @@ int main(int argc, char** argv)
 	// 	std::cout << ecvept.what() <<"lol " << std::endl;
 	// });
 
-	p.process_loop_and_reset();
+	p.run();
 
 	
 	// bungeegum::detail::protect_em([] () {

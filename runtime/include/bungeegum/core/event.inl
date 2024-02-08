@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/glue/raw.fwd>
+#include <bungeegum/glue/raw.hpp>
 
 namespace bungeegum {
 namespace detail {
