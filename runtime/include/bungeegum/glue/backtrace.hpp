@@ -58,6 +58,9 @@ namespace detail {
         std::string _what;
     };
 
+	/// @brief 
+	/// @param try_callback 
+	/// @param catch_callback 
 	void protect(
 		const std::function<void()>& try_callback,
 		const std::function<void(const std::string&)>& catch_callback = nullptr);

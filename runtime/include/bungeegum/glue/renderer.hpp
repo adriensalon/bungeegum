@@ -142,7 +142,7 @@ namespace detail {
         void resize(const float2 display_size);
 
         /// @brief The color to use when clearing the screen.
-        float4 clear_color = { 0.f, 0.f, 0.f, 1.f };
+        float4 clear_color = { 1.f, 1.f, 1.f, 1.f };
 
         float4x4 projection_matrix; // default to orthographic!
 

@@ -53,6 +53,7 @@ namespace widgets {
             command.resize(_childSize);
         } else
             command.resize(command.get_max_size());
+			
 
         std::this_thread::sleep_for(std::chrono::milliseconds(3));
     }

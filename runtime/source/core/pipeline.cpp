@@ -179,14 +179,19 @@ namespace detail {
 
         _global.pipelines.current.value().get().steps_chronometer.begin_task("animations");
         _global.animations.update(delta_time);
+		std::this_thread::sleep_for(std::chrono::milliseconds(3));
         _global.pipelines.current.value().get().steps_chronometer.end_task("animations");
 
         _global.pipelines.current.value().get().steps_chronometer.begin_task("events");
         _global.events.update();
+		std::this_thread::sleep_for(std::chrono::milliseconds(3));
         _global.pipelines.current.value().get().steps_chronometer.end_task("events");
 
         // interact_widgets();
+        _global.pipelines.current.value().get().steps_chronometer.begin_task("resolve pass");
         resolve_widgets(viewport_size, root_updatable);
+		std::this_thread::sleep_for(std::chrono::milliseconds(3));
+        _global.pipelines.current.value().get().steps_chronometer.end_task("resolve pass");
 
         // return (has_userspace_thrown() || !global().widgets.drawables.empty());
 

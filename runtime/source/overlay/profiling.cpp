@@ -264,7 +264,7 @@ namespace detail {
         // 	throw backtraced_exception("lol");
         // }
         ImGui::SetNextWindowSize({ 700, 350 }, ImGuiCond_Once);
-        if (ImGui::Begin(("profiler" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
+        if (ImGui::Begin(("profiling" + tag("window_title")).c_str(), NULL, ImGuiWindowFlags_NoCollapse)) {
             static float _history = 10.f;
             ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
             if (ImGui::BeginTabBar(tag("tab_bar").c_str(), tab_bar_flags)) {

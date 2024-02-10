@@ -224,17 +224,17 @@ namespace detail {
         }
 #endif
 
-//         void draw_hotswap_button()
-//         {
-// #if BUNGEEGUM_USE_HOTSWAP
-//             color_guard _cg_button(ImGuiCol_Button, { 0.627f, 0.627f, 0.627f, 1.f });
-//             if (ImGui::Button("force update", ImVec2(ImGui::GetContentRegionAvail().x, 0.f))) {
-//                 detail::global().hotswap.save_widgets("TODO"); // CREATE TEMP FILE HERE
-//                 detail::global().hotswap.reload_manager->force_update();
-//                 detail::global().hotswap.load_widgets("TODO"); // FIND TEMP FILE HERE AND DELETE
-//             }
-// #endif
-//         }
+        void draw_hotswap_button()
+        {
+#if BUNGEEGUM_USE_HOTSWAP
+            color_guard _cguard00(ImGuiCol_Button, { 0.627f, 0.627f, 0.627f, 1.f });
+            if (ImGui::Button("force update", ImVec2(ImGui::GetContentRegionAvail().x, 0.f))) {
+                // detail::global().hotswap.save_widgets("TODO"); // CREATE TEMP FILE HERE
+                // detail::global().hotswap.reload_manager->force_update();
+                // detail::global().hotswap.load_widgets("TODO"); // FIND TEMP FILE HERE AND DELETE
+            }
+#endif
+        }
 
         // void draw_defines(std::vector<std::string>& defines, const float frame_height_without_padding)
         // {
@@ -288,9 +288,9 @@ namespace detail {
         if (ImGui::Begin("hotswapper##__bungeegum_window_hotswapper_title__", NULL, ImGuiWindowFlags_NoCollapse)) {
 
             color_guard _cg_button(ImGuiCol_Button, { 0.58f, 0.58f, 0.58f, 0.40f });
-            // draw_tabs(30.f);
+            draw_tabs(30.f);
             draw_tabs(ImGui::GetFrameHeight());
-            // draw_hotswap_button();
+            draw_hotswap_button();
         }
         ImGui::End();
 #endif
