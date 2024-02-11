@@ -33,6 +33,7 @@
 #include <Graphics/GraphicsEngine/interface/RenderDevice.h>
 
 #include <bungeegum/config/backend.hpp>
+#include <bungeegum/config/feature.hpp>
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/glue/window.hpp>
 
@@ -48,6 +49,7 @@ struct IShaderResourceVariable;
 
 struct ImGuiContext;
 struct ImPlotContext;
+struct ImFont;
 
 namespace bungeegum {
 namespace detail {
@@ -62,14 +64,32 @@ namespace detail {
 #endif
 
     /// @brief for user defined shaders in HLSL etc
-    // struct rasterizer {
+    struct shader_view {
 
-    // private:
-    //     Diligent::IPipelineState* _diligent_pipeline_state = nullptr;
-    //     Diligent::IBuffer* _diligent_vertex_buffer = nullptr;
-    //     Diligent::IBuffer* _diligent_index_buffer = nullptr;
-    //     friend struct renderer;
-    // };
+
+
+    private:
+        Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_pipeline_state = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_vertex_buffer = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_index_buffer = {};
+        friend struct renderer;
+    };
+
+	/// @brief 
+	struct texture_view {
+
+	private:
+        Diligent::RefCntAutoPtr<Diligent::ITextureView> _texture_view = {};
+        friend struct renderer;
+	};
+
+	///
+	struct font_view {
+
+	private:
+		ImFont* _font_ptr = nullptr;
+        friend struct renderer;
+	};
 
     /// @brief Instances of this struct represent cross-platform GPU renderers that will select the
     /// most appropriate graphics API depending on the platform. Macros defined above can be
@@ -114,6 +134,9 @@ namespace detail {
         void create_vulkan(window& existing_window);
 #endif
 
+		/// @brief 
+		void current();
+
         /// @brief
         /// @return
         [[nodiscard]] bool has_renderer() const;
@@ -137,7 +160,12 @@ namespace detail {
         void present();
 
         /// @brief Rebuilds the ImGui fonts.
-        void rebuild_fonts();
+        void rebuild_user_fonts();
+
+#if BUNGEEGUM_USE_OVERLAY
+        /// @brief Rebuilds the ImGui fonts.
+        void rebuild_overlay_fonts();
+#endif
 
         void resize(const float2 display_size);
 
@@ -159,11 +187,17 @@ namespace detail {
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_ignore_stencil_vertex_buffer;
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_ignore_stencil_index_buffer;
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_uniform_buffer;
-        Diligent::RefCntAutoPtr<Diligent::ITextureView> _diligent_imgui_font_texture;
+
+        Diligent::RefCntAutoPtr<Diligent::ITextureView> _user_font_texture;
         Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource;
         Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
-        ImGuiContext* _imgui_context = nullptr;
+		ImGuiContext* _user_imgui_context = nullptr;
         ImPlotContext* _implot_context = nullptr;
+		
+#if BUNGEEGUM_USE_OVERLAY
+        Diligent::RefCntAutoPtr<Diligent::ITextureView> _overlay_font_texture;
+		ImGuiContext* _overlay_imgui_context = nullptr;
+#endif
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         SDL_Window* _sdl_window = nullptr;

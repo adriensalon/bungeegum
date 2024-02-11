@@ -224,6 +224,8 @@ namespace detail {
 #endif
     }
 
+
+
     void update_hotswap_frame(const std::filesystem::path& serialize_path, widget_update_data& root_updatable)
     {
 #if BUNGEEGUM_USE_HOTSWAP
@@ -289,9 +291,9 @@ pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& 
         _data.pipeline_renderer.create_directx11(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
-    detail::setup_overlay(); // loading fonts there ? fugly go renderer
+    detail::setup_overlay(); // loading fonts there ? fugly go renderer	
 #endif
-    _data.pipeline_renderer.rebuild_fonts();
+    _data.pipeline_renderer.rebuild_user_fonts();
     return *this;
 }
 
@@ -313,7 +315,7 @@ pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& 
 #if BUNGEEGUM_USE_OVERLAY
     detail::setup_overlay(); // loading fonts there ? fugly go renderer
 #endif
-    _data.pipeline_renderer.rebuild_fonts();
+    _data.pipeline_renderer.rebuild_user_fonts();
     return *this;
 }
 
@@ -333,7 +335,7 @@ pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& pro
 #if BUNGEEGUM_USE_OVERLAY
     detail::setup_overlay(); // loading fonts there ? fugly go renderer
 #endif
-    _data.pipeline_renderer.rebuild_fonts();
+    _data.pipeline_renderer.rebuild_user_fonts();
     return *this;
 }
 

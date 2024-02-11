@@ -40,6 +40,10 @@ struct pipeline {
     pipeline(pipeline&& other) = default;
     pipeline& operator=(pipeline&& other) = default;
 	
+    /// @brief 
+    /// @tparam backend_t 
+    /// @param provider 
+    /// @return 
     template <renderer_backend backend_t = preferred_renderer_backend>
 	pipeline& setup(const pipeline_provider& provider);
 

@@ -1,0 +1,42 @@
+#pragma once
+
+#include <filesystem>
+#include <memory>
+#include <string>
+
+#include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/core/math.hpp>
+
+namespace bungeegum {
+
+struct texture_resource;
+struct texture_ref;
+
+namespace detail {
+
+    struct texture_resource_data {
+		std::size_t height = 0;
+		std::size_t width = 0;
+		std::vector<unsigned char> pixels = {};
+    };
+
+    struct texture_ref_data {
+        std::unordered_map<std::uintptr_t, Diligent::RefCntAutoPtr<Diligent::ITextureView>> texture_views = {};
+    };
+
+	struct texture_manager_data {
+        std::unordered_map<std::string, texture_ref_data> textures = {};
+	};
+	
+    struct texture_resource_access {
+        [[nodiscard]] static texture_resource make_from_data(const texture_resource_data& data);
+        [[nodiscard]] static texture_resource_data& get_data(texture_resource& object);
+    };
+	
+    struct texture_ref_access {
+        [[nodiscard]] static texture_ref make_from_data(const texture_ref_data& data);
+        [[nodiscard]] static texture_ref_data& get_data(texture_ref& object);
+    };
+
+}
+}

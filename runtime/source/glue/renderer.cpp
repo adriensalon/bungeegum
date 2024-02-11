@@ -101,7 +101,8 @@ namespace detail {
         static void setup_context(window& wnd, renderer& rnd)
         {
             rnd._is_base_vertex_supported = rnd._diligent_render_device->GetAdapterInfo().DrawCommand.CapFlags & Diligent::DRAW_COMMAND_CAP_FLAG_BASE_VERTEX;
-            rnd._imgui_context = ImGui::CreateContext();
+			// ImGui::GetIO().Fonts; // existing font atlas
+            rnd._user_imgui_context = ImGui::CreateContext();
             rnd._implot_context = ImPlot::CreateContext();
             ImGuiIO& io = ImGui::GetIO();
             // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -138,43 +139,9 @@ namespace detail {
             rnd._diligent_ignore_stencil_index_buffer.Release();
             rnd._diligent_uniform_buffer.Release();
             rnd._diligent_ignore_stencil_pipeline.Release();
-            rnd._diligent_imgui_font_texture.Release();
+            rnd._overlay_font_texture.Release();
             rnd._diligent_shader_resource.Release();
 
-        }
-
-        static void setup_fonts_texture(renderer& rnd)
-        {
-            // Build texture atlas
-            ImGuiIO& IO = ImGui::GetIO();
-
-            unsigned char* pData = nullptr;
-            int Width = 0;
-            int Weight = 0;
-            IO.Fonts->GetTexDataAsRGBA32(&pData, &Width, &Weight);
-
-            Diligent::TextureDesc FontTexDesc;
-            FontTexDesc.Name = "Imgui font texture";
-            FontTexDesc.Type = Diligent::RESOURCE_DIM_TEX_2D;
-            FontTexDesc.Width = static_cast<Diligent::Uint32>(Width);
-            FontTexDesc.Height = static_cast<Diligent::Uint32>(Weight);
-            FontTexDesc.Format = Diligent::TEX_FORMAT_RGBA8_UNORM;
-            FontTexDesc.BindFlags = Diligent::BIND_SHADER_RESOURCE;
-            FontTexDesc.Usage = Diligent::USAGE_IMMUTABLE;
-
-            Diligent::TextureSubResData Mip0Data[] = { { pData, 4 * Diligent::Uint64 { FontTexDesc.Width } } };
-            Diligent::TextureData InitData(Mip0Data, _countof(Mip0Data));
-
-            Diligent::RefCntAutoPtr<Diligent::ITexture> pFontTex;
-            rnd._diligent_render_device->CreateTexture(FontTexDesc, &InitData, &pFontTex);
-            rnd._diligent_imgui_font_texture = pFontTex->GetDefaultView(Diligent::TEXTURE_VIEW_SHADER_RESOURCE);
-            rnd._diligent_shader_resource.Release();
-            rnd._diligent_ignore_stencil_pipeline->CreateShaderResourceBinding(&(rnd._diligent_shader_resource), true);
-            rnd._diligent_texture_variable = rnd._diligent_shader_resource->GetVariableByName(Diligent::SHADER_TYPE_PIXEL, "Texture");
-            VERIFY_EXPR(rnd._diligent_texture_variable != nullptr);
-
-            // Store our identifier
-            IO.Fonts->TexID = (ImTextureID)(rnd._diligent_imgui_font_texture);
         }
 
         static void setup_renderer(renderer& rnd)
@@ -267,7 +234,7 @@ namespace detail {
             }
             rnd._diligent_ignore_stencil_pipeline->GetStaticVariableByName(Diligent::SHADER_TYPE_VERTEX, "Constants")->Set(rnd._diligent_uniform_buffer);
 
-            setup_fonts_texture(rnd);
+            // setup_fonts_texture(rnd);
         }
 
         static void new_frame(renderer& rnd)
@@ -292,7 +259,7 @@ namespace detail {
                 setup_renderer(rnd);
             }
             ImGui::NewFrame();
-            ImGui::SetCurrentContext(rnd._imgui_context); // ig on new frame is enough for now?
+            ImGui::SetCurrentContext(rnd._user_imgui_context); // ig on new frame is enough for now?
             ImPlot::SetCurrentContext(rnd._implot_context); // ig on new frame is enough for now?
         }
 
@@ -459,7 +426,55 @@ namespace detail {
                 GlobalVtxOffset += pCmdList->VtxBuffer.Size;
             }
         }
-    };
+
+		static void setup_user_fonts_texture(renderer& rnd)
+		{
+			_setup_fonts_texture(rnd, rnd._user_font_texture);
+		}
+
+#if BUNGEEGUM_USE_OVERLAY
+		static void setup_overlay_fonts_texture(renderer& rnd)
+		{
+			_setup_fonts_texture(rnd, rnd._overlay_font_texture);
+		}
+#endif
+
+	private:
+        static void _setup_fonts_texture(renderer& rnd, Diligent::RefCntAutoPtr<Diligent::ITextureView>& texture_view)
+        {
+            // Build texture atlas
+            ImGuiIO& IO = ImGui::GetIO();
+
+            unsigned char* pData = nullptr;
+            int Width = 0;
+            int Weight = 0;
+            IO.Fonts->GetTexDataAsRGBA32(&pData, &Width, &Weight);
+
+            Diligent::TextureDesc FontTexDesc;
+            FontTexDesc.Name = "Imgui font texture";
+            FontTexDesc.Type = Diligent::RESOURCE_DIM_TEX_2D;
+            FontTexDesc.Width = static_cast<Diligent::Uint32>(Width);
+            FontTexDesc.Height = static_cast<Diligent::Uint32>(Weight);
+            FontTexDesc.Format = Diligent::TEX_FORMAT_RGBA8_UNORM;
+            FontTexDesc.BindFlags = Diligent::BIND_SHADER_RESOURCE;
+            FontTexDesc.Usage = Diligent::USAGE_IMMUTABLE;
+
+            Diligent::TextureSubResData Mip0Data[] = { { pData, 4 * Diligent::Uint64 { FontTexDesc.Width } } };
+            Diligent::TextureData InitData(Mip0Data, _countof(Mip0Data));
+
+            Diligent::RefCntAutoPtr<Diligent::ITexture> pFontTex;
+            rnd._diligent_render_device->CreateTexture(FontTexDesc, &InitData, &pFontTex);
+            texture_view = pFontTex->GetDefaultView(Diligent::TEXTURE_VIEW_SHADER_RESOURCE);
+            rnd._diligent_shader_resource.Release();
+            rnd._diligent_ignore_stencil_pipeline->CreateShaderResourceBinding(&(rnd._diligent_shader_resource), true);
+            rnd._diligent_texture_variable = rnd._diligent_shader_resource->GetVariableByName(Diligent::SHADER_TYPE_PIXEL, "Texture");
+            VERIFY_EXPR(rnd._diligent_texture_variable != nullptr);
+
+            // Store our identifier
+            IO.Fonts->TexID = (ImTextureID)(texture_view);
+        }
+
+	};
 
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
     void renderer::create_directx11(window& existing_window)
@@ -522,10 +537,17 @@ namespace detail {
     }
 #endif
 
-    void renderer::rebuild_fonts()
+    void renderer::rebuild_user_fonts()
     {
-        imgui_renderer::setup_renderer(*this);
+        imgui_renderer::setup_user_fonts_texture(*this);
     }
+
+#if BUNGEEGUM_USE_OVERLAY
+    void renderer::rebuild_overlay_fonts()
+    {
+        imgui_renderer::setup_overlay_fonts_texture(*this);
+    }
+#endif
 
     bool renderer::has_renderer() const
     {

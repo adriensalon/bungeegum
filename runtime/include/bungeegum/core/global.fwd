@@ -5,6 +5,9 @@
 #include <bungeegum/core/log.fwd>
 #include <bungeegum/core/pipeline.fwd>
 #include <bungeegum/core/widget.fwd>
+#include <bungeegum/core/shader.fwd>
+#include <bungeegum/core/font.fwd>
+#include <bungeegum/core/texture.fwd>
 
 namespace bungeegum {
 namespace detail {
@@ -15,6 +18,9 @@ namespace detail {
         log_manager_data logs = {};
         pipeline_manager_data pipelines = {};
         widget_manager_data widgets = {};
+        shader_manager_data shaders = {};
+        font_manager_data fonts = {};
+        texture_manager_data textures = {};
     };
 
     void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)

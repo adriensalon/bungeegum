@@ -137,6 +137,26 @@ int main()
 	bungeegum::pipeline _my_pipeline;
 	_my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
 
+	bungeegum::texture_resource _texture_res;
+	_texture_res.pixels({0u});
+	_texture_res.size(1, 1);
+	bungeegum::texture_ref _tex = bungeegum::make_texture("my tex 1", _texture_res);
+
+	bungeegum::shader_resource _shader1_res;
+	_shader1_res.fragment("okokokok", {});
+	_shader1_res.blend({});
+	_shader1_res.stencil({});
+	bungeegum::make_shader("my shader 1", _shader1_res);
+
+	bungeegum::font_resource _font1_res;
+	// _font1_res.compressed(nullptr, 0);
+	// _font1_res.size(13.4f);
+
+
+	bungeegum::shader_ref _shader1 = bungeegum::get_shader("my shader 1");
+	_shader1.uniform<float>("okok", 44.f);
+
+
 	// auto p2 = std::move(_my_pipeline);
 	_my_pipeline.root(bungeegum::make<Title>().title("mytitle"));
     // p.root(bungeegum::widget_id( bungeegum::make<Title>()

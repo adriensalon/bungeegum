@@ -1,0 +1,43 @@
+#pragma once
+
+#include <filesystem>
+#include <memory>
+#include <string>
+
+#include <imgui.h>
+
+#include <bungeegum/glue/renderer.hpp>
+
+namespace bungeegum {
+
+struct font_resource;
+struct font_ref;
+
+namespace detail {
+
+    struct font_resource_data {
+		void* compressed = nullptr;
+		std::size_t count = 0;
+		float size = 0.f;
+    };
+
+    struct font_ref_data {
+		std::unordered_map<std::uintptr_t, ImFont*> fonts = {};
+    };
+
+	struct font_manager_data {
+        std::unordered_map<std::string, font_ref_data> fonts = {};
+	};
+	
+    struct font_resource_access {
+        [[nodiscard]] static font_resource make_from_data(const font_resource_data& data);
+        [[nodiscard]] static font_resource_data& get_data(font_resource& object);
+    };
+	
+    struct font_ref_access {
+        [[nodiscard]] static font_ref make_from_data(const font_ref_data& data);
+        [[nodiscard]] static font_ref_data& get_data(font_ref& object);
+    };
+
+}
+}

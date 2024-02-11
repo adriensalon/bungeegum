@@ -1,0 +1,33 @@
+#pragma once
+
+#include <string>
+#include <unordered_map>
+
+#include <bungeegum/glue/renderer.hpp>
+
+namespace bungeegum {
+
+struct shader_ref;
+
+namespace detail {
+
+    struct shader_resource_data {
+		std::string fragment;
+		// blending etc
+    };
+
+    struct shader_ref_data {
+		std::unordered_map<std::uintptr_t, detail::shader_view> rasterizers;
+    };
+
+	struct shader_manager_data {
+        std::unordered_map<std::string, shader_ref_data> shaders;
+	};
+
+    struct shader_ref_access {
+        [[nodiscard]] static shader_ref make_from_data(const shader_ref_data& data);
+        [[nodiscard]] static shader_ref_data& get_data(shader_ref& object);
+    };
+
+}
+}

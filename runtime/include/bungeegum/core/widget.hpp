@@ -238,6 +238,8 @@ struct draw_command {
 
 	/// @brief 
 	void draw_children();
+
+	// void draw_text(const std::string text, const font& text_font); // + FONT ?
 	
     /// @brief
     /// @param first_point
