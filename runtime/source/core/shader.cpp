@@ -4,15 +4,31 @@
 namespace bungeegum {
 namespace detail {
 
-	shader_ref shader_ref_access::make_from_data(const shader_ref_data& data)
-	{
-		return shader_ref(data);
-	}
+    shader_resource shader_resource_access::make_from_data(const shader_resource_data& data)
+    {
+        return shader_resource(data);
+    }
 
-	shader_ref_data& shader_ref_access::get_data(shader_ref& object)
-	{
-		return object._data;
-	}
+    shader_resource_data& shader_resource_access::get_data(shader_resource& object)
+    {
+        return object._data;
+    }
+
+    shader_ref shader_ref_access::make_from_data(const shader_ref_data& data)
+    {
+        return shader_ref(data);
+    }
+
+    shader_ref_data& shader_ref_access::get_data(shader_ref& object)
+    {
+        return object._data;
+    }
+}
+
+shader_resource::shader_resource(const detail::shader_resource_data& data)
+    : _data(data)
+{
+	
 }
 
 shader_resource& shader_resource::fragment(const std::string& source, std::initializer_list<int> args)
@@ -47,20 +63,22 @@ shader_ref::shader_ref(const detail::shader_ref_data& data)
 shader_ref get_shader(const std::string& name)
 {
     detail::global_manager_data& _global = detail::global();
-	detail::shader_ref_data& _data = _global.shaders.shaders[name];
+    detail::shader_ref_data& _data = _global.shaders.shaders[name];
     return detail::shader_ref_access::make_from_data(_data);
 }
 
 shader_ref make_shader(const std::string& name, shader_resource& resource)
 {
     detail::global_manager_data& _global = detail::global();
-	detail::shader_ref_data& _data = _global.shaders.shaders[name];
-	for (std::pair<const uintptr_t, std::reference_wrapper<bungeegum::detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-		detail::shader_view& _rasterizer = _data.rasterizers[_it.first];
-		// todo setup every rasterizer (1 for each pipeline)
-		(void)_rasterizer;
-	}
-    return detail::shader_ref_access::make_from_data(_data);
+    detail::shader_ref_data& _ref_data = _global.shaders.shaders[name];
+    detail::shader_resource_data& _resource_data = detail::shader_resource_access::get_data(resource);
+    for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
+        _ref_data.shaders[_it.first].create(
+            _it.second.get().pipeline_renderer,
+            " VERTEX SGADER HERE ! ",
+            _resource_data.fragment);
+    }
+    return detail::shader_ref_access::make_from_data(_ref_data);
 }
 
 }

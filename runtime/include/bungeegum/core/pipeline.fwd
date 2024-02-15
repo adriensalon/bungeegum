@@ -39,6 +39,13 @@ namespace detail {
     struct pipeline_data {
         window pipeline_window = {};
         renderer pipeline_renderer = {};
+
+		imgui_shader_handle user_shader = {};
+		imgui_shader_handle user_mask = {};
+#if BUNGEEGUM_USE_OVERLAY
+		imgui_shader_handle overlay_shader = {};
+#endif
+
         std::optional<std::reference_wrapper<widget_update_data>> root_updatable = std::nullopt;
         stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
 

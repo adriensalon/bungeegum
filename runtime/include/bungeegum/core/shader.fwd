@@ -7,6 +7,7 @@
 
 namespace bungeegum {
 
+struct shader_resource;
 struct shader_ref;
 
 namespace detail {
@@ -17,12 +18,17 @@ namespace detail {
     };
 
     struct shader_ref_data {
-		std::unordered_map<std::uintptr_t, detail::shader_view> rasterizers;
+		std::unordered_map<std::uintptr_t, shader_handle> shaders;
     };
 
 	struct shader_manager_data {
         std::unordered_map<std::string, shader_ref_data> shaders;
 	};
+	
+    struct shader_resource_access {
+        [[nodiscard]] static shader_resource make_from_data(const shader_resource_data& data);
+        [[nodiscard]] static shader_resource_data& get_data(shader_resource& object);
+    };
 
     struct shader_ref_access {
         [[nodiscard]] static shader_ref make_from_data(const shader_ref_data& data);

@@ -3,6 +3,7 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/pipeline.hpp>
 #include <bungeegum/glue/console.hpp>
+#include <bungeegum/glue/raw.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -313,6 +314,8 @@ pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& 
     detail::setup_overlay(); // loading fonts there ? fugly go renderer	
 #endif
     _data.pipeline_renderer.rebuild_user_fonts();
+	detail::global_manager_data& _global = detail::global();
+	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
     return *this;
 }
 
@@ -335,6 +338,8 @@ pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& 
     detail::setup_overlay(); // loading fonts there ? fugly go renderer
 #endif
     _data.pipeline_renderer.rebuild_user_fonts();
+	detail::global_manager_data& _global = detail::global();
+	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
     return *this;
 }
 
@@ -355,6 +360,8 @@ pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& pro
     detail::setup_overlay(); // loading fonts there ? fugly go renderer
 #endif
     _data.pipeline_renderer.rebuild_user_fonts();
+	detail::global_manager_data& _global = detail::global();
+	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
     return *this;
 }
 
@@ -363,6 +370,10 @@ pipeline& pipeline::setup<renderer_backend::vulkan>(const pipeline_provider& pro
 {
     detail::setup_global_if_required();
     detail::setup_window(_data.pipeline_window, provider);
+
+	
+	detail::global_manager_data& _global = detail::global();
+	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
     // TODO
     return *this;
 }

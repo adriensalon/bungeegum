@@ -48,15 +48,12 @@ font_ref make_font(const std::string& name, font_resource& resource)
 	detail::font_ref_data& _ref_data = _global.fonts.fonts[name];
 	detail::font_resource_data& _resource_data = detail::font_resource_access::get_data(resource);
 	for (std::pair<const uintptr_t, std::reference_wrapper<bungeegum::detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-		detail::renderer& _renderer = _it.second.get().pipeline_renderer;
-		_renderer.current();
-		ImGuiIO& _io = ImGui::GetIO();
-		_ref_data.fonts[_it.first] = _io.Fonts->AddFontFromMemoryCompressedTTF(
+		detail::imgui_shader_handle& _user_shader = _it.second.get().user_shader;
+		_ref_data.fonts[_it.first].create(
+			_user_shader,
 			_resource_data.compressed, 
-			static_cast<int>(_resource_data.count), 
+			_resource_data.count, 
 			_resource_data.size);
-		_io.Fonts->Build();
-		_renderer.rebuild_user_fonts();
 	}
     return detail::font_ref_access::make_from_data(_ref_data);
 }

@@ -43,6 +43,7 @@ struct IDeviceContext;
 struct ISwapChain;
 struct IPipelineState;
 struct IBuffer;
+struct ITexture;
 struct ITextureView;
 struct IShaderResourceVariable;
 }
@@ -50,6 +51,8 @@ struct IShaderResourceVariable;
 struct ImGuiContext;
 struct ImPlotContext;
 struct ImFont;
+struct ImFontAtlas;
+
 
 namespace bungeegum {
 namespace detail {
@@ -62,34 +65,6 @@ namespace detail {
     /// @brief
     inline static std::string_view default_emscripten_canvas = "#canvas";
 #endif
-
-    /// @brief for user defined shaders in HLSL etc
-    struct shader_view {
-
-
-
-    private:
-        Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_pipeline_state = {};
-        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_vertex_buffer = {};
-        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_index_buffer = {};
-        friend struct renderer;
-    };
-
-	/// @brief 
-	struct texture_view {
-
-	private:
-        Diligent::RefCntAutoPtr<Diligent::ITextureView> _texture_view = {};
-        friend struct renderer;
-	};
-
-	///
-	struct font_view {
-
-	private:
-		ImFont* _font_ptr = nullptr;
-        friend struct renderer;
-	};
 
     /// @brief Instances of this struct represent cross-platform GPU renderers that will select the
     /// most appropriate graphics API depending on the platform. Macros defined above can be
@@ -134,12 +109,9 @@ namespace detail {
         void create_vulkan(window& existing_window);
 #endif
 
-		/// @brief 
-		void current();
-
         /// @brief
         /// @return
-        [[nodiscard]] bool has_renderer() const;
+        [[nodiscard]] bool has_value() const;
 
         /// @brief Begins a new frame, enabling all drawing commands.
         /// @exception Throws a backtraced exception if a new frame has already begun.
@@ -159,6 +131,25 @@ namespace detail {
         /// @exception Throws a backtraced exception if the frame has already been ended.
         void present();
 
+        void resize(const float2 display_size);
+
+        /// @brief The color to use when clearing the screen.
+        float4 clear_color = { 1.f, 1.f, 1.f, 1.f };
+
+    private:
+        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device;
+        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context;
+        Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain;
+
+
+
+
+
+
+
+
+	public:
+
         /// @brief Rebuilds the ImGui fonts.
         void rebuild_user_fonts();
 
@@ -167,44 +158,154 @@ namespace detail {
         void rebuild_overlay_fonts();
 #endif
 
-        void resize(const float2 display_size);
-
-        /// @brief The color to use when clearing the screen.
-        float4 clear_color = { 1.f, 1.f, 1.f, 1.f };
-
         float4x4 projection_matrix; // default to orthographic!
 
         float4x4 view_matrix; // default to identity!
 
-    private:
-		bool _is_base_vertex_supported = false;
-		unsigned int _vertex_buffer_size = default_initial_vertex_buffer_size;
-		unsigned int _index_buffer_size = default_initial_index_buffer_size;
-        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device;
-        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context;
-        Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain;
-        Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_ignore_stencil_pipeline;
+        
+		Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_ignore_stencil_pipeline;
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_ignore_stencil_vertex_buffer;
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_ignore_stencil_index_buffer;
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_uniform_buffer;
-
+		bool _is_base_vertex_supported = false;
+		unsigned int _vertex_buffer_size = default_initial_vertex_buffer_size;
+		unsigned int _index_buffer_size = default_initial_index_buffer_size;
         Diligent::RefCntAutoPtr<Diligent::ITextureView> _user_font_texture;
         Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource;
         Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
 		ImGuiContext* _user_imgui_context = nullptr;
         ImPlotContext* _implot_context = nullptr;
+
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        SDL_Window* _sdl_window = nullptr;
+#endif
 		
 #if BUNGEEGUM_USE_OVERLAY
         Diligent::RefCntAutoPtr<Diligent::ITextureView> _overlay_font_texture;
 		ImGuiContext* _overlay_imgui_context = nullptr;
 #endif
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        SDL_Window* _sdl_window = nullptr;
-#endif
-
+        friend struct shader_handle;
+        friend struct texture_handle;
+        friend struct imgui_shader_handle;
+        friend struct imgui_font_handle;
         friend struct imgui_renderer;
     };
+
+
+
+
+	/// @brief 
+	struct texture_handle {
+		texture_handle() = default;
+		texture_handle(const texture_handle& other) = default;
+		texture_handle& operator=(const texture_handle& other) = default;
+		texture_handle(texture_handle&& other) = default;
+		texture_handle& operator=(texture_handle&& other) = default;
+
+		/// @brief 
+		/// @param owner 
+		/// @param pixels 
+		/// @param width 
+		/// @param height 
+		void create(
+			renderer& owner, 
+			const std::vector<unsigned char>& pixels, 
+			const std::size_t width, 
+			const std::size_t height);
+
+		
+
+
+	private:
+        Diligent::RefCntAutoPtr<Diligent::ITexture> _diligent_texture = {};
+	};
+
+
+
+
+
+    /// @brief for user defined shaders in HLSL etc
+    struct shader_handle {
+		shader_handle() = default;
+		shader_handle(const shader_handle& other) = default;
+		shader_handle& operator=(const shader_handle& other) = default;
+		shader_handle(shader_handle&& other) = default;
+		shader_handle& operator=(shader_handle&& other) = default;
+
+		/// @brief 
+		/// @param owner 
+		void create(
+			renderer& owner,
+			const std::string& vertex,
+			const std::string& fragment /* TODO */);
+
+		/// @brief 
+		/// @tparam value_t 
+		/// @param value 
+		template <typename value_t>
+		void uniform(const value_t& value);
+
+		/// @brief 
+		/// @param texture 
+		void uniform(const texture_handle& texture);
+
+    private:
+        Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_pipeline_state = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_vertex_buffer = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_index_buffer = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_uniform_buffer = {};
+    };
+
+
+
+
+	/// @brief 
+	struct imgui_shader_handle {
+		imgui_shader_handle() = default;
+		imgui_shader_handle(const imgui_shader_handle& other) = default;
+		imgui_shader_handle& operator=(const imgui_shader_handle& other) = default;
+		imgui_shader_handle(imgui_shader_handle&& other) = default;
+		imgui_shader_handle& operator=(imgui_shader_handle&& other) = default;
+
+		/// @brief 
+		/// @param owner 
+		void create(
+			renderer& owner,
+			ImFontAtlas* atlas = nullptr);
+
+		// fonts ?
+
+	private:
+        Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_pipeline_state = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_vertex_buffer = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_index_buffer = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_uniform_buffer = {};
+		
+		bool _is_base_vertex_supported = false;
+		unsigned int _vertex_buffer_size = default_initial_vertex_buffer_size;
+		unsigned int _index_buffer_size = default_initial_index_buffer_size;
+        Diligent::RefCntAutoPtr<Diligent::ITextureView> _user_font_texture;
+        Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource;
+        Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
+		ImGuiContext* _user_imgui_context = nullptr;
+        ImPlotContext* _implot_context = nullptr;
+		friend struct imgui_font_handle;
+	};
+
+	///
+	struct imgui_font_handle {
+
+
+		void create(
+			imgui_shader_handle& owner,
+			const void* ttf, 
+			const std::size_t count,
+			const float size);
+
+	private:
+		ImFont* _font_ptr = nullptr;
+	};
 }
 }
 

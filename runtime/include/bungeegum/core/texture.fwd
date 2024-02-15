@@ -21,7 +21,7 @@ namespace detail {
     };
 
     struct texture_ref_data {
-        std::unordered_map<std::uintptr_t, Diligent::RefCntAutoPtr<Diligent::ITextureView>> texture_views = {};
+        std::unordered_map<std::uintptr_t, texture_handle> textures = {};
     };
 
 	struct texture_manager_data {

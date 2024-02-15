@@ -37,6 +37,8 @@ struct shader_resource {
     shader_resource& stencil(const shader_stencil_options& options);
 	
 private:
+	friend struct detail::shader_resource_access;
+    shader_resource(const detail::shader_resource_data& data);
 	detail::shader_resource_data _data;
 };
 

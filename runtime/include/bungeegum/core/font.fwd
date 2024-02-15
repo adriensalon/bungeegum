@@ -22,7 +22,7 @@ namespace detail {
     };
 
     struct font_ref_data {
-		std::unordered_map<std::uintptr_t, ImFont*> fonts = {};
+		std::unordered_map<std::uintptr_t, imgui_font_handle> fonts = {};
     };
 
 	struct font_manager_data {

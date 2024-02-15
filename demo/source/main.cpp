@@ -143,7 +143,22 @@ int main()
 	bungeegum::texture_ref _tex = bungeegum::make_texture("my tex 1", _texture_res);
 
 	bungeegum::shader_resource _shader1_res;
-	_shader1_res.fragment("okokokok", {});
+	_shader1_res.fragment(R"(
+		struct PSInput
+		{
+			float4 pos : SV_POSITION;
+			float4 col : COLOR;
+			float2 uv  : TEXCOORD;
+		};
+
+		Texture2D    Texture;
+		SamplerState Texture_sampler;
+
+		float4 main(in PSInput PSIn) : SV_Target
+		{
+			return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
+		}
+		)", {});
 	_shader1_res.blend({});
 	_shader1_res.stencil({});
 	bungeegum::make_shader("my shader 1", _shader1_res);
