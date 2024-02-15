@@ -104,9 +104,11 @@ namespace detail {
         _pipeline_manager.current.value().get().steps_chronometer.begin_task("resolve");
 #endif
         bool _resolve_done = false;
+		std::vector<std::uintptr_t> _ids;
         while (!_resolve_done) {
-            std::size_t _iteration_size = _widget_manager.resolvables.size();
-            for (widget_update_data& _updatable : _widget_manager.resolvables) {
+            for (std::pair<const std::uintptr_t, resolve_command_data>& _it : _widget_manager.resolvables) {
+				_ids.push_back(_it.first);
+				widget_update_data& _updatable = _it.second.get();
                 if (_updatable.raw == root_updatable.raw) {
                     _updatable.local_min_size = viewport_size;
                     _updatable.local_max_size = viewport_size;
@@ -127,11 +129,12 @@ namespace detail {
 #if BUNGEEGUM_USE_OVERLAY
                 _pipeline_manager.current.value().get().widgets_chronometer.end_task(_updatable.clean_typename);
 #endif
-            };
-            _widget_manager.resolvables.erase(
-                _widget_manager.resolvables.begin(),
-                _widget_manager.resolvables.begin() + _iteration_size);
-            _resolve_done = _widget_manager.resolvables.empty();
+            }
+			for (const std::uintptr_t _id : _ids) {
+				_widget_manager.resolvables.erase(_id);
+			}
+			_ids.clear();
+			_resolve_done = _widget_manager.resolvables.empty();
         }
 #if BUNGEEGUM_USE_OVERLAY
         _pipeline_manager.current.value().get().steps_chronometer.end_task("resolve");
@@ -142,10 +145,12 @@ namespace detail {
     {
         global_manager_data& _global = global();
         bool _draw_done = false;
-
+		std::vector<std::uintptr_t> _ids;
         while (!_draw_done) {
-            for (widget_update_data& _updatable : _global.widgets.drawables) { // go default to draw_children()
-                if (_updatable.parent.has_value()) {
+            for (std::pair<const std::uintptr_t, bungeegum::detail::resolve_command_data>& _it : _global.widgets.drawables) {
+				_ids.push_back(_it.first);
+                widget_update_data& _updatable = _it.second.get();
+				if (_updatable.parent.has_value()) {
                     widget_update_data& _parent_updatable = _updatable.parent.value().get();
                     _parent_updatable.local_position += _updatable.local_position;
                 }
@@ -168,7 +173,10 @@ namespace detail {
                 // #endif
                 // _widget_drawer_command._data.draw(imgui_drawlist);
             };
-            _global.widgets.drawables.erase(_global.widgets.drawables.begin(), _global.widgets.drawables.end());
+			for (const std::uintptr_t _id : _ids) {
+				_global.widgets.drawables.erase(_id);
+			}
+			_ids.clear();
             _draw_done = _global.widgets.drawables.empty();
         }
     }
@@ -259,18 +267,29 @@ namespace detail {
 #endif
     }
 
-    void update_process_frame(renderer& pipeline_renderer, widget_update_data& root_updatable, const float2 viewport_size, const BUNGEEGUM_USE_TIME_UNIT& delta_time, const bool force_rendering)
+    void update_process_frame(renderer& pipeline_renderer, widget_update_data& root_updatable, const float2 viewport_size, const BUNGEEGUM_USE_TIME_UNIT& delta_time, const bool force_rendering, const bool exclusive_rendering)
     {
         global_manager_data& _global = global();
-        _global.pipelines.current.value().get().steps_chronometer.new_frame();
-        _global.pipelines.current.value().get().widgets_chronometer.new_frame();
-        bool _must_render = BUNGEEGUM_USE_OVERLAY || force_rendering || process_widgets(viewport_size, delta_time, root_updatable);
-        if (_must_render) {
-            _global.pipelines.current.value().get().steps_chronometer.begin_task("draw widgets");
-            pipeline_renderer.new_frame();
+		pipeline_data& _pipeline = _global.pipelines.current.value().get();
+        _pipeline.steps_chronometer.new_frame();
+        _pipeline.widgets_chronometer.new_frame();
+			
+		
+		if constexpr (BUNGEEGUM_USE_OVERLAY || force_rendering) {
+			widget_update_data& _root_updatable = _pipeline.root_updatable.value().get();
+			_global.widgets.drawables = { { _root_updatable.raw, std::ref(_root_updatable) } };
+		}
+		process_widgets(viewport_size, delta_time, root_updatable);
+		if (!_global.widgets.drawables.empty()) {
+            _pipeline.steps_chronometer.begin_task("draw pass");
+            if (exclusive_rendering) {
+				pipeline_renderer.new_frame();
+			}
             render_widgets();
-            pipeline_renderer.present();
-            _global.pipelines.current.value().get().steps_chronometer.end_task("draw widgets");
+			if (exclusive_rendering) {
+            	pipeline_renderer.present();
+			}
+            _pipeline.steps_chronometer.end_task("draw pass");
         }
     }
 }
@@ -358,7 +377,7 @@ void pipeline::run(const std::optional<unsigned int> frames_per_second, const bo
 			detail::global().pipelines.current = std::ref(_data);
             detail::update_input_frame(_data.pipeline_window, _data.pipeline_renderer);
             float2 _viewport_size = _data.pipeline_window.get_size();
-            detail::update_process_frame(_data.pipeline_renderer, _data.root_updatable.value(), _viewport_size, delta_time, force_rendering);
+            detail::update_process_frame(_data.pipeline_renderer, _data.root_updatable.value(), _viewport_size, delta_time, force_rendering, true);
             detail::update_hotswap_frame("C:/Users/adri/desktop/ok.json", _data.root_updatable.value());
         });
     });
@@ -374,7 +393,7 @@ pipeline& pipeline::run_once(const bool force_rendering)
 			detail::global().pipelines.current = std::ref(_data);
             detail::update_input_frame(_data.pipeline_window, _data.pipeline_renderer);
             float2 _viewport_size = _data.pipeline_window.get_size();
-            detail::update_process_frame(_data.pipeline_renderer, _data.root_updatable.value(), _viewport_size, delta_time, force_rendering);
+            detail::update_process_frame(_data.pipeline_renderer, _data.root_updatable.value(), _viewport_size, delta_time, force_rendering, false);
             detail::update_hotswap_frame("C:/Users/adri/desktop/ok.json", _data.root_updatable.value());
         });
     });

@@ -96,9 +96,9 @@ namespace detail {
         std::unique_ptr<reloader> hotswap_reloader = nullptr;
 #endif
         std::unordered_map<std::uintptr_t, widget_update_data> updatables = {};
-        std::vector<std::reference_wrapper<widget_update_data>> resolvables = {};
-        std::vector<std::reference_wrapper<widget_update_data>> interactables = {};
-        std::vector<std::reference_wrapper<widget_update_data>> drawables = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> resolvables = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> interactables = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> drawables = {};
     };
 
     struct resolve_command_access {

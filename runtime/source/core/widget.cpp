@@ -365,15 +365,19 @@ void must_resolve(const widget_id id)
     detail::widget_manager_data& _manager = detail::global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
-    _manager.resolvables.push_back(_updatable);
+    if (_manager.resolvables.find(_raw) != _manager.resolvables.end()) {
+		_manager.resolvables.insert(std::make_pair(_raw, std::ref(_updatable)));
+	}
 }
 
 void must_draw(const widget_id id)
 {
-    const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_manager_data& _manager = detail::global().widgets;
+    const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
-    _manager.drawables.push_back(_updatable);
+	if (_manager.drawables.find(_raw) != _manager.drawables.end()) {
+		_manager.drawables.insert(std::make_pair(_raw, std::ref(_updatable)));
+	}
 }
 
 }
