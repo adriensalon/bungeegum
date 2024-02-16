@@ -12,19 +12,40 @@ struct shader_ref;
 
 namespace detail {
 
+    struct shader_depth_options_data {
+        bool depth_enable = true;
+        bool depth_write_enable = false;
+        std::size_t depth_function = 0u;
+    };
+
+    struct shader_stencil_options_data {
+        bool stencil_enable = false;
+        std::uint8_t stencil_read_mask = 0xFF;
+        std::uint8_t stencil_write_mask = 0xFF;
+        std::size_t face_op = 0u;
+    };
+
     struct shader_resource_data {
-		std::string fragment;
-		// blending etc
+        std::string fragment = {};
+        shader_depth_options_data depth;
+        shader_stencil_options_data stencil;
+        // blending etc
     };
 
     struct shader_ref_data {
-		std::unordered_map<std::uintptr_t, shader_handle> shaders;
+        std::unordered_map<std::uintptr_t, shader_handle> shaders;
     };
 
-	struct shader_manager_data {
+    struct shader_manager_data {
         std::unordered_map<std::string, shader_ref_data> shaders;
-	};
-	
+    };
+
+    struct shader_depth_options_access {
+    };
+
+    struct shader_stencil_options_access {
+    };
+
     struct shader_resource_access {
         [[nodiscard]] static shader_resource make_from_data(const shader_resource_data& data);
         [[nodiscard]] static shader_resource_data& get_data(shader_resource& object);

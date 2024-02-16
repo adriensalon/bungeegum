@@ -130,20 +130,20 @@ int main()
     // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
     // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
 
-	bungeegum::pipeline_provider _provider;
-	_provider.emscripten_canvas_id = "canvas";
-	_provider.native_window_ptr = nullptr;
+    bungeegum::pipeline_provider _provider;
+    _provider.emscripten_canvas_id = "canvas";
+    _provider.native_window_ptr = nullptr;
 
-	bungeegum::pipeline _my_pipeline;
-	_my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
+    bungeegum::pipeline _my_pipeline;
+    _my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
 
-	bungeegum::texture_resource _texture_res;
-	_texture_res.pixels({0u});
-	_texture_res.size(1, 1);
-	bungeegum::texture_ref _tex = bungeegum::make_texture("my tex 1", _texture_res);
+    bungeegum::texture_resource _texture_res;
+    _texture_res.pixels({ 0u });
+    _texture_res.size(1, 1);
+    bungeegum::texture_ref _tex = bungeegum::make_texture("my tex 1", _texture_res);
 
-	bungeegum::shader_resource _shader1_res;
-	_shader1_res.fragment(R"(
+    bungeegum::shader_resource _shader1_res;
+    _shader1_res.fragment(R"(
 		struct PSInput
 		{
 			float4 pos : SV_POSITION;
@@ -158,22 +158,22 @@ int main()
 		{
 			return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
 		}
-		)", {});
-	_shader1_res.blend({});
-	_shader1_res.stencil({});
-	bungeegum::make_shader("my shader 1", _shader1_res);
+		)",
+        {});
+    _shader1_res.depth({});
+    _shader1_res.stencil({});
+    bungeegum::make_shader("my shader 1", _shader1_res);
 
-	bungeegum::font_resource _font1_res;
-	// _font1_res.compressed(nullptr, 0);
-	// _font1_res.size(13.4f);
+    bungeegum::font_resource _font1_res;
+    // _font1_res.compressed(nullptr, 0);
+    // _font1_res.size(13.4f);
 
+    bungeegum::shader_ref _shader1 = bungeegum::get_shader("my shader 1");
+    _shader1.uniform<float>("okok", 44.f);
 
-	bungeegum::shader_ref _shader1 = bungeegum::get_shader("my shader 1");
-	_shader1.uniform<float>("okok", 44.f);
+    _my_pipeline.root(bungeegum::make<Title>().title("mytitle"));
+    _my_pipeline.run(60, true);
 
-
-	// auto p2 = std::move(_my_pipeline);
-	_my_pipeline.root(bungeegum::make<Title>().title("mytitle"));
     // p.root(bungeegum::widget_id( bungeegum::make<Title>()
     //            .title("my title !!!")
     //            .child(bungeegum::make<Align>()
@@ -257,7 +257,6 @@ int main()
 
     //     //   )
     // ));
-    _my_pipeline.run(60, true);
 
     return 0;
 }

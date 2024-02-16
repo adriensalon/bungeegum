@@ -28,7 +28,6 @@ namespace detail {
 shader_resource::shader_resource(const detail::shader_resource_data& data)
     : _data(data)
 {
-	
 }
 
 shader_resource& shader_resource::fragment(const std::string& source, std::initializer_list<int> args)
@@ -37,7 +36,7 @@ shader_resource& shader_resource::fragment(const std::string& source, std::initi
     return *this;
 }
 
-shader_resource& shader_resource::blend(const shader_blend_options& options)
+shader_resource& shader_resource::depth(const shader_depth_options& options)
 {
 
     return *this;
@@ -45,7 +44,7 @@ shader_resource& shader_resource::blend(const shader_blend_options& options)
 
 shader_resource& shader_resource::stencil(const shader_stencil_options& options)
 {
-
+    // _data.stencil = options._data;
     return *this;
 }
 

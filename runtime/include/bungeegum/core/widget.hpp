@@ -102,11 +102,11 @@ private:
 /// @brief
 /// @details
 struct interact_command {
-	interact_command() = delete;
-	interact_command(const interact_command& other) = delete;
-	interact_command& operator=(const interact_command& other) = delete;
-	interact_command(interact_command&& other) = delete;
-	interact_command& operator=(interact_command&& other) = delete;
+    interact_command() = delete;
+    interact_command(const interact_command& other) = delete;
+    interact_command& operator=(const interact_command& other) = delete;
+    interact_command(interact_command&& other) = delete;
+    interact_command& operator=(interact_command&& other) = delete;
 
     /// @brief
     /// @return
@@ -132,15 +132,15 @@ struct interact_command {
     /// @return
     [[nodiscard]] std::optional<mouse_pressed_interaction> mouse_pressed() const;
 
-	/// @brief 
-	/// @param child_id 
-	void interact_child(const widget_id child_id);
-	
-	/// @brief 
-	void interact_children();
+    /// @brief
+    /// @param child_id
+    void interact_child(const widget_id child_id);
+
+    /// @brief
+    void interact_children();
 
 private:
-	friend struct detail::interact_command_access;
+    friend struct detail::interact_command_access;
     interact_command(const detail::interact_command_data& data);
     detail::interact_command_data _data;
 };
@@ -148,11 +148,11 @@ private:
 /// @brief
 /// @details
 struct resolve_command {
-	resolve_command() = delete;
-	resolve_command(const resolve_command& other) = delete;
-	resolve_command& operator=(const resolve_command& other) = delete;
-	resolve_command(resolve_command&& other) = delete;
-	resolve_command& operator=(resolve_command&& other) = delete;
+    resolve_command() = delete;
+    resolve_command(const resolve_command& other) = delete;
+    resolve_command& operator=(const resolve_command& other) = delete;
+    resolve_command(resolve_command&& other) = delete;
+    resolve_command& operator=(resolve_command&& other) = delete;
 
     /// @brief
     [[nodiscard]] float2 get_min_size() const;
@@ -169,10 +169,10 @@ struct resolve_command {
     /// @param constraint
     float2 resolve_child(const widget_id child_widget, const float2 min_size, const float2 max_size) const;
 
-    /// @brief 
-    /// @param min_size 
-    /// @param max_size 
-    /// @return 
+    /// @brief
+    /// @param min_size
+    /// @param max_size
+    /// @return
     std::vector<float2> resolve_children(const float2 min_size, const float2 max_size);
 
     /// @brief
@@ -180,30 +180,30 @@ struct resolve_command {
     /// @param position
     void position_child(const widget_id child_widget, const float2 position);
 
-    /// @brief 
-    /// @param position 
+    /// @brief
+    /// @param position
     void position_children(const float2 position);
 
-	/// @brief 
-	/// @param child_id 
-	/// @param transform 
-	void rotate_child(const widget_id child_id, const float degrees = 180.f);
+    /// @brief
+    /// @param child_id
+    /// @param transform
+    void rotate_child(const widget_id child_id, const float degrees = 180.f);
 
-	/// @brief 
-	/// @param child_id 
-	/// @param transform 
-	void rotate_child(const widget_id child_id, const float3 rotation);
+    /// @brief
+    /// @param child_id
+    /// @param transform
+    void rotate_child(const widget_id child_id, const float3 rotation);
 
-	/// @brief 
-	/// @param transform 
-	void rotate_children(const float3 rotation);
+    /// @brief
+    /// @param transform
+    void rotate_children(const float3 rotation);
 
-	/// @brief 
-	/// @param transform 
-	void rotate_children(const float degrees = 180.f);
+    /// @brief
+    /// @param transform
+    void rotate_children(const float degrees = 180.f);
 
 private:
-	friend struct detail::resolve_command_access;
+    friend struct detail::resolve_command_access;
     resolve_command(const detail::resolve_command_data& data);
     detail::resolve_command_data _data;
 };
@@ -211,11 +211,11 @@ private:
 /// @brief
 /// @details
 struct draw_command {
-	draw_command() = delete;
-	draw_command(const draw_command& other) = delete;
-	draw_command& operator=(const draw_command& other) = delete;
-	draw_command(draw_command&& other) = delete;
-	draw_command& operator=(draw_command&& other) = delete;
+    draw_command() = delete;
+    draw_command(const draw_command& other) = delete;
+    draw_command& operator=(const draw_command& other) = delete;
+    draw_command(draw_command&& other) = delete;
+    draw_command& operator=(draw_command&& other) = delete;
 
     /// @brief
     [[nodiscard]] float2 get_size() const;
@@ -232,15 +232,28 @@ struct draw_command {
 
     void perspective_projection(const float fov);
 
-	/// @brief 
-	/// @param child_id 
-	void draw_child(const widget_id child_id);
+    /// @brief
+    /// @param child_id
+    void draw_child(const widget_id child_id);
 
-	/// @brief 
-	void draw_children();
+    /// @brief
+    void draw_children();
 
-	// void draw_text(const std::string text, const font& text_font); // + FONT ?
-	
+    /// @brief
+    void use_default_shader();
+
+    /// @brief
+    /// @param shader
+    void use_custom_shader(const shader_ref& shader);
+
+    /// @brief
+    /// @param texture
+    /// @param position
+    /// @param size
+    void draw_texture(const texture_ref& texture, const float2 position, const float2 size);
+
+    // void draw_text(const std::string text, const font& text_font); // + FONT ?
+
     /// @brief
     /// @param first_point
     /// @param second_point
@@ -306,9 +319,8 @@ struct draw_command {
 
     // draw bezier and bspline from points direct (sans curve)
 
-
 private:
-	friend struct detail::draw_command_access;
+    friend struct detail::draw_command_access;
     draw_command(const detail::draw_command_data& data);
     detail::draw_command_data _data;
 };
@@ -338,7 +350,7 @@ struct widget_id {
     widget_id(widget_ref<widget_t>& widget);
 
 private:
-	friend struct detail::widget_id_access;
+    friend struct detail::widget_id_access;
     widget_id(const detail::widget_id_data& data);
     detail::widget_id_data _data;
 };
@@ -361,52 +373,52 @@ struct widget_ref {
     widget_t* operator->() const;
 
 private:
-	friend struct detail::widget_ref_access<widget_t>;
+    friend struct detail::widget_ref_access<widget_t>;
     widget_ref(const detail::widget_ref_data<widget_t>& data);
     detail::widget_ref_data<widget_t> _data;
 };
 
-/// @brief 
-/// @param parent_id 
-/// @param child_id 
+/// @brief
+/// @param parent_id
+/// @param child_id
 void adopt(const widget_id parent_id, const widget_id child_id);
 
-/// @brief 
-/// @param parent_id 
-/// @param child_id 
+/// @brief
+/// @param parent_id
+/// @param child_id
 void abandon(const widget_id parent_id, const widget_id child_id);
 
 /// @brief Destroys a widget created with the make_reference function. References to it will no longer
 /// be valid.
-/// @param id 
+/// @param id
 void destroy(const widget_id id);
 
-/// @brief 
-/// @param id 
-/// @return 
+/// @brief
+/// @param id
+/// @return
 [[nodiscard]] std::vector<widget_id> get_children(const widget_id id);
 
-/// @brief 
-/// @param id 
-/// @return 
+/// @brief
+/// @param id
+/// @return
 [[nodiscard]] widget_id get_parent(const widget_id id);
 
-/// @brief 
-/// @tparam widget_t 
-/// @param id 
-/// @return 
+/// @brief
+/// @tparam widget_t
+/// @param id
+/// @return
 template <typename widget_t>
 [[nodiscard]] widget_ref<widget_t> get_ref(const widget_id id);
 
-/// @brief 
-/// @param widget 
-/// @return 
+/// @brief
+/// @param widget
+/// @return
 [[nodiscard]] bool has_parent(const widget_id widget);
 
-/// @brief 
-/// @tparam widget_t 
-/// @param widget 
-/// @return 
+/// @brief
+/// @tparam widget_t
+/// @param widget
+/// @return
 template <typename widget_t>
 [[nodiscard]] bool has_type(const widget_id widget);
 

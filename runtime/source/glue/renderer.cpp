@@ -31,8 +31,9 @@
 #define PLATFORM_IOS
 #endif
 
-#include <Graphics/GraphicsTools/interface/MapHelper.hpp>
 #include <Graphics/GraphicsEngineOpenGL/interface/EngineFactoryOpenGL.h>
+#include <Graphics/GraphicsTools/interface/MapHelper.hpp>
+
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
 #include <Graphics/GraphicsEngineD3D11/interface/EngineFactoryD3D11.h>
 #include <Graphics/GraphicsEngineD3D12/interface/EngineFactoryD3D12.h>
@@ -101,7 +102,7 @@ namespace detail {
         static void setup_context(window& wnd, renderer& rnd)
         {
             rnd._is_base_vertex_supported = rnd._diligent_render_device->GetAdapterInfo().DrawCommand.CapFlags & Diligent::DRAW_COMMAND_CAP_FLAG_BASE_VERTEX;
-			// ImGui::GetIO().Fonts; // existing font atlas
+            // ImGui::GetIO().Fonts; // existing font atlas
             rnd._user_imgui_context = ImGui::CreateContext();
             rnd._implot_context = ImPlot::CreateContext();
             ImGuiIO& io = ImGui::GetIO();
@@ -129,7 +130,7 @@ namespace detail {
             io.KeyMap[ImGuiKey_Y] = DOM_VK_Y;
             io.KeyMap[ImGuiKey_Z] = DOM_VK_Z;
 #else
-			ImGui_ImplSDL2_InitForOpenGL(wnd.get_sdl(), nullptr);
+            ImGui_ImplSDL2_InitForOpenGL(wnd.get_sdl(), nullptr);
 #endif
         }
 
@@ -141,7 +142,6 @@ namespace detail {
             rnd._diligent_ignore_stencil_pipeline.Release();
             rnd._overlay_font_texture.Release();
             rnd._diligent_shader_resource.Release();
-
         }
 
         static void setup_renderer(renderer& rnd)
@@ -159,14 +159,14 @@ namespace detail {
             _shader_create_info.Desc.ShaderType = Diligent::SHADER_TYPE_VERTEX;
             _shader_create_info.Desc.Name = "Imgui VS";
             _shader_create_info.Source = VertexShaderHLSL;
-			_shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
+            _shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
             rnd._diligent_render_device->CreateShader(_shader_create_info, &_vertex_shader);
 
             Diligent::RefCntAutoPtr<Diligent::IShader> _pixel_shader;
             _shader_create_info.Desc.ShaderType = Diligent::SHADER_TYPE_PIXEL;
             _shader_create_info.Desc.Name = "Imgui PS";
             _shader_create_info.Source = PixelShaderHLSL;
-			_shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
+            _shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
             rnd._diligent_render_device->CreateShader(_shader_create_info, &_pixel_shader);
 
             Diligent::GraphicsPipelineStateCreateInfo PSOCreateInfo;
@@ -245,7 +245,7 @@ namespace detail {
             const float _display_width = static_cast<float>(_swapchain_descriptor.Width);
 
             // bof
-			static auto m_LastTimestamp = std::chrono::high_resolution_clock::now();
+            static auto m_LastTimestamp = std::chrono::high_resolution_clock::now();
             auto now = std::chrono::high_resolution_clock::now();
             auto elapsed_ns = now - m_LastTimestamp;
             m_LastTimestamp = now;
@@ -427,19 +427,19 @@ namespace detail {
             }
         }
 
-		static void setup_user_fonts_texture(renderer& rnd)
-		{
-			_setup_fonts_texture(rnd, rnd._user_font_texture);
-		}
+        static void setup_user_fonts_texture(renderer& rnd)
+        {
+            _setup_fonts_texture(rnd, rnd._user_font_texture);
+        }
 
 #if BUNGEEGUM_USE_OVERLAY
-		static void setup_overlay_fonts_texture(renderer& rnd)
-		{
-			_setup_fonts_texture(rnd, rnd._overlay_font_texture);
-		}
+        static void setup_overlay_fonts_texture(renderer& rnd)
+        {
+            _setup_fonts_texture(rnd, rnd._overlay_font_texture);
+        }
 #endif
 
-	private:
+    private:
         static void _setup_fonts_texture(renderer& rnd, Diligent::RefCntAutoPtr<Diligent::ITextureView>& texture_view)
         {
             // Build texture atlas
@@ -473,8 +473,7 @@ namespace detail {
             // Store our identifier
             IO.Fonts->TexID = (ImTextureID)(texture_view);
         }
-
-	};
+    };
 
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
     void renderer::create_directx11(window& existing_window)
@@ -482,14 +481,14 @@ namespace detail {
         Diligent::SwapChainDesc _swap_chain_descriptor;
         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
         Diligent::EngineD3D11CreateInfo _engine_create_info;
-// #if defined(__DEBUG__)
-//         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
-// #endif
+        // #if defined(__DEBUG__)
+        //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
+        // #endif
         _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_diligent_render_device, &_diligent_device_context);
         Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
         _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
             Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
-        
+
         imgui_renderer::setup_context(existing_window, *this);
         imgui_renderer::setup_renderer(*this);
     }
@@ -552,7 +551,7 @@ namespace detail {
     bool renderer::has_value() const
     {
         // return _data.operator bool();
-		return false;
+        return false;
     }
 
     void renderer::new_frame()
@@ -578,9 +577,9 @@ namespace detail {
 
     void renderer::consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events)
     {
-        auto& io = ImGui::GetIO();        
+        auto& io = ImGui::GetIO();
         for (const emscripten_mouse_event& _event : events) {
-			io.MousePos = ImVec2(_event.event->targetX, _event.event->targetY);
+            io.MousePos = ImVec2(_event.event->targetX, _event.event->targetY);
             io.MouseDown[0] = _event.event->buttons & 1;
             io.MouseDown[1] = _event.event->buttons & 2;
             io.MouseDown[2] = _event.event->buttons & 4;
@@ -600,11 +599,11 @@ namespace detail {
     {
         for (const SDL_Event& _event : events) {
             // _data->imgui_renderer->OnEvent(_event);
-			
-			if (ImGui::GetCurrentContext() == NULL)
-				return;
 
-			ImGui_ImplSDL2_ProcessEvent(&_event);
+            if (ImGui::GetCurrentContext() == NULL)
+                return;
+
+            ImGui_ImplSDL2_ProcessEvent(&_event);
         }
         events.clear();
     }
@@ -627,13 +626,13 @@ namespace detail {
             Diligent::SURFACE_TRANSFORM_OPTIMAL);
     }
 
-	void texture_handle::create(
-		renderer& owner, 
-		const std::vector<unsigned char>& pixels,
-		const std::size_t width,
-		const std::size_t height)
-	{
-		Diligent::TextureDesc _texture_desc;
+    void texture_handle::create(
+        renderer& owner,
+        const std::vector<unsigned char>& pixels,
+        const std::size_t width,
+        const std::size_t height)
+    {
+        Diligent::TextureDesc _texture_desc;
         _texture_desc.Name = "uiw user texture";
         _texture_desc.Type = Diligent::RESOURCE_DIM_TEX_2D;
         _texture_desc.Width = static_cast<Diligent::Uint32>(width);
@@ -644,116 +643,111 @@ namespace detail {
         Diligent::TextureSubResData _texture_subres_data[] = { { pixels.data(), 4 * Diligent::Uint64 { _texture_desc.Width } } };
         Diligent::TextureData _texture_data(_texture_subres_data, _countof(_texture_subres_data));
         owner._diligent_render_device->CreateTexture(_texture_desc, &_texture_data, &_diligent_texture);
-	}
+    }
 
-	
-	void shader_handle::create(
-		renderer& owner,
-		const std::string& vertex,
-		const std::string& fragment /* TODO */)
-	{
-		Diligent::ShaderCreateInfo _shader_create_info;
-		// _shader_create_info.UseCombinedTextureSamplers = true;
-		// _shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE_DEFAULT;
-		_shader_create_info.Desc.UseCombinedTextureSamplers = true;
+    void shader_handle::create(
+        renderer& owner,
+        const std::string& vertex,
+        const std::string& fragment /* TODO */)
+    {
+        Diligent::ShaderCreateInfo _shader_create_info;
+        _shader_create_info.Desc.UseCombinedTextureSamplers = true;
 
-		Diligent::RefCntAutoPtr<Diligent::IShader> _vertex_shader;
-		_shader_create_info.Desc.ShaderType = Diligent::SHADER_TYPE_VERTEX;
-		_shader_create_info.Desc.Name = "uiw vertex shader";
-		// _shader_create_info.Source = vertex.c_str();
-		_shader_create_info.Source = VertexShaderHLSL;
-		_shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
-		owner._diligent_render_device->CreateShader(_shader_create_info, &_vertex_shader);
+        Diligent::RefCntAutoPtr<Diligent::IShader> _vertex_shader;
+        _shader_create_info.Desc.ShaderType = Diligent::SHADER_TYPE_VERTEX;
+        _shader_create_info.Desc.Name = "uiw vertex shader";
+        // _shader_create_info.Source = vertex.c_str();
+        _shader_create_info.Source = VertexShaderHLSL;
+        _shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
+        owner._diligent_render_device->CreateShader(_shader_create_info, &_vertex_shader);
 
-		Diligent::RefCntAutoPtr<Diligent::IShader> _pixel_shader;
-		_shader_create_info.Desc.ShaderType = Diligent::SHADER_TYPE_PIXEL;
-		_shader_create_info.Desc.Name = "uiw fragment shader";
-		_shader_create_info.Source = fragment.c_str();
-		_shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
-		owner._diligent_render_device->CreateShader(_shader_create_info, &_pixel_shader);
+        Diligent::RefCntAutoPtr<Diligent::IShader> _pixel_shader;
+        _shader_create_info.Desc.ShaderType = Diligent::SHADER_TYPE_PIXEL;
+        _shader_create_info.Desc.Name = "uiw fragment shader";
+        _shader_create_info.Source = fragment.c_str();
+        _shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
+        owner._diligent_render_device->CreateShader(_shader_create_info, &_pixel_shader);
 
-		Diligent::GraphicsPipelineStateCreateInfo PSOCreateInfo;
+        Diligent::GraphicsPipelineStateCreateInfo PSOCreateInfo;
 
-		PSOCreateInfo.PSODesc.Name = "uiw pso";
-		auto& GraphicsPipeline = PSOCreateInfo.GraphicsPipeline;
+        PSOCreateInfo.PSODesc.Name = "uiw pso";
+        auto& GraphicsPipeline = PSOCreateInfo.GraphicsPipeline;
 
-		const Diligent::SwapChainDesc& _swapchain_descriptpr = owner._diligent_swap_chain->GetDesc();
+        const Diligent::SwapChainDesc& _swapchain_descriptpr = owner._diligent_swap_chain->GetDesc();
 
-		GraphicsPipeline.NumRenderTargets = 1;
-		GraphicsPipeline.RTVFormats[0] = _swapchain_descriptpr.ColorBufferFormat;
-		GraphicsPipeline.DSVFormat = _swapchain_descriptpr.DepthBufferFormat;
-		GraphicsPipeline.PrimitiveTopology = Diligent::PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        GraphicsPipeline.NumRenderTargets = 1;
+        GraphicsPipeline.RTVFormats[0] = _swapchain_descriptpr.ColorBufferFormat;
+        GraphicsPipeline.DSVFormat = _swapchain_descriptpr.DepthBufferFormat;
+        GraphicsPipeline.PrimitiveTopology = Diligent::PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 
-		PSOCreateInfo.pVS = _vertex_shader;
-		PSOCreateInfo.pPS = _pixel_shader;
+        PSOCreateInfo.pVS = _vertex_shader;
+        PSOCreateInfo.pPS = _pixel_shader;
 
-		GraphicsPipeline.RasterizerDesc.CullMode = Diligent::CULL_MODE_NONE;
-		GraphicsPipeline.RasterizerDesc.ScissorEnable = true;
-		GraphicsPipeline.DepthStencilDesc.DepthEnable = true;
-		GraphicsPipeline.DepthStencilDesc.DepthWriteEnable = false;
-		GraphicsPipeline.DepthStencilDesc.StencilEnable = true;
+        GraphicsPipeline.RasterizerDesc.CullMode = Diligent::CULL_MODE_NONE;
+        GraphicsPipeline.RasterizerDesc.ScissorEnable = true;
+        GraphicsPipeline.DepthStencilDesc.DepthEnable = true;
+        GraphicsPipeline.DepthStencilDesc.DepthWriteEnable = false;
+        GraphicsPipeline.DepthStencilDesc.StencilEnable = true;
 
-		auto& RT0 = GraphicsPipeline.BlendDesc.RenderTargets[0];
-		RT0.BlendEnable = true;
-		RT0.SrcBlend = Diligent::BLEND_FACTOR_SRC_ALPHA;
-		RT0.DestBlend = Diligent::BLEND_FACTOR_INV_SRC_ALPHA;
-		RT0.BlendOp = Diligent::BLEND_OPERATION_ADD;
-		RT0.SrcBlendAlpha = Diligent::BLEND_FACTOR_INV_SRC_ALPHA;
-		RT0.DestBlendAlpha = Diligent::BLEND_FACTOR_ZERO;
-		RT0.BlendOpAlpha = Diligent::BLEND_OPERATION_ADD;
-		RT0.RenderTargetWriteMask = Diligent::COLOR_MASK_ALL;
+        auto& RT0 = GraphicsPipeline.BlendDesc.RenderTargets[0];
+        RT0.BlendEnable = true;
+        RT0.SrcBlend = Diligent::BLEND_FACTOR_SRC_ALPHA;
+        RT0.DestBlend = Diligent::BLEND_FACTOR_INV_SRC_ALPHA;
+        RT0.BlendOp = Diligent::BLEND_OPERATION_ADD;
+        RT0.SrcBlendAlpha = Diligent::BLEND_FACTOR_INV_SRC_ALPHA;
+        RT0.DestBlendAlpha = Diligent::BLEND_FACTOR_ZERO;
+        RT0.BlendOpAlpha = Diligent::BLEND_OPERATION_ADD;
+        RT0.RenderTargetWriteMask = Diligent::COLOR_MASK_ALL;
 
-		Diligent::LayoutElement VSInputs[] {
-			{ 0, 0, 2, Diligent::VT_FLOAT32 }, // pos
-			{ 1, 0, 2, Diligent::VT_FLOAT32 }, // uv
-			{ 2, 0, 4, Diligent::VT_UINT8, true } // col
-		};
-		GraphicsPipeline.InputLayout.NumElements = _countof(VSInputs);
-		GraphicsPipeline.InputLayout.LayoutElements = VSInputs;
+        Diligent::LayoutElement VSInputs[] {
+            { 0, 0, 2, Diligent::VT_FLOAT32 }, // pos
+            { 1, 0, 2, Diligent::VT_FLOAT32 }, // uv
+            { 2, 0, 4, Diligent::VT_UINT8, true } // col
+        };
+        GraphicsPipeline.InputLayout.NumElements = _countof(VSInputs);
+        GraphicsPipeline.InputLayout.LayoutElements = VSInputs;
 
-		Diligent::ShaderResourceVariableDesc Variables[] = {
-			{ Diligent::SHADER_TYPE_PIXEL, "Texture", Diligent::SHADER_RESOURCE_VARIABLE_TYPE_DYNAMIC } //
-		};
-		PSOCreateInfo.PSODesc.ResourceLayout.Variables = Variables;
-		PSOCreateInfo.PSODesc.ResourceLayout.NumVariables = _countof(Variables);
+        Diligent::ShaderResourceVariableDesc Variables[] = {
+            { Diligent::SHADER_TYPE_PIXEL, "Texture", Diligent::SHADER_RESOURCE_VARIABLE_TYPE_DYNAMIC } //
+        };
+        PSOCreateInfo.PSODesc.ResourceLayout.Variables = Variables;
+        PSOCreateInfo.PSODesc.ResourceLayout.NumVariables = _countof(Variables);
 
-		Diligent::SamplerDesc SamLinearWrap;
-		SamLinearWrap.AddressU = Diligent::TEXTURE_ADDRESS_WRAP;
-		SamLinearWrap.AddressV = Diligent::TEXTURE_ADDRESS_WRAP;
-		SamLinearWrap.AddressW = Diligent::TEXTURE_ADDRESS_WRAP;
-		Diligent::ImmutableSamplerDesc ImtblSamplers[] = {
-			{ Diligent::SHADER_TYPE_PIXEL, "Texture", SamLinearWrap } //
-		};
-		PSOCreateInfo.PSODesc.ResourceLayout.ImmutableSamplers = ImtblSamplers;
-		PSOCreateInfo.PSODesc.ResourceLayout.NumImmutableSamplers = _countof(ImtblSamplers);
+        Diligent::SamplerDesc SamLinearWrap;
+        SamLinearWrap.AddressU = Diligent::TEXTURE_ADDRESS_WRAP;
+        SamLinearWrap.AddressV = Diligent::TEXTURE_ADDRESS_WRAP;
+        SamLinearWrap.AddressW = Diligent::TEXTURE_ADDRESS_WRAP;
+        Diligent::ImmutableSamplerDesc ImtblSamplers[] = {
+            { Diligent::SHADER_TYPE_PIXEL, "Texture", SamLinearWrap } //
+        };
+        PSOCreateInfo.PSODesc.ResourceLayout.ImmutableSamplers = ImtblSamplers;
+        PSOCreateInfo.PSODesc.ResourceLayout.NumImmutableSamplers = _countof(ImtblSamplers);
 
-		owner._diligent_render_device->CreateGraphicsPipelineState(PSOCreateInfo, &(_diligent_pipeline_state));
+        owner._diligent_render_device->CreateGraphicsPipelineState(PSOCreateInfo, &(_diligent_pipeline_state));
 
-		{
-			Diligent::BufferDesc BuffDesc;
-			BuffDesc.Size = sizeof(float4x4);
-			BuffDesc.Usage = Diligent::USAGE_DYNAMIC;
-			BuffDesc.BindFlags = Diligent::BIND_UNIFORM_BUFFER;
-			BuffDesc.CPUAccessFlags = Diligent::CPU_ACCESS_WRITE;
-			owner._diligent_render_device->CreateBuffer(BuffDesc, nullptr, &(_diligent_uniform_buffer));
-		}
-		_diligent_pipeline_state->GetStaticVariableByName(Diligent::SHADER_TYPE_VERTEX, "Constants")->Set(_diligent_uniform_buffer);
+        {
+            Diligent::BufferDesc BuffDesc;
+            BuffDesc.Size = sizeof(float4x4);
+            BuffDesc.Usage = Diligent::USAGE_DYNAMIC;
+            BuffDesc.BindFlags = Diligent::BIND_UNIFORM_BUFFER;
+            BuffDesc.CPUAccessFlags = Diligent::CPU_ACCESS_WRITE;
+            owner._diligent_render_device->CreateBuffer(BuffDesc, nullptr, &(_diligent_uniform_buffer));
+        }
+        _diligent_pipeline_state->GetStaticVariableByName(Diligent::SHADER_TYPE_VERTEX, "Constants")->Set(_diligent_uniform_buffer);
+    }
 
-	}
+    void imgui_font_handle::create(
+        imgui_context_handle& owner,
+        const void* ttf,
+        const std::size_t count,
+        const float size)
+    {
+        ImGui::SetCurrentContext(owner._user_imgui_context);
+        ImGuiIO& _io = ImGui::GetIO();
+        _io.Fonts->AddFontFromMemoryCompressedTTF(ttf, static_cast<int>(count), size);
+        _io.Fonts->Build();
+        // update font texture on owner
+    }
 
-	
-	void imgui_font_handle::create(
-		imgui_shader_handle& owner,
-		const void* ttf, 
-		const std::size_t count,
-		const float size)
-	{
-		ImGui::SetCurrentContext(owner._user_imgui_context);
-		ImGuiIO& _io = ImGui::GetIO();
-		_io.Fonts->AddFontFromMemoryCompressedTTF(ttf, static_cast<int>(count), size);
-		_io.Fonts->Build();
-		// update font texture on owner
-	}
-	
 }
 }

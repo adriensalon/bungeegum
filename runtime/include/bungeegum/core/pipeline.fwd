@@ -40,15 +40,16 @@ namespace detail {
         window pipeline_window = {};
         renderer pipeline_renderer = {};
 
-		imgui_shader_handle user_shader = {};
-		imgui_shader_handle user_mask = {};
+        shader_handle user_shader = {};
+        shader_handle mask_shader = {};
+        imgui_context_handle user_context = {};
 #if BUNGEEGUM_USE_OVERLAY
-		imgui_shader_handle overlay_shader = {};
+        shader_handle overlay_shader = {};
+        imgui_context_handle overlay_context = {};
 #endif
 
         std::optional<std::reference_wrapper<widget_update_data>> root_updatable = std::nullopt;
         stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
-
 
 #if BUNGEEGUM_USE_OVERLAY
         std::string renderer_info = {};
@@ -60,7 +61,7 @@ namespace detail {
     };
 
     struct pipeline_manager_data {
-		std::unordered_map<std::uintptr_t, std::reference_wrapper<pipeline_data>> pipelines = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<pipeline_data>> pipelines = {};
 
 #if BUNGEEGUM_USE_OVERLAY
         std::optional<std::reference_wrapper<pipeline_data>> current = std::nullopt;
