@@ -643,6 +643,7 @@ namespace detail {
         Diligent::TextureSubResData _texture_subres_data[] = { { pixels.data(), 4 * Diligent::Uint64 { _texture_desc.Width } } };
         Diligent::TextureData _texture_data(_texture_subres_data, _countof(_texture_subres_data));
         owner._diligent_render_device->CreateTexture(_texture_desc, &_texture_data, &_diligent_texture);
+        _diligent_texture_view = _diligent_texture->GetDefaultView(Diligent::TEXTURE_VIEW_SHADER_RESOURCE);
     }
 
     void shader_handle::create(

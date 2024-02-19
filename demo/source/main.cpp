@@ -85,6 +85,19 @@ struct Composed {
     bungeegum::widget_ref<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>();
 };
 
+
+
+struct drawerwidget {
+
+    void draw(bungeegum::draw_command& command)
+    {
+        bungeegum::float2 _min_point = bungeegum::float2 { 500.f, 500.f };
+        bungeegum::float2 _max_point = _min_point + bungeegum::float2 { 500.f, 500.f };
+        command.draw_rect_filled(_min_point, _max_point, { 1.f, 0.5f, 0.5f, 1.f });
+    }
+
+};
+
 int main()
 {
     // bungeegum::detail::chronometer<30u> _chrono;
@@ -139,7 +152,7 @@ int main()
 
     bungeegum::texture_resource _texture_res;
     _texture_res.pixels({ 0u });
-    _texture_res.size(1, 1);
+    _texture_res.size(1, 2);
     bungeegum::texture_ref _tex = bungeegum::make_texture("my tex 1", _texture_res);
 
     bungeegum::shader_resource _shader1_res;
@@ -171,7 +184,7 @@ int main()
     bungeegum::shader_ref _shader1 = bungeegum::get_shader("my shader 1");
     _shader1.uniform<float>("okok", 44.f);
 
-    _my_pipeline.root(bungeegum::make<Title>().title("mytitle"));
+    _my_pipeline.root(bungeegum::make<drawerwidget>());
     _my_pipeline.run(60, true);
 
     // p.root(bungeegum::widget_id( bungeegum::make<Title>()

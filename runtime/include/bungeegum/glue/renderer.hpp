@@ -214,11 +214,9 @@ namespace detail {
 
     private:
         Diligent::RefCntAutoPtr<Diligent::ITexture> _diligent_texture = {};
+        Diligent::RefCntAutoPtr<Diligent::ITextureView> _diligent_texture_view = {};
     };
 
-    struct texture_view_handle {
-
-    }; /// ??????
 
     /// @brief for user defined shaders in HLSL etc
     struct shader_handle {

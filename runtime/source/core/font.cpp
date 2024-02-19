@@ -27,7 +27,7 @@ namespace detail {
 
 font_resource::font_resource(const detail::font_resource_data& data)
     : _data(data)
-{
+{   
 }
 
 font_ref::font_ref(const detail::font_ref_data& data)

@@ -115,7 +115,7 @@ namespace detail {
                 } else {
                     float2 _max_size = zero<float2>;
                     for (detail::widget_update_data& _child_widget_data : updatable.children) {
-                        widget_id _child_widget = detail::global().widgets.create_runtime_widget(_child_widget_data);
+                        widget_id _child_widget = detail::widget_id_access::make_from_data(_child_widget_data.raw);
                         float2 _child_size = command.resolve_child(_child_widget, command.get_min_size(), command.get_max_size());
                         _max_size = glm::max(_max_size, _child_size);
                         command.position_child(_child_widget, zero<float2>);
