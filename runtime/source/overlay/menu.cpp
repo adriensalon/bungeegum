@@ -24,8 +24,8 @@ namespace detail {
 
     namespace {
 
-        imgui_font_handle regular_font;
-        imgui_font_handle extrabold_font;
+        imgui_font_handle regular_font = {};
+        imgui_font_handle extrabold_font = {};
         ImFont* icons_font = nullptr;
 
         bool show_build_overlay = false;

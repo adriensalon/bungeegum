@@ -261,9 +261,7 @@ namespace detail {
 
         /// @brief
         /// @param owner
-        void create(
-            renderer& owner,
-            ImFontAtlas* atlas = nullptr);
+        void create(renderer& owner, ImFontAtlas* atlas = nullptr);
 
         /// @brief
         [[nodiscard]] bool has_value() const;
@@ -274,8 +272,6 @@ namespace detail {
         void new_frame();
 
         void render();
-
-        void use();
 
         /// @brief 
         float4x4 projection_matrix; // default to orthographic!
@@ -288,17 +284,14 @@ namespace detail {
         bool _is_base_vertex_supported = false;
         ImGuiContext* _imgui_context = nullptr;
         ImPlotContext* _implot_context = nullptr;
-        
+        std::optional<std::reference_wrapper<renderer>> _owner = std::nullopt;        
         unsigned int _vertex_buffer_size = default_initial_vertex_buffer_size;
         unsigned int _index_buffer_size = default_initial_index_buffer_size;
-
-        std::optional<std::reference_wrapper<renderer>> _owner = std::nullopt;
-        texture_handle _font_texture = {};
-        shader_handle _shader = {};
-
-
-        Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource;
+        Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource = {};
         Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
+        texture_handle _font_texture = {};
+        shader_handle _draw_shader = {};
+        shader_handle _mask_shader = {};
         friend struct imgui_font_handle;
     };
 

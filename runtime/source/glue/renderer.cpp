@@ -338,7 +338,7 @@ namespace detail {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
     void imgui_context_handle::consume_emscripten_key_events(std::vector<emscripten_key_event>& events)
     {
-        use();
+        ImGui::SetCurrentContext(_imgui_context);
         // for (const emscripten_key_event& _event : events) {
         //     _data->imgui_renderer->OnKeyEvent(_event.event_type, _event.event);
         // }
@@ -346,7 +346,7 @@ namespace detail {
 
     void imgui_context_handle::consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events)
     {
-        use();
+        ImGui::SetCurrentContext(_imgui_context);
         auto& io = ImGui::GetIO();
         for (const emscripten_mouse_event& _event : events) {
             io.MousePos = ImVec2(_event.event->targetX, _event.event->targetY);
@@ -358,7 +358,7 @@ namespace detail {
 
     void imgui_context_handle::consume_emscripten_wheel_events(std::vector<emscripten_wheel_event>& events)
     {
-        use();
+        ImGui::SetCurrentContext(_imgui_context);
         // for (const emscripten_wheel_event& _event : events) {
         //     _data->imgui_renderer->OnWheelEvent(_event.event_type, _event.event);
         // }
@@ -366,7 +366,7 @@ namespace detail {
 #else
     void imgui_context_handle::consume_sdl_events(std::vector<SDL_Event>& events)
     {
-        use();
+        ImGui::SetCurrentContext(_imgui_context);
         for (const SDL_Event& _event : events) {
             ImGui_ImplSDL2_ProcessEvent(&_event);
         }
@@ -383,7 +383,7 @@ namespace detail {
         _is_base_vertex_supported = owner._diligent_render_device->GetAdapterInfo().DrawCommand.CapFlags & Diligent::DRAW_COMMAND_CAP_FLAG_BASE_VERTEX;
         _imgui_context = ImGui::CreateContext(atlas);
         _implot_context = ImPlot::CreateContext();
-        use();
+        ImGui::SetCurrentContext(_imgui_context);
         ImGuiIO& _io = ImGui::GetIO();
         // _io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         
@@ -416,7 +416,7 @@ namespace detail {
         ImGui_ImplSDL2_InitForOpenGL(owner._sdl_window, nullptr);
 #endif
         _owner = std::ref(owner);
-        _shader.create(owner, VertexShaderHLSL, PixelShaderHLSL);
+        _draw_shader.create(owner, VertexShaderHLSL, PixelShaderHLSL);
 
         
         _io.Fonts->AddFontDefault();
@@ -430,7 +430,7 @@ namespace detail {
             static_cast<std::size_t>(_raw_width), 
             static_cast<std::size_t>(_raw_height));        
         _diligent_shader_resource.Release();
-        _shader._diligent_pipeline_state->CreateShaderResourceBinding(&(_diligent_shader_resource), true);
+        _draw_shader._diligent_pipeline_state->CreateShaderResourceBinding(&(_diligent_shader_resource), true);
         _diligent_texture_variable = _diligent_shader_resource->GetVariableByName(Diligent::SHADER_TYPE_PIXEL, "Texture");
         VERIFY_EXPR(_diligent_texture_variable != nullptr);
         _io.Fonts->TexID = _font_texture.get_id().value();
@@ -446,7 +446,7 @@ namespace detail {
         ImPlot::DestroyContext(_implot_context);
         _owner = std::nullopt;
         _font_texture.destroy();
-        _shader.destroy();
+        _draw_shader.destroy();
         _diligent_shader_resource.Release();
         _diligent_texture_variable = nullptr;
         _has_value = false;
@@ -459,7 +459,7 @@ namespace detail {
 
     void imgui_context_handle::new_frame()
     {
-        use();
+        ImGui::SetCurrentContext(_imgui_context);
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         const Diligent::SwapChainDesc& _swapchain_descriptor = rnd._diligent_swap_chain->GetDesc();
         const float _display_height = static_cast<float>(_swapchain_descriptor.Height);
@@ -475,7 +475,7 @@ namespace detail {
 #else
         ImGui_ImplSDL2_NewFrame();
 #endif
-        if (!_shader.has_value()) {
+        if (!_draw_shader.has_value()) {
             // _shader.create(rnd);
         }
         ImGui::NewFrame();
@@ -492,8 +492,8 @@ namespace detail {
             return;
 
         // Create and grow vertex/index buffers if needed
-        if (!_shader._diligent_vertex_buffer || static_cast<int>(_vertex_buffer_size) < _imgui_draw_data->TotalVtxCount) {
-            _shader._diligent_vertex_buffer.Release();
+        if (!_draw_shader._diligent_vertex_buffer || static_cast<int>(_vertex_buffer_size) < _imgui_draw_data->TotalVtxCount) {
+            _draw_shader._diligent_vertex_buffer.Release();
             while (static_cast<int>(_vertex_buffer_size) < _imgui_draw_data->TotalVtxCount) {
                 _vertex_buffer_size *= 2;
             }
@@ -503,10 +503,10 @@ namespace detail {
             VBDesc.Size = _vertex_buffer_size * sizeof(ImDrawVert);
             VBDesc.Usage = Diligent::USAGE_DYNAMIC;
             VBDesc.CPUAccessFlags = Diligent::CPU_ACCESS_WRITE;
-            _owner_ref._diligent_render_device->CreateBuffer(VBDesc, nullptr, &(_shader._diligent_vertex_buffer));
+            _owner_ref._diligent_render_device->CreateBuffer(VBDesc, nullptr, &(_draw_shader._diligent_vertex_buffer));
         }
-        if (!_shader._diligent_index_buffer || static_cast<int>(_index_buffer_size) < _imgui_draw_data->TotalIdxCount) {
-            _shader._diligent_index_buffer.Release();
+        if (!_draw_shader._diligent_index_buffer || static_cast<int>(_index_buffer_size) < _imgui_draw_data->TotalIdxCount) {
+            _draw_shader._diligent_index_buffer.Release();
             while (static_cast<int>(_index_buffer_size) < _imgui_draw_data->TotalIdxCount) {
                 _index_buffer_size *= 2;
             }
@@ -516,12 +516,12 @@ namespace detail {
             IBDesc.Size = _index_buffer_size * sizeof(ImDrawIdx);
             IBDesc.Usage = Diligent::USAGE_DYNAMIC;
             IBDesc.CPUAccessFlags = Diligent::CPU_ACCESS_WRITE;
-            _owner_ref._diligent_render_device->CreateBuffer(IBDesc, nullptr, &(_shader._diligent_index_buffer));
+            _owner_ref._diligent_render_device->CreateBuffer(IBDesc, nullptr, &(_draw_shader._diligent_index_buffer));
         }
 
         {
-            Diligent::MapHelper<ImDrawVert> Vertices(_owner_ref._diligent_device_context, _shader._diligent_vertex_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
-            Diligent::MapHelper<ImDrawIdx> Indices(_owner_ref._diligent_device_context, _shader._diligent_index_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
+            Diligent::MapHelper<ImDrawVert> Vertices(_owner_ref._diligent_device_context, _draw_shader._diligent_vertex_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
+            Diligent::MapHelper<ImDrawIdx> Indices(_owner_ref._diligent_device_context, _draw_shader._diligent_index_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
             ImDrawVert* pVtxDst = Vertices;
             ImDrawIdx* pIdxDst = Indices;
             for (int CmdListID = 0; CmdListID < _imgui_draw_data->CmdListsCount; CmdListID++) {
@@ -550,17 +550,17 @@ namespace detail {
                 0.0f, 0.0f, 0.5f, 0.0f,
                 (R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f
             };
-            Diligent::MapHelper<float4x4> CBData(_owner_ref._diligent_device_context, _shader._diligent_uniform_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
+            Diligent::MapHelper<float4x4> CBData(_owner_ref._diligent_device_context, _draw_shader._diligent_uniform_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
             *CBData = Projection;
         }
 
         auto SetupRenderState = [&]() //
         {
             // Setup shader and vertex buffers
-            Diligent::IBuffer* pVBs[] = { _shader._diligent_vertex_buffer };
+            Diligent::IBuffer* pVBs[] = { _draw_shader._diligent_vertex_buffer };
             _owner_ref._diligent_device_context->SetVertexBuffers(0, 1, pVBs, nullptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION, Diligent::SET_VERTEX_BUFFERS_FLAG_RESET);
-            _owner_ref._diligent_device_context->SetIndexBuffer(_shader._diligent_index_buffer, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-            _owner_ref._diligent_device_context->SetPipelineState(_shader._diligent_pipeline_state);
+            _owner_ref._diligent_device_context->SetIndexBuffer(_draw_shader._diligent_index_buffer, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+            _owner_ref._diligent_device_context->SetPipelineState(_draw_shader._diligent_pipeline_state);
 
             const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
             _owner_ref._diligent_device_context->SetBlendFactors(blend_factor);
@@ -634,7 +634,7 @@ namespace detail {
                     if (_is_base_vertex_supported) {
                         DrawAttrs.BaseVertex = pCmd->VtxOffset + GlobalVtxOffset;
                     } else {
-                        Diligent::IBuffer* pVBs[] = { _shader._diligent_vertex_buffer };
+                        Diligent::IBuffer* pVBs[] = { _draw_shader._diligent_vertex_buffer };
                         Diligent::Uint64 VtxOffsets[] = { sizeof(ImDrawVert) * (size_t { pCmd->VtxOffset } + size_t { GlobalVtxOffset }) };
                         _owner_ref._diligent_device_context->SetVertexBuffers(0, 1, pVBs, VtxOffsets, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION, Diligent::SET_VERTEX_BUFFERS_FLAG_NONE);
                     }
@@ -644,12 +644,6 @@ namespace detail {
             GlobalIdxOffset += pCmdList->IdxBuffer.Size;
             GlobalVtxOffset += pCmdList->VtxBuffer.Size;
         }
-    }
-    
-    void imgui_context_handle::use()
-    {
-        ImGui::SetCurrentContext(_imgui_context);
-        ImPlot::SetCurrentContext(_implot_context);
     }
 
     void imgui_font_handle::create(
@@ -683,7 +677,7 @@ namespace detail {
             static_cast<std::size_t>(_raw_height));
         
         context._diligent_shader_resource.Release();
-        context._shader._diligent_pipeline_state->CreateShaderResourceBinding(&(context._diligent_shader_resource), true);
+        context._draw_shader._diligent_pipeline_state->CreateShaderResourceBinding(&(context._diligent_shader_resource), true);
         context._diligent_texture_variable = context._diligent_shader_resource->GetVariableByName(Diligent::SHADER_TYPE_PIXEL, "Texture");
         VERIFY_EXPR(context._diligent_texture_variable != nullptr);
 
