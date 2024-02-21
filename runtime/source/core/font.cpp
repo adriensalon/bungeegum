@@ -48,11 +48,10 @@ font_ref make_font(const std::string& name, font_resource& resource)
     detail::font_ref_data& _ref_data = _global.fonts.fonts[name];
     detail::font_resource_data& _resource_data = detail::font_resource_access::get_data(resource);
     for (std::pair<const uintptr_t, std::reference_wrapper<bungeegum::detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-        detail::renderer& _owner = _it.second.get().pipeline_renderer;
-        detail::imgui_context_handle& _user_context = _it.second.get().user_context;
+        detail::pipeline_data& _pipeline_data = _it.second.get();
         _ref_data.fonts[_it.first].create(
-            _owner,
-            _user_context,
+            _pipeline_data.pipeline_renderer,
+            _pipeline_data.user_context,
             _resource_data.compressed,
             _resource_data.count,
             _resource_data.size);

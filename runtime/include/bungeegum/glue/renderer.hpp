@@ -152,6 +152,28 @@ namespace detail {
         friend struct imgui_renderer;
     };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
     /// @brief
     struct texture_handle {
         texture_handle() = default;
@@ -186,6 +208,19 @@ namespace detail {
         Diligent::RefCntAutoPtr<Diligent::ITexture> _diligent_texture = {};
         Diligent::RefCntAutoPtr<Diligent::ITextureView> _diligent_texture_view = {};
     };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /// @brief for user defined shaders in HLSL etc
