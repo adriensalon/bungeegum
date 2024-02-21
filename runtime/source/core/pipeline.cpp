@@ -1,4 +1,5 @@
 #include <imgui.h>
+#include <SDL.h> // event only omg
 
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/pipeline.hpp>
@@ -9,7 +10,7 @@ namespace bungeegum {
 namespace detail {
 
 #if BUNGEEGUM_USE_OVERLAY
-    extern void setup_overlay();
+    extern void setup_overlay(renderer& owner, imgui_context_handle& context);
     extern void draw_overlay();
 #endif
 
@@ -213,11 +214,7 @@ namespace detail {
 
     void render_widgets()
     {
-        ImDrawList* _drawlist = ImGui::GetBackgroundDrawList();
-        draw_widgets(_drawlist);
-#if BUNGEEGUM_USE_OVERLAY
-        draw_overlay();
-#endif
+
     }
 
     void setup_window(window& pipeline_window, const pipeline_provider& provider)
@@ -251,24 +248,34 @@ namespace detail {
 #endif
     }
 
-    void update_input_frame(window& pipeline_window, renderer& pipeline_renderer)
+    void update_input_frame(pipeline_data& data)
     {
-        pipeline_window.poll();
-        if (!pipeline_window.window_resized_events.empty()) {
-            pipeline_renderer.resize(pipeline_window.window_resized_events.back().new_size);
+        data.pipeline_window.poll();
+        if (!data.pipeline_window.window_resized_events.empty()) {
+            data.pipeline_renderer.resize(data.pipeline_window.window_resized_events.back().new_size);
         }
-#if BUNGEEGUM_USE_OVERLAY
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        pipeline_renderer.consume_emscripten_key_events(pipeline_window.get_emscripten_key_events());
-        pipeline_renderer.consume_emscripten_mouse_events(pipeline_window.get_emscripten_mouse_events());
-        pipeline_renderer.consume_emscripten_wheel_events(pipeline_window.get_emscripten_wheel_events());
-#else
-        pipeline_renderer.consume_sdl_events(pipeline_window.get_sdl_events());
+        data.user_context.consume_emscripten_key_events(pipeline_window.get_emscripten_key_events());
+        data.user_context.consume_emscripten_mouse_events(pipeline_window.get_emscripten_mouse_events());
+        data.user_context.consume_emscripten_wheel_events(pipeline_window.get_emscripten_wheel_events());
+#if BUNGEEGUM_USE_OVERLAY
+        data.overlay_context.consume_emscripten_key_events(pipeline_window.get_emscripten_key_events());
+        data.overlay_context.consume_emscripten_mouse_events(pipeline_window.get_emscripten_mouse_events());
+        data.overlay_context.consume_emscripten_wheel_events(pipeline_window.get_emscripten_wheel_events());
 #endif
+        pipeline_window.get_emscripten_key_events().clear();
+        pipeline_window.get_emscripten_mouse_events().clear();
+        pipeline_window.get_emscripten_wheel_events().clear();
+#else
+        data.user_context.consume_sdl_events(data.pipeline_window.get_sdl_events());
+#if BUNGEEGUM_USE_OVERLAY
+        data.overlay_context.consume_sdl_events(data.pipeline_window.get_sdl_events());
+#endif
+        data.pipeline_window.get_sdl_events().clear();
 #endif
     }
 
-    void update_process_frame(renderer& pipeline_renderer, widget_update_data& root_updatable, const float2 viewport_size, const BUNGEEGUM_USE_TIME_UNIT& delta_time, const bool force_rendering, const bool exclusive_rendering)
+    void update_process_frame(pipeline_data& data, const float2 viewport_size, const BUNGEEGUM_USE_TIME_UNIT& delta_time, const bool force_rendering, const bool exclusive_rendering)
     {
         global_manager_data& _global = global();
 		pipeline_data& _pipeline = _global.pipelines.current.value().get();
@@ -280,15 +287,26 @@ namespace detail {
 			widget_update_data& _root_updatable = _pipeline.root_updatable.value().get();
 			_global.widgets.drawables = { { _root_updatable.raw, std::ref(_root_updatable) } };
 		}
-		process_widgets(viewport_size, delta_time, root_updatable);
+		process_widgets(viewport_size, delta_time, data.root_updatable.value());
 		if (!_global.widgets.drawables.empty()) {
             _pipeline.steps_chronometer.begin_task("draw pass");
             if (exclusive_rendering) {
-				pipeline_renderer.new_frame();
+				data.pipeline_renderer.clear_screen();
 			}
-            render_widgets();
+
+            data.user_context.new_frame();
+            ImDrawList* _drawlist = ImGui::GetBackgroundDrawList();
+            draw_widgets(_drawlist);
+            data.user_context.render();
+
+#if BUNGEEGUM_USE_OVERLAY
+            data.overlay_context.new_frame();
+            draw_overlay();
+            data.overlay_context.render();
+#endif
+
 			if (exclusive_rendering) {
-            	pipeline_renderer.present();
+            	data.pipeline_renderer.present();
 			}
             _pipeline.steps_chronometer.end_task("draw pass");
         }
@@ -311,9 +329,12 @@ pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& 
         _data.pipeline_renderer.create_directx11(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
-    detail::setup_overlay(); // loading fonts there ? fugly go renderer	
+    _data.overlay_context.create(_data.pipeline_renderer, nullptr);
+    detail::setup_overlay(_data.pipeline_renderer, _data.overlay_context);
 #endif
-    _data.pipeline_renderer.rebuild_user_fonts();
+
+    _data.user_context.create(_data.pipeline_renderer, nullptr);
+
 	detail::global_manager_data& _global = detail::global();
 	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
     return *this;
@@ -335,9 +356,9 @@ pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& 
         _data.pipeline_renderer.create_directx12(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
-    detail::setup_overlay(); // loading fonts there ? fugly go renderer
+    detail::setup_overlay(_data.pipeline_renderer, _data.overlay_context);
 #endif
-    _data.pipeline_renderer.rebuild_user_fonts();
+    _data.user_context.create(_data.pipeline_renderer, nullptr);
 	detail::global_manager_data& _global = detail::global();
 	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
     return *this;
@@ -357,9 +378,9 @@ pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& pro
         _data.pipeline_renderer.create_opengl(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
-    detail::setup_overlay(); // loading fonts there ? fugly go renderer
+    detail::setup_overlay(_data.pipeline_renderer, _data.overlay_context);
 #endif
-    _data.pipeline_renderer.rebuild_user_fonts();
+    _data.user_context.create(_data.pipeline_renderer, nullptr);
 	detail::global_manager_data& _global = detail::global();
 	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
     return *this;
@@ -386,9 +407,9 @@ void pipeline::run(const std::optional<unsigned int> frames_per_second, const bo
     _data.pipeline_window.update_loop(frames_per_second, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
         detail::protect_library([this, &delta_time, force_rendering]() {
 			detail::global().pipelines.current = std::ref(_data);
-            detail::update_input_frame(_data.pipeline_window, _data.pipeline_renderer);
+            detail::update_input_frame(_data);
             float2 _viewport_size = _data.pipeline_window.get_size();
-            detail::update_process_frame(_data.pipeline_renderer, _data.root_updatable.value(), _viewport_size, delta_time, force_rendering, true);
+            detail::update_process_frame(_data, _viewport_size, delta_time, force_rendering, true);
             detail::update_hotswap_frame("C:/Users/adri/desktop/ok.json", _data.root_updatable.value());
         });
     });
@@ -402,9 +423,9 @@ pipeline& pipeline::run_once(const bool force_rendering)
     _data.pipeline_window.update_once(9999u, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
         detail::protect_library([this, &delta_time, force_rendering]() {			
 			detail::global().pipelines.current = std::ref(_data);
-            detail::update_input_frame(_data.pipeline_window, _data.pipeline_renderer);
+            detail::update_input_frame(_data);
             float2 _viewport_size = _data.pipeline_window.get_size();
-            detail::update_process_frame(_data.pipeline_renderer, _data.root_updatable.value(), _viewport_size, delta_time, force_rendering, false);
+            detail::update_process_frame(_data, _viewport_size, delta_time, force_rendering, false);
             detail::update_hotswap_frame("C:/Users/adri/desktop/ok.json", _data.root_updatable.value());
         });
     });

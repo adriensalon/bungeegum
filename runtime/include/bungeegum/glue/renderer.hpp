@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN && !defined(PLATFORM_EMSCRIPTEN)
 #define PLATFORM_EMSCRIPTEN
 #elif TOOLCHAIN_PLATFORM_WIN32 && !defined(PLATFORM_WIN32)
@@ -31,6 +29,10 @@
 #include <Graphics/GraphicsEngine/interface/ShaderResourceBinding.h>
 #include <Graphics/GraphicsEngine/interface/SwapChain.h>
 #include <Graphics/GraphicsEngine/interface/TextureView.h>
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #include <bungeegum/config/backend.hpp>
 #include <bungeegum/config/feature.hpp>
@@ -65,6 +67,12 @@ namespace detail {
     inline static std::string_view default_emscripten_canvas = "#canvas";
 #endif
 
+
+
+
+
+
+
     /// @brief Instances of this struct represent cross-platform GPU renderers that will select the
     /// most appropriate graphics API depending on the platform. Macros defined above can be
     /// modified to force usage of a specific platform.
@@ -92,16 +100,6 @@ namespace detail {
         void attach_vulkan(window& existing_window);
 #endif
 
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        void consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events);
-
-        void consume_emscripten_wheel_events(std::vector<emscripten_wheel_event>& events);
-
-        void consume_emscripten_key_events(std::vector<emscripten_key_event>& events);
-#else
-        void consume_sdl_events(std::vector<SDL_Event>& events);
-#endif
-
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
         /// @brief Creates an instance from an existing window with the DirectX 11 API.
         void create_directx11(window& existing_window);
@@ -127,7 +125,7 @@ namespace detail {
 
         /// @brief Begins a new frame, enabling all drawing commands.
         /// @exception Throws a backtraced exception if a new frame has already begun.
-        void new_frame();
+        void clear_screen();
 
         /// @brief Ends the frame, disabling all drawing commands. Swaps the window buffers.
         /// @exception Throws a backtraced exception if the frame has already been ended.
@@ -147,38 +145,6 @@ namespace detail {
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         SDL_Window* _sdl_window = nullptr;
 #endif
-
-    public:
-        /// @brief Rebuilds the ImGui fonts.
-        void rebuild_user_fonts();
-
-#if BUNGEEGUM_USE_OVERLAY
-        /// @brief Rebuilds the ImGui fonts.
-        void rebuild_overlay_fonts();
-#endif
-
-        float4x4 projection_matrix; // default to orthographic!
-
-        float4x4 view_matrix; // default to identity!
-
-        Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_ignore_stencil_pipeline;
-        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_ignore_stencil_vertex_buffer;
-        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_ignore_stencil_index_buffer;
-        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_uniform_buffer;
-        bool _is_base_vertex_supported = false;
-        unsigned int _vertex_buffer_size = default_initial_vertex_buffer_size;
-        unsigned int _index_buffer_size = default_initial_index_buffer_size;
-        Diligent::RefCntAutoPtr<Diligent::ITextureView> _user_font_texture;
-        Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource;
-        Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
-        ImGuiContext* _user_imgui_context = nullptr;
-        ImPlotContext* _implot_context = nullptr;
-
-#if BUNGEEGUM_USE_OVERLAY
-        Diligent::RefCntAutoPtr<Diligent::ITextureView> _overlay_font_texture;
-        ImGuiContext* _overlay_imgui_context = nullptr;
-#endif
-
         friend struct shader_handle;
         friend struct texture_handle;
         friend struct imgui_context_handle;
@@ -209,10 +175,14 @@ namespace detail {
         [[nodiscard]] bool has_value() const;
 
         /// @brief
-        /// @param owner
-        void destroy(renderer& owner);
+        void destroy();
+
+        /// @brief 
+        /// @return 
+        std::optional<void*> get_id() const;
 
     private:
+        bool _has_value = false;
         Diligent::RefCntAutoPtr<Diligent::ITexture> _diligent_texture = {};
         Diligent::RefCntAutoPtr<Diligent::ITextureView> _diligent_texture_view = {};
     };
@@ -249,15 +219,27 @@ namespace detail {
         [[nodiscard]] bool has_value() const;
 
         /// @brief
-        /// @param owner
-        void destroy(renderer& owner);
+        void destroy();
 
     private:
+        bool _has_value = false;
         Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_pipeline_state = {};
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_vertex_buffer = {};
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_index_buffer = {};
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_uniform_buffer = {};
+        friend struct imgui_context_handle;
+        friend struct imgui_font_handle;
     };
+
+
+
+
+
+
+
+
+
+
 
     /// @brief
     struct imgui_context_handle {
@@ -266,6 +248,16 @@ namespace detail {
         imgui_context_handle& operator=(const imgui_context_handle& other) = default;
         imgui_context_handle(imgui_context_handle&& other) = default;
         imgui_context_handle& operator=(imgui_context_handle&& other) = default;
+     
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        void consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events);
+
+        void consume_emscripten_wheel_events(std::vector<emscripten_wheel_event>& events);
+
+        void consume_emscripten_key_events(std::vector<emscripten_key_event>& events);
+#else
+        void consume_sdl_events(std::vector<SDL_Event>& events);
+#endif
 
         /// @brief
         /// @param owner
@@ -273,24 +265,40 @@ namespace detail {
             renderer& owner,
             ImFontAtlas* atlas = nullptr);
 
-        // fonts ?
-
         /// @brief
         [[nodiscard]] bool has_value() const;
 
         /// @brief
-        /// @param owner
-        void destroy(renderer& owner);
+        void destroy();        
+
+        void new_frame();
+
+        void render();
+
+        void use();
+
+        /// @brief 
+        float4x4 projection_matrix; // default to orthographic!
+
+        /// @brief 
+        float4x4 view_matrix; // default to identity!
 
     private:
+        bool _has_value = false;
         bool _is_base_vertex_supported = false;
+        ImGuiContext* _imgui_context = nullptr;
+        ImPlotContext* _implot_context = nullptr;
+        
         unsigned int _vertex_buffer_size = default_initial_vertex_buffer_size;
         unsigned int _index_buffer_size = default_initial_index_buffer_size;
-        Diligent::RefCntAutoPtr<Diligent::ITextureView> _user_font_texture;
+
+        std::optional<std::reference_wrapper<renderer>> _owner = std::nullopt;
+        texture_handle _font_texture = {};
+        shader_handle _shader = {};
+
+
         Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource;
         Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
-        ImGuiContext* _user_imgui_context = nullptr;
-        ImPlotContext* _implot_context = nullptr;
         friend struct imgui_font_handle;
     };
 
@@ -298,17 +306,24 @@ namespace detail {
     struct imgui_font_handle {
 
         void create(
-            imgui_context_handle& owner,
+            renderer& owner,
+            imgui_context_handle& context,
             const void* ttf,
             const std::size_t count,
             const float size);
 
+        
+        /// @brief
+        [[nodiscard]] bool has_value() const;
+
+        /// @brief
+        void destroy();  
+
+        std::optional<ImFont*> get_font() const;
+
     private:
-        ImFont* _font_ptr = nullptr;
+        bool _has_value = false;
+        ImFont* _imgui_font = nullptr;
     };
 }
 }
-
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif

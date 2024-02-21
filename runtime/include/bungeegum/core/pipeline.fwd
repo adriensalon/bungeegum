@@ -40,11 +40,8 @@ namespace detail {
         window pipeline_window = {};
         renderer pipeline_renderer = {};
 
-        shader_handle user_shader = {};
-        shader_handle mask_shader = {};
         imgui_context_handle user_context = {};
 #if BUNGEEGUM_USE_OVERLAY
-        shader_handle overlay_shader = {};
         imgui_context_handle overlay_context = {};
 #endif
 

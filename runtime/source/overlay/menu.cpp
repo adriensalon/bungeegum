@@ -7,6 +7,7 @@
 #include <functional>
 
 #include <bungeegum/glue/imutil.hpp>
+#include <bungeegum/glue/renderer.hpp>
 
 #include "compressed/font_awesome.hpp"
 #include "compressed/inter_extrabold.cpp"
@@ -23,8 +24,8 @@ namespace detail {
 
     namespace {
 
-        ImFont* regular_font = nullptr;
-        ImFont* extrabold_font = nullptr;
+        imgui_font_handle regular_font;
+        imgui_font_handle extrabold_font;
         ImFont* icons_font = nullptr;
 
         bool show_build_overlay = false;
@@ -41,7 +42,7 @@ namespace detail {
 
 		void with_theme(const std::function<void()>& callback)
 		{
-			font_guard _fguard00(regular_font);
+			font_guard _fguard00(regular_font.get_font().value());
 
 			color_guard _cguard00(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 1.f });
             color_guard _cguard01(ImGuiCol_ScrollbarBg, { 0.878f, 0.878f, 0.878f, 1.f });
@@ -107,7 +108,7 @@ namespace detail {
         {
             font_guard _fg_selected;
             if (state)
-                _fg_selected.set(extrabold_font);
+                _fg_selected.set(extrabold_font.get_font().value());
             std::string _name_str = name.data() + std::string("##__bungeegum_footer_button_") + name.data();
             if (ImGui::Button(_name_str.c_str())) {
                 state = !state;
@@ -148,7 +149,7 @@ namespace detail {
                     ImGui::Text(_metrics_text_1);
                     ImGui::SetCursorPosY(_cursor_pos_mem.y);
                     {
-                        font_guard _fglast(extrabold_font);
+                        font_guard _fglast(extrabold_font.get_font().value());
                         ImGui::Text(_metrics_text_2);
                     }
                     ImGui::EndMenuBar();
@@ -158,31 +159,12 @@ namespace detail {
         }
     }
 
-    void setup_overlay()
+    void setup_overlay(renderer& owner, imgui_context_handle& context)
     {
-        // setup_profiler_overlay();
-
         static bool _installed = false;
         if (!_installed) {
-
-            // config.
-            ImGuiIO& io = ImGui::GetIO();
-            // io.Fonts->AddFontFromMemoryCompressedTTF(helvetica_compressed_data, helvetica_compressed_size, 13.0f);
-            regular_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_regular_compressed_data, inter_regular_compressed_size, 13.0f);
-            extrabold_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_extrabold_compressed_data, inter_extrabold_compressed_size, 13.0f);
-            // shared_data::regular_font = io.Fonts->AddFontFromMemoryCompressedTTF(inter_extrabold_compressed_data, inter_extrabold_compressed_size, 13.0f);
-
-            // font awesome for the glyphs
-            // ImFontConfig config;
-            // config.MergeMode = true;
-            // config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
-            // static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-            // icons_font = io.Fonts->AddFontFromMemoryCompressedTTF(fa4_compressed_data, fa4_compressed_size, 13.0f, &config, icon_ranges);
-
-            // build
-            io.Fonts->Build();
-            io.FontDefault = regular_font;
-            _installed = true;
+            regular_font.create(owner, context, inter_regular_compressed_data, inter_regular_compressed_size, 13.0f);
+            extrabold_font.create(owner, context, inter_extrabold_compressed_data, inter_extrabold_compressed_size, 13.0f);
         }
     }
 
