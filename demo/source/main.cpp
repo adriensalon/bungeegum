@@ -92,8 +92,12 @@ struct drawerwidget {
     void draw(bungeegum::draw_command& command)
     {
         bungeegum::float2 _min_point = bungeegum::float2 { 500.f, 500.f };
-        bungeegum::float2 _max_point = _min_point + bungeegum::float2 { 500.f, 500.f };
-        command.draw_rect_filled(_min_point, _max_point, { 1.f, 0.5f, 0.5f, 1.f });
+        bungeegum::float2 _max_point_1 = _min_point + bungeegum::float2 { 100.f, 100.f };
+        bungeegum::float2 _max_point_2 = _min_point + bungeegum::float2 { 500.f, 500.f };
+        command.use_shader_mask();
+        command.draw_rect_filled(_min_point - bungeegum::float2 {10.f, 10.f }, _max_point_1, { 1.f, 1.f, 0.5f, 1.f });
+        command.use_shader_default();
+        command.draw_rect_filled(_min_point, _max_point_2, { 1.f, 0.5f, 0.5f, 1.f });
     }
 
 };

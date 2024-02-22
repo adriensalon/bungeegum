@@ -268,7 +268,7 @@ namespace detail {
     struct shader_stencil_descriptor {
 
         /// @brief 
-        bool enable = false;
+        bool enable = true;
         
         /// @brief 
         std::uint8_t read_mask = 0xFF;

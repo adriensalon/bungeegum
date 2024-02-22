@@ -221,12 +221,15 @@ float2 resolve_command::resolve_child(const widget_id child_id, const float2 min
     return _child_updatable.resolved_size;
 }
 
-void resolve_command::position_child(const widget_id child_id, const float2 position)
+void resolve_command::position_child(const widget_id child_id, const float2 position, const bool absolute)
 {
     detail::widget_manager_data& _manager = detail::global().widgets;
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
     detail::widget_update_data& _child_updatable = _manager.updatables[_child_raw];
-    _child_updatable.local_position = float3(position, 0.f);
+    if (absolute) {
+        _child_updatable.local_position = zero<float3>;
+    }    
+    _child_updatable.local_position += float3(position, 0.f);
 }
 
 // void draw_command_data::draw()
@@ -290,21 +293,21 @@ void draw_command::draw_rect_filled(
     _data.list->AddRectFilled(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All);
 }
 
-void draw_command::use_default_shader()
+void draw_command::use_shader_default()
 {
     detail::global_manager_data& _global = detail::global();
     detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
     _pipeline_data.user_context.default_shader.use();
 }
 
-void draw_command::use_mask_shader()
+void draw_command::use_shader_mask()
 {
     detail::global_manager_data& _global = detail::global();
     detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
     _pipeline_data.user_context.mask_shader.use();
 }
 
-void draw_command::use_custom_shader(const shader_ref& shader)
+void draw_command::use_shader_custom(const shader_ref& shader)
 {
     // detail::global_manager_data& _global = detail::global();
     // shader._data.shaders[0].use(); // index from current pipeline_data.raw

@@ -178,29 +178,29 @@ struct resolve_command {
     /// @brief
     /// @param child_widget
     /// @param position
-    void position_child(const widget_id child_widget, const float2 position);
+    void position_child(const widget_id child_widget, const float2 position, const bool absolute = true);
 
     /// @brief
     /// @param position
-    void position_children(const float2 position);
+    void position_children(const float2 position, const bool absolute = true);
 
     /// @brief
     /// @param child_id
     /// @param transform
-    void rotate_child(const widget_id child_id, const float degrees = 180.f);
+    void rotate_child(const widget_id child_id, const float degrees = 180.f, const bool absolute = true);
 
     /// @brief
     /// @param child_id
     /// @param transform
-    void rotate_child(const widget_id child_id, const float3 rotation);
+    void rotate_child(const widget_id child_id, const float3 rotation, const bool absolute = true);
 
     /// @brief
     /// @param transform
-    void rotate_children(const float3 rotation);
+    void rotate_children(const float degrees = 180.f, const bool absolute = true);
 
     /// @brief
     /// @param transform
-    void rotate_children(const float degrees = 180.f);
+    void rotate_children(const float3 rotation, const bool absolute = true);
 
 private:
     friend struct detail::resolve_command_access;
@@ -220,17 +220,8 @@ struct draw_command {
     /// @brief
     [[nodiscard]] float2 get_size() const;
 
-    // /// @brief Sets the clipping rectangle for all the commands issued to this widget and all the
-    // /// commands issued by its children.
-    // /// @param first_point is the minimum point for this clipping rectangle
-    // /// @param second_point is the maximum point for this clipping rectangle
-    // void clip_rect(const float2 first_point, const float2 second_point); //
-
-    void clip_mesh(const std::vector<float2>& positions, const std::vector<std::size_t>& indices);
-
-    void orthographic_projection();
-
-    void perspective_projection(const float fov);
+    /// @brief 
+    void clear_mask();
 
     /// @brief
     /// @param child_id
@@ -240,12 +231,21 @@ struct draw_command {
     void draw_children();
 
     /// @brief
+    void draw_curve();
+
+    /// @brief
+    void draw_curve_filled();
+
+    /// @brief
     /// @param texture
     /// @param position
     /// @param size
     void draw_texture(const texture_ref& texture, const float2 position, const float2 size);
 
-    // void draw_text(const std::string text, const font& text_font); // + FONT ?
+    /// @brief 
+    /// @param text 
+    /// @param font 
+    void draw_text(const std::string text, const font_ref& font);
 
     /// @brief
     /// @param first_point
@@ -309,19 +309,34 @@ struct draw_command {
     /// @param third_corner
     /// @param color
     void draw_triangle_filled(const float2 first_corner, const float2 second_corner, const float2 third_corner, const float4 color);
-
-    // draw bezier and bspline from points direct (sans curve)
     
-
     /// @brief
-    void use_default_shader();
+    void use_shader_default();
 
     /// @brief 
-    void use_mask_shader();
+    void use_shader_mask();
 
     /// @brief
     /// @param shader
-    void use_custom_shader(const shader_ref& shader);
+    void use_shader_custom(const shader_ref& shader);
+    
+    /// @brief 
+    void use_projection_orthographic();
+
+    /// @brief 
+    /// @param fov 
+    void use_projection_perspective(const float fov);
+
+    /// @brief Sets the clipping rectangle for all the commands issued to this widget and all the
+    /// commands issued by its children.
+    /// @param first_point is the minimum point for this clipping rectangle
+    /// @param second_point is the maximum point for this clipping rectangle
+    /// @param keep
+    void use_scissors(const float2 first_point, const float2 second_point, const bool keep = false);
+
+    /// @brief 
+    /// @param transform 
+    void use_transform(const float4x4 transform, const bool absolute = true);
 
 private:
     friend struct detail::draw_command_access;
