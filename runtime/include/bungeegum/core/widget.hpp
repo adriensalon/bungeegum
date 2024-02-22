@@ -220,9 +220,6 @@ struct draw_command {
     /// @brief
     [[nodiscard]] float2 get_size() const;
 
-    /// @brief 
-    void clear_mask();
-
     /// @brief
     /// @param child_id
     void draw_child(const widget_id child_id);
@@ -311,14 +308,17 @@ struct draw_command {
     void draw_triangle_filled(const float2 first_corner, const float2 second_corner, const float2 third_corner, const float4 color);
     
     /// @brief
+    /// @param shader
+    void use_shader_custom(const shader_ref& shader);
+
+    /// @brief
     void use_shader_default();
 
     /// @brief 
-    void use_shader_mask();
+    void use_shader_mask();    
 
-    /// @brief
-    /// @param shader
-    void use_shader_custom(const shader_ref& shader);
+    /// @brief 
+    void clear_mask();
     
     /// @brief 
     void use_projection_orthographic();

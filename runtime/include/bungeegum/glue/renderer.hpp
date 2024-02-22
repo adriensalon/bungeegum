@@ -379,10 +379,15 @@ namespace detail {
         void new_frame();
 
         /// @brief
-        void render();        
-        
+        void render();
+
+        /// @brief 
+        /// @param shaders 
+        void set_shaders(const std::vector<shader_handle>& shaders);
+
         /// @brief
-        texture_handle font_texture = {};
+        /// @param index
+        void use_shader(const std::size_t index);        
         
         /// @brief
         shader_handle default_shader = {};
@@ -394,7 +399,7 @@ namespace detail {
         float4x4 projection_matrix; // default to orthographic!
 
         /// @brief 
-        float4x4 view_matrix; // default to identity!
+        float4x4 transform_matrix = identity<float4x4>;
 
     private:
         bool _has_value = false;
@@ -406,6 +411,7 @@ namespace detail {
         unsigned int _index_buffer_size = default_initial_index_buffer_size;
         Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource = {};
         Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
+        texture_handle font_texture = {};
         friend struct imgui_font_handle;
     };
 
