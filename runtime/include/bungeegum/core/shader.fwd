@@ -12,24 +12,23 @@ struct shader_ref;
 
 namespace detail {
 
+    struct shader_blend_options_data {
+        shader_blend_descriptor descriptor = {};
+    };
+
     struct shader_depth_options_data {
-        bool depth_enable = true;
-        bool depth_write_enable = false;
-        std::size_t depth_function = 0u;
+        shader_depth_descriptor descriptor = {};
     };
 
     struct shader_stencil_options_data {
-        bool stencil_enable = false;
-        std::uint8_t stencil_read_mask = 0xFF;
-        std::uint8_t stencil_write_mask = 0xFF;
-        std::size_t face_op = 0u;
+        shader_stencil_descriptor descriptor = {};
     };
 
     struct shader_resource_data {
         std::string fragment = {};
-        shader_depth_options_data depth;
-        shader_stencil_options_data stencil;
-        // blending etc
+        shader_blend_descriptor blend = {};
+        shader_depth_descriptor depth = {};
+        shader_stencil_descriptor stencil = {};
     };
 
     struct shader_ref_data {

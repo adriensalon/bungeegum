@@ -59,9 +59,9 @@ namespace detail {
 
     struct pipeline_manager_data {
         std::unordered_map<std::uintptr_t, std::reference_wrapper<pipeline_data>> pipelines = {};
+        std::optional<std::reference_wrapper<pipeline_data>> current = std::nullopt;
 
 #if BUNGEEGUM_USE_OVERLAY
-        std::optional<std::reference_wrapper<pipeline_data>> current = std::nullopt;
         std::optional<std::uintptr_t> inspector_selected = std::nullopt;
 #endif
     };

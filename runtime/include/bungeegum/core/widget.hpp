@@ -240,13 +240,6 @@ struct draw_command {
     void draw_children();
 
     /// @brief
-    void use_default_shader();
-
-    /// @brief
-    /// @param shader
-    void use_custom_shader(const shader_ref& shader);
-
-    /// @brief
     /// @param texture
     /// @param position
     /// @param size
@@ -318,6 +311,17 @@ struct draw_command {
     void draw_triangle_filled(const float2 first_corner, const float2 second_corner, const float2 third_corner, const float4 color);
 
     // draw bezier and bspline from points direct (sans curve)
+    
+
+    /// @brief
+    void use_default_shader();
+
+    /// @brief 
+    void use_mask_shader();
+
+    /// @brief
+    /// @param shader
+    void use_custom_shader(const shader_ref& shader);
 
 private:
     friend struct detail::draw_command_access;

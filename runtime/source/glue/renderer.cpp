@@ -226,12 +226,16 @@ namespace detail {
 
     void shader_handle::create(
         renderer& owner,
-        const std::string& vertex,
-        const std::string& fragment /* TODO */)
+        const std::string& fragment,
+        const shader_blend_descriptor& blend,
+        const shader_depth_descriptor& depth,
+        const shader_stencil_descriptor& stencil)
     {
         if (_has_value) {
             destroy();
         }
+
+        _owner = std::ref(owner);
 
         Diligent::ShaderCreateInfo _shader_create_info;
         _shader_create_info.Desc.UseCombinedTextureSamplers = true;
@@ -254,7 +258,7 @@ namespace detail {
         Diligent::GraphicsPipelineStateCreateInfo PSOCreateInfo;
 
         PSOCreateInfo.PSODesc.Name = "uiw pso";
-        auto& GraphicsPipeline = PSOCreateInfo.GraphicsPipeline;
+        Diligent::GraphicsPipelineDesc& GraphicsPipeline = PSOCreateInfo.GraphicsPipeline;
 
         const Diligent::SwapChainDesc& _swapchain_descriptpr = owner._diligent_swap_chain->GetDesc();
 
@@ -268,19 +272,32 @@ namespace detail {
 
         GraphicsPipeline.RasterizerDesc.CullMode = Diligent::CULL_MODE_NONE;
         GraphicsPipeline.RasterizerDesc.ScissorEnable = true;
-        GraphicsPipeline.DepthStencilDesc.DepthEnable = true;
-        GraphicsPipeline.DepthStencilDesc.DepthWriteEnable = false;
-        GraphicsPipeline.DepthStencilDesc.StencilEnable = true;
 
-        auto& RT0 = GraphicsPipeline.BlendDesc.RenderTargets[0];
-        RT0.BlendEnable = true;
-        RT0.SrcBlend = Diligent::BLEND_FACTOR_SRC_ALPHA;
-        RT0.DestBlend = Diligent::BLEND_FACTOR_INV_SRC_ALPHA;
-        RT0.BlendOp = Diligent::BLEND_OPERATION_ADD;
-        RT0.SrcBlendAlpha = Diligent::BLEND_FACTOR_INV_SRC_ALPHA;
-        RT0.DestBlendAlpha = Diligent::BLEND_FACTOR_ZERO;
-        RT0.BlendOpAlpha = Diligent::BLEND_OPERATION_ADD;
-        RT0.RenderTargetWriteMask = Diligent::COLOR_MASK_ALL;
+        GraphicsPipeline.DepthStencilDesc.DepthEnable = depth.enable;
+        GraphicsPipeline.DepthStencilDesc.DepthWriteEnable = depth.enable_write;
+        GraphicsPipeline.DepthStencilDesc.DepthFunc = depth.function;
+
+        GraphicsPipeline.DepthStencilDesc.StencilEnable = stencil.enable;
+        GraphicsPipeline.DepthStencilDesc.StencilReadMask = stencil.read_mask;
+        GraphicsPipeline.DepthStencilDesc.StencilWriteMask = stencil.write_mask;
+        GraphicsPipeline.DepthStencilDesc.FrontFace.StencilFailOp = stencil.fail_op;
+        GraphicsPipeline.DepthStencilDesc.FrontFace.StencilDepthFailOp = stencil.depth_fail_op;
+        GraphicsPipeline.DepthStencilDesc.FrontFace.StencilPassOp = stencil.pass_op;
+        GraphicsPipeline.DepthStencilDesc.FrontFace.StencilFunc = stencil.function;
+        GraphicsPipeline.DepthStencilDesc.BackFace.StencilFailOp = stencil.fail_op;
+        GraphicsPipeline.DepthStencilDesc.BackFace.StencilDepthFailOp = stencil.depth_fail_op;
+        GraphicsPipeline.DepthStencilDesc.BackFace.StencilPassOp = stencil.pass_op;
+        GraphicsPipeline.DepthStencilDesc.BackFace.StencilFunc = stencil.function;
+
+        Diligent::RenderTargetBlendDesc& _blend_desc = GraphicsPipeline.BlendDesc.RenderTargets[0];
+        _blend_desc.BlendEnable = blend.enable;
+        _blend_desc.SrcBlend = blend.src;
+        _blend_desc.DestBlend = blend.dest;
+        _blend_desc.BlendOp = blend.op;
+        _blend_desc.SrcBlendAlpha = blend.src_alpha;
+        _blend_desc.DestBlendAlpha = blend.dest_alpha;
+        _blend_desc.BlendOpAlpha = blend.alpha_op;
+        _blend_desc.RenderTargetWriteMask = blend.color_mask;
 
         Diligent::LayoutElement VSInputs[] {
             { 0, 0, 2, Diligent::VT_FLOAT32 }, // pos
@@ -333,6 +350,11 @@ namespace detail {
     bool shader_handle::has_value() const
     {
         return _has_value;
+    }
+
+    void shader_handle::use() const
+    {
+        _owner.value().get()._diligent_device_context->SetPipelineState(_diligent_pipeline_state);
     }
     
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
@@ -416,7 +438,17 @@ namespace detail {
         ImGui_ImplSDL2_InitForOpenGL(owner._sdl_window, nullptr);
 #endif
         _owner = std::ref(owner);
-        _draw_shader.create(owner, VertexShaderHLSL, PixelShaderHLSL);
+        default_shader.create(owner, PixelShaderHLSL);
+
+        shader_stencil_descriptor _mask_stencil;
+        _mask_stencil.enable = true;
+        _mask_stencil.function = Diligent::COMPARISON_FUNC_ALWAYS; // Always pass stencil test
+        _mask_stencil.pass_op = Diligent::STENCIL_OP_REPLACE; // Replace stencil buffer value
+        _mask_stencil.fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if test fails
+        _mask_stencil.depth_fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if depth test fails
+        _mask_stencil.read_mask = 0xFF;
+        _mask_stencil.write_mask = 0xFF;
+        mask_shader.create(owner, PixelShaderHLSL, {}, {}, _mask_stencil);
 
         
         _io.Fonts->AddFontDefault();
@@ -424,16 +456,16 @@ namespace detail {
         int _raw_width, _raw_height = 0;
         unsigned char* _raw_pixels = nullptr;
         _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
-        _font_texture.create(
+        font_texture.create(
             owner, 
             std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)), 
             static_cast<std::size_t>(_raw_width), 
             static_cast<std::size_t>(_raw_height));        
         _diligent_shader_resource.Release();
-        _draw_shader._diligent_pipeline_state->CreateShaderResourceBinding(&(_diligent_shader_resource), true);
+        default_shader._diligent_pipeline_state->CreateShaderResourceBinding(&(_diligent_shader_resource), true);
         _diligent_texture_variable = _diligent_shader_resource->GetVariableByName(Diligent::SHADER_TYPE_PIXEL, "Texture");
         VERIFY_EXPR(_diligent_texture_variable != nullptr);
-        _io.Fonts->TexID = _font_texture.get_id().value();
+        _io.Fonts->TexID = font_texture.get_id().value();
 
 
 
@@ -445,8 +477,9 @@ namespace detail {
         ImGui::DestroyContext(_imgui_context);
         ImPlot::DestroyContext(_implot_context);
         _owner = std::nullopt;
-        _font_texture.destroy();
-        _draw_shader.destroy();
+        font_texture.destroy();
+        default_shader.destroy();
+        mask_shader.destroy();
         _diligent_shader_resource.Release();
         _diligent_texture_variable = nullptr;
         _has_value = false;
@@ -475,9 +508,6 @@ namespace detail {
 #else
         ImGui_ImplSDL2_NewFrame();
 #endif
-        if (!_draw_shader.has_value()) {
-            // _shader.create(rnd);
-        }
         ImGui::NewFrame();
     }
 
@@ -492,8 +522,8 @@ namespace detail {
             return;
 
         // Create and grow vertex/index buffers if needed
-        if (!_draw_shader._diligent_vertex_buffer || static_cast<int>(_vertex_buffer_size) < _imgui_draw_data->TotalVtxCount) {
-            _draw_shader._diligent_vertex_buffer.Release();
+        if (!default_shader._diligent_vertex_buffer || static_cast<int>(_vertex_buffer_size) < _imgui_draw_data->TotalVtxCount) {
+            default_shader._diligent_vertex_buffer.Release();
             while (static_cast<int>(_vertex_buffer_size) < _imgui_draw_data->TotalVtxCount) {
                 _vertex_buffer_size *= 2;
             }
@@ -503,10 +533,10 @@ namespace detail {
             VBDesc.Size = _vertex_buffer_size * sizeof(ImDrawVert);
             VBDesc.Usage = Diligent::USAGE_DYNAMIC;
             VBDesc.CPUAccessFlags = Diligent::CPU_ACCESS_WRITE;
-            _owner_ref._diligent_render_device->CreateBuffer(VBDesc, nullptr, &(_draw_shader._diligent_vertex_buffer));
+            _owner_ref._diligent_render_device->CreateBuffer(VBDesc, nullptr, &(default_shader._diligent_vertex_buffer));
         }
-        if (!_draw_shader._diligent_index_buffer || static_cast<int>(_index_buffer_size) < _imgui_draw_data->TotalIdxCount) {
-            _draw_shader._diligent_index_buffer.Release();
+        if (!default_shader._diligent_index_buffer || static_cast<int>(_index_buffer_size) < _imgui_draw_data->TotalIdxCount) {
+            default_shader._diligent_index_buffer.Release();
             while (static_cast<int>(_index_buffer_size) < _imgui_draw_data->TotalIdxCount) {
                 _index_buffer_size *= 2;
             }
@@ -516,12 +546,12 @@ namespace detail {
             IBDesc.Size = _index_buffer_size * sizeof(ImDrawIdx);
             IBDesc.Usage = Diligent::USAGE_DYNAMIC;
             IBDesc.CPUAccessFlags = Diligent::CPU_ACCESS_WRITE;
-            _owner_ref._diligent_render_device->CreateBuffer(IBDesc, nullptr, &(_draw_shader._diligent_index_buffer));
+            _owner_ref._diligent_render_device->CreateBuffer(IBDesc, nullptr, &(default_shader._diligent_index_buffer));
         }
 
         {
-            Diligent::MapHelper<ImDrawVert> Vertices(_owner_ref._diligent_device_context, _draw_shader._diligent_vertex_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
-            Diligent::MapHelper<ImDrawIdx> Indices(_owner_ref._diligent_device_context, _draw_shader._diligent_index_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
+            Diligent::MapHelper<ImDrawVert> Vertices(_owner_ref._diligent_device_context, default_shader._diligent_vertex_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
+            Diligent::MapHelper<ImDrawIdx> Indices(_owner_ref._diligent_device_context, default_shader._diligent_index_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
             ImDrawVert* pVtxDst = Vertices;
             ImDrawIdx* pIdxDst = Indices;
             for (int CmdListID = 0; CmdListID < _imgui_draw_data->CmdListsCount; CmdListID++) {
@@ -550,17 +580,17 @@ namespace detail {
                 0.0f, 0.0f, 0.5f, 0.0f,
                 (R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f
             };
-            Diligent::MapHelper<float4x4> CBData(_owner_ref._diligent_device_context, _draw_shader._diligent_uniform_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
+            Diligent::MapHelper<float4x4> CBData(_owner_ref._diligent_device_context, default_shader._diligent_uniform_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
             *CBData = Projection;
         }
 
         auto SetupRenderState = [&]() //
         {
             // Setup shader and vertex buffers
-            Diligent::IBuffer* pVBs[] = { _draw_shader._diligent_vertex_buffer };
+            Diligent::IBuffer* pVBs[] = { default_shader._diligent_vertex_buffer };
             _owner_ref._diligent_device_context->SetVertexBuffers(0, 1, pVBs, nullptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION, Diligent::SET_VERTEX_BUFFERS_FLAG_RESET);
-            _owner_ref._diligent_device_context->SetIndexBuffer(_draw_shader._diligent_index_buffer, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-            _owner_ref._diligent_device_context->SetPipelineState(_draw_shader._diligent_pipeline_state);
+            _owner_ref._diligent_device_context->SetIndexBuffer(default_shader._diligent_index_buffer, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+            _owner_ref._diligent_device_context->SetPipelineState(default_shader._diligent_pipeline_state);
 
             const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
             _owner_ref._diligent_device_context->SetBlendFactors(blend_factor);
@@ -634,7 +664,7 @@ namespace detail {
                     if (_is_base_vertex_supported) {
                         DrawAttrs.BaseVertex = pCmd->VtxOffset + GlobalVtxOffset;
                     } else {
-                        Diligent::IBuffer* pVBs[] = { _draw_shader._diligent_vertex_buffer };
+                        Diligent::IBuffer* pVBs[] = { default_shader._diligent_vertex_buffer };
                         Diligent::Uint64 VtxOffsets[] = { sizeof(ImDrawVert) * (size_t { pCmd->VtxOffset } + size_t { GlobalVtxOffset }) };
                         _owner_ref._diligent_device_context->SetVertexBuffers(0, 1, pVBs, VtxOffsets, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION, Diligent::SET_VERTEX_BUFFERS_FLAG_NONE);
                     }
@@ -670,19 +700,19 @@ namespace detail {
 
         _io.Fonts->Build();
         _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
-        context._font_texture.create(
+        context.font_texture.create(
             owner, 
             std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)), 
             static_cast<std::size_t>(_raw_width), 
             static_cast<std::size_t>(_raw_height));
         
         context._diligent_shader_resource.Release();
-        context._draw_shader._diligent_pipeline_state->CreateShaderResourceBinding(&(context._diligent_shader_resource), true);
+        context.default_shader._diligent_pipeline_state->CreateShaderResourceBinding(&(context._diligent_shader_resource), true);
         context._diligent_texture_variable = context._diligent_shader_resource->GetVariableByName(Diligent::SHADER_TYPE_PIXEL, "Texture");
         VERIFY_EXPR(context._diligent_texture_variable != nullptr);
 
         // Store our identifier
-        _io.Fonts->TexID = context._font_texture.get_id().value();
+        _io.Fonts->TexID = context.font_texture.get_id().value();
 
         _has_value = true;
     }

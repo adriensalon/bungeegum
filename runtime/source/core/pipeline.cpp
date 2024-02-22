@@ -295,12 +295,14 @@ namespace detail {
 			}
 
             data.user_context.new_frame();
+            data.user_context.default_shader.use();
             ImDrawList* _drawlist = ImGui::GetBackgroundDrawList();
             draw_widgets(_drawlist);
             data.user_context.render();
 
 #if BUNGEEGUM_USE_OVERLAY
             data.overlay_context.new_frame();
+            data.overlay_context.default_shader.use();
             draw_overlay();
             data.overlay_context.render();
 #endif

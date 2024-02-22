@@ -23,7 +23,9 @@
 
 #include <Common/interface/RefCntAutoPtr.hpp>
 #include <Graphics/GraphicsEngine/interface/Buffer.h>
+#include <Graphics/GraphicsEngine/interface/DepthStencilState.h>
 #include <Graphics/GraphicsEngine/interface/DeviceContext.h>
+#include <Graphics/GraphicsEngine/interface/GraphicsTypes.h>
 #include <Graphics/GraphicsEngine/interface/PipelineState.h>
 #include <Graphics/GraphicsEngine/interface/RenderDevice.h>
 #include <Graphics/GraphicsEngine/interface/ShaderResourceBinding.h>
@@ -221,7 +223,71 @@ namespace detail {
 
 
 
+    /// @brief 
+    struct shader_blend_descriptor {
+        
+        /// @brief
+        bool enable = true;
+        
+        /// @brief
+        Diligent::BLEND_FACTOR src = Diligent::BLEND_FACTOR_SRC_ALPHA;
+        
+        /// @brief
+        Diligent::BLEND_FACTOR dest = Diligent::BLEND_FACTOR_INV_SRC_ALPHA;
+        
+        /// @brief
+        Diligent::BLEND_OPERATION op = Diligent::BLEND_OPERATION_ADD;
+        
+        /// @brief
+        Diligent::BLEND_FACTOR src_alpha = Diligent::BLEND_FACTOR_INV_SRC_ALPHA;
+        
+        /// @brief
+        Diligent::BLEND_FACTOR dest_alpha = Diligent::BLEND_FACTOR_ZERO;
+        
+        /// @brief
+        Diligent::BLEND_OPERATION alpha_op = Diligent::BLEND_OPERATION_ADD;
+        
+        /// @brief
+        Diligent::COLOR_MASK color_mask = Diligent::COLOR_MASK_ALL;
+    };
 
+    /// @brief 
+    struct shader_depth_descriptor {
+        
+        /// @brief 
+        bool enable = true;
+        
+        /// @brief 
+        bool enable_write = false;
+        
+        /// @brief 
+        Diligent::COMPARISON_FUNCTION function = Diligent::COMPARISON_FUNC_LESS;
+    };
+
+    /// @brief 
+    struct shader_stencil_descriptor {
+
+        /// @brief 
+        bool enable = false;
+        
+        /// @brief 
+        std::uint8_t read_mask = 0xFF;
+        
+        /// @brief 
+        std::uint8_t write_mask = 0xFF;
+        
+        /// @brief 
+        Diligent::STENCIL_OP fail_op = Diligent::STENCIL_OP_KEEP;
+        
+        /// @brief 
+        Diligent::STENCIL_OP depth_fail_op = Diligent::STENCIL_OP_KEEP;
+        
+        /// @brief 
+        Diligent::STENCIL_OP pass_op = Diligent::STENCIL_OP_KEEP;
+        
+        /// @brief 
+        Diligent::COMPARISON_FUNCTION function = Diligent::COMPARISON_FUNC_ALWAYS;
+    };
 
     /// @brief for user defined shaders in HLSL etc
     struct shader_handle {
@@ -231,14 +297,25 @@ namespace detail {
         shader_handle(shader_handle&& other) = default;
         shader_handle& operator=(shader_handle&& other) = default;
 
-        /// @brief
-        /// @param owner
+        /// @brief 
+        /// @param owner 
+        /// @param fragment 
+        /// @param blend 
+        /// @param depth 
+        /// @param stencil 
         void create(
             renderer& owner,
-            const std::string& vertex,
-            const std::string& fragment /* TODO */);
-        // le depth
-        // le stenicl
+            const std::string& fragment,
+            const shader_blend_descriptor& blend = { },
+            const shader_depth_descriptor& depth = { },
+            const shader_stencil_descriptor& stencil = {});
+            
+
+        /// @brief
+        void destroy();
+
+        /// @brief
+        [[nodiscard]] bool has_value() const;
 
         /// @brief
         /// @tparam value_t
@@ -247,17 +324,11 @@ namespace detail {
         void uniform(const value_t& value);
 
         /// @brief
-        /// @param texture
-        void uniform(const texture_handle& texture);
-
-        /// @brief
-        [[nodiscard]] bool has_value() const;
-
-        /// @brief
-        void destroy();
+        void use() const;
 
     private:
         bool _has_value = false;
+        std::optional<std::reference_wrapper<renderer>> _owner = std::nullopt; 
         Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_pipeline_state = {};
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_vertex_buffer = {};
         Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_index_buffer = {};
@@ -302,11 +373,22 @@ namespace detail {
         [[nodiscard]] bool has_value() const;
 
         /// @brief
-        void destroy();        
+        void destroy();
 
+        /// @brief
         void new_frame();
 
-        void render();
+        /// @brief
+        void render();        
+        
+        /// @brief
+        texture_handle font_texture = {};
+        
+        /// @brief
+        shader_handle default_shader = {};
+        
+        /// @brief
+        shader_handle mask_shader = {};
 
         /// @brief 
         float4x4 projection_matrix; // default to orthographic!
@@ -324,9 +406,6 @@ namespace detail {
         unsigned int _index_buffer_size = default_initial_index_buffer_size;
         Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource = {};
         Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
-        texture_handle _font_texture = {};
-        shader_handle _draw_shader = {};
-        shader_handle _mask_shader = {};
         friend struct imgui_font_handle;
     };
 

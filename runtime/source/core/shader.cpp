@@ -72,10 +72,13 @@ shader_ref make_shader(const std::string& name, shader_resource& resource)
     detail::shader_ref_data& _ref_data = _global.shaders.shaders[name];
     detail::shader_resource_data& _resource_data = detail::shader_resource_access::get_data(resource);
     for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
+        detail::pipeline_data& _pipeline_data = _it.second.get();
         _ref_data.shaders[_it.first].create(
-            _it.second.get().pipeline_renderer,
-            " VERTEX SGADER HERE ! ",
-            _resource_data.fragment);
+            _pipeline_data.pipeline_renderer,
+            _resource_data.fragment,
+            _resource_data.blend,
+            _resource_data.depth,
+            _resource_data.stencil);
     }
     return detail::shader_ref_access::make_from_data(_ref_data);
 }

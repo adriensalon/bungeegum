@@ -290,6 +290,26 @@ void draw_command::draw_rect_filled(
     _data.list->AddRectFilled(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All);
 }
 
+void draw_command::use_default_shader()
+{
+    detail::global_manager_data& _global = detail::global();
+    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
+    _pipeline_data.user_context.default_shader.use();
+}
+
+void draw_command::use_mask_shader()
+{
+    detail::global_manager_data& _global = detail::global();
+    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
+    _pipeline_data.user_context.mask_shader.use();
+}
+
+void draw_command::use_custom_shader(const shader_ref& shader)
+{
+    // detail::global_manager_data& _global = detail::global();
+    // shader._data.shaders[0].use(); // index from current pipeline_data.raw
+}
+
 widget_id::widget_id(const detail::widget_id_data& data)
     : _data(data)
 {
