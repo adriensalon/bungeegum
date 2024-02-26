@@ -427,6 +427,8 @@ namespace detail {
         /// @param fov 
         void use_projection_perspective(const float fov);
 
+        void use_color_buffer(const bool is_used);
+
         /// @brief 
         /// @param matrix 
         // void use_transform(const float4x4 matrix);

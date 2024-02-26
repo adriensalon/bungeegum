@@ -385,7 +385,7 @@ void draw_command::draw_triangle_filled(const float2 first_corner, const float2 
     _data.draw_list->AddTriangleFilled(_first_corner, _second_corner, _third_corner, _color);
 }
 
-void use_shader_callback(const ImDrawList* parent_list, const ImDrawCmd* cmd) 
+void use_shader_callback_NO_COLOR(const ImDrawList* parent_list, const ImDrawCmd* cmd) 
 {
     detail::shader_handle _shader;
     _shader.emplace(cmd->UserCallbackData);
@@ -393,6 +393,19 @@ void use_shader_callback(const ImDrawList* parent_list, const ImDrawCmd* cmd)
     detail::global_manager_data& _global = detail::global();
     detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
 
+    _pipeline_data.user_context.use_color_buffer(false);
+    _pipeline_data.user_context.use_shader(_shader);
+}
+
+void use_shader_callback_COLOR(const ImDrawList* parent_list, const ImDrawCmd* cmd) 
+{
+    detail::shader_handle _shader;
+    _shader.emplace(cmd->UserCallbackData);
+    
+    detail::global_manager_data& _global = detail::global();
+    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
+
+    _pipeline_data.user_context.use_color_buffer(true);
     _pipeline_data.user_context.use_shader(_shader);
 }
 
@@ -401,7 +414,7 @@ void draw_command::use_shader_custom(shader_ref& shader)
     detail::shader_ref_data& _shader_ref_data = detail::shader_ref_access::get_data(shader);
     detail::shader_handle& _shader_handle = _shader_ref_data.shaders[_data.raw_pipeline];
   
-    _data.draw_list->AddCallback(use_shader_callback, _shader_handle.get());
+    _data.draw_list->AddCallback(use_shader_callback_COLOR, _shader_handle.get());
 }
 
 void draw_command::use_shader_default()
@@ -409,7 +422,7 @@ void draw_command::use_shader_default()
     detail::global_manager_data& _global = detail::global();
     detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
   
-    _data.draw_list->AddCallback(use_shader_callback, _pipeline_data.default_shader.get());
+    _data.draw_list->AddCallback(use_shader_callback_COLOR, _pipeline_data.default_shader.get());
 }
 
 void draw_command::use_shader_mask()
@@ -417,7 +430,7 @@ void draw_command::use_shader_mask()
     detail::global_manager_data& _global = detail::global();
     detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
 
-    _data.draw_list->AddCallback(use_shader_callback, _pipeline_data.mask_shader.get());
+    _data.draw_list->AddCallback(use_shader_callback_NO_COLOR, _pipeline_data.mask_shader.get());
 }
 
 void draw_command::clear_mask()

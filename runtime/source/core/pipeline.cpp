@@ -231,7 +231,7 @@ namespace detail {
 #endif
     }
 
-    static const char* pixel_shader_hlsl_0 = R"(
+    static const char* pixel_shader_hlsl_default = R"(
         struct PSInput
         {
             float4 pos : SV_POSITION;
@@ -248,7 +248,7 @@ namespace detail {
         }
         )";
 
-    static const char* pixel_shader_hlsl_1 = R"(
+    static const char* pixel_shader_hlsl_mask = R"(
         struct PSInput
         {
             float4 pos : SV_POSITION;
@@ -265,45 +265,47 @@ namespace detail {
         }
         )";
 
-    static const char* pixel_shader_hlsl_2 = R"(
-        struct PSInput
-        {
-            float4 pos : SV_POSITION;
-            float4 col : COLOR;
-            float2 uv  : TEXCOORD;
-        };
-
-        Texture2D    Texture;
-        SamplerState Texture_sampler;
-
-        float4 main(in PSInput PSIn) : SV_Target
-        {
-            return float4(1, 0, 0, 1) * Texture.Sample(Texture_sampler, PSIn.uv);
-        }
-        )";
-
     void setup_default_shader(pipeline_data& data) 
     {
         shader_stencil_descriptor _default_stencil;
         _default_stencil.enable = true;
-        _default_stencil.function = Diligent::COMPARISON_FUNC_ALWAYS; // Always pass stencil test
+        _default_stencil.function = Diligent::COMPARISON_FUNC_NEVER; // Always pass stencil test
         _default_stencil.pass_op = Diligent::STENCIL_OP_KEEP; // Replace stencil buffer value
         _default_stencil.fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if test fails
         _default_stencil.depth_fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if depth test fails
-        data.default_shader.emplace(data.user_context, pixel_shader_hlsl_0, {}, {}, _default_stencil);
+
+        shader_depth_descriptor _default_depth;
+        _default_depth.enable = true;
+        _default_depth.enable_write = false;
+        _default_depth.function = Diligent::COMPARISON_FUNC_LESS;
+        data.default_shader.emplace(data.user_context, pixel_shader_hlsl_default, {}, _default_depth, _default_stencil);
     }
 
     void setup_mask_shader(pipeline_data& data) 
     {
         shader_stencil_descriptor _mask_stencil;
         _mask_stencil.enable = true;
-        _mask_stencil.function = Diligent::COMPARISON_FUNC_NEVER; // Always pass stencil test
+        _mask_stencil.function = Diligent::COMPARISON_FUNC_ALWAYS; // Always pass stencil test
         _mask_stencil.pass_op = Diligent::STENCIL_OP_REPLACE; // Replace stencil buffer value
         _mask_stencil.fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if test fails
         _mask_stencil.depth_fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if depth test fails
         _mask_stencil.read_mask = 0xFF;
         _mask_stencil.write_mask = 0xFF;
-        data.mask_shader.emplace(data.user_context, pixel_shader_hlsl_2, {}, {}, _mask_stencil);
+        
+        shader_depth_descriptor _default_depth;
+        _default_depth.enable = true;
+        _default_depth.enable_write = true;
+        _default_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
+
+        data.mask_shader.emplace(data.user_context, pixel_shader_hlsl_mask, {}, _default_depth, _mask_stencil);
+    }
+
+    void setup_overlay_shader(pipeline_data& data) 
+    {
+        shader_depth_descriptor _default_depth;
+        _default_depth.enable = false;
+
+        data.overlay_shader.emplace(data.user_context, pixel_shader_hlsl_default, {}, _default_depth);
     }
 
 
@@ -380,8 +382,7 @@ namespace detail {
 #if BUNGEEGUM_USE_OVERLAY
             data.overlay_context.new_frame();
             data.overlay_context.use_projection_orthographic();
-            data.overlay_context.use_shader(data.default_shader);
-            // set shader on 1st time
+            data.overlay_context.use_shader(data.overlay_shader);
             draw_overlay();
             data.overlay_context.render();
 #endif
@@ -416,6 +417,7 @@ pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& 
     _data.user_context.emplace(_data.pipeline_renderer, nullptr);
     detail::setup_default_shader(_data);
     detail::setup_mask_shader(_data);
+    detail::setup_overlay_shader(_data);
     _data.raw = detail::raw_cast(this);
 	detail::global_manager_data& _global = detail::global();
 	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
@@ -443,6 +445,7 @@ pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& 
     _data.user_context.emplace(_data.pipeline_renderer, nullptr);
     detail::setup_default_shader(_data);
     detail::setup_mask_shader(_data);
+    detail::setup_overlay_shader(_data);
     _data.raw = detail::raw_cast(this);
 	detail::global_manager_data& _global = detail::global();
 	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
@@ -468,6 +471,7 @@ pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& pro
     _data.user_context.emplace(_data.pipeline_renderer, nullptr);
     detail::setup_default_shader(_data);
     detail::setup_mask_shader(_data);
+    detail::setup_overlay_shader(_data);
     _data.raw = detail::raw_cast(this);
 	detail::global_manager_data& _global = detail::global();
 	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
@@ -482,6 +486,7 @@ pipeline& pipeline::setup<renderer_backend::vulkan>(const pipeline_provider& pro
 
     detail::setup_default_shader(_data);
     detail::setup_mask_shader(_data);
+    detail::setup_overlay_shader(_data);
     _data.raw = detail::raw_cast(this);
 	detail::global_manager_data& _global = detail::global();
 	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });

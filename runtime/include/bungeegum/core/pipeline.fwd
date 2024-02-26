@@ -48,6 +48,7 @@ namespace detail {
 
         rasterizer_handle user_context = {};
 #if BUNGEEGUM_USE_OVERLAY
+        shader_handle overlay_shader = {};
         rasterizer_handle overlay_context = {};
 #endif
 
