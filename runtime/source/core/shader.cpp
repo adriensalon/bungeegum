@@ -73,8 +73,8 @@ shader_ref make_shader(const std::string& name, shader_resource& resource)
     detail::shader_resource_data& _resource_data = detail::shader_resource_access::get_data(resource);
     for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
         detail::pipeline_data& _pipeline_data = _it.second.get();
-        _ref_data.shaders[_it.first].create(
-            _pipeline_data.pipeline_renderer,
+        _ref_data.shaders[_it.first].emplace(
+            _pipeline_data.user_context,
             _resource_data.fragment,
             _resource_data.blend,
             _resource_data.depth,

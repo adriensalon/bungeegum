@@ -37,12 +37,18 @@ namespace detail {
     using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_TIME_UNIT>;
 
     struct pipeline_data {
+        std::uintptr_t raw = {};
+        
         window pipeline_window = {};
-        renderer pipeline_renderer = {};
+        renderer_handle pipeline_renderer = {};
+        
 
-        imgui_context_handle user_context = {};
+        shader_handle default_shader = {};
+        shader_handle mask_shader = {};
+
+        rasterizer_handle user_context = {};
 #if BUNGEEGUM_USE_OVERLAY
-        imgui_context_handle overlay_context = {};
+        rasterizer_handle overlay_context = {};
 #endif
 
         std::optional<std::reference_wrapper<widget_update_data>> root_updatable = std::nullopt;

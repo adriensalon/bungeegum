@@ -61,8 +61,9 @@ texture_ref make_texture(const std::string& name, texture_resource& resource)
     detail::texture_ref_data& _ref_data = _global.textures.textures[name];
     detail::texture_resource_data& _resource_data = detail::texture_resource_access::get_data(resource);
     for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-		_ref_data.textures[_it.first].create(
-			_it.second.get().pipeline_renderer, 
+        detail::pipeline_data& _pipeline_data = _it.second.get();
+		_ref_data.textures[_it.first].emplace(
+			_pipeline_data.user_context, 
 			_resource_data.pixels, 
 			_resource_data.width, 
 			_resource_data.height);

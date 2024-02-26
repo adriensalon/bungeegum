@@ -10,7 +10,7 @@ namespace bungeegum {
 namespace detail {
 
 #if BUNGEEGUM_USE_OVERLAY
-    extern void setup_overlay(renderer& owner, imgui_context_handle& context);
+    extern void setup_overlay(rasterizer_handle& context);
     extern void draw_overlay();
 #endif
 
@@ -148,6 +148,7 @@ namespace detail {
         global_manager_data& _global = global();
         bool _draw_done = false;
 		std::vector<std::uintptr_t> _ids;
+        const std::uintptr_t _raw_pipeline = _global.pipelines.current.value().get().raw; // get from func args
         while (!_draw_done) {
             for (std::pair<const std::uintptr_t, bungeegum::detail::resolve_command_data>& _it : _global.widgets.drawables) {
 				_ids.push_back(_it.first);
@@ -165,8 +166,8 @@ namespace detail {
                 //                         std::string _clean_typename = global().pipelines.to_clean_typename(_updatable.inplace_data.type().name());
                 //                         global().pipelines.profiler_draw_chronometer.begin_task(_clean_typename);
                 // #endif
-                protect_userspace(_global.logs.userspace_errors, [&_updatable, imgui_drawlist]() {
-                    draw_command_data _data = { _updatable, imgui_drawlist };
+                protect_userspace(_global.logs.userspace_errors, [&_updatable, imgui_drawlist, _raw_pipeline]() {
+                    draw_command_data _data = { _updatable, _raw_pipeline, imgui_drawlist };
                     draw_command _command = detail::draw_command_access::make_from_data(_data);
                     _updatable.drawer(_command);
                 });
@@ -228,6 +229,81 @@ namespace detail {
             pipeline_window.create_native();
         }
 #endif
+    }
+
+    static const char* pixel_shader_hlsl_0 = R"(
+        struct PSInput
+        {
+            float4 pos : SV_POSITION;
+            float4 col : COLOR;
+            float2 uv  : TEXCOORD;
+        };
+
+        Texture2D    Texture;
+        SamplerState Texture_sampler;
+
+        float4 main(in PSInput PSIn) : SV_Target
+        {
+            return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
+        }
+        )";
+
+    static const char* pixel_shader_hlsl_1 = R"(
+        struct PSInput
+        {
+            float4 pos : SV_POSITION;
+            float4 col : COLOR;
+            float2 uv  : TEXCOORD;
+        };
+
+        Texture2D    Texture;
+        SamplerState Texture_sampler;
+
+        float4 main(in PSInput PSIn) : SV_Target
+        {
+            return float4(0, 1, 0, 1) * Texture.Sample(Texture_sampler, PSIn.uv);
+        }
+        )";
+
+    static const char* pixel_shader_hlsl_2 = R"(
+        struct PSInput
+        {
+            float4 pos : SV_POSITION;
+            float4 col : COLOR;
+            float2 uv  : TEXCOORD;
+        };
+
+        Texture2D    Texture;
+        SamplerState Texture_sampler;
+
+        float4 main(in PSInput PSIn) : SV_Target
+        {
+            return float4(1, 0, 0, 1) * Texture.Sample(Texture_sampler, PSIn.uv);
+        }
+        )";
+
+    void setup_default_shader(pipeline_data& data) 
+    {
+        shader_stencil_descriptor _default_stencil;
+        _default_stencil.enable = true;
+        _default_stencil.function = Diligent::COMPARISON_FUNC_ALWAYS; // Always pass stencil test
+        _default_stencil.pass_op = Diligent::STENCIL_OP_KEEP; // Replace stencil buffer value
+        _default_stencil.fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if test fails
+        _default_stencil.depth_fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if depth test fails
+        data.default_shader.emplace(data.user_context, pixel_shader_hlsl_0, {}, {}, _default_stencil);
+    }
+
+    void setup_mask_shader(pipeline_data& data) 
+    {
+        shader_stencil_descriptor _mask_stencil;
+        _mask_stencil.enable = true;
+        _mask_stencil.function = Diligent::COMPARISON_FUNC_NEVER; // Always pass stencil test
+        _mask_stencil.pass_op = Diligent::STENCIL_OP_REPLACE; // Replace stencil buffer value
+        _mask_stencil.fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if test fails
+        _mask_stencil.depth_fail_op = Diligent::STENCIL_OP_KEEP; // Keep stencil buffer value if depth test fails
+        _mask_stencil.read_mask = 0xFF;
+        _mask_stencil.write_mask = 0xFF;
+        data.mask_shader.emplace(data.user_context, pixel_shader_hlsl_2, {}, {}, _mask_stencil);
     }
 
 
@@ -295,14 +371,17 @@ namespace detail {
 			}
 
             data.user_context.new_frame();
-            data.user_context.default_shader.use();
+            data.user_context.use_projection_orthographic();
+            // data.user_context.use_shader(data.default_shader);
             ImDrawList* _drawlist = ImGui::GetBackgroundDrawList();
             draw_widgets(_drawlist);
             data.user_context.render();
 
 #if BUNGEEGUM_USE_OVERLAY
             data.overlay_context.new_frame();
-            data.overlay_context.default_shader.use();
+            data.overlay_context.use_projection_orthographic();
+            data.overlay_context.use_shader(data.default_shader);
+            // set shader on 1st time
             draw_overlay();
             data.overlay_context.render();
 #endif
@@ -331,14 +410,15 @@ pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& 
         _data.pipeline_renderer.create_directx11(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
-    _data.overlay_context.create(_data.pipeline_renderer, nullptr);
-    detail::setup_overlay(_data.pipeline_renderer, _data.overlay_context);
+    _data.overlay_context.emplace(_data.pipeline_renderer, nullptr);
+    detail::setup_overlay(_data.overlay_context);
 #endif
-
-    _data.user_context.create(_data.pipeline_renderer, nullptr);
-
+    _data.user_context.emplace(_data.pipeline_renderer, nullptr);
+    detail::setup_default_shader(_data);
+    detail::setup_mask_shader(_data);
+    _data.raw = detail::raw_cast(this);
 	detail::global_manager_data& _global = detail::global();
-	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
+	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
     return *this;
 }
 
@@ -358,11 +438,14 @@ pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& 
         _data.pipeline_renderer.create_directx12(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
-    detail::setup_overlay(_data.pipeline_renderer, _data.overlay_context);
+    detail::setup_overlay(_data.overlay_context);
 #endif
-    _data.user_context.create(_data.pipeline_renderer, nullptr);
+    _data.user_context.emplace(_data.pipeline_renderer, nullptr);
+    detail::setup_default_shader(_data);
+    detail::setup_mask_shader(_data);
+    _data.raw = detail::raw_cast(this);
 	detail::global_manager_data& _global = detail::global();
-	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
+	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
     return *this;
 }
 
@@ -380,11 +463,14 @@ pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& pro
         _data.pipeline_renderer.create_opengl(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
-    detail::setup_overlay(_data.pipeline_renderer, _data.overlay_context);
+    detail::setup_overlay(_data.overlay_context);
 #endif
-    _data.user_context.create(_data.pipeline_renderer, nullptr);
+    _data.user_context.emplace(_data.pipeline_renderer, nullptr);
+    detail::setup_default_shader(_data);
+    detail::setup_mask_shader(_data);
+    _data.raw = detail::raw_cast(this);
 	detail::global_manager_data& _global = detail::global();
-	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
+	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
     return *this;
 }
 
@@ -394,9 +480,11 @@ pipeline& pipeline::setup<renderer_backend::vulkan>(const pipeline_provider& pro
     detail::setup_global_if_required();
     detail::setup_window(_data.pipeline_window, provider);
 
-	
+    detail::setup_default_shader(_data);
+    detail::setup_mask_shader(_data);
+    _data.raw = detail::raw_cast(this);
 	detail::global_manager_data& _global = detail::global();
-	_global.pipelines.pipelines.insert({ detail::raw_cast(this), std::ref(_data) });
+	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
     // TODO
     return *this;
 }

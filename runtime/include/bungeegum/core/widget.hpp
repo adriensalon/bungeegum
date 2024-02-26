@@ -235,14 +235,32 @@ struct draw_command {
 
     /// @brief
     /// @param texture
-    /// @param position
-    /// @param size
-    void draw_texture(const texture_ref& texture, const float2 position, const float2 size);
+    /// @param min_point
+    /// @param max_point
+    void draw_texture(texture_ref& texture, const float2 min_point, const float2 max_point);
+    
+    /// @brief 
+    /// @param texture 
+    /// @param top_left_corner 
+    /// @param top_right_corner 
+    /// @param bottom_left_corner 
+    /// @param bottom_right_corner 
+    void draw_texture_quad(texture_ref& texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner);
+
+    /// @brief
+    /// @param texture
+    /// @param min_point
+    /// @param max_point
+    /// @param rounding
+    void draw_texture_rounded(texture_ref& texture, const float2 min_point, const float2 max_point, const float rounding);
 
     /// @brief 
-    /// @param text 
     /// @param font 
-    void draw_text(const std::string text, const font_ref& font);
+    /// @param font_size 
+    /// @param position 
+    /// @param color 
+    /// @param text 
+    void draw_text(font_ref& font, const float font_size, const float2 position, const float4 color, const std::string& text);
 
     /// @brief
     /// @param first_point
@@ -273,7 +291,7 @@ struct draw_command {
     /// @param color_top_right
     /// @param color_bottom_left
     /// @param color_bottom_right
-    void draw_rect_filled_multi_color(const float2 min_corner, const float2 max_corner, const float4 color_top_left, const float4 color_top_right, const float4 color_bottom_left, const float4 color_bottom_right);
+    void draw_rect_filled_multi_color(const float2 min_corner, const float2 max_corner, const float4 color_top_left, const float4 color_top_right, const float4 color_bottom_right, const float4 color_bottom_left);
 
     /// @brief
     /// @param top_left_corner
@@ -290,7 +308,7 @@ struct draw_command {
     /// @param bottom_left_corner
     /// @param bottom_right_corner
     /// @param color
-    void draw_quad_filled(const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_left_corner, const float2 bottom_right_corner, const float4 color);
+    void draw_quad_filled(const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner, const float4 color);
 
     /// @brief
     /// @param first_corner
@@ -309,7 +327,7 @@ struct draw_command {
     
     /// @brief
     /// @param shader
-    void use_shader_custom(const shader_ref& shader);
+    void use_shader_custom(shader_ref& shader);
 
     /// @brief
     void use_shader_default();
@@ -334,9 +352,9 @@ struct draw_command {
     /// @param keep
     void use_scissors(const float2 first_point, const float2 second_point, const bool keep = false);
 
-    /// @brief 
-    /// @param transform 
-    void use_transform(const float4x4 transform, const bool absolute = true);
+    // @brief 
+    // @param transform 
+    // void use_transform(const float4x4 transform, const bool absolute = true);
 
 private:
     friend struct detail::draw_command_access;

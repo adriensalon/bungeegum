@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include <unordered_map>
+
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN && !defined(PLATFORM_EMSCRIPTEN)
 #define PLATFORM_EMSCRIPTEN
 #elif TOOLCHAIN_PLATFORM_WIN32 && !defined(PLATFORM_WIN32)
@@ -79,12 +82,12 @@ namespace detail {
     /// most appropriate graphics API depending on the platform. Macros defined above can be
     /// modified to force usage of a specific platform.
     /// @details Instances of this struct can only be moved.
-    struct renderer {
-        renderer() = default;
-        renderer(const renderer& other) = delete;
-        renderer& operator=(const renderer& other) = delete;
-        renderer(renderer&& other) = default;
-        renderer& operator=(renderer&& other) = default;
+    struct renderer_handle {
+        renderer_handle() = default;
+        renderer_handle(const renderer_handle& other) = delete;
+        renderer_handle& operator=(const renderer_handle& other) = delete;
+        renderer_handle(renderer_handle&& other) = default;
+        renderer_handle& operator=(renderer_handle&& other) = default;
 
 #if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
         /// @brief Creates an instance from an existing DirectX 11 context.
@@ -141,17 +144,14 @@ namespace detail {
         float4 clear_color = { 1.f, 1.f, 1.f, 1.f };
 
     private:
-        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device;
-        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context;
-        Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain;
+        bool _has_value = false;
+        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
+        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};
+        Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain = {};
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         SDL_Window* _sdl_window = nullptr;
 #endif
-        friend struct shader_handle;
-        friend struct texture_handle;
-        friend struct imgui_context_handle;
-        friend struct imgui_font_handle;
-        friend struct imgui_renderer;
+        friend struct rasterizer_handle;
     };
 
 
@@ -176,6 +176,41 @@ namespace detail {
 
     
 
+
+    ///
+    struct font_handle {
+        
+        /// @brief
+        /// @param rasterizer
+        /// @param ttf
+        /// @param count
+        /// @param size
+        void emplace(
+            rasterizer_handle& rasterizer,
+            const void* ttf,
+            const std::size_t count,
+            const float size);
+        
+        /// @brief
+        /// @return
+        [[nodiscard]] ImFont* get() const;
+
+        
+        /// @brief
+        [[nodiscard]] bool has_value() const;
+
+        /// @brief
+        void reset();  
+
+    private:
+        bool _has_value = false;
+        ImFont* _imgui_font = nullptr;
+    };
+
+
+
+
+
     /// @brief
     struct texture_handle {
         texture_handle() = default;
@@ -185,39 +220,31 @@ namespace detail {
         texture_handle& operator=(texture_handle&& other) = default;
 
         /// @brief
-        /// @param owner
+        /// @param rasterizer
         /// @param pixels
         /// @param width
         /// @param height
-        void create(
-            renderer& owner,
+        void emplace(
+            rasterizer_handle& rasterizer,
             const std::vector<unsigned char>& pixels,
             const std::size_t width,
             const std::size_t height);
+
+        /// @brief 
+        /// @return 
+        [[nodiscard]] void* get() const;
 
         /// @brief
         [[nodiscard]] bool has_value() const;
 
         /// @brief
-        void destroy();
-
-        /// @brief 
-        /// @return 
-        std::optional<void*> get_id() const;
+        void reset();
 
     private:
         bool _has_value = false;
         Diligent::RefCntAutoPtr<Diligent::ITexture> _diligent_texture = {};
         Diligent::RefCntAutoPtr<Diligent::ITextureView> _diligent_texture_view = {};
     };
-
-
-
-
-
-
-
-
 
 
 
@@ -298,24 +325,31 @@ namespace detail {
         shader_handle& operator=(shader_handle&& other) = default;
 
         /// @brief 
-        /// @param owner 
+        /// @param rasterizer 
         /// @param fragment 
         /// @param blend 
         /// @param depth 
         /// @param stencil 
-        void create(
-            renderer& owner,
+        void emplace(
+            rasterizer_handle& rasterizer,
             const std::string& fragment,
             const shader_blend_descriptor& blend = { },
             const shader_depth_descriptor& depth = { },
             const shader_stencil_descriptor& stencil = {});
-            
 
-        /// @brief
-        void destroy();
+        /// @brief PERMET DE PASSER LE SHADER DANS UN VOID*
+        /// @param data 
+        void emplace(void* data);
+
+        /// @brief 
+        /// @return 
+        [[nodiscard]] void* get() const;
 
         /// @brief
         [[nodiscard]] bool has_value() const;
+
+        /// @brief
+        void reset();
 
         /// @brief
         /// @tparam value_t
@@ -323,19 +357,17 @@ namespace detail {
         template <typename value_t>
         void uniform(const value_t& value);
 
-        /// @brief
-        void use() const;
-
     private:
         bool _has_value = false;
-        std::optional<std::reference_wrapper<renderer>> _owner = std::nullopt; 
         Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_pipeline_state = {};
-        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_vertex_buffer = {};
-        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_index_buffer = {};
-        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_uniform_buffer = {};
-        friend struct imgui_context_handle;
-        friend struct imgui_font_handle;
+        friend struct rasterizer_handle;
     };
+
+
+
+
+
+
 
 
 
@@ -348,12 +380,12 @@ namespace detail {
 
 
     /// @brief
-    struct imgui_context_handle {
-        imgui_context_handle() = default;
-        imgui_context_handle(const imgui_context_handle& other) = default;
-        imgui_context_handle& operator=(const imgui_context_handle& other) = default;
-        imgui_context_handle(imgui_context_handle&& other) = default;
-        imgui_context_handle& operator=(imgui_context_handle&& other) = default;
+    struct rasterizer_handle {
+        rasterizer_handle() = default;
+        rasterizer_handle(const rasterizer_handle& other) = default;
+        rasterizer_handle& operator=(const rasterizer_handle& other) = default;
+        rasterizer_handle(rasterizer_handle&& other) = default;
+        rasterizer_handle& operator=(rasterizer_handle&& other) = default;
      
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         void consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events);
@@ -366,14 +398,14 @@ namespace detail {
 #endif
 
         /// @brief
-        /// @param owner
-        void create(renderer& owner, ImFontAtlas* atlas = nullptr);
+        /// @param renderer
+        void emplace(renderer_handle& renderer, ImFontAtlas* atlas = nullptr);
 
         /// @brief
         [[nodiscard]] bool has_value() const;
 
         /// @brief
-        void destroy();
+        void reset();
 
         /// @brief
         void new_frame();
@@ -381,62 +413,70 @@ namespace detail {
         /// @brief
         void render();
 
-        /// @brief 
-        /// @param shaders 
-        void set_shaders(const std::vector<shader_handle>& shaders);
+        /// @brief
+        void clear_stencil_buffer();
 
         /// @brief
         /// @param index
-        void use_shader(const std::size_t index);        
-        
-        /// @brief
-        shader_handle default_shader = {};
-        
-        /// @brief
-        shader_handle mask_shader = {};
+        void use_shader(const shader_handle& shader);
 
         /// @brief 
-        float4x4 projection_matrix; // default to orthographic!
+        void use_projection_orthographic();
 
         /// @brief 
-        float4x4 transform_matrix = identity<float4x4>;
+        /// @param fov 
+        void use_projection_perspective(const float fov);
+
+        /// @brief 
+        /// @param matrix 
+        // void use_transform(const float4x4 matrix);
 
     private:
         bool _has_value = false;
-        bool _is_base_vertex_supported = false;
-        ImGuiContext* _imgui_context = nullptr;
-        ImPlotContext* _implot_context = nullptr;
-        std::optional<std::reference_wrapper<renderer>> _owner = std::nullopt;        
-        unsigned int _vertex_buffer_size = default_initial_vertex_buffer_size;
-        unsigned int _index_buffer_size = default_initial_index_buffer_size;
+        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
+        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};
+        Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_vertex_buffer = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_index_buffer = {};
+        Diligent::RefCntAutoPtr<Diligent::IBuffer> _diligent_uniform_buffer = {};
+        Diligent::RefCntAutoPtr<Diligent::IPipelineState> _diligent_pipeline_state = {};
         Diligent::RefCntAutoPtr<Diligent::IShaderResourceBinding> _diligent_shader_resource = {};
         Diligent::IShaderResourceVariable* _diligent_texture_variable = nullptr;
-        texture_handle font_texture = {};
-        friend struct imgui_font_handle;
+        ImGuiContext* _imgui_context = nullptr;
+        ImPlotContext* _implot_context = nullptr;
+        bool _is_base_vertex_supported = false;
+        bool _has_shader = false;
+        float2 _display_position = {};
+        float2 _display_size = {};
+        unsigned int _vertex_buffer_size = default_initial_vertex_buffer_size;
+        unsigned int _index_buffer_size = default_initial_index_buffer_size;
+        texture_handle _font_texture = {};
+        float4x4 _projection_matrix = {};
+        // float4x4 _transform_matrix = identity<float4x4>;
+
+        friend struct texture_handle;
+        friend struct shader_handle;
+        friend struct font_handle;
     };
 
-    ///
-    struct imgui_font_handle {
 
-        void create(
-            renderer& owner,
-            imgui_context_handle& context,
-            const void* ttf,
-            const std::size_t count,
-            const float size);
 
-        
-        /// @brief
-        [[nodiscard]] bool has_value() const;
 
-        /// @brief
-        void destroy();  
 
-        std::optional<ImFont*> get_font() const;
 
-    private:
-        bool _has_value = false;
-        ImFont* _imgui_font = nullptr;
-    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 }

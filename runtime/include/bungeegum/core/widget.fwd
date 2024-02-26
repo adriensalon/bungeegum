@@ -8,10 +8,12 @@
 #include <vector>
 
 #include <bungeegum/core/math.hpp>
+#include <bungeegum/core/pipeline.fwd>
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/raw.hpp>
 #include <bungeegum/glue/reload.hpp>
 #include <bungeegum/glue/window.hpp>
+#include <bungeegum/glue/renderer.hpp>
 
 struct ImDrawList;
 
@@ -83,7 +85,8 @@ namespace detail {
 	
 	struct draw_command_data {
 		std::reference_wrapper<widget_update_data> updatable;
-		ImDrawList* list = nullptr;
+		std::uintptr_t raw_pipeline;
+		ImDrawList* draw_list = nullptr;
 	};
 
     using widget_id_data = std::uintptr_t;
