@@ -1,11 +1,7 @@
-// #define PLATFORM_WIN32
-#include <bungeegum/glue/backtrace.hpp>
-#include <bungeegum/glue/renderer.hpp> // TOOLCHAIN HERE !
-#include <bungeegum/glue/raw.hpp> // TOOLCHAIN HERE !
 
-#include <array>
 
 #include <imgui.h>
+
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <emscripten/html5.h>
 #include <emscripten/key_codes.h>
@@ -13,9 +9,16 @@
 #include <SDL.h>
 #include <backends/imgui_impl_sdl2.h>
 #endif
+
 #include <implot.h>
 
-// Define those before including diligent headers
+#include <bungeegum/glue/renderer.hpp>
+
+// #if defined(__clang__)
+// #pragma clang diagnostic push
+// #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+// #endif
+
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN && !defined(PLATFORM_EMSCRIPTEN)
 #define PLATFORM_EMSCRIPTEN
 #elif TOOLCHAIN_PLATFORM_WIN32 && !defined(PLATFORM_WIN32)
@@ -32,74 +35,142 @@
 #define PLATFORM_IOS
 #endif
 
+#if BUNGEEGUM_USE_OPENGL
 #include <Graphics/GraphicsEngineOpenGL/interface/EngineFactoryOpenGL.h>
-#include <Graphics/GraphicsTools/interface/MapHelper.hpp>
+#endif
 
-#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
+#if BUNGEEGUM_USE_DIRECTX
 #include <Graphics/GraphicsEngineD3D11/interface/EngineFactoryD3D11.h>
 #include <Graphics/GraphicsEngineD3D12/interface/EngineFactoryD3D12.h>
 #endif
-#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
+
+#if BUNGEEGUM_USE_VULKAN
 #include <Graphics/GraphicsEngineVulkan/interface/EngineFactoryVk.h>
 #endif
-// #include <Imgui/interface/ImGuiDiligentRenderer.hpp>
-// #include <Imgui/interface/ImGuiImplDiligent.hpp>
-// #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-// #include <Imgui/interface/ImGuiImplEmscripten.hpp>
-// #else
-// #include <Imgui/interface/ImGuiImplSDL.hpp>
+
+#include <Graphics/GraphicsTools/interface/MapHelper.hpp>
+
+// #if defined(__clang__)
+// #pragma clang diagnostic pop
 // #endif
 
-static const char* VertexShaderHLSL = R"(
-cbuffer Constants
-{
-    float4x4 ProjectionMatrix;
-}
+#include <array>
 
-struct VSInput
-{
-    float2 pos : ATTRIB0;
-    float2 uv  : ATTRIB1;
-    float4 col : ATTRIB2;
-};
-
-struct PSInput
-{
-    float4 pos : SV_POSITION;
-    float4 col : COLOR;
-    float2 uv  : TEXCOORD;
-};
-
-void main(in VSInput VSIn, out PSInput PSIn)
-{
-    PSIn.pos = mul(ProjectionMatrix, float4(VSIn.pos.xy, 0.0, 1.0));
-    PSIn.col = VSIn.col;
-    PSIn.uv  = VSIn.uv;
-}
-)";
-
-static const char* PixelShaderHLSL = R"(
-struct PSInput
-{
-    float4 pos : SV_POSITION;
-    float4 col : COLOR;
-    float2 uv  : TEXCOORD;
-};
-
-Texture2D    Texture;
-SamplerState Texture_sampler;
-
-float4 main(in PSInput PSIn) : SV_Target
-{
-    return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
-}
-)";
+#include <bungeegum/glue/backtrace.hpp>
+#include <bungeegum/glue/raw.hpp>
 
 namespace bungeegum {
 namespace detail {
 
-#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
-    void renderer_handle::create_directx11(window& existing_window)
+    namespace {
+
+        constexpr std::string_view default_imgui_backend_name = "bungeegum backend";
+
+        constexpr std::string_view default_vertex_shader_source = R"(
+            cbuffer Constants
+            {
+                float4x4 ProjectionMatrix;
+            }
+
+            struct VSInput
+            {
+                float2 pos : ATTRIB0;
+                float2 uv  : ATTRIB1;
+                float4 col : ATTRIB2;
+            };
+
+            struct PSInput
+            {
+                float4 pos : SV_POSITION;
+                float4 col : COLOR;
+                float2 uv  : TEXCOORD;
+            };
+
+            void main(in VSInput VSIn, out PSInput PSIn)
+            {
+                PSIn.pos = mul(ProjectionMatrix, float4(VSIn.pos.xy, 0.0, 1.0));
+                PSIn.col = VSIn.col;
+                PSIn.uv  = VSIn.uv;
+            }
+            )";
+
+        std::string string_replace(
+            const std::string& source,
+            const std::string& to_replace,
+            const std::string& replace_with)
+        {
+            std::size_t _pos = 0;
+            std::size_t _cursor = 0;
+            std::size_t _rep_len = to_replace.length();
+            std::stringstream _builder;
+            do {
+                _pos = source.find(to_replace, _cursor);
+                if (std::string::npos != _pos) {
+                    _builder << source.substr(_cursor, _pos - _cursor);
+                    _builder << replace_with;
+                    _cursor = _pos + _rep_len;
+                }
+            } while (std::string::npos != _pos);
+            _builder << source.substr(_cursor);
+            return (_builder.str());
+        }
+    }
+
+    std::string hlsl_fragment(
+        const std::string& main_function,
+        const std::string& position_alias,
+        const std::string& color_alias,
+        const std::string& texcoord_alias,
+        const std::string& sample_alias)
+    {
+        constexpr std::string_view _prefix = R"(
+            struct  PSInput
+            {
+                float4 pos : SV_POSITION;
+                float4 col : COLOR;
+                float2 uv : TEXCOORD;
+            };
+
+            Texture2D Texture;
+            SamplerState Texture_sampler;
+
+            float4 main(in PSInput PSIn) : SV_Target
+            {
+            )";
+        constexpr std::string_view _suffix = R"(
+            })";
+        std::string _main_function_replaced { main_function };
+        _main_function_replaced = string_replace(_main_function_replaced, position_alias, "PSIn.pos");
+        _main_function_replaced = string_replace(_main_function_replaced, color_alias, "PSIn.col");
+        _main_function_replaced = string_replace(_main_function_replaced, texcoord_alias, "PSIn.uv");
+        _main_function_replaced = string_replace(_main_function_replaced, sample_alias + "(", "Texture.Sample(Texture_sampler, ");
+        return std::string(_prefix.data()) + _main_function_replaced + std::string(_suffix.data());
+    }
+
+    std::string hlsl_fragment_default()
+    {
+        constexpr std::string_view _fragment = R"(
+            struct  PSInput
+            {
+                float4 pos : SV_POSITION;
+                float4 col : COLOR;
+                float2 uv  : TEXCOORD;
+            };
+
+            Texture2D    Texture;
+            SamplerState Texture_sampler;
+
+            float4 main(in PSInput PSIn) : SV_Target
+            {
+                return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
+            }
+            )";
+        return _fragment.data();
+    }
+
+#if BUNGEEGUM_USE_DIRECTX
+
+    void renderer_handle::emplace_create_directx11(window& existing_window)
     {
         Diligent::SwapChainDesc _swap_chain_descriptor;
         _swap_chain_descriptor.DefaultStencilValue = 0u;
@@ -116,7 +187,7 @@ namespace detail {
         _sdl_window = existing_window.get_sdl();
     }
 
-    void renderer_handle::create_directx12(window& existing_window)
+    void renderer_handle::emplace_create_directx12(window& existing_window)
     {
         Diligent::SwapChainDesc _swap_chain_descriptor;
         _swap_chain_descriptor.DefaultStencilValue = 0u;
@@ -124,9 +195,10 @@ namespace detail {
 
         // todo
     }
+
 #endif
 
-    void renderer_handle::create_opengl(window& existing_window)
+    void renderer_handle::emplace_create_opengl(window& existing_window)
     {
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         // _data->sdl_window = existing_window->get_sdl();
@@ -149,11 +221,13 @@ namespace detail {
             &_diligent_swap_chain);
     }
 
-#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_ANDROID)
-    void renderer_handle::create_vulkan(window& existing)
+#if BUNGEEGUM_USE_VULKAN
+    
+    void renderer_handle::emplace_create_vulkan(window& existing)
     {
         (void)existing;
     }
+
 #endif
 
     bool renderer_handle::has_value() const
@@ -162,17 +236,25 @@ namespace detail {
         return false;
     }
 
-    void renderer_handle::clear_screen()
+    void renderer_handle::reset() 
     {
+
+    }
+
+    void renderer_handle::clear_screen(
+        const bool clear_color_buffer, 
+        const bool clear_depth_buffer)
+    {
+        (void)clear_color_buffer;
+        (void)clear_depth_buffer;
         Diligent::ITextureView* _rtv_ptr = _diligent_swap_chain->GetCurrentBackBufferRTV();
         Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
         _diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        
+
         const std::array<float, 4> _clear_color_array = { clear_color.x, clear_color.y, clear_color.z, clear_color.w };
         _diligent_device_context->ClearRenderTarget(_rtv_ptr, _clear_color_array.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         _diligent_device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG | Diligent::CLEAR_STENCIL_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         _diligent_device_context->SetStencilRef(8);
-
     }
 
     void renderer_handle::present()
@@ -191,35 +273,23 @@ namespace detail {
             Diligent::SURFACE_TRANSFORM_OPTIMAL);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    void renderer_handle::use_color_buffer(const bool is_used)
+    {
+        Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
+        if (is_used) {
+            Diligent::ITextureView* _rtv_ptr = _diligent_swap_chain->GetCurrentBackBufferRTV();
+            _diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        } else {
+            _diligent_device_context->SetRenderTargets(0, nullptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        }
+    }
 
     void font_handle::emplace(
         rasterizer_handle& rasterizer,
         const void* ttf,
         const std::size_t count,
         const float size)
-    {        
+    {
         if (!rasterizer.has_value()) {
             throw backtraced_exception { "[rendering exception] impossible to create font because rasterizer has no value" };
         }
@@ -230,7 +300,7 @@ namespace detail {
         ImGui::SetCurrentContext(rasterizer._imgui_context);
         ImGuiIO& _io = ImGui::GetIO();
         _imgui_font = _io.Fonts->AddFontFromMemoryCompressedTTF(ttf, static_cast<int>(count), size);
-        
+
         // // font awesome for the glyphs
         // // ImFontConfig config;
         // // config.MergeMode = true;
@@ -241,9 +311,9 @@ namespace detail {
         _io.Fonts->Build();
         _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
         rasterizer._font_texture.emplace(
-            rasterizer, 
-            std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)), 
-            static_cast<std::size_t>(_raw_width), 
+            rasterizer,
+            std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)),
+            static_cast<std::size_t>(_raw_width),
             static_cast<std::size_t>(_raw_height));
         _io.Fonts->TexID = rasterizer._font_texture.get();
         _has_value = true;
@@ -262,22 +332,13 @@ namespace detail {
         return _has_value;
     }
 
-    void font_handle::reset() 
+    void font_handle::reset()
     {
         if (_has_value) {
             _imgui_font = nullptr;
             _has_value = false;
         }
     }
-
-
-
-
-
-
-    
-
-
 
     void texture_handle::emplace(
         rasterizer_handle& rasterizer,
@@ -326,19 +387,6 @@ namespace detail {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     void shader_handle::emplace(
         rasterizer_handle& rasterizer,
         const std::string& fragment,
@@ -357,8 +405,7 @@ namespace detail {
         Diligent::RefCntAutoPtr<Diligent::IShader> _vertex_shader;
         _shader_create_info.Desc.ShaderType = Diligent::SHADER_TYPE_VERTEX;
         _shader_create_info.Desc.Name = "uiw vertex shader";
-        // _shader_create_info.Source = vertex.c_str();
-        _shader_create_info.Source = VertexShaderHLSL;
+        _shader_create_info.Source = default_vertex_shader_source.data();
         _shader_create_info.SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_HLSL;
         rasterizer._diligent_render_device->CreateShader(_shader_create_info, &_vertex_shader);
 
@@ -477,30 +524,8 @@ namespace detail {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+
     void rasterizer_handle::consume_emscripten_key_events(std::vector<emscripten_key_event>& events)
     {
         ImGui::SetCurrentContext(_imgui_context);
@@ -528,7 +553,9 @@ namespace detail {
         //     _data->imgui_renderer->OnWheelEvent(_event.event_type, _event.event);
         // }
     }
+
 #else
+
     void rasterizer_handle::consume_sdl_events(std::vector<SDL_Event>& events)
     {
         ImGui::SetCurrentContext(_imgui_context);
@@ -536,6 +563,7 @@ namespace detail {
             ImGui_ImplSDL2_ProcessEvent(&_event);
         }
     }
+
 #endif
 
     void rasterizer_handle::emplace(
@@ -552,7 +580,7 @@ namespace detail {
         ImGui::SetCurrentContext(_imgui_context);
         ImGuiIO& _io = ImGui::GetIO();
         // _io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        
+
         _io.IniFilename = nullptr;
         _io.BackendPlatformName = default_imgui_backend_name.data();
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
@@ -581,7 +609,7 @@ namespace detail {
         _diligent_device_context = renderer._diligent_device_context;
         _diligent_render_device = renderer._diligent_render_device;
         _diligent_swap_chain = renderer._diligent_swap_chain;
-        
+
         // create uniform buffer
         {
             Diligent::BufferDesc _diligent_uniform_buffer_desc;
@@ -593,16 +621,16 @@ namespace detail {
         }
 
         _io.Fonts->AddFontDefault();
-        _io.Fonts->Build();        
+        _io.Fonts->Build();
         int _raw_width, _raw_height = 0;
         unsigned char* _raw_pixels = nullptr;
         _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
-        
+
         _has_value = true; // we do it now because required for creating texture
         _font_texture.emplace(
-            *this, 
-            std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)), 
-            static_cast<std::size_t>(_raw_width), 
+            *this,
+            std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)),
+            static_cast<std::size_t>(_raw_width),
             static_cast<std::size_t>(_raw_height));
         _io.Fonts->TexID = _font_texture.get();
     }
@@ -700,9 +728,6 @@ namespace detail {
             }
         }
 
-
-
-
         // ONCE PER FRAME OK
 
         // Setup orthographic projection matrix into our constant buffer
@@ -798,11 +823,11 @@ namespace detail {
                     auto* pTextureView = reinterpret_cast<Diligent::ITextureView*>(pCmd->TextureId);
                     VERIFY_EXPR(pTextureView);
                     // if (pTextureView != pLastTextureView) {
-                        pLastTextureView = pTextureView;
-                        _diligent_texture_variable->Set(pTextureView);
-                        // _diligent_texture_variable->Set(_diligent_swap_chain->GetDepthBufferDSV()->GetTexture()->GetDefaultView(Diligent::TEXTURE_VIEW_TYPE::TEXTURE_VIEW_SHADER_RESOURCE));
-                        
-                        _diligent_device_context->CommitShaderResources(_diligent_shader_resource, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+                    pLastTextureView = pTextureView;
+                    _diligent_texture_variable->Set(pTextureView);
+                    // _diligent_texture_variable->Set(_diligent_swap_chain->GetDepthBufferDSV()->GetTexture()->GetDefaultView(Diligent::TEXTURE_VIEW_TYPE::TEXTURE_VIEW_SHADER_RESOURCE));
+
+                    _diligent_device_context->CommitShaderResources(_diligent_shader_resource, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
                     // }
 
                     Diligent::DrawIndexedAttribs DrawAttrs { pCmd->ElemCount, sizeof(ImDrawIdx) == sizeof(Diligent::Uint16) ? Diligent::VT_UINT16 : Diligent::VT_UINT32, Diligent::DRAW_FLAG_VERIFY_STATES };
@@ -822,17 +847,11 @@ namespace detail {
         }
     }
 
-    void rasterizer_handle::clear_stencil_buffer()
-    {
-        Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
-        _diligent_device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_STENCIL_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-    }
-
     void rasterizer_handle::use_shader(const shader_handle& shader)
     {
         _diligent_pipeline_state = shader._diligent_pipeline_state;
         _diligent_device_context->SetPipelineState(_diligent_pipeline_state);
-        
+
         // bind texture slot
         _diligent_shader_resource.Release();
         _diligent_pipeline_state->CreateShaderResourceBinding(&(_diligent_shader_resource), true);
@@ -842,7 +861,6 @@ namespace detail {
         // commit uniform matrix (without transform for now)
         Diligent::MapHelper<float4x4> _map_helper(_diligent_device_context, _diligent_uniform_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
         *_map_helper = _projection_matrix;
-            
     }
 
     void rasterizer_handle::use_projection_orthographic()
@@ -861,26 +879,7 @@ namespace detail {
 
     void rasterizer_handle::use_projection_perspective(const float fov)
     {
-
     }
-
-    void rasterizer_handle::use_color_buffer(const bool is_used)
-    {
-        Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
-        if (is_used) {
-            Diligent::ITextureView* _rtv_ptr = _diligent_swap_chain->GetCurrentBackBufferRTV();
-            _diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        } else {
-            _diligent_device_context->SetRenderTargets(0, nullptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        }
-    }
-
-
-
-
-
-
-
 
 }
 }

@@ -393,7 +393,7 @@ void use_shader_callback_NO_COLOR(const ImDrawList* parent_list, const ImDrawCmd
     detail::global_manager_data& _global = detail::global();
     detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
 
-    _pipeline_data.user_context.use_color_buffer(false);
+    _pipeline_data.pipeline_renderer.use_color_buffer(false);
     _pipeline_data.user_context.use_shader(_shader);
 }
 
@@ -405,7 +405,7 @@ void use_shader_callback_COLOR(const ImDrawList* parent_list, const ImDrawCmd* c
     detail::global_manager_data& _global = detail::global();
     detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
 
-    _pipeline_data.user_context.use_color_buffer(true);
+    _pipeline_data.pipeline_renderer.use_color_buffer(true);
     _pipeline_data.user_context.use_shader(_shader);
 }
 

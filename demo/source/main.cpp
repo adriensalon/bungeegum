@@ -86,7 +86,6 @@ struct Composed {
 };
 
 
-
 struct drawerwidget {
 
     void draw(bungeegum::draw_command& command)
