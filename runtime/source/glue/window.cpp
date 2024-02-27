@@ -220,7 +220,7 @@ namespace detail {
     }
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-	void window::attach_emscripten(const std::string& canvas_id)
+	void window_handle::attach_emscripten(const std::string& canvas_id)
 	{
 		_canvas_id = canvas_id;
 	}
@@ -300,17 +300,17 @@ namespace detail {
     }
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    std::vector<emscripten_key_event>& window::get_emscripten_key_events()
+    std::vector<emscripten_key_event>& window_handle::get_emscripten_key_events()
     {
         return emscripten_static_data.key_events;
     }
 
-    std::vector<emscripten_mouse_event>& window::get_emscripten_mouse_events()
+    std::vector<emscripten_mouse_event>& window_handle::get_emscripten_mouse_events()
     {
         return emscripten_static_data.mouse_events;
     }
 
-    std::vector<emscripten_wheel_event>& window::get_emscripten_wheel_events()
+    std::vector<emscripten_wheel_event>& window_handle::get_emscripten_wheel_events()
     {
         return emscripten_static_data.wheel_events;
     }

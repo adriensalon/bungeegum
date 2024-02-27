@@ -191,7 +191,8 @@ int main()
     _shader1.uniform<float>("okok", 44.f);
 
     _my_pipeline.root(bungeegum::make<drawerwidget>());
-    _my_pipeline.run(60, true);
+    // _my_pipeline.run(60, true);
+    _my_pipeline.run();
 
     // p.root(bungeegum::widget_id( bungeegum::make<Title>()
     //            .title("my title !!!")

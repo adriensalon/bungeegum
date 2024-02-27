@@ -1,31 +1,30 @@
 #pragma once
 
+#include <bungeegum/config/backend.hpp>
+#include <bungeegum/config/misc.hpp>
+#include <bungeegum/core/math.hpp>
+#include <bungeegum/glue/window.hpp>
+
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
+
 #include <Common/interface/RefCntAutoPtr.hpp>
 #include <Graphics/GraphicsEngine/interface/Buffer.h>
 #include <Graphics/GraphicsEngine/interface/DepthStencilState.h>
 #include <Graphics/GraphicsEngine/interface/DeviceContext.h>
+#include <Graphics/GraphicsEngine/interface/PipelineState.h>
 #include <Graphics/GraphicsEngine/interface/RenderDevice.h>
 #include <Graphics/GraphicsEngine/interface/ShaderResourceBinding.h>
 #include <Graphics/GraphicsEngine/interface/SwapChain.h>
 #include <Graphics/GraphicsEngine/interface/TextureView.h>
 
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#endif
-
-#include <Graphics/GraphicsEngine/interface/PipelineState.h>
-
-#if defined(__clang__)
+#if TOOLCHAIN_COMPILER_CLANG
 #pragma clang diagnostic pop
 #endif
 
 #include <vector>
-
-#include <bungeegum/config/backend.hpp>
-#include <bungeegum/config/misc.hpp>
-#include <bungeegum/core/math.hpp>
-#include <bungeegum/glue/window.hpp>
 
 struct ImFont;
 struct ImFontAtlas;

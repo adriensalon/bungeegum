@@ -179,6 +179,7 @@ namespace detail {
             Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
 
         _sdl_window = window.get_sdl();
+		_has_value = true;
     }
 
     void renderer_handle::emplace_new_directx11(window_handle& window)
@@ -196,6 +197,7 @@ namespace detail {
             Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
 
         _sdl_window = window.get_sdl();
+		_has_value = true;
     }
 
     void renderer_handle::emplace_new_directx12(window_handle& existing_window)
@@ -205,6 +207,7 @@ namespace detail {
         Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
 
         // todo
+		_has_value = true;
     }
 
 #endif
@@ -229,6 +232,7 @@ namespace detail {
             &_diligent_render_device,
             &_diligent_device_context);
         // swapchain mdr?
+		_has_value = true;
     }
 
     void renderer_handle::emplace_new_opengl(window_handle& existing_window)
@@ -252,6 +256,7 @@ namespace detail {
             &_diligent_device_context,
             _swap_chain_descriptor,
             &_diligent_swap_chain);
+		_has_value = true;
     }
 
 #if BUNGEEGUM_USE_VULKAN
@@ -259,19 +264,21 @@ namespace detail {
     void renderer_handle::emplace_new_vulkan(window_handle& existing)
     {
         (void)existing;
+		_has_value = true;
     }
 
 #endif
 
     bool renderer_handle::has_value() const
     {
-        // return _data.operator bool();
-        return false;
+        return _has_value;
     }
 
     void renderer_handle::reset() 
     {
-
+		if (_has_value) {
+			
+		}
     }
 
     void renderer_handle::clear_screen(
