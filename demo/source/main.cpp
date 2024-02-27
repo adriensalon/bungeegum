@@ -153,7 +153,8 @@ int main()
     _provider.native_window_ptr = nullptr;
 
     bungeegum::pipeline _my_pipeline;
-    _my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
+    _my_pipeline.setup<bungeegum::renderer_backend::opengl>(_provider);
+    // _my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
 
     bungeegum::texture_resource _texture_res;
     _texture_res.pixels({ 0u });
@@ -182,7 +183,7 @@ int main()
     _shader1_res.stencil({});
     bungeegum::make_shader("my shader 1", _shader1_res);
 
-    bungeegum::font_resource _font1_res;
+    // bungeegum::font_resource _font1_res;
     // _font1_res.compressed(nullptr, 0);
     // _font1_res.size(13.4f);
 

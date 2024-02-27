@@ -1,10 +1,19 @@
 #include <imgui.h>
+
+
+#include <bungeegum/glue/toolchain.hpp>
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <SDL.h> // event only omg
+#endif
+
+#include <iostream>
 
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/pipeline.hpp>
+#include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/console.hpp>
 #include <bungeegum/glue/raw.hpp>
+#include <bungeegum/glue/reload.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -42,6 +51,7 @@ namespace detail {
 
     void save_widgets(const std::filesystem::path& archive_path, widget_update_data& root_updatable)
     {
+#if BUNGEEGUM_USE_HOTRELOAD
         reloaded_saver _archiver(archive_path);
         std::function<void(widget_update_data&)> _traverse_function = [&_archiver, &_traverse_function](widget_update_data& _updatable) {
             if (_updatable.saver) {
@@ -52,10 +62,15 @@ namespace detail {
             }
         };
         _traverse_function(root_updatable);
+#else
+		(void)archive_path;
+		(void)root_updatable;
+#endif
     }
 
     void load_widgets(const std::filesystem::path& archive_path, widget_update_data& root_updatable)
     {
+#if BUNGEEGUM_USE_HOTRELOAD
         reloaded_loader _archiver(archive_path);
         std::function<void(widget_update_data&)> _traverse_function = [&_archiver, &_traverse_function](widget_update_data& _updatable) {
             if (_updatable.loader) {
@@ -66,6 +81,10 @@ namespace detail {
             }
         };
         _traverse_function(root_updatable);
+#else
+		(void)archive_path;
+		(void)root_updatable;
+#endif
     }
 
     //     void interact_widgets()
@@ -232,16 +251,22 @@ namespace detail {
         _default_depth.function = Diligent::COMPARISON_FUNC_LESS;
         data.default_shader.emplace(data.user_context, hlsl_fragment_default(), {}, _default_depth);     
         
+		shader_blend_descriptor _mask_blend;
+		_mask_blend.color_mask = Diligent::COLOR_MASK::COLOR_MASK_NONE;
         shader_depth_descriptor _mask_depth;
         _mask_depth.enable_write = true;
         _mask_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
-        std::string _fragment = hlsl_fragment("return float4(1, 0, 0, 1) * UIW_SAMPLE(0, 0);");
-        data.mask_shader.emplace(data.user_context, _fragment, {}, _mask_depth);
+        // std::string _fragment = hlsl_fragment("return float4(1, 0, 0, 1) * UIW_SAMPLE(0, 0);");
+        // data.mask_shader.emplace(data.user_context, _fragment, {}, _mask_depth);
+        data.mask_shader.emplace(data.user_context, hlsl_fragment_default(), _mask_blend, _mask_depth);
 
 #if BUNGEEGUM_USE_OVERLAY
         shader_depth_descriptor _overlay_depth;
         _overlay_depth.enable = false;
-        data.overlay_shader.emplace(data.user_context, hlsl_fragment_default(), {}, _overlay_depth);
+        // _overlay_depth.enable = true;
+        // _overlay_depth.enable_write = false;
+        // _mask_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
+        data.overlay_shader.emplace(data.overlay_context, hlsl_fragment_default(), {}, _overlay_depth);
 #endif
     }
 
@@ -270,17 +295,17 @@ namespace detail {
             data.pipeline_renderer.resize(data.pipeline_window.window_resized_events.back().new_size);
         }
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        data.user_context.consume_emscripten_key_events(pipeline_window.get_emscripten_key_events());
-        data.user_context.consume_emscripten_mouse_events(pipeline_window.get_emscripten_mouse_events());
-        data.user_context.consume_emscripten_wheel_events(pipeline_window.get_emscripten_wheel_events());
+        data.user_context.consume_emscripten_key_events(data.pipeline_window.get_emscripten_key_events());
+        data.user_context.consume_emscripten_mouse_events(data.pipeline_window.get_emscripten_mouse_events());
+        data.user_context.consume_emscripten_wheel_events(data.pipeline_window.get_emscripten_wheel_events());
 #if BUNGEEGUM_USE_OVERLAY
-        data.overlay_context.consume_emscripten_key_events(pipeline_window.get_emscripten_key_events());
-        data.overlay_context.consume_emscripten_mouse_events(pipeline_window.get_emscripten_mouse_events());
-        data.overlay_context.consume_emscripten_wheel_events(pipeline_window.get_emscripten_wheel_events());
+        data.overlay_context.consume_emscripten_key_events(data.pipeline_window.get_emscripten_key_events());
+        data.overlay_context.consume_emscripten_mouse_events(data.pipeline_window.get_emscripten_mouse_events());
+        data.overlay_context.consume_emscripten_wheel_events(data.pipeline_window.get_emscripten_wheel_events());
 #endif
-        pipeline_window.get_emscripten_key_events().clear();
-        pipeline_window.get_emscripten_mouse_events().clear();
-        pipeline_window.get_emscripten_wheel_events().clear();
+        data.pipeline_window.get_emscripten_key_events().clear();
+        data.pipeline_window.get_emscripten_mouse_events().clear();
+        data.pipeline_window.get_emscripten_wheel_events().clear();
 #else
         data.user_context.consume_sdl_events(data.pipeline_window.get_sdl_events());
 #if BUNGEEGUM_USE_OVERLAY
@@ -311,7 +336,7 @@ namespace detail {
 
             data.user_context.new_frame();
             data.user_context.use_projection_orthographic();
-            // data.user_context.use_shader(data.default_shader);
+            data.user_context.use_shader(data.default_shader);
             ImDrawList* _drawlist = ImGui::GetBackgroundDrawList();
             draw_widgets(_drawlist);
             data.user_context.render();
@@ -332,12 +357,10 @@ namespace detail {
     }
 }
 
+#if BUNGEEGUM_USE_DIRECTX
 template <>
 pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& provider)
 {
-#if !BUNGEEGUM_USE_DIRECTX
-    static_assert(false, "DirectX must be enabled");
-#endif
     detail::setup_global_if_required();
     detail::setup_window(_data.pipeline_window, provider);
     if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
@@ -362,9 +385,6 @@ pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& 
 template <>
 pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& provider)
 {
-#if !BUNGEEGUM_USE_DIRECTX
-    static_assert(false, "DirectX must be enabled");
-#endif
     detail::setup_global_if_required();
     detail::setup_window(_data.pipeline_window, provider);
     if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
@@ -384,6 +404,7 @@ pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& 
 	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
     return *this;
 }
+#endif
 
 template <>
 pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& provider)
@@ -399,6 +420,7 @@ pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& pro
         _data.pipeline_renderer.emplace_create_opengl(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
+	_data.overlay_context.emplace(_data.pipeline_renderer, nullptr);
     detail::setup_overlay(_data.overlay_context);
 #endif
     _data.user_context.emplace(_data.pipeline_renderer, nullptr);
@@ -474,7 +496,9 @@ pipeline& pipeline::color(const float4 rgba)
 
 pipeline& pipeline::title(const std::string& description)
 {
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
     _data.pipeline_window.title(description);
+#endif
     return *this;
 }
 

@@ -8,6 +8,7 @@ namespace bungeegum {
 namespace detail {
     namespace {
 
+#if !BUNGEEGUM_USE_OVERLAY
         void console_log_exception(const backtraced_exception& exception, const console_color color)
         {
             console_log("\"" + std::string(exception.what()) + "\"", console_color::black_or_white);
@@ -47,6 +48,8 @@ namespace detail {
 			console_log("Message ", console_color::blue);
 			console_log_exception(exception, console_color::blue);
 		}
+
+#endif
     }
 
 //     void protect_library(const std::function<void()>& try_callback)

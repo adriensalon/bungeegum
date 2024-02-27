@@ -26,7 +26,7 @@ namespace detail {
 
         font_handle regular_font = {};
         font_handle extrabold_font = {};
-        ImFont* icons_font = nullptr;
+        // ImFont* icons_font = nullptr;
 
         bool show_build_overlay = false;
         bool show_hierarchy_overlay = false;

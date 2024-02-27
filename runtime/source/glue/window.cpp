@@ -220,7 +220,7 @@ namespace detail {
     }
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-	void attach_emscripten(const std::string& canvas_id)
+	void window::attach_emscripten(const std::string& canvas_id)
 	{
 		_canvas_id = canvas_id;
 	}

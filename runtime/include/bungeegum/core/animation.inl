@@ -6,9 +6,9 @@ namespace detail {
     template <typename value_t>
     animation_data<value_t>::~animation_data()
     {
-        if (global().animations.contains(raw_animation)) {
-            global().animations.notify_erase(raw_animation);
-        }
+        // if (global().animations.contains(raw_animation)) {
+        //     global().animations.notify_erase(raw_animation);
+        // }
     }
 
     template <typename value_t>
@@ -83,7 +83,7 @@ animation<value_t>& animation<value_t>::start()
         _update_data.kind = std::make_unique<std::type_index>(typeid(value_t));
         detail::assign_ticker(_data, _update_data);
 #if BUNGEEGUM_USE_OVERLAY
-        _update_data.clean_typename = detail::pipeline_manager_data::to_clean_typename(_update_data.kind->name());
+        // _update_data.clean_typename = detail::pipeline_manager_data::to_clean_typename(_update_data.kind->name());
 #endif
     }
     _data.is_playing = true;
@@ -128,7 +128,7 @@ animation<value_t>& animation<value_t>::max(value_t&& max_value)
 template <typename value_t>
 animation<value_t>& animation<value_t>::mode(const animation_mode mode)
 {
-    _mode = mode;
+    _data.mode = mode;
     return *this;
 }
 

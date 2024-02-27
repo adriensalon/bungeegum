@@ -1,5 +1,10 @@
 #pragma once
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
+
 #include <Common/interface/RefCntAutoPtr.hpp>
 #include <Graphics/GraphicsEngine/interface/Buffer.h>
 #include <Graphics/GraphicsEngine/interface/DepthStencilState.h>
@@ -9,6 +14,10 @@
 #include <Graphics/GraphicsEngine/interface/ShaderResourceBinding.h>
 #include <Graphics/GraphicsEngine/interface/SwapChain.h>
 #include <Graphics/GraphicsEngine/interface/TextureView.h>
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #include <vector>
 
@@ -130,6 +139,8 @@ namespace detail {
 #endif
         friend struct rasterizer_handle;
     };
+
+	struct rasterizer_handle;
 
     ///
     struct font_handle {

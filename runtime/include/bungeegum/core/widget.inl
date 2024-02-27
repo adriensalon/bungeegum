@@ -129,41 +129,61 @@ namespace detail {
     template <typename widget_t>
     constexpr void install_on_load(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
+#if BUNGEEGUM_USE_HOTRELOAD
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
             updatable.loader = [&reference](detail::reloaded_loader& archiver) {
                 archiver.load<widget_t>(widget_ref_access<widget_t>::get_data(reference));
             };
         }
+#else
+		(void)reference;
+		(void)updatable;
+#endif
     }
 
     template <typename widget_t>
     constexpr void install_on_save(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
+#if BUNGEEGUM_USE_HOTRELOAD
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
             updatable.saver = [&reference](detail::reloaded_saver& archiver) {
                 archiver.save<widget_t>(widget_ref_access<widget_t>::get_data(reference));
             };
         }
+#else
+		(void)reference;
+		(void)updatable;
+#endif
     }
 
     template <typename widget_t>
     constexpr void install_on_sizeof(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
+#if BUNGEEGUM_USE_HOTRELOAD
         updatable.true_sizeof = [reference]() {
             return bungeegum::access::get_sizeof<widget_t>(reference.get());
         };
+#else
+		(void)reference;
+		(void)updatable;
+#endif
     }
 
     template <typename widget_t>
     constexpr void install_on_this(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
+#if BUNGEEGUM_USE_HOTRELOAD
         updatable.true_ptr = [reference]() {
             return bungeegum::access::get_this<widget_t>(reference.get());
         };
+#else
+		(void)reference;
+		(void)updatable;
+#endif
     }
 
     template <typename widget_t>
-    constexpr void install_clean_typename(detail::widget_update_data& updatable)
+    void install_clean_typename(detail::widget_update_data& updatable)
     {
 #if BUNGEEGUM_USE_OVERLAY
         std::function<std::string(const std::string&)> _to_clean_typename = [](const std::string raw_typename) {
@@ -240,6 +260,8 @@ widget_ref<widget_t> make_reference()
     detail::value_type_t<widget_t>* _widget_ptr;
     std::uintptr_t _raw_widget;
     std::any _inplace_data;
+
+#if BUNGEEGUM_USE_HOTRELOAD
     if constexpr (detail::traits::is_reloadable_v<widget_t>) {
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>(
             detail::global().widgets.hotswap_reloader->allocate<widget_t>()));
@@ -249,6 +271,10 @@ widget_ref<widget_t> make_reference()
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>());
         _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
     }
+#else
+	_widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>());
+	_raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
+#endif
     detail::widget_update_data& _updatable = detail::global().widgets.updatables[_raw_widget];
     _updatable.raw = _raw_widget;
     _updatable.inplace_data = std::move(_inplace_data);

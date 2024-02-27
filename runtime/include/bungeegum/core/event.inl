@@ -133,9 +133,9 @@ event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& fut
         (_update_data.kinds.push_back(typeid(values_t)), ...);
         detail::assign_ticker(_data, _update_data);
 #if BUNGEEGUM_USE_OVERLAY
-        for (const std::type_index& _type_index : _update_data.kinds) {
-            _update_data.clean_typenames.push_back(detail::pipelines_manager::to_clean_typename(_type_index.name()));
-        }
+        // for (const std::type_index& _type_index : _update_data.kinds) {
+        //     _update_data.clean_typenames.push_back(detail::pipelines_manager::to_clean_typename(_type_index.name()));
+        // }
 #endif
     }
     _data.futures.push_back(std::move(future_value));
@@ -152,9 +152,9 @@ event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_
         (_update_data.kinds.push_back(typeid(values_t)), ...);
         detail::assign_ticker(_data, _update_data);
 #if BUNGEEGUM_USE_OVERLAY
-        for (const std::type_index& _type_index : _update_data.kinds) {
-            _update_data.clean_typenames.push_back(detail::global().pipelines.to_clean_typename(_type_index.name()));
-        }
+        // for (const std::type_index& _type_index : _update_data.kinds) {
+        //     _update_data.clean_typenames.push_back(detail::global().pipelines.to_clean_typename(_type_index.name()));
+        // }
 #endif
     }
     _data.shared_futures.push_back(shared_future_value);

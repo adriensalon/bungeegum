@@ -1,8 +1,9 @@
-
-
 #include <imgui.h>
 
+#include <bungeegum/glue/toolchain.hpp>
+
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
 #include <emscripten/key_codes.h>
 #else
@@ -14,10 +15,6 @@
 
 #include <bungeegum/glue/renderer.hpp>
 
-// #if defined(__clang__)
-// #pragma clang diagnostic push
-// #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-// #endif
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN && !defined(PLATFORM_EMSCRIPTEN)
 #define PLATFORM_EMSCRIPTEN
@@ -50,9 +47,6 @@
 
 #include <Graphics/GraphicsTools/interface/MapHelper.hpp>
 
-// #if defined(__clang__)
-// #pragma clang diagnostic pop
-// #endif
 
 #include <array>
 
@@ -254,7 +248,7 @@ namespace detail {
         const std::array<float, 4> _clear_color_array = { clear_color.x, clear_color.y, clear_color.z, clear_color.w };
         _diligent_device_context->ClearRenderTarget(_rtv_ptr, _clear_color_array.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         _diligent_device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG | Diligent::CLEAR_STENCIL_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        _diligent_device_context->SetStencilRef(8);
+        // _diligent_device_context->SetStencilRef(8);
     }
 
     void renderer_handle::present()
@@ -660,7 +654,7 @@ namespace detail {
     {
         ImGui::SetCurrentContext(_imgui_context);
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        const Diligent::SwapChainDesc& _swapchain_descriptor = rnd._diligent_swap_chain->GetDesc();
+        const Diligent::SwapChainDesc& _swapchain_descriptor = _diligent_swap_chain->GetDesc();
         const float _display_height = static_cast<float>(_swapchain_descriptor.Height);
         const float _display_width = static_cast<float>(_swapchain_descriptor.Width);
 
@@ -823,6 +817,7 @@ namespace detail {
                     auto* pTextureView = reinterpret_cast<Diligent::ITextureView*>(pCmd->TextureId);
                     VERIFY_EXPR(pTextureView);
                     // if (pTextureView != pLastTextureView) {
+					(void)pLastTextureView;
                     pLastTextureView = pTextureView;
                     _diligent_texture_variable->Set(pTextureView);
                     // _diligent_texture_variable->Set(_diligent_swap_chain->GetDepthBufferDSV()->GetTexture()->GetDefaultView(Diligent::TEXTURE_VIEW_TYPE::TEXTURE_VIEW_SHADER_RESOURCE));
