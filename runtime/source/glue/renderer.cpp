@@ -653,21 +653,20 @@ namespace detail {
     void rasterizer_handle::new_frame()
     {
         ImGui::SetCurrentContext(_imgui_context);
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         const Diligent::SwapChainDesc& _swapchain_descriptor = _diligent_swap_chain->GetDesc();
         const float _display_height = static_cast<float>(_swapchain_descriptor.Height);
         const float _display_width = static_cast<float>(_swapchain_descriptor.Width);
-
+        ImGuiIO& _imgui_io = ImGui::GetIO();
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         static auto m_LastTimestamp = std::chrono::high_resolution_clock::now();
         auto now = std::chrono::high_resolution_clock::now();
         auto elapsed_ns = now - m_LastTimestamp;
         m_LastTimestamp = now;
-        auto& io = ImGui::GetIO();
-        io.DeltaTime = static_cast<float>(elapsed_ns.count() / 1e+9);
-        io.DisplaySize = ImVec2(_display_width, _display_height);
+        _imgui_io.DeltaTime = static_cast<float>(elapsed_ns.count() / 1e+9);
 #else
         ImGui_ImplSDL2_NewFrame();
 #endif
+        _imgui_io.DisplaySize = ImVec2(_display_width, _display_height);
         ImGui::NewFrame();
     }
 
