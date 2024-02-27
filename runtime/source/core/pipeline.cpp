@@ -232,7 +232,7 @@ namespace detail {
         return !_global.widgets.drawables.empty();
     }
 
-    void setup_window(window& pipeline_window, const pipeline_provider& provider)
+    void setup_window(window_handle& pipeline_window, const pipeline_provider& provider)
     {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         pipeline_window.attach_emscripten(provider.emscripten_canvas_id);
@@ -249,16 +249,16 @@ namespace detail {
     {
         shader_depth_descriptor _default_depth;
         _default_depth.function = Diligent::COMPARISON_FUNC_LESS;
-        data.default_shader.emplace(data.user_context, hlsl_fragment_default(), {}, _default_depth);     
+        data.default_shader.emplace(data.user_context, shader_fragment_default(), {}, _default_depth);     
         
 		shader_blend_descriptor _mask_blend;
 		_mask_blend.color_mask = Diligent::COLOR_MASK::COLOR_MASK_NONE;
         shader_depth_descriptor _mask_depth;
         _mask_depth.enable_write = true;
         _mask_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
-        // std::string _fragment = hlsl_fragment("return float4(1, 0, 0, 1) * UIW_SAMPLE(0, 0);");
+        // std::string _fragment = shader_fragment("return float4(1, 0, 0, 1) * UIW_SAMPLE(0, 0);");
         // data.mask_shader.emplace(data.user_context, _fragment, {}, _mask_depth);
-        data.mask_shader.emplace(data.user_context, hlsl_fragment_default(), _mask_blend, _mask_depth);
+        data.mask_shader.emplace(data.user_context, shader_fragment_default(), _mask_blend, _mask_depth);
 
 #if BUNGEEGUM_USE_OVERLAY
         shader_depth_descriptor _overlay_depth;
@@ -266,7 +266,7 @@ namespace detail {
         // _overlay_depth.enable = true;
         // _overlay_depth.enable_write = false;
         // _mask_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
-        data.overlay_shader.emplace(data.overlay_context, hlsl_fragment_default(), {}, _overlay_depth);
+        data.overlay_shader.emplace(data.overlay_context, shader_fragment_default(), {}, _overlay_depth);
 #endif
     }
 
@@ -368,7 +368,7 @@ pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& 
         //     provider.directx_device_ptr,
         //     provider.directx_swapchain_ptr);
     } else {
-        _data.pipeline_renderer.emplace_create_directx11(_data.pipeline_window);
+        _data.pipeline_renderer.emplace_new_directx11(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
     _data.overlay_context.emplace(_data.pipeline_renderer, nullptr);
@@ -392,7 +392,7 @@ pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& 
         //     provider.directx_device_ptr,
         //     provider.directx_swapchain_ptr);
     } else {
-        _data.pipeline_renderer.emplace_create_directx12(_data.pipeline_window);
+        _data.pipeline_renderer.emplace_new_directx12(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
     detail::setup_overlay(_data.overlay_context);
@@ -417,7 +417,7 @@ pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& pro
     if (provider.opengl_attach_to_existing) {
         // _data.pipeline_renderer.attach_opengl(_data.pipeline_window);
     } else {
-        _data.pipeline_renderer.emplace_create_opengl(_data.pipeline_window);
+        _data.pipeline_renderer.emplace_new_opengl(_data.pipeline_window);
     }
 #if BUNGEEGUM_USE_OVERLAY
 	_data.overlay_context.emplace(_data.pipeline_renderer, nullptr);

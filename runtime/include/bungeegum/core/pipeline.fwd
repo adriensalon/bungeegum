@@ -39,7 +39,7 @@ namespace detail {
     struct pipeline_data {
         std::uintptr_t raw = {};
         
-        window pipeline_window = {};
+        window_handle pipeline_window = {};
         renderer_handle pipeline_renderer = {};
         
 

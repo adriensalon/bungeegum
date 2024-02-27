@@ -110,7 +110,7 @@ namespace detail {
         }
     }
 
-    std::string hlsl_fragment(
+    std::string shader_fragment(
         const std::string& main_function,
         const std::string& position_alias,
         const std::string& color_alias,
@@ -141,7 +141,7 @@ namespace detail {
         return std::string(_prefix.data()) + _main_function_replaced + std::string(_suffix.data());
     }
 
-    std::string hlsl_fragment_default()
+    std::string shader_fragment_default()
     {
         constexpr std::string_view _fragment = R"(
             struct  PSInput
@@ -164,7 +164,24 @@ namespace detail {
 
 #if BUNGEEGUM_USE_DIRECTX
 
-    void renderer_handle::emplace_create_directx11(window& existing_window)
+    void renderer_handle::emplace_attach_directx11(window_handle& window, void* device, void* context)
+    {
+        Diligent::SwapChainDesc _swap_chain_descriptor;
+        _swap_chain_descriptor.DefaultStencilValue = 0u;
+        Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
+        Diligent::EngineD3D11CreateInfo _engine_create_info;
+        // #if defined(__DEBUG__)
+        //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
+        // #endif
+        _factory_ptr->AttachToD3D11Device(device, context, _engine_create_info, &_diligent_render_device, &_diligent_device_context);
+        Diligent::Win32NativeWindow _win32_native_window(window.get_native());
+        _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
+            Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
+
+        _sdl_window = window.get_sdl();
+    }
+
+    void renderer_handle::emplace_new_directx11(window_handle& window)
     {
         Diligent::SwapChainDesc _swap_chain_descriptor;
         _swap_chain_descriptor.DefaultStencilValue = 0u;
@@ -174,14 +191,14 @@ namespace detail {
         //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
         // #endif
         _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_diligent_render_device, &_diligent_device_context);
-        Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
+        Diligent::Win32NativeWindow _win32_native_window(window.get_native());
         _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
             Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
 
-        _sdl_window = existing_window.get_sdl();
+        _sdl_window = window.get_sdl();
     }
 
-    void renderer_handle::emplace_create_directx12(window& existing_window)
+    void renderer_handle::emplace_new_directx12(window_handle& existing_window)
     {
         Diligent::SwapChainDesc _swap_chain_descriptor;
         _swap_chain_descriptor.DefaultStencilValue = 0u;
@@ -192,7 +209,29 @@ namespace detail {
 
 #endif
 
-    void renderer_handle::emplace_create_opengl(window& existing_window)
+    void renderer_handle::emplace_attach_opengl(window_handle& existing_window)
+    {
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        // _data->sdl_window = existing_window->get_sdl();
+#endif
+        // Diligent::SwapChainDesc _swap_chain_descriptor;
+        // _swap_chain_descriptor.DefaultStencilValue = 0u;
+        Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
+        Diligent::EngineGLCreateInfo _engine_create_info;
+        // _engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1); marche meme pas
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
+#else
+        _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
+#endif
+        _factory->AttachToActiveGLContext(
+            _engine_create_info,
+            &_diligent_render_device,
+            &_diligent_device_context);
+        // swapchain mdr?
+    }
+
+    void renderer_handle::emplace_new_opengl(window_handle& existing_window)
     {
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         // _data->sdl_window = existing_window->get_sdl();
@@ -217,7 +256,7 @@ namespace detail {
 
 #if BUNGEEGUM_USE_VULKAN
     
-    void renderer_handle::emplace_create_vulkan(window& existing)
+    void renderer_handle::emplace_new_vulkan(window_handle& existing)
     {
         (void)existing;
     }
@@ -267,16 +306,16 @@ namespace detail {
             Diligent::SURFACE_TRANSFORM_OPTIMAL);
     }
 
-    void renderer_handle::use_color_buffer(const bool is_used)
-    {
-        Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
-        if (is_used) {
-            Diligent::ITextureView* _rtv_ptr = _diligent_swap_chain->GetCurrentBackBufferRTV();
-            _diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        } else {
-            _diligent_device_context->SetRenderTargets(0, nullptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        }
-    }
+    // void renderer_handle::use_color_buffer(const bool is_used)
+    // {
+    //     Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
+    //     if (is_used) {
+    //         Diligent::ITextureView* _rtv_ptr = _diligent_swap_chain->GetCurrentBackBufferRTV();
+    //         _diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+    //     } else {
+    //         _diligent_device_context->SetRenderTargets(0, nullptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+    //     }
+    // }
 
     void font_handle::emplace(
         rasterizer_handle& rasterizer,

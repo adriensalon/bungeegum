@@ -203,14 +203,14 @@ namespace detail {
     }
 #endif
 
-    window::window()
+    window_handle::window_handle()
     {
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         _sdl_events = std::make_shared<std::vector<SDL_Event>>();
 #endif
     }
 
-    window::~window()
+    window_handle::~window_handle()
     {
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         if (_sdl_window) {
@@ -226,7 +226,7 @@ namespace detail {
 	}
 #else
 
-    void window::attach_native(void* sdl_window)
+    void window_handle::attach_native(void* sdl_window)
     {
 		if (_sdl_window) {
 			// throw
@@ -238,7 +238,7 @@ namespace detail {
         sdl_check_errors();
     }
 
-    void window::attach_sdl(SDL_Window* sdl_window)
+    void window_handle::attach_sdl(SDL_Window* sdl_window)
     {
 		if (_sdl_window) {
 			// throw
@@ -246,7 +246,7 @@ namespace detail {
         _sdl_window = sdl_window;
     }
 
-    void window::create_native()
+    void window_handle::create_native()
     {
 		if (_sdl_window) {
 			// throw
@@ -263,7 +263,7 @@ namespace detail {
         sdl_check_errors();
     }
 
-    void window::destroy_native()
+    void window_handle::destroy_native()
     {
 		if (!_sdl_window) {
             // throw
@@ -272,7 +272,7 @@ namespace detail {
     }
 #endif
 
-    void window::cursor(const bool enabled)
+    void window_handle::cursor(const bool enabled)
     {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         // TODO
@@ -283,7 +283,7 @@ namespace detail {
 #endif
     }
 
-    void window::fullscreen(const bool enabled)
+    void window_handle::fullscreen(const bool enabled)
     {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         // TODO
@@ -317,7 +317,7 @@ namespace detail {
 #endif
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    void* window::get_native() const
+    void* window_handle::get_native() const
     {
         if constexpr (is_platform_win32 || is_platform_uwp) {
             SDL_SysWMinfo _wmi;
@@ -332,28 +332,28 @@ namespace detail {
         }
     }
 
-    SDL_Window* window::get_sdl() const
+    SDL_Window* window_handle::get_sdl() const
     {
         return _sdl_window;
     }
 
-	std::vector<SDL_Event>& window::get_sdl_events()
+	std::vector<SDL_Event>& window_handle::get_sdl_events()
 	{
 		return *_sdl_events;
 	}
 
-	bool window::has_native_window() const
+	bool window_handle::has_native_window() const
 	{		
 		return _sdl_window;
 	}
 #endif
 
-    float2 window::get_size() const
+    float2 window_handle::get_size() const
     {
         return _display_size;
     }
 
-    void window::poll(const bool poll_device)
+    void window_handle::poll(const bool poll_device)
     {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 		if (!_canvas_id.has_value()) {
@@ -440,7 +440,7 @@ namespace detail {
     }
 
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    void window::resize(const float2 new_size)
+    void window_handle::resize(const float2 new_size)
     {
         // eventuellement sanitize to : max(0, round(new_size))
         if constexpr (is_platform_win32 || is_platform_uwp || is_platform_macos || is_platform_linux) {
@@ -450,13 +450,13 @@ namespace detail {
         }
     }
 
-    void window::title(const std::string& description)
+    void window_handle::title(const std::string& description)
     {
         SDL_SetWindowTitle(_sdl_window, description.c_str());
     }
 #endif
 
-    void window::update_once(const std::optional<unsigned int> max_framerate, const std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>& update_callback)
+    void window_handle::update_once(const std::optional<unsigned int> max_framerate, const std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>& update_callback)
     {
         BUNGEEGUM_USE_TIME_UNIT _target_frame_duration;
         if (max_framerate.has_value()) {
@@ -469,7 +469,7 @@ namespace detail {
         update_callback(max_framerate.has_value() ? _target_frame_duration : _delta_time);
     }
 
-    void window::update_loop(const std::optional<unsigned int> max_framerate, const std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>& update_callback)
+    void window_handle::update_loop(const std::optional<unsigned int> max_framerate, const std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>& update_callback)
     {
         BUNGEEGUM_USE_TIME_UNIT _target_frame_duration;
         if (max_framerate.has_value()) {

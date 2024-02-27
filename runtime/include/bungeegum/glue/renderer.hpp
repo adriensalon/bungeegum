@@ -1,19 +1,20 @@
 #pragma once
 
+#include <Common/interface/RefCntAutoPtr.hpp>
+#include <Graphics/GraphicsEngine/interface/Buffer.h>
+#include <Graphics/GraphicsEngine/interface/DepthStencilState.h>
+#include <Graphics/GraphicsEngine/interface/DeviceContext.h>
+#include <Graphics/GraphicsEngine/interface/RenderDevice.h>
+#include <Graphics/GraphicsEngine/interface/ShaderResourceBinding.h>
+#include <Graphics/GraphicsEngine/interface/SwapChain.h>
+#include <Graphics/GraphicsEngine/interface/TextureView.h>
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
 
-#include <Common/interface/RefCntAutoPtr.hpp>
-#include <Graphics/GraphicsEngine/interface/Buffer.h>
-#include <Graphics/GraphicsEngine/interface/DepthStencilState.h>
-#include <Graphics/GraphicsEngine/interface/DeviceContext.h>
 #include <Graphics/GraphicsEngine/interface/PipelineState.h>
-#include <Graphics/GraphicsEngine/interface/RenderDevice.h>
-#include <Graphics/GraphicsEngine/interface/ShaderResourceBinding.h>
-#include <Graphics/GraphicsEngine/interface/SwapChain.h>
-#include <Graphics/GraphicsEngine/interface/TextureView.h>
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
@@ -26,36 +27,18 @@
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/glue/window.hpp>
 
-struct ImGuiContext;
-struct ImPlotContext;
 struct ImFont;
 struct ImFontAtlas;
+struct ImGuiContext;
+struct ImPlotContext;
 
 namespace bungeegum {
 namespace detail {
 
-    /// @brief
-    /// @param main_function
-    /// @param position_alias
-    /// @param color_alias
-    /// @param texcoord_alias
-    /// @param sample_alias
-    /// @return
-    [[nodiscard]] std::string hlsl_fragment(
-        const std::string& main_function,
-        const std::string& position_alias = "UIW_POSITION",
-        const std::string& color_alias = "UIW_COLOR",
-        const std::string& texcoord_alias = "UIW_TEXCOORD",
-        const std::string& sample_alias = "UIW_SAMPLE");
-
-    /// @brief
-    /// @return
-    [[nodiscard]] std::string hlsl_fragment_default();
-
-    /// @brief Instances of this struct represent cross-platform GPU renderers that will select the
-    /// most appropriate graphics API depending on the platform. Macros defined above can be
-    /// modified to force usage of a specific platform.
-    /// @details Instances of this struct can only be moved.
+    /// @brief Instances of this struct contain owning references to GPU render devices, swapchains
+    /// and device contexts depending on the platform. They manage low level access to a rendering
+    /// pipeline. Only one instance can be attached to a single OS window
+    /// @details Instances of this struct can only be moved
     struct renderer_handle {
         renderer_handle() = default;
         renderer_handle(const renderer_handle& other) = delete;
@@ -65,41 +48,53 @@ namespace detail {
 
 #if BUNGEEGUM_USE_DIRECTX
 
-        /// @brief Creates an instance from an existing DirectX 11 context.
-        void emplace_attach_directx11(window& existing_window, void* directx_context, void* directx_swapchain);
-
-        /// @brief Creates an instance from an existing DirectX 12 context.
-        void emplace_attach_directx12(window& existing_window, void* directx_context, void* directx_swapchain);
-
-#endif
-
-        /// @brief Creates an instance from an existing OpenGL context.
-        void emplace_attach_opengl(window& existing_window);
-
-#if BUNGEEGUM_USE_VULKAN
-
-        /// @brief Creates an instance from an existing window with the Vulkan API.
-        void emplace_attach_vulkan(window& existing_window);
-
-#endif
-
-#if BUNGEEGUM_USE_DIRECTX
+        /// @brief Defines a value for this instance from an OS window handle and an existing
+        /// DirectX 11 context already created by the user
+        /// @param window OS window that has a value
+        /// @param device User provided ID3D11Device* that is not nullptr
+        /// @param context User provided ID3D11DeviceContext* that is not nullptr
+        void emplace_attach_directx11(window_handle& window, void* device, void* context);
 
         /// @brief Creates an instance from an existing window with the DirectX 11 API.
-        void emplace_create_directx11(window& existing_window);
+        /// @param window OS window that has a value
+        void emplace_new_directx11(window_handle& window);
+
+        /// @brief Defines a value for this instance from an OS window handle and an existing
+        /// DirectX 12 context already created by the user
+        /// @param window OS window that has a value
+        /// @param device User provided ID3D12Device* that is not nullptr
+        /// @param context User provided ID3D12DeviceContext* that is not nullptr
+        void emplace_attach_directx12(window_handle& window, void* device, void* context);
 
         /// @brief Creates an instance from an existing window with the DirectX 12 API.
-        void emplace_create_directx12(window& existing_window);
+        /// @param window OS window that has a value
+        void emplace_new_directx12(window_handle& window);
 
 #endif
 
+#if BUNGEEGUM_USE_OPENGL
+
+        /// @brief Defines a value for this instance from an OS window handle and an existing
+        /// OpenGL context already created by the user
+        /// @param window OS window that has a value
+        void emplace_attach_opengl(window_handle& window);
+
         /// @brief Creates an instance from an existing window with the OpenGL API.
-        void emplace_create_opengl(window& existing_window);
+        /// @param window OS window that has a value
+        void emplace_new_opengl(window_handle& window);
+
+#endif
 
 #if BUNGEEGUM_USE_VULKAN
 
+        /// @brief Defines a value for this instance from an OS window handle and an existing
+        /// Vulkan context already created by the user
+        /// @param window OS window that has a value
+        void emplace_attach_vulkan(window_handle& window);
+
         /// @brief Creates an instance from an existing window with the Vulkan API.
-        void emplace_create_vulkan(window& existing_window);
+        /// @param window OS window that has a value
+        void emplace_new_vulkan(window_handle& window);
 
 #endif
 
@@ -111,9 +106,7 @@ namespace detail {
         void reset();
 
         /// @brief Begins a new frame, enabling all drawing commands.
-        void clear_screen(
-            const bool clear_color_buffer = true,
-            const bool clear_depth_buffer = true);
+        void clear_screen(const bool color_buffer = true, const bool depth_buffer = true);
 
         /// @brief Ends the frame, disabling all drawing commands. Swaps the window buffers.
         void present();
@@ -122,9 +115,9 @@ namespace detail {
         /// @param display_size
         void resize(const float2 display_size);
 
-        /// @brief
-        /// @param must_use
-        void use_color_buffer(const bool must_use);
+        // /// @brief
+        // /// @param must_use
+        // void use_color_buffer(const bool must_use);
 
         /// @brief The color to use when clearing the screen.
         float4 clear_color = { 1.f, 1.f, 1.f, 1.f };
@@ -140,10 +133,15 @@ namespace detail {
         friend struct rasterizer_handle;
     };
 
-	struct rasterizer_handle;
+    struct rasterizer_handle;
 
     ///
     struct font_handle {
+        font_handle() = default;
+        font_handle(const font_handle& other) = default;
+        font_handle& operator=(const font_handle& other) = default;
+        font_handle(font_handle&& other) = default;
+        font_handle& operator=(font_handle&& other) = default;
 
         /// @brief
         /// @param rasterizer
@@ -205,6 +203,24 @@ namespace detail {
         Diligent::RefCntAutoPtr<Diligent::ITexture> _diligent_texture = {};
         Diligent::RefCntAutoPtr<Diligent::ITextureView> _diligent_texture_view = {};
     };
+
+    /// @brief
+    /// @param main_function
+    /// @param position_alias
+    /// @param color_alias
+    /// @param texcoord_alias
+    /// @param sample_alias
+    /// @return
+    [[nodiscard]] std::string shader_fragment(
+        const std::string& main_function,
+        const std::string& position_alias = "UIW_POSITION",
+        const std::string& color_alias = "UIW_COLOR",
+        const std::string& texcoord_alias = "UIW_TEXCOORD",
+        const std::string& sample_alias = "UIW_SAMPLE");
+
+    /// @brief
+    /// @return
+    [[nodiscard]] std::string shader_fragment_default();
 
     /// @brief
     struct shader_blend_descriptor {

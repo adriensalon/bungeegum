@@ -89,13 +89,13 @@ namespace detail {
     /// @brief Instances of this struct represent cross-platform OS windows that can be modified
     /// at runtime, collect OS events such as input, and swap buffers after rendering has finished.
     /// @details Instances of this struct can only be moved.
-    struct window {
-        window();
-        window(const window& other) = delete;
-        window& operator=(const window& other) = delete;
-        window(window&& other) = default; // WARNING moving the window will invalidate __this ptr if captured in a callback
-        window& operator=(window&& other) = default; // WARNING moving the window will invalidate __this ptr if captured in a callback
-        ~window();
+    struct window_handle {
+        window_handle();
+        window_handle(const window_handle& other) = delete;
+        window_handle& operator=(const window_handle& other) = delete;
+        window_handle(window_handle&& other) = default; // WARNING moving the window will invalidate __this ptr if captured in a callback
+        window_handle& operator=(window_handle&& other) = default; // WARNING moving the window will invalidate __this ptr if captured in a callback
+        ~window_handle();
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         void attach_emscripten(const std::string& canvas_id);
