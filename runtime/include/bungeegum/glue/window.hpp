@@ -130,11 +130,14 @@ namespace detail {
 
 #endif
 
-        /// @brief
-        /// @return
+        /// @brief Gets if this instance has a value. Default created instances don't have a value
+        /// until an emplace_xxx() method is called. Instances don't have a value anymore after the
+        /// reset() method is called
         [[nodiscard]] bool has_value() const;
 
-        /// @brief
+        /// @brief Resets this instance if it has a value. Default created instances don't have a
+        /// value until an emplace_xxx() method is called. Instances don't have a value anymore
+        /// after the reset() method is called
         void reset();
 
         /// @brief Sets globally if the cursor is shown for all windows.
@@ -145,7 +148,7 @@ namespace detail {
         /// @param enabled Whether fullscreen mode must be enabled.
         void fullscreen(const bool enabled);
 
-        /// @brief Gets the current size of this instance.
+        /// @brief Gets the current display size of this instance
         [[nodiscard]] float2 get_size() const;
 
         /// @brief Collects all the events fired since the last call to poll() and triggers

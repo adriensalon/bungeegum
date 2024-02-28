@@ -8,7 +8,7 @@
 
 // #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/glue/regex.hpp>
+#include <bungeegum/glue/string.hpp>
 
 #define BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE 2000
 

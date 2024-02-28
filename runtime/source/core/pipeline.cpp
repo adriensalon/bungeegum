@@ -14,6 +14,7 @@
 #include <bungeegum/glue/console.hpp>
 #include <bungeegum/glue/raw.hpp>
 #include <bungeegum/glue/reload.hpp>
+#include <bungeegum/glue/string.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -26,7 +27,7 @@ namespace detail {
     void protect_library(const std::function<void()>& try_callback)
     {
         protect(try_callback, [](const std::string& _what) {
-            console_log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", console_color::red);
+            log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", log_color::red);
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
 #else

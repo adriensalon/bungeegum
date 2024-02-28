@@ -6,8 +6,8 @@
 
 #include <functional>
 
-#include <bungeegum/glue/imutil.hpp>
-#include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/glue/theme.hpp>
+#include <bungeegum/glue/rendering.hpp>
 
 #include "compressed/font_awesome.hpp"
 #include "compressed/inter_extrabold.cpp"

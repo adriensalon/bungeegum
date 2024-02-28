@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/glue/rendering.hpp>
 
 namespace bungeegum {
 

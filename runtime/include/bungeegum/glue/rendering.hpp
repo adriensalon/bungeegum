@@ -47,25 +47,27 @@ namespace detail {
 
 #if BUNGEEGUM_USE_DIRECTX
 
-        /// @brief Defines a value for this instance from an OS window handle and an existing
-        /// DirectX 11 context already created by the user
+        /// @brief Defines a value for this instance from an OS window and a DirectX 11 context
+        /// already created by the user
         /// @param window OS window that has a value
         /// @param device User provided ID3D11Device* that is not nullptr
         /// @param context User provided ID3D11DeviceContext* that is not nullptr
         void emplace_attach_directx11(window_handle& window, void* device, void* context);
 
-        /// @brief Creates an instance from an existing window with the DirectX 11 API.
+        /// @brief Defines a value for this instance from an OS window by creating a new DirectX 11
+        /// context
         /// @param window OS window that has a value
         void emplace_new_directx11(window_handle& window);
 
-        /// @brief Defines a value for this instance from an OS window handle and an existing
-        /// DirectX 12 context already created by the user
+        /// @brief Defines a value for this instance from an OS window and a DirectX 12 context
+        /// already created by the user
         /// @param window OS window that has a value
         /// @param device User provided ID3D12Device* that is not nullptr
         /// @param context User provided ID3D12DeviceContext* that is not nullptr
         void emplace_attach_directx12(window_handle& window, void* device, void* context);
 
-        /// @brief Creates an instance from an existing window with the DirectX 12 API.
+        /// @brief Defines a value for this instance from an OS window by creating a new DirectX 12
+        /// context
         /// @param window OS window that has a value
         void emplace_new_directx12(window_handle& window);
 
@@ -73,12 +75,13 @@ namespace detail {
 
 #if BUNGEEGUM_USE_OPENGL
 
-        /// @brief Defines a value for this instance from an OS window handle and an existing
-        /// OpenGL context already created by the user
+        /// @brief Defines a value for this instance from an OS window using an OpenGL context
+        /// already created by the user
         /// @param window OS window that has a value
         void emplace_attach_opengl(window_handle& window);
 
-        /// @brief Creates an instance from an existing window with the OpenGL API.
+        /// @brief Defines a value for this instance from an OS window by creating a new OpenGL
+        /// context
         /// @param window OS window that has a value
         void emplace_new_opengl(window_handle& window);
 
@@ -86,33 +89,39 @@ namespace detail {
 
 #if BUNGEEGUM_USE_VULKAN
 
-        /// @brief Defines a value for this instance from an OS window handle and an existing
-        /// Vulkan context already created by the user
+        /// @brief Defines a value for this instance from an OS window using a Vulkan context
+        /// already created by the user
         /// @param window OS window that has a value
         void emplace_attach_vulkan(window_handle& window);
 
-        /// @brief Creates an instance from an existing window with the Vulkan API.
+        /// @brief Defines a value for this instance from an OS window by creating a new Vulkan
+        /// context
         /// @param window OS window that has a value
         void emplace_new_vulkan(window_handle& window);
 
 #endif
 
-        /// @brief
-        /// @return
+        /// @brief Gets if this instance has a value. Default created instances don't have a value
+        /// until an emplace_xxx() method is called. Instances don't have a value anymore after the
+        /// reset() method is called
         [[nodiscard]] bool has_value() const;
 
-        /// @brief
+        /// @brief Resets this instance if it has a value. Default created instances don't have a
+        /// value until an emplace_xxx() method is called. Instances don't have a value anymore
+        /// after the reset() method is called
         void reset();
 
-        /// @brief Begins a new frame, enabling all drawing commands.
-        void clear_screen(const bool color_buffer = true, const bool depth_buffer = true);
+        /// @brief Clears the selected render targets
+        /// @param color
+        /// @param depth
+        void clear_screen(const bool color = true, const bool depth = true);
 
-        /// @brief Ends the frame, disabling all drawing commands. Swaps the window buffers.
+        /// @brief Ends the frame, disabling all drawing commands. Swaps the window buffers
         void present();
 
         /// @brief
-        /// @param display_size
-        void resize(const float2 display_size);
+        /// @param size
+        void resize(const float2 size);
 
         /// @brief The color to use when clearing the screen.
         float4 clear_color = { 1.f, 1.f, 1.f, 1.f };
@@ -153,10 +162,14 @@ namespace detail {
         /// @return
         [[nodiscard]] ImFont* get() const;
 
-        /// @brief
+        /// @brief Gets if this instance has a value. Default created instances don't have a value
+        /// until the emplace() method is called. Instances don't have a value anymore after the
+        /// reset() method is called
         [[nodiscard]] bool has_value() const;
 
-        /// @brief
+        /// @brief Resets this instance if it has a value. Default created instances don't have a
+        /// value until the emplace() method is called. Instances don't have a value anymore after
+        /// the reset() method is called
         void reset();
 
     private:
@@ -187,10 +200,14 @@ namespace detail {
         /// @return
         [[nodiscard]] void* get() const;
 
-        /// @brief
+        /// @brief Gets if this instance has a value. Default created instances don't have a value
+        /// until the emplace() method is called. Instances don't have a value anymore after the
+        /// reset() method is called
         [[nodiscard]] bool has_value() const;
 
-        /// @brief
+        /// @brief Resets this instance if it has a value. Default created instances don't have a
+        /// value until the emplace() method is called. Instances don't have a value anymore after
+        /// the reset() method is called
         void reset();
 
     private:
@@ -312,10 +329,14 @@ namespace detail {
         /// @return
         [[nodiscard]] void* get() const;
 
-        /// @brief
+        /// @brief Gets if this instance has a value. Default created instances don't have a value
+        /// until an emplace_xxx() method is called. Instances don't have a value anymore after the
+        /// reset() method is called
         [[nodiscard]] bool has_value() const;
 
-        /// @brief
+        /// @brief Resets this instance if it has a value. Default created instances don't have a
+        /// value until an emplace_xxx() method is called. Instances don't have a value anymore
+        /// after the reset() method is called
         void reset();
 
         /// @brief
@@ -338,29 +359,41 @@ namespace detail {
         rasterizer_handle(rasterizer_handle&& other) = default;
         rasterizer_handle& operator=(rasterizer_handle&& other) = default;
 
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-
-        void consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events);
-
-        void consume_emscripten_wheel_events(std::vector<emscripten_wheel_event>& events);
-
-        void consume_emscripten_key_events(std::vector<emscripten_key_event>& events);
-
-#else
-
-        void consume_sdl_events(std::vector<SDL_Event>& events);
-
-#endif
-
         /// @brief
         /// @param renderer
         void emplace(renderer_handle& renderer, ImFontAtlas* atlas = nullptr);
 
-        /// @brief
+        /// @brief Gets if this instance has a value. Default created instances don't have a value
+        /// until the emplace() method is called. Instances don't have a value anymore after the
+        /// reset() method is called
         [[nodiscard]] bool has_value() const;
 
-        /// @brief
+        /// @brief Resets this instance if it has a value. Default created instances don't have a
+        /// value until the emplace() method is called. Instances don't have a value anymore after
+        /// the reset() method is called.
         void reset();
+
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+
+        /// @brief 
+        /// @param events 
+        void consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events);
+
+        /// @brief 
+        /// @param events 
+        void consume_emscripten_wheel_events(std::vector<emscripten_wheel_event>& events);
+
+        /// @brief 
+        /// @param events 
+        void consume_emscripten_key_events(std::vector<emscripten_key_event>& events);
+
+#else
+
+        /// @brief 
+        /// @param events 
+        void consume_sdl_events(std::vector<SDL_Event>& events);
+
+#endif
 
         /// @brief
         void new_frame();
@@ -369,7 +402,7 @@ namespace detail {
         void render();
 
         /// @brief
-        /// @param index
+        /// @param shader
         void use_shader(const shader_handle& shader);
 
         /// @brief

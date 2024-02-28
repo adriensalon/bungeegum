@@ -19,7 +19,7 @@ struct event {
     /// @brief Future values resolve to void for event<>, to value_t for event<value_t> and to
     /// std::tuple<values_t...> for event<values_t...> so that it fits as a template parameter
     /// for std::future and std::shared_future
-    using future_values = detail::future_typelist_t<values_t...>;
+    using future_values = detail::variadic_reduce_t<values_t...>;
 
     /// @brief Merges another event by adding its callbacks.
     event& merge(const event& other);

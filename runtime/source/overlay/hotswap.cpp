@@ -10,7 +10,7 @@
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/dialog.hpp>
-#include <bungeegum/glue/imutil.hpp>
+#include <bungeegum/glue/theme.hpp>
 
 #if defined(__clang__)
 #pragma clang diagnostic push

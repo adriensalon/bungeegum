@@ -11,7 +11,7 @@
 #include <bungeegum/core/shader.hpp>
 #include <bungeegum/core/texture.hpp>
 #include <bungeegum/core/widget.fwd>
-#include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/glue/rendering.hpp>
 #include <bungeegum/glue/time.hpp>
 #include <bungeegum/glue/window.hpp>
 

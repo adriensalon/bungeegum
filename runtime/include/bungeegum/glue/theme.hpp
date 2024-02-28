@@ -9,6 +9,7 @@ struct ImFont;
 namespace bungeegum {
 namespace detail {
 
+    /// @brief 
     struct font_guard {
         font_guard();
         font_guard(const font_guard& other) = delete;
@@ -18,7 +19,11 @@ namespace detail {
         font_guard(ImFont* font);
         ~font_guard();
 
+        /// @brief 
+        /// @param font 
         void set(ImFont* font);
+
+        /// @brief 
         void release();
 
     private:
@@ -80,4 +85,4 @@ namespace detail {
 }
 }
 
-#include <bungeegum/glue/imutil.inl>
+#include <bungeegum/glue/theme.inl>

@@ -1,39 +1,18 @@
 #pragma once
 
+#include <bungeegum/glue/toolchain.hpp>
+
 #include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include <bungeegum/config/feature.hpp>
-
 namespace bungeegum {
 namespace detail {
 
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-	/// @brief 
-	/// @param file_path 
-	/// @param file_name 
-	/// @param mime_type 
-	void download_file_from_disk(const std::filesystem::path& file_path, const std::string& file_name, const std::string& mime_type);
-	
-	/// @brief 
-	/// @param content 
-	/// @param file_name 
-	/// @param mime_type 
-	void download_file_from_string(const std::string& content, const std::string& file_name, const std::string& mime_type);
-	
-	/// @brief 
-	/// @tparam value_t 
-	/// @param content 
-	/// @param file_name 
-	/// @param mime_type 
-	template <typename value_t>
-	void download_file_from_memory(const value_t& content, const std::string& file_name, const std::string& mime_type);
-#endif
+#if TOOLCHAIN_PLATFORM_DESKTOP
 
-#if (BUNGEEGUM_USE_OVERLAY && !TOOLCHAIN_PLATFORM_EMSCRIPTEN)
-    /// @brief Instances of this struct represent filters to use with desktop OS file picker APIs.
+    /// @brief Instances of this struct represent filters to use with desktop OS file picker
     struct dialog_extensions_filter {
 
         /// @brief Description for this filter, for example { "Libraries" }
@@ -43,20 +22,27 @@ namespace detail {
         std::vector<std::string> extensions = {};
     };
 
-    /// @brief Blocks the thread and gets a file path using desktop OS file picker APIs.
+    /// @brief Blocks the thread and gets a file path using desktop OS file picker
+    /// @param filters
+    /// @param default_path
     [[nodiscard]] std::optional<std::filesystem::path> open_file_dialog(
         const std::vector<dialog_extensions_filter>& filters = {},
         const std::optional<std::filesystem::path>& default_path = std::nullopt);
 
-    /// @brief Blocks the thread and gets a file path for save using desktop OS file picker APIs.
+    /// @brief Blocks the thread and gets a file path for save using desktop OS file picker
+    /// @param filters
+    /// @param default_path
+    /// @param default_name
     [[nodiscard]] std::optional<std::filesystem::path> save_file_dialog(
         const std::vector<dialog_extensions_filter>& filters = {},
         const std::optional<std::filesystem::path>& default_path = std::nullopt,
         const std::optional<std::string>& default_name = std::nullopt);
 
-    /// @brief Blocks the thread and gets a directory path using desktop OS file picker APIs.
+    /// @brief Blocks the thread and gets a directory path using desktop OS file picker
+    /// @param default_path
     [[nodiscard]] std::optional<std::filesystem::path> pick_folder_dialog(
         const std::optional<std::filesystem::path>& default_path = std::nullopt);
+
 #endif
 }
 }

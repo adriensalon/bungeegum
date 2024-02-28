@@ -9,44 +9,44 @@ namespace detail {
     namespace {
 
 #if !BUNGEEGUM_USE_OVERLAY
-        void console_log_exception(const backtraced_exception& exception, const console_color color)
+        void console_log_exception(const backtraced_exception& exception, const log_color color)
         {
-            console_log("\"" + std::string(exception.what()) + "\"", console_color::black_or_white);
-            console_log(" occured", color);
+            log("\"" + std::string(exception.what()) + "\"", log_color::black_or_white);
+            log(" occured", color);
 #if BUNGEEGUM_USE_BACKTRACE
             if (exception.tracing.empty()) {
-                console_log(". \n", color);
+                log(". \n", color);
             } else {
-                console_log(" with trace : \n", color);
-                for (const backtraced_result& _result : exception.tracing) {
+                log(" with trace : \n", color);
+                for (const backtraced_step& _result : exception.tracing) {
                     std::string _trace_location = "[" + _result.primary.file.filename().generic_string();
                     _trace_location += ", Ln " + std::to_string(_result.primary.line);
                     _trace_location += ", Col " + std::to_string(_result.primary.column) + "] ";
-                    console_log(_trace_location, console_color::black_or_white);
-                    console_log(_result.primary.function + "\n", console_color::black_or_white);
+                    log(_trace_location, log_color::black_or_white);
+                    log(_result.primary.function + "\n", log_color::black_or_white);
                 }
             }
 #else
-            console_log(". \n", color);
+            log(". \n", color);
 #endif
         }		
 
 		void console_log_error(const backtraced_exception& exception)
 		{
-			console_log("Error ", console_color::red);
-			console_log_exception(exception, console_color::red);
+			log("Error ", log_color::red);
+			console_log_exception(exception, log_color::red);
 		}
 
 		void console_log_warning(const backtraced_exception& exception)
 		{
-			console_log("Warning ", console_color::yellow);
-			console_log_exception(exception, console_color::yellow);
+			log("Warning ", log_color::yellow);
+			console_log_exception(exception, log_color::yellow);
 		}
 
 		void console_log_message(const backtraced_exception& exception)
 		{
-			console_log("Message ", console_color::blue);
-			console_log_exception(exception, console_color::blue);
+			log("Message ", log_color::blue);
+			console_log_exception(exception, log_color::blue);
 		}
 
 #endif
@@ -55,7 +55,7 @@ namespace detail {
 //     void protect_library(const std::function<void()>& try_callback)
 //     {
 // 		protect(try_callback, [] (const std::string& _what) {
-//        	 	console_log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", console_color::red);
+//        	 	log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", log_color::red);
 // #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
 // #else

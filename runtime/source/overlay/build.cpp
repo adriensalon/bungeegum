@@ -6,8 +6,8 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/math.hpp>
-#include <bungeegum/glue/imutil.hpp>
-#include <bungeegum/glue/regex.hpp>
+#include <bungeegum/glue/theme.hpp>
+#include <bungeegum/glue/string.hpp>
 
 namespace bungeegum {
 namespace detail {

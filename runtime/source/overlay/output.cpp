@@ -7,8 +7,8 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/math.hpp>
-#include <bungeegum/glue/imutil.hpp>
-#include <bungeegum/glue/regex.hpp>
+#include <bungeegum/glue/theme.hpp>
+#include <bungeegum/glue/string.hpp>
 
 #define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGE_LENGTH 300u
 #define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGES 999u
@@ -17,7 +17,7 @@ namespace bungeegum {
 namespace detail {
 
     namespace {
-        using backtraced_results = std::vector<backtraced_result>;
+        using backtraced_results = std::vector<backtraced_step>;
         using counted_backtraced_results = std::pair<std::size_t, backtraced_results>;
 
         static std::unordered_map<std::string, counted_backtraced_results> error_logs = {};
@@ -72,7 +72,7 @@ namespace detail {
                         const std::string& _log_description = _log.first;
                         if (!filter_enabled || (regex_search(_log_description, filter_text))) {
                             std::size_t& _log_count = _log.second.first;
-                            const std::vector<backtraced_result>& _results = _log.second.second;
+                            const std::vector<backtraced_step>& _results = _log.second.second;
 
                             ImGui::TableNextRow();
                             ImGui::TableSetColumnIndex(0);
@@ -85,13 +85,13 @@ namespace detail {
                             ImGui::TableSetColumnIndex(1);
                             ImGui::Text(_log_description);
                             if (!_results.empty()) {
-                                const backtraced_result& _last_result = _results.front();
+                                const backtraced_step& _last_result = _results.front();
                                 ImGui::TableSetColumnIndex(2);
-                                ImGui::Text(_last_result.primary.file.filename().generic_string());
+                                ImGui::Text(_last_result.file.filename().generic_string());
                                 ImGui::TableSetColumnIndex(3);
-                                ImGui::Text(("Ln " + std::to_string(_last_result.primary.line)));
+                                ImGui::Text(("Ln " + std::to_string(_last_result.line)));
                                 ImGui::TableSetColumnIndex(4);
-                                ImGui::Text(("Col " + std::to_string(_last_result.primary.column)));
+                                ImGui::Text(("Col " + std::to_string(_last_result.column)));
                             } else {
 
                                 ImGui::TableSetColumnIndex(2);

@@ -38,12 +38,12 @@ namespace detail {
         update_data.ticker = [&]() {
             for (future_iterator _future_it = data.futures.begin(); _future_it != data.futures.end();) {
                 if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    if constexpr (future_typelist<values_t...>::is_void()) {
+                    if constexpr (variadic_reduce<values_t...>::is_void()) {
                         for (callback_iterator _callback_it : data.callbacks)
                             _callback_it();
                     } else {
-                        future_typelist_t<values_t...> _vals = _future_it->get();
-                        if constexpr (future_typelist<values_t...>::is_tuple()) {
+                        variadic_reduce_t<values_t...> _vals = _future_it->get();
+                        if constexpr (variadic_reduce<values_t...>::is_tuple()) {
                             for (callback_iterator _callback_it : data.callbacks)
                                 _callback_it(std::forward<values_t>(std::get<values_t>(_vals))...);
                         } else {
@@ -60,12 +60,12 @@ namespace detail {
             }
             for (shared_future_iterator _shared_future_it = data.shared_futures.begin(); _shared_future_it != data.shared_futures.end();) {
                 if (_shared_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    if constexpr (future_typelist<values_t...>::is_void()) {
+                    if constexpr (variadic_reduce<values_t...>::is_void()) {
                         for (callback_iterator _callback : data.callbacks)
                             _callback();
                     } else {
-                        future_typelist_t<values_t...> _vals = _shared_future_it->get();
-                        if constexpr (future_typelist<values_t...>::is_tuple()) {
+                        variadic_reduce_t<values_t...> _vals = _shared_future_it->get();
+                        if constexpr (variadic_reduce<values_t...>::is_tuple()) {
                             for (callback_iterator _callback : data.callbacks)
                                 _callback(std::forward<values_t>(std::get<values_t>(_vals))...);
                         } else {

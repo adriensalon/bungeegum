@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/glue/rendering.hpp>
 #include <bungeegum/core/math.hpp>
 
 namespace bungeegum {

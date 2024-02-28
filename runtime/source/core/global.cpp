@@ -1,5 +1,5 @@
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/glue/console.hpp>
+#include <bungeegum/glue/string.hpp>
 
 namespace bungeegum {
 namespace detail {

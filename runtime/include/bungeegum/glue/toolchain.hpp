@@ -42,6 +42,7 @@
 #define TOOLCHAIN_PLATFORM_IOS 0
 #define TOOLCHAIN_PLATFORM_LINUX 0
 #define TOOLCHAIN_PLATFORM_ANDROID 0
+#define TOOLCHAIN_PLATFORM_DESKTOP 0
 #elif defined(__android__)
 #define TOOLCHAIN_PLATFORM_NAME "android"
 #define TOOLCHAIN_PLATFORM_EMSCRIPTEN 0
@@ -51,6 +52,7 @@
 #define TOOLCHAIN_PLATFORM_IOS 0
 #define TOOLCHAIN_PLATFORM_LINUX 0
 #define TOOLCHAIN_PLATFORM_ANDROID 1
+#define TOOLCHAIN_PLATFORM_DESKTOP 0
 #elif defined(__linux__)
 #define TOOLCHAIN_PLATFORM_NAME "linux"
 #define TOOLCHAIN_PLATFORM_EMSCRIPTEN 0
@@ -60,6 +62,7 @@
 #define TOOLCHAIN_PLATFORM_IOS 0
 #define TOOLCHAIN_PLATFORM_LINUX 1
 #define TOOLCHAIN_PLATFORM_ANDROID 0
+#define TOOLCHAIN_PLATFORM_DESKTOP 1
 #elif defined(__APPLE__) && defined(__MACH__)
 #include <TargetConditionals.h>
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
@@ -71,6 +74,7 @@
 #define TOOLCHAIN_PLATFORM_IOS 1
 #define TOOLCHAIN_PLATFORM_LINUX 0
 #define TOOLCHAIN_PLATFORM_ANDROID 0
+#define TOOLCHAIN_PLATFORM_DESKTOP 0
 #elif TARGET_OS_MAC
 #define TOOLCHAIN_PLATFORM_NAME "macos"
 #define TOOLCHAIN_PLATFORM_EMSCRIPTEN 0
@@ -80,6 +84,7 @@
 #define TOOLCHAIN_PLATFORM_IOS 0
 #define TOOLCHAIN_PLATFORM_LINUX 0
 #define TOOLCHAIN_PLATFORM_ANDROID 0
+#define TOOLCHAIN_PLATFORM_DESKTOP 1
 #else
 #error "Undefined Apple platform. Please define TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE || TARGET_OS_MAC."
 #endif
@@ -94,6 +99,7 @@
 #define TOOLCHAIN_PLATFORM_IOS 0
 #define TOOLCHAIN_PLATFORM_LINUX 0
 #define TOOLCHAIN_PLATFORM_ANDROID 0
+#define TOOLCHAIN_PLATFORM_DESKTOP 1
 #else
 #define TOOLCHAIN_PLATFORM_EMSCRIPTEN 0
 #define TOOLCHAIN_PLATFORM_NAME "uwp"
@@ -103,6 +109,7 @@
 #define TOOLCHAIN_PLATFORM_IOS 0
 #define TOOLCHAIN_PLATFORM_LINUX 0
 #define TOOLCHAIN_PLATFORM_ANDROID 0
+#define TOOLCHAIN_PLATFORM_DESKTOP 0
 #endif
 #else
 #define TOOLCHAIN_PLATFORM_NAME "undefined"
@@ -113,6 +120,7 @@
 #define TOOLCHAIN_PLATFORM_IOS 0
 #define TOOLCHAIN_PLATFORM_LINUX 0
 #define TOOLCHAIN_PLATFORM_ANDROID 0
+#define TOOLCHAIN_PLATFORM_DESKTOP 0
 #endif
 
 // compiler detection
@@ -181,6 +189,9 @@ namespace detail {
 
     /// @brief True if the current platform is Android
     constexpr bool is_platform_android = TOOLCHAIN_PLATFORM_ANDROID;
+
+    /// @brief True if the current platform is a desktop platform
+    constexpr bool is_platform_desktop = TOOLCHAIN_PLATFORM_DESKTOP;
 
     /// @brief True if the current compiler is MSVC
     constexpr bool is_compiler_msvc = TOOLCHAIN_COMPILER_MSVC;

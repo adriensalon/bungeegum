@@ -1,21 +1,14 @@
 #pragma once
 
 #include <iostream>
+#include <functional>
 #include <sstream>
 
 namespace bungeegum {
 namespace detail {
 
     /// @brief
-    /// @param wstr
-    [[nodiscard]] std::wstring widen(const std::string& str);
-
-    /// @brief
-    /// @param wstr
-    [[nodiscard]] std::string narrow(const std::wstring& wstr);
-
-    /// @brief
-    enum struct console_color {
+    enum struct log_color {
         black_or_white,
         blue,
         green,
@@ -26,43 +19,51 @@ namespace detail {
     };
 
     /// @brief
-    void console_log(const std::string& message, const console_color color = console_color::black_or_white);
+    void log(const std::string& message, const log_color color = log_color::black_or_white);
 
     /// @brief
-    void console_log(const std::wstring& message, const console_color color = console_color::black_or_white);
+    void log(const std::wstring& message, const log_color color = log_color::black_or_white);
 
     /// @brief
-    /// @details Instances of this struct can not be copied or moved.
-    struct console_redirect {
-        console_redirect() = delete;
-        console_redirect(const console_redirect& other) = delete;
-        console_redirect& operator=(const console_redirect& other) = delete;
-        console_redirect(console_redirect&& other) = delete;
-        console_redirect& operator=(console_redirect&& other) = delete;
-        ~console_redirect();
+    /// @details Instances of this struct can not be copied or moved
+    struct redirect_guard {
+        redirect_guard() = delete;
+        redirect_guard(const redirect_guard& other) = delete;
+        redirect_guard& operator=(const redirect_guard& other) = delete;
+        redirect_guard(redirect_guard&& other) = delete;
+        redirect_guard& operator=(redirect_guard&& other) = delete;
+        ~redirect_guard();
 
         /// @brief
-        console_redirect(std::streambuf* buffer);
+        redirect_guard(std::streambuf* buffer);
 
     private:
         std::streambuf* _captured_cout;
     };
 
     /// @brief
-    /// @details Instances of this struct can not be copied or moved.
-    struct console_redirect_wide {
-        console_redirect_wide() = delete;
-        console_redirect_wide(const console_redirect_wide& other) = delete;
-        console_redirect_wide& operator=(const console_redirect_wide& other) = delete;
-        console_redirect_wide(console_redirect_wide&& other) = delete;
-        console_redirect_wide& operator=(console_redirect_wide&& other) = delete;
-        ~console_redirect_wide();
+    /// @details Instances of this struct can not be copied or moved
+    struct redirect_wide_guard {
+        redirect_wide_guard() = delete;
+        redirect_wide_guard(const redirect_wide_guard& other) = delete;
+        redirect_wide_guard& operator=(const redirect_wide_guard& other) = delete;
+        redirect_wide_guard(redirect_wide_guard&& other) = delete;
+        redirect_wide_guard& operator=(redirect_wide_guard&& other) = delete;
+        ~redirect_wide_guard();
 
         /// @brief
-        console_redirect_wide(std::wstreambuf* buffer);
+        redirect_wide_guard(std::wstreambuf* buffer);
 
     private:
         std::wstreambuf* _captured_wcout;
     };
+
+    /// @brief 
+    /// @param callback 
+    std::string redirect(const std::function<void()>& callback);
+
+    /// @brief 
+    /// @param callback 
+    std::wstring redirect_wide(const std::function<void()>& callback);
 }
 }

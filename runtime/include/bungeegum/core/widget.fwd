@@ -13,7 +13,7 @@
 #include <bungeegum/glue/raw.hpp>
 #include <bungeegum/glue/reload.hpp>
 #include <bungeegum/glue/window.hpp>
-#include <bungeegum/glue/renderer.hpp>
+#include <bungeegum/glue/rendering.hpp>
 
 struct ImDrawList;
 

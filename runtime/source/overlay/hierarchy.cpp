@@ -9,7 +9,7 @@
 #include <bungeegum/core/animation.hpp>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/widget.hpp>
-#include <bungeegum/glue/imutil.hpp>
+#include <bungeegum/glue/theme.hpp>
 
 namespace bungeegum {
 namespace detail {

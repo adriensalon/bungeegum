@@ -1,6 +1,4 @@
-#include <imgui.h>
-
-#include <bungeegum/glue/toolchain.hpp>
+#include <bungeegum/glue/rendering.hpp>
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <emscripten/emscripten.h>
@@ -11,9 +9,9 @@
 #include <backends/imgui_impl_sdl2.h>
 #endif
 
+#include <imgui.h>
 #include <implot.h>
 
-#include <bungeegum/glue/renderer.hpp>
 
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN && !defined(PLATFORM_EMSCRIPTEN)

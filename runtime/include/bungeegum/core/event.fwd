@@ -7,10 +7,10 @@
 #include <vector>
 
 #include <bungeegum/config/feature.hpp>
-#include <bungeegum/glue/typelist.hpp>
+#include <bungeegum/glue/foreach.hpp>
 
 namespace bungeegum {
-namespace detail {
+namespace detail {    
 
     template <typename... values_t>
     struct event_data {
@@ -23,8 +23,8 @@ namespace detail {
 
         std::uintptr_t raw_event = 0;
         std::vector<std::function<void(values_t...)>> callbacks = {};
-        std::vector<std::future<future_typelist_t<values_t...>>> futures = {};
-        std::vector<std::shared_future<future_typelist_t<values_t...>>> shared_futures = {};
+        std::vector<std::future<variadic_reduce_t<values_t...>>> futures = {};
+        std::vector<std::shared_future<variadic_reduce_t<values_t...>>> shared_futures = {};
     };
 
     struct event_update_data {

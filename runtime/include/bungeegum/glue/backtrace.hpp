@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bungeegum/config/feature.hpp>
+
 #include <cstddef>
 #include <exception>
 #include <filesystem>
@@ -8,24 +10,33 @@
 #include <functional>
 #include <optional>
 
-#include <bungeegum/config/feature.hpp>
-
 namespace bungeegum {
 namespace detail {
 
-    /// @brief Instances of this struct store additional data from a backtraced call.
-    struct backtraced_source {
-        std::filesystem::path file;
-        std::string function;
-        std::size_t line;
-        std::size_t column;
-    };
+	/// @brief 
+	/// @param try_callback 
+	/// @param catch_callback 
+	void protect(
+		const std::function<void()>& try_callback,
+		const std::function<void(const std::string&)>& catch_callback = nullptr);
 
     /// @brief Instance of this struct store data from a backtraced call.
-    struct backtraced_result {
+    struct backtraced_step {
+        
+        /// @brief
         void* address;
-        backtraced_source primary;
-        std::vector<backtraced_source> inliners;
+
+        /// @brief
+        std::filesystem::path file;
+        
+        /// @brief
+        std::string function;
+        
+        /// @brief
+        std::size_t line;
+        
+        /// @brief
+        std::size_t column;
     };
 
     /// @brief Instances of this struct can be thrown as exceptions. They hold a string error
@@ -52,17 +63,10 @@ namespace detail {
         [[nodiscard]] const char* what() const noexcept;
 
         /// @brief Data resulting from tracing.
-        std::vector<backtraced_result> tracing;
+        std::vector<backtraced_step> tracing;
 
     private:
         std::string _what;
     };
-
-	/// @brief 
-	/// @param try_callback 
-	/// @param catch_callback 
-	void protect(
-		const std::function<void()>& try_callback,
-		const std::function<void(const std::string&)>& catch_callback = nullptr);
 }
 }
