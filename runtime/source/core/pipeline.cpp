@@ -238,9 +238,9 @@ namespace detail {
         pipeline_window.attach_emscripten(provider.emscripten_canvas_id);
 #else
         if (provider.native_window_ptr) {
-            pipeline_window.attach_native(provider.native_window_ptr);
+            pipeline_window.emplace_existing_native(provider.native_window_ptr);
         } else {
-            pipeline_window.create_native();
+            pipeline_window.emplace_new_native();
         }
 #endif
     }

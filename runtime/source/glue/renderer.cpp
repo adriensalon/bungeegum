@@ -166,17 +166,25 @@ namespace detail {
 
     void renderer_handle::emplace_attach_directx11(window_handle& window, void* device, void* context)
     {
-        Diligent::SwapChainDesc _swap_chain_descriptor;
-        _swap_chain_descriptor.DefaultStencilValue = 0u;
+        if (_has_value) {
+            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+        }
         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
         Diligent::EngineD3D11CreateInfo _engine_create_info;
         // #if defined(__DEBUG__)
         //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
         // #endif
         _factory_ptr->AttachToD3D11Device(device, context, _engine_create_info, &_diligent_render_device, &_diligent_device_context);
-        Diligent::Win32NativeWindow _win32_native_window(window.get_native());
-        _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
-            Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
+        Diligent::Win32NativeWindow _win32_native_window(window.get_native());        
+        Diligent::SwapChainDesc _swap_chain_descriptor;
+        _swap_chain_descriptor.DefaultStencilValue = 0u;
+        _factory_ptr->CreateSwapChainD3D11(
+            _diligent_render_device, 
+            _diligent_device_context, 
+            _swap_chain_descriptor,
+            Diligent::FullScreenModeDesc {}, 
+            _win32_native_window, 
+            &_diligent_swap_chain);
 
         _sdl_window = window.get_sdl();
 		_has_value = true;
@@ -184,6 +192,9 @@ namespace detail {
 
     void renderer_handle::emplace_new_directx11(window_handle& window)
     {
+        if (_has_value) {
+            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+        }
         Diligent::SwapChainDesc _swap_chain_descriptor;
         _swap_chain_descriptor.DefaultStencilValue = 0u;
         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
@@ -202,6 +213,9 @@ namespace detail {
 
     void renderer_handle::emplace_new_directx12(window_handle& existing_window)
     {
+        if (_has_value) {
+            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+        }
         Diligent::SwapChainDesc _swap_chain_descriptor;
         _swap_chain_descriptor.DefaultStencilValue = 0u;
         Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
@@ -214,6 +228,9 @@ namespace detail {
 
     void renderer_handle::emplace_attach_opengl(window_handle& existing_window)
     {
+        if (_has_value) {
+            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+        }
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         // _data->sdl_window = existing_window->get_sdl();
 #endif
@@ -237,6 +254,9 @@ namespace detail {
 
     void renderer_handle::emplace_new_opengl(window_handle& existing_window)
     {
+        if (_has_value) {
+            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+        }
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         // _data->sdl_window = existing_window->get_sdl();
 #endif
@@ -263,6 +283,9 @@ namespace detail {
     
     void renderer_handle::emplace_new_vulkan(window_handle& existing)
     {
+        if (_has_value) {
+            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+        }
         (void)existing;
 		_has_value = true;
     }
@@ -313,17 +336,6 @@ namespace detail {
             Diligent::SURFACE_TRANSFORM_OPTIMAL);
     }
 
-    // void renderer_handle::use_color_buffer(const bool is_used)
-    // {
-    //     Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
-    //     if (is_used) {
-    //         Diligent::ITextureView* _rtv_ptr = _diligent_swap_chain->GetCurrentBackBufferRTV();
-    //         _diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-    //     } else {
-    //         _diligent_device_context->SetRenderTargets(0, nullptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-    //     }
-    // }
-
     void font_handle::emplace(
         rasterizer_handle& rasterizer,
         const void* ttf,
@@ -331,7 +343,7 @@ namespace detail {
         const float size)
     {
         if (!rasterizer.has_value()) {
-            throw backtraced_exception { "[rendering exception] impossible to create font because rasterizer has no value" };
+            throw backtraced_exception { "[rendering] Impossible to create font because rasterizer has no value" };
         }
         reset();
 
@@ -619,7 +631,6 @@ namespace detail {
         _implot_context = ImPlot::CreateContext();
         ImGui::SetCurrentContext(_imgui_context);
         ImGuiIO& _io = ImGui::GetIO();
-        // _io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
         _io.IniFilename = nullptr;
         _io.BackendPlatformName = default_imgui_backend_name.data();
@@ -768,27 +779,7 @@ namespace detail {
         }
 
         // ONCE PER FRAME OK
-
-        // Setup orthographic projection matrix into our constant buffer
-        // Our visible imgui space lies from _imgui_draw_data->DisplayPos (top left) to _imgui_draw_data->DisplayPos+data_data->DisplaySize (bottom right).
-        // DisplayPos is (0,0) for single viewport apps.
-        // {
-        //     // DisplaySize always refers to the logical dimensions that account for pre-transform, hence
-        //     // the aspect ratio will be correct after applying appropriate rotation.
-        //     float L = _imgui_draw_data->DisplayPos.x;
-        //     float R = _imgui_draw_data->DisplayPos.x + _imgui_draw_data->DisplaySize.x;
-        //     float T = _imgui_draw_data->DisplayPos.y;
-        //     float B = _imgui_draw_data->DisplayPos.y + _imgui_draw_data->DisplaySize.y;
-
-        //     _projection_matrix = float4x4 {
-        //         2.0f / (R - L), 0.0f, 0.0f, 0.0f,
-        //         0.0f, 2.0f / (T - B), 0.0f, 0.0f,
-        //         0.0f, 0.0f, 0.5f, 0.0f,
-        //         (R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f
-        //     };
-        //     Diligent::MapHelper<float4x4> CBData(_diligent_device_context, _diligent_uniform_buffer, Diligent::MAP_WRITE, Diligent::MAP_FLAG_DISCARD);
-        //     *CBData = _projection_matrix;
-        // }
+        
         _display_position = float2 { _imgui_draw_data->DisplayPos.x, _imgui_draw_data->DisplayPos.y };
         _display_size = float2 { _imgui_draw_data->DisplaySize.x, _imgui_draw_data->DisplaySize.y };
 
@@ -843,8 +834,6 @@ namespace detail {
                             (pCmd->ClipRect.z - _imgui_draw_data->DisplayPos.x) * _imgui_draw_data->FramebufferScale.x,
                             (pCmd->ClipRect.w - _imgui_draw_data->DisplayPos.y) * _imgui_draw_data->FramebufferScale.y //
                         };
-                    // Apply pretransform
-                    // ClipRect = TransformClipRect(_imgui_draw_data->DisplaySize, ClipRect);
 
                     Diligent::Rect Scissor //
                         {

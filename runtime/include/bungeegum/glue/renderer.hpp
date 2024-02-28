@@ -114,10 +114,6 @@ namespace detail {
         /// @param display_size
         void resize(const float2 display_size);
 
-        // /// @brief
-        // /// @param must_use
-        // void use_color_buffer(const bool must_use);
-
         /// @brief The color to use when clearing the screen.
         float4 clear_color = { 1.f, 1.f, 1.f, 1.f };
 

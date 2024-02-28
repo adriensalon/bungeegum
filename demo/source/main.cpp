@@ -99,6 +99,8 @@ struct drawerwidget {
         
         command.use_shader_default();
         command.draw_rect_filled(_min_point, _max_point_2, { 1.f, 0.5f, 0.5f, 1.f });
+
+        // bungeegum::log_error("yaaaaa");
     }
 
 };
@@ -153,7 +155,7 @@ int main()
     _provider.native_window_ptr = nullptr;
 
     bungeegum::pipeline _my_pipeline;
-    _my_pipeline.setup<bungeegum::renderer_backend::opengl>(_provider);
+    _my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
     // _my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
 
     bungeegum::texture_resource _texture_res;

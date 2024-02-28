@@ -44,7 +44,7 @@ namespace detail {
 		{
 			font_guard _fguard00(regular_font.get());
 
-			color_guard _cguard00(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 1.f });
+			color_guard _cguard00(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 0.95f });
             color_guard _cguard01(ImGuiCol_ScrollbarBg, { 0.878f, 0.878f, 0.878f, 1.f });
             color_guard _cguard02(ImGuiCol_TitleBg, { 0.627f, 0.627f, 0.627f, 1.f });
             color_guard _cguard03(ImGuiCol_TitleBgActive, { 0.627f, 0.627f, 0.627f, 1.f });

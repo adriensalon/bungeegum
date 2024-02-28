@@ -18,190 +18,198 @@
 namespace bungeegum {
 namespace detail {
 
+    namespace {
+
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    EM_JS(int, emscripten_get_canvas_width, (const char* canvas_id), {
-        var canvas = document.getElementById(UTF8ToString(canvas_id));
-        canvas.width = canvas.getBoundingClientRect().width;
-        return canvas.getBoundingClientRect().width;
-    });
 
-    EM_JS(int, emscripten_get_canvas_height, (const char* canvas_id), {
-        var canvas = document.getElementById(UTF8ToString(canvas_id));
-        canvas.height = canvas.getBoundingClientRect().height;
-        return canvas.getBoundingClientRect().height;
-    });
+        EM_JS(int, emscripten_get_canvas_width, (const char* canvas_id), {
+            var canvas = document.getElementById(UTF8ToString(canvas_id));
+            canvas.width = canvas.getBoundingClientRect().width;
+            return canvas.getBoundingClientRect().width;
+        });
 
-    struct emscripten_loop_data {
-        std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)> callback;
-        BUNGEEGUM_USE_TIME_UNIT target_frame_duration;
-    };
+        EM_JS(int, emscripten_get_canvas_height, (const char* canvas_id), {
+            var canvas = document.getElementById(UTF8ToString(canvas_id));
+            canvas.height = canvas.getBoundingClientRect().height;
+            return canvas.getBoundingClientRect().height;
+        });
 
-    struct emscripten_data {
-        std::vector<emscripten_key_event> key_events = {};
-        std::vector<emscripten_mouse_event> mouse_events = {};
-        std::vector<emscripten_wheel_event> wheel_events = {};
-        std::vector<std::string> keys_down = {};
-        std::vector<std::string> keys_up = {};
-        std::vector<unsigned int> mouse_buttons_down = {};
-        std::vector<unsigned int> mouse_buttons_up = {};
-        float2 mouse_position = zero<float2>;
-        float2 mouse_position_delta = zero<float2>;
-        bool must_lock_cursor = false;
-        bool must_unlock_cursor = false;
-    };
+        struct emscripten_loop_data {
+            std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)> callback;
+            BUNGEEGUM_USE_TIME_UNIT target_frame_duration;
+        };
 
-    inline static emscripten_data emscripten_static_data = {};
+        struct emscripten_data {
+            std::vector<emscripten_key_event> key_events = {};
+            std::vector<emscripten_mouse_event> mouse_events = {};
+            std::vector<emscripten_wheel_event> wheel_events = {};
+            std::vector<std::string> keys_down = {};
+            std::vector<std::string> keys_up = {};
+            std::vector<unsigned int> mouse_buttons_down = {};
+            std::vector<unsigned int> mouse_buttons_up = {};
+            float2 mouse_position = zero<float2>;
+            float2 mouse_position_delta = zero<float2>;
+            bool must_lock_cursor = false;
+            bool must_unlock_cursor = false;
+        };
 
-    [[nodiscard]] std::string emscripten_result_to_string(EMSCRIPTEN_RESULT result)
-    {
-        if (result == EMSCRIPTEN_RESULT_SUCCESS)
-            return "EMSCRIPTEN_RESULT_SUCCESS";
-        if (result == EMSCRIPTEN_RESULT_DEFERRED)
-            return "EMSCRIPTEN_RESULT_DEFERRED";
-        if (result == EMSCRIPTEN_RESULT_NOT_SUPPORTED)
-            return "EMSCRIPTEN_RESULT_NOT_SUPPORTED";
-        if (result == EMSCRIPTEN_RESULT_FAILED_NOT_DEFERRED)
-            return "EMSCRIPTEN_RESULT_FAILED_NOT_DEFERRED";
-        if (result == EMSCRIPTEN_RESULT_INVALID_TARGET)
-            return "EMSCRIPTEN_RESULT_INVALID_TARGET";
-        if (result == EMSCRIPTEN_RESULT_UNKNOWN_TARGET)
-            return "EMSCRIPTEN_RESULT_UNKNOWN_TARGET";
-        if (result == EMSCRIPTEN_RESULT_INVALID_PARAM)
-            return "EMSCRIPTEN_RESULT_INVALID_PARAM";
-        if (result == EMSCRIPTEN_RESULT_FAILED)
-            return "EMSCRIPTEN_RESULT_FAILED";
-        if (result == EMSCRIPTEN_RESULT_NO_DATA)
-            return "EMSCRIPTEN_RESULT_NO_DATA";
-        return "Unknown EMSCRIPTEN_RESULT!";
-    }
+        inline static emscripten_data emscripten_static_data = {};
 
-    void emscripten_check_errors(EMSCRIPTEN_RESULT result)
-    {
-        if (result != EMSCRIPTEN_RESULT_SUCCESS) {
-            std::string _error_message = emscripten_result_to_string(result);
-            throw backtraced_exception(_error_message);
-        }
-    }
-
-    void emscripten_cursor_lock()
-    {
-        if (emscripten_static_data.must_lock_cursor) {
-            EmscriptenPointerlockChangeEvent _pointer_lock;
-            emscripten_check_errors(emscripten_get_pointerlock_status(&_pointer_lock));
-            if (!_pointer_lock.isActive) {
-                emscripten_check_errors(emscripten_request_pointerlock("#canvas", 1));
-            }
-            emscripten_static_data.must_lock_cursor = false;
-            // verify ptr is locked ?
-        } else if (emscripten_static_data.must_unlock_cursor) {
-            EmscriptenPointerlockChangeEvent _pointer_lock;
-            emscripten_check_errors(emscripten_get_pointerlock_status(&_pointer_lock));
-            if (_pointer_lock.isActive) {
-                emscripten_check_errors(emscripten_exit_pointerlock());
-            }
-            emscripten_static_data.must_unlock_cursor = false;
-            // verify ptr is unlocked ?
-        }
-    }
-
-    [[nodiscard]] EM_BOOL key_callback(int event_type, const EmscriptenKeyboardEvent* event, void* user_data)
-    {
-        emscripten_static_data.key_events.push_back({ event_type, event });
-        if (event_type == EMSCRIPTEN_EVENT_KEYDOWN) {
-            emscripten_static_data.keys_down.push_back(event->key);
-        } else if (event_type == EMSCRIPTEN_EVENT_KEYUP) {
-            emscripten_static_data.keys_up.push_back(event->key);
-        }
-        return 0;
-    }
-
-    [[nodiscard]] EM_BOOL mouse_callback(int event_type, const EmscriptenMouseEvent* event, void* user_data)
-    {
-        emscripten_static_data.mouse_events.push_back({ event_type, event });
-
-        // https://github.com/emscripten-core/emscripten/blob/main/test/test_html5_core.c
-        if (event_type == EMSCRIPTEN_EVENT_MOUSEMOVE) {
-            emscripten_static_data.mouse_position = float2 { event->clientX, event->clientY };
-            emscripten_static_data.mouse_position_delta = float2 { event->movementX, event->movementY };
-        }
-        if (event_type == EMSCRIPTEN_EVENT_MOUSEDOWN) {
-            unsigned int _button = event->button;
-            emscripten_static_data.mouse_buttons_down.push_back(_button);
-        } else if (event_type == EMSCRIPTEN_EVENT_MOUSEUP) {
-            unsigned int _button = event->button;
-            emscripten_static_data.mouse_buttons_up.push_back(_button);
-        }
-        if (event_type == EMSCRIPTEN_EVENT_CLICK) // we lock / unlock the pointer on click
+        [[nodiscard]] std::string emscripten_result_to_string(EMSCRIPTEN_RESULT result)
         {
-            emscripten_cursor_lock();
-        } else if (event_type == EMSCRIPTEN_EVENT_MOUSEOVER) {
-        } else if (event_type == EMSCRIPTEN_EVENT_MOUSEOUT) {
+            if (result == EMSCRIPTEN_RESULT_SUCCESS)
+                return "EMSCRIPTEN_RESULT_SUCCESS";
+            if (result == EMSCRIPTEN_RESULT_DEFERRED)
+                return "EMSCRIPTEN_RESULT_DEFERRED";
+            if (result == EMSCRIPTEN_RESULT_NOT_SUPPORTED)
+                return "EMSCRIPTEN_RESULT_NOT_SUPPORTED";
+            if (result == EMSCRIPTEN_RESULT_FAILED_NOT_DEFERRED)
+                return "EMSCRIPTEN_RESULT_FAILED_NOT_DEFERRED";
+            if (result == EMSCRIPTEN_RESULT_INVALID_TARGET)
+                return "EMSCRIPTEN_RESULT_INVALID_TARGET";
+            if (result == EMSCRIPTEN_RESULT_UNKNOWN_TARGET)
+                return "EMSCRIPTEN_RESULT_UNKNOWN_TARGET";
+            if (result == EMSCRIPTEN_RESULT_INVALID_PARAM)
+                return "EMSCRIPTEN_RESULT_INVALID_PARAM";
+            if (result == EMSCRIPTEN_RESULT_FAILED)
+                return "EMSCRIPTEN_RESULT_FAILED";
+            if (result == EMSCRIPTEN_RESULT_NO_DATA)
+                return "EMSCRIPTEN_RESULT_NO_DATA";
+            return "Unknown EMSCRIPTEN_RESULT!";
         }
-        return 0;
-    }
 
-    [[nodiscard]] EM_BOOL touch_callback(int event_type, const EmscriptenTouchEvent* event, void* user_data)
-    {
-        const EmscriptenTouchPoint* _touch_point = &(event->touches[0]);
-        float2 _touch_move_position = glm::vec2((float)_touch_point->clientX, (float)_touch_point->clientY);
-        // if (event_type == EMSCRIPTEN_EVENT_TOUCHSTART) {
-        // detail::mouse_position_delta = { 0, 0 };
-        // } else if (event_type == EMSCRIPTEN_EVENT_TOUCHMOVE)
-        //     detail::mouse_position_delta = _touch_move_position - detail::mouse_position;
-        // detail::mouse_position = _touch_move_position;
-        return EM_TRUE; // we use preventDefault() for touch callbacks (see Safari on iPad)
-    }
-
-    void emscripten_loop(void* window_ptr)
-    {
-        emscripten_loop_data* _typed_data = static_cast<emscripten_loop_data*>(window_ptr);
-        _typed_data->callback(_typed_data->target_frame_duration);
-    }
-
-    [[nodiscard]] bool emscripten_setup()
-    {
-        emscripten_check_errors(emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback));
-        emscripten_check_errors(emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback));
-        emscripten_check_errors(emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback));
-        emscripten_check_errors(emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_mousedown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_mouseup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_dblclick_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_mouseenter_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_mouseleave_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_mouseover_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_mouseout_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
-        emscripten_check_errors(emscripten_set_touchstart_callback("#canvas", nullptr, 1, touch_callback));
-        // emscripten_assert(emscripten_set_touchend_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, touch_callback));
-        emscripten_check_errors(emscripten_set_touchmove_callback("#canvas", nullptr, 1, touch_callback)); // EMSCRIPTEN_EVENT_TARGET_WINDOW doesnt work on safari
-        // emscripten_assert(emscripten_set_touchcancel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, touch_callback));
-        return true;
-    }
-
-    inline static bool emscripten_static_setup = emscripten_setup();
-#else
-    static void sdl_check_errors()
-    {
-        std::string _error_message = SDL_GetError();
-        SDL_ClearError();
-        if (!_error_message.empty()) {
-            throw backtraced_exception(_error_message);
-        }
-    }
-
-    static void sdl_check_main_ready()
-    {
-        static bool _is_sdl_main_ready = false;
-        if (!_is_sdl_main_ready) {
-            SDL_SetMainReady();
-            if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) < 0) {
-                sdl_check_errors();
+        void emscripten_check_errors(EMSCRIPTEN_RESULT result)
+        {
+            if (result != EMSCRIPTEN_RESULT_SUCCESS) {
+                std::string _error_message = emscripten_result_to_string(result);
+                throw backtraced_exception(_error_message);
             }
-            _is_sdl_main_ready = true;
         }
-    }
+
+        void emscripten_cursor_lock()
+        {
+            if (emscripten_static_data.must_lock_cursor) {
+                EmscriptenPointerlockChangeEvent _pointer_lock;
+                emscripten_check_errors(emscripten_get_pointerlock_status(&_pointer_lock));
+                if (!_pointer_lock.isActive) {
+                    emscripten_check_errors(emscripten_request_pointerlock("#canvas", 1));
+                }
+                emscripten_static_data.must_lock_cursor = false;
+                // verify ptr is locked ?
+            } else if (emscripten_static_data.must_unlock_cursor) {
+                EmscriptenPointerlockChangeEvent _pointer_lock;
+                emscripten_check_errors(emscripten_get_pointerlock_status(&_pointer_lock));
+                if (_pointer_lock.isActive) {
+                    emscripten_check_errors(emscripten_exit_pointerlock());
+                }
+                emscripten_static_data.must_unlock_cursor = false;
+                // verify ptr is unlocked ?
+            }
+        }
+
+        [[nodiscard]] EM_BOOL key_callback(int event_type, const EmscriptenKeyboardEvent* event, void* user_data)
+        {
+            emscripten_static_data.key_events.push_back({ event_type, event });
+            if (event_type == EMSCRIPTEN_EVENT_KEYDOWN) {
+                emscripten_static_data.keys_down.push_back(event->key);
+            } else if (event_type == EMSCRIPTEN_EVENT_KEYUP) {
+                emscripten_static_data.keys_up.push_back(event->key);
+            }
+            return 0;
+        }
+
+        [[nodiscard]] EM_BOOL mouse_callback(int event_type, const EmscriptenMouseEvent* event, void* user_data)
+        {
+            emscripten_static_data.mouse_events.push_back({ event_type, event });
+
+            // https://github.com/emscripten-core/emscripten/blob/main/test/test_html5_core.c
+            if (event_type == EMSCRIPTEN_EVENT_MOUSEMOVE) {
+                emscripten_static_data.mouse_position = float2 { event->clientX, event->clientY };
+                emscripten_static_data.mouse_position_delta = float2 { event->movementX, event->movementY };
+            }
+            if (event_type == EMSCRIPTEN_EVENT_MOUSEDOWN) {
+                unsigned int _button = event->button;
+                emscripten_static_data.mouse_buttons_down.push_back(_button);
+            } else if (event_type == EMSCRIPTEN_EVENT_MOUSEUP) {
+                unsigned int _button = event->button;
+                emscripten_static_data.mouse_buttons_up.push_back(_button);
+            }
+            if (event_type == EMSCRIPTEN_EVENT_CLICK) // we lock / unlock the pointer on click
+            {
+                emscripten_cursor_lock();
+            } else if (event_type == EMSCRIPTEN_EVENT_MOUSEOVER) {
+            } else if (event_type == EMSCRIPTEN_EVENT_MOUSEOUT) {
+            }
+            return 0;
+        }
+
+        [[nodiscard]] EM_BOOL touch_callback(int event_type, const EmscriptenTouchEvent* event, void* user_data)
+        {
+            const EmscriptenTouchPoint* _touch_point = &(event->touches[0]);
+            float2 _touch_move_position = glm::vec2((float)_touch_point->clientX, (float)_touch_point->clientY);
+            // if (event_type == EMSCRIPTEN_EVENT_TOUCHSTART) {
+            // detail::mouse_position_delta = { 0, 0 };
+            // } else if (event_type == EMSCRIPTEN_EVENT_TOUCHMOVE)
+            //     detail::mouse_position_delta = _touch_move_position - detail::mouse_position;
+            // detail::mouse_position = _touch_move_position;
+            return EM_TRUE; // we use preventDefault() for touch callbacks (see Safari on iPad)
+        }
+
+        void emscripten_loop(void* window_ptr)
+        {
+            emscripten_loop_data* _typed_data = static_cast<emscripten_loop_data*>(window_ptr);
+            _typed_data->callback(_typed_data->target_frame_duration);
+        }
+
+        [[nodiscard]] bool emscripten_setup()
+        {
+            emscripten_check_errors(emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback));
+            emscripten_check_errors(emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback));
+            emscripten_check_errors(emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback));
+            emscripten_check_errors(emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_mousedown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_mouseup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_dblclick_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_mouseenter_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_mouseleave_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_mouseover_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_mouseout_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback));
+            emscripten_check_errors(emscripten_set_touchstart_callback("#canvas", nullptr, 1, touch_callback));
+            // emscripten_assert(emscripten_set_touchend_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, touch_callback));
+            emscripten_check_errors(emscripten_set_touchmove_callback("#canvas", nullptr, 1, touch_callback)); // EMSCRIPTEN_EVENT_TARGET_WINDOW doesnt work on safari
+            // emscripten_assert(emscripten_set_touchcancel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, touch_callback));
+            return true;
+        }
+
+        inline static bool emscripten_static_setup = emscripten_setup();
+
+#else
+
+        static void sdl_check_errors()
+        {
+            std::string _error_message = SDL_GetError();
+            SDL_ClearError();
+            if (!_error_message.empty()) {
+                throw backtraced_exception(_error_message);
+            }
+        }
+
+        static void sdl_check_main_ready()
+        {
+            static bool _is_sdl_main_ready = false;
+            if (!_is_sdl_main_ready) {
+                SDL_SetMainReady();
+                if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) < 0) {
+                    sdl_check_errors();
+                }
+                _is_sdl_main_ready = true;
+            }
+        }
+
 #endif
+        
+    }
 
     window_handle::window_handle()
     {
@@ -210,23 +218,31 @@ namespace detail {
 #endif
     }
 
-    window_handle::~window_handle()
-    {
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        if (_sdl_window) {
-            destroy_native();
-        }
-#endif
-    }
-
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-	void window_handle::attach_emscripten(const std::string& canvas_id)
+
+	void window_handle::emplace_existing_emscripten(const std::string& canvas_id)
 	{
 		_canvas_id = canvas_id;
 	}
+    
+    std::vector<emscripten_key_event>& window_handle::get_emscripten_key_events()
+    {
+        return emscripten_static_data.key_events;
+    }
+
+    std::vector<emscripten_mouse_event>& window_handle::get_emscripten_mouse_events()
+    {
+        return emscripten_static_data.mouse_events;
+    }
+
+    std::vector<emscripten_wheel_event>& window_handle::get_emscripten_wheel_events()
+    {
+        return emscripten_static_data.wheel_events;
+    }
+
 #else
 
-    void window_handle::attach_native(void* sdl_window)
+    void window_handle::emplace_existing_native(void* sdl_window)
     {
 		if (_sdl_window) {
 			// throw
@@ -238,7 +254,7 @@ namespace detail {
         sdl_check_errors();
     }
 
-    void window_handle::attach_sdl(SDL_Window* sdl_window)
+    void window_handle::emplace_existing_sdl(SDL_Window* sdl_window)
     {
 		if (_sdl_window) {
 			// throw
@@ -246,7 +262,7 @@ namespace detail {
         _sdl_window = sdl_window;
     }
 
-    void window_handle::create_native()
+    void window_handle::emplace_new_native()
     {
 		if (_sdl_window) {
 			// throw
@@ -254,23 +270,59 @@ namespace detail {
         sdl_check_main_ready();
         SDL_WindowFlags _window_flags = static_cast<SDL_WindowFlags>(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
         _sdl_window = SDL_CreateWindow(
-            default_native_window_title.data(),
+            BUNGEEGUM_USE_INITIAL_WINDOW_TITLE,
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
-            static_cast<int>(math::floor(default_native_window_size.x)),
-            static_cast<int>(math::floor(default_native_window_size.y)),
+            static_cast<int>(math::floor(BUNGEEGUM_USE_INITIAL_WINDOW_WIDTH)),
+            static_cast<int>(math::floor(BUNGEEGUM_USE_INITIAL_WINDOW_HEIGHT)),
             _window_flags);
         sdl_check_errors();
     }
-
-    void window_handle::destroy_native()
+    
+    void* window_handle::get_native() const
     {
-		if (!_sdl_window) {
-            // throw
-		}
-		SDL_DestroyWindow(_sdl_window);
+        if constexpr (is_platform_win32 || is_platform_uwp) {
+            SDL_SysWMinfo _wmi;
+            SDL_VERSION(&_wmi.version);
+            if (SDL_GetWindowWMInfo(_sdl_window, &_wmi) != SDL_TRUE) {
+                sdl_check_errors();
+            }
+            return _wmi.info.win.window;
+        } else if constexpr (is_platform_linux) {
+
+        } else if constexpr (is_platform_macos) {
+        }
     }
+
+    SDL_Window* window_handle::get_sdl() const
+    {
+        return _sdl_window;
+    }
+
+	std::vector<SDL_Event>& window_handle::get_sdl_events()
+	{
+		return *_sdl_events;
+	}
+
 #endif
+
+    bool window_handle::has_value() const
+    {
+        return _has_value;
+    }
+
+    void window_handle::reset()
+    {
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        if (_has_value) 
+        {
+            // TODO
+            SDL_DestroyWindow(_sdl_window);
+            _has_value = false;
+        }
+		
+#endif
+    }
 
     void window_handle::cursor(const bool enabled)
     {
@@ -298,55 +350,6 @@ namespace detail {
         }
 #endif
     }
-
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    std::vector<emscripten_key_event>& window_handle::get_emscripten_key_events()
-    {
-        return emscripten_static_data.key_events;
-    }
-
-    std::vector<emscripten_mouse_event>& window_handle::get_emscripten_mouse_events()
-    {
-        return emscripten_static_data.mouse_events;
-    }
-
-    std::vector<emscripten_wheel_event>& window_handle::get_emscripten_wheel_events()
-    {
-        return emscripten_static_data.wheel_events;
-    }
-#endif
-
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-    void* window_handle::get_native() const
-    {
-        if constexpr (is_platform_win32 || is_platform_uwp) {
-            SDL_SysWMinfo _wmi;
-            SDL_VERSION(&_wmi.version);
-            if (SDL_GetWindowWMInfo(_sdl_window, &_wmi) != SDL_TRUE) {
-                sdl_check_errors();
-            }
-            return _wmi.info.win.window;
-        } else if constexpr (is_platform_linux) {
-
-        } else if constexpr (is_platform_macos) {
-        }
-    }
-
-    SDL_Window* window_handle::get_sdl() const
-    {
-        return _sdl_window;
-    }
-
-	std::vector<SDL_Event>& window_handle::get_sdl_events()
-	{
-		return *_sdl_events;
-	}
-
-	bool window_handle::has_native_window() const
-	{		
-		return _sdl_window;
-	}
-#endif
 
     float2 window_handle::get_size() const
     {
@@ -439,22 +442,21 @@ namespace detail {
 #endif
     }
 
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
     void window_handle::resize(const float2 new_size)
     {
-        // eventuellement sanitize to : max(0, round(new_size))
-        if constexpr (is_platform_win32 || is_platform_uwp || is_platform_macos || is_platform_linux) {
-            int _width = static_cast<int>(new_size.x);
-            int _height = static_cast<int>(new_size.y);
-            SDL_SetWindowSize(_sdl_window, _width, _height);
-        }
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        int _width = static_cast<int>(new_size.x);
+        int _height = static_cast<int>(new_size.y);
+        SDL_SetWindowSize(_sdl_window, _width, _height);
+#endif
     }
 
     void window_handle::title(const std::string& description)
     {
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
         SDL_SetWindowTitle(_sdl_window, description.c_str());
-    }
 #endif
+    }
 
     void window_handle::update_once(const std::optional<unsigned int> max_framerate, const std::function<void(const BUNGEEGUM_USE_TIME_UNIT&)>& update_callback)
     {
