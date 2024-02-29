@@ -269,20 +269,20 @@ void draw_command::draw_curve_filled()
 {
 }
 
-void draw_command::draw_texture(texture_ref& texture, const float2 min_point, const float2 max_point)
+void draw_command::draw_texture(texture_ref& user_texture, const float2 min_point, const float2 max_point)
 {
-    detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(texture);
-    detail::texture_handle& _texture_handle = _texture_ref_data.textures[_data.raw_pipeline];
+    const detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(user_texture);
+    const detail::texture_handle& _texture_handle = _texture_ref_data.textures.at(_data.raw_pipeline);
     ImTextureID _id = _texture_handle.get();
     ImVec2 _min_point { min_point.x, min_point.y };
     ImVec2 _max_point { max_point.x, max_point.y };
     _data.draw_list->AddImage(_id, _min_point, _max_point);
 }
 
-void draw_command::draw_texture_quad(texture_ref& texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner)
+void draw_command::draw_texture_quad(texture_ref& user_texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner)
 {
-    detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(texture);
-    detail::texture_handle& _texture_handle = _texture_ref_data.textures[_data.raw_pipeline];
+    const detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(user_texture);
+    const detail::texture_handle& _texture_handle = _texture_ref_data.textures.at(_data.raw_pipeline);
     ImTextureID _id = _texture_handle.get();
     ImVec2 _top_left_corner { top_left_corner.x, top_left_corner.y };
     ImVec2 _top_right_corner { top_right_corner.x, top_right_corner.y };
@@ -291,20 +291,20 @@ void draw_command::draw_texture_quad(texture_ref& texture, const float2 top_left
     _data.draw_list->AddImageQuad(_id, _top_left_corner, _top_right_corner, _bottom_right_corner, _bottom_left_corner);
 }
 
-void draw_command::draw_texture_rounded(texture_ref& texture, const float2 min_point, const float2 max_point, const float rounding)
+void draw_command::draw_texture_rounded(texture_ref& user_texture, const float2 min_point, const float2 max_point, const float rounding)
 {
-    detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(texture);
-    detail::texture_handle& _texture_handle = _texture_ref_data.textures[_data.raw_pipeline];
+    const detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(user_texture);
+    const detail::texture_handle& _texture_handle = _texture_ref_data.textures.at(_data.raw_pipeline);
     ImTextureID _id = _texture_handle.get();
     ImVec2 _min_point { min_point.x, min_point.y };
     ImVec2 _max_point { max_point.x, max_point.y };
     _data.draw_list->AddImageRounded(_id, _min_point, _max_point, ImVec2(0.f, 0.f), ImVec2(0.f, 0.f), 4294967295U, rounding, ImDrawCornerFlags_All);
 }
 
-void draw_command::draw_text(font_ref& font, const float font_size, const float2 position, const float4 color, const std::string& text)
+void draw_command::draw_text(font_ref& user_font, const float font_size, const float2 position, const float4 color, const std::string& text)
 {
-    detail::font_ref_data& _font_ref_data = detail::font_ref_access::get_data(font);
-    detail::font_handle& _font_handle = _font_ref_data.fonts[_data.raw_pipeline];
+    const detail::font_ref_data& _font_ref_data = detail::font_ref_access::get_data(user_font);
+    const detail::font_handle& _font_handle = _font_ref_data.fonts.at(_data.raw_pipeline);
     ImFont* _font = _font_handle.get();
     const char* _ctext = text.c_str();
     ImVec2 _position { position.x, position.y };
@@ -385,52 +385,34 @@ void draw_command::draw_triangle_filled(const float2 first_corner, const float2 
     _data.draw_list->AddTriangleFilled(_first_corner, _second_corner, _third_corner, _color);
 }
 
-void use_shader_callback_NO_COLOR(const ImDrawList* parent_list, const ImDrawCmd* cmd) 
+void use_shader_callback(const ImDrawList* parent_list, const ImDrawCmd* cmd) 
 {
     detail::shader_handle _shader;
-    _shader.emplace(cmd->UserCallbackData);
-    
+    _shader.emplace(cmd->UserCallbackData);    
     detail::global_manager_data& _global = detail::global();
-    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
-
-    // _pipeline_data.pipeline_renderer.use_color_buffer(false);
+    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();    
     _pipeline_data.user_context.use_shader(_shader);
 }
 
-void use_shader_callback_COLOR(const ImDrawList* parent_list, const ImDrawCmd* cmd) 
+void draw_command::use_shader_custom(const shader& user_shader)
 {
-    detail::shader_handle _shader;
-    _shader.emplace(cmd->UserCallbackData);
-    
-    detail::global_manager_data& _global = detail::global();
-    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
-
-    // _pipeline_data.pipeline_renderer.use_color_buffer(true);
-    _pipeline_data.user_context.use_shader(_shader);
-}
-
-void draw_command::use_shader_custom(shader_ref& shader)
-{
-    detail::shader_ref_data& _shader_ref_data = detail::shader_ref_access::get_data(shader);
-    detail::shader_handle& _shader_handle = _shader_ref_data.shaders[_data.raw_pipeline];
-  
-    _data.draw_list->AddCallback(use_shader_callback_COLOR, _shader_handle.get());
+    const detail::shader_data& _shader_data = detail::shader_access::get_data(user_shader);
+    const detail::shader_handle& _shader_handle = _shader_data.shaders.at(_data.raw_pipeline);  
+    _data.draw_list->AddCallback(use_shader_callback, _shader_handle.get());
 }
 
 void draw_command::use_shader_default()
 {
     detail::global_manager_data& _global = detail::global();
-    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
-  
-    _data.draw_list->AddCallback(use_shader_callback_COLOR, _pipeline_data.default_shader.get());
+    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();  
+    _data.draw_list->AddCallback(use_shader_callback, _pipeline_data.default_shader.get());
 }
 
 void draw_command::use_shader_mask()
 {
     detail::global_manager_data& _global = detail::global();
     detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
-
-    _data.draw_list->AddCallback(use_shader_callback_NO_COLOR, _pipeline_data.mask_shader.get());
+    _data.draw_list->AddCallback(use_shader_callback, _pipeline_data.mask_shader.get());
 }
 
 void draw_command::clear_mask()

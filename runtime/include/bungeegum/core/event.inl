@@ -6,36 +6,17 @@
 #include <bungeegum/glue/raw.hpp>
 
 namespace bungeegum {
-namespace detail {
+namespace detail {    
 
     template <typename... values_t>
-    event_data<values_t...>::event_data(const event_data& other)
-    {
-        *this = other;
-    }
-
-    template <typename... values_t>
-    event_data<values_t...>& event_data<values_t...>::operator=(const event_data<values_t...>& other)
-    {
-        callbacks = other.callbacks;
-        return *this;
-    }
-
-    template <typename... values_t>
-    event_data<values_t...>::~event_data()
-    {
-        if (global().events.contains(raw_event)) {
-            global().events.notify_erase(raw_event);
-        }
-    }
-
-    template <typename... values_t>
-    void assign_ticker(event_data<values_t...>& data, event_update_data& update_data)
+    void assign_ticker(event_data<values_t...>& data)
     {
         using callback_iterator = typename event<values_t...>::on_trigger_callback;
         using future_iterator = typename std::vector<std::future<typename event<values_t...>::future_values>>::iterator;
         using shared_future_iterator = typename std::vector<std::shared_future<typename event<values_t...>::future_values>>::iterator;
-        update_data.ticker = [&]() {
+        
+        data.update_data.ticker = [&]() {
+
             for (future_iterator _future_it = data.futures.begin(); _future_it != data.futures.end();) {
                 if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                     if constexpr (variadic_reduce<values_t...>::is_void()) {
@@ -53,11 +34,12 @@ namespace detail {
                     }
                     _future_it = data.futures.erase(_future_it);
                     if (data.futures.empty() && data.shared_futures.empty()) {
-                        global().events.notify_erase(data.raw_event);
+                        global().events.updatables_to_erase.push_back(data.raw);
                     }
                 } else
                     _future_it++;
             }
+
             for (shared_future_iterator _shared_future_it = data.shared_futures.begin(); _shared_future_it != data.shared_futures.end();) {
                 if (_shared_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                     if constexpr (variadic_reduce<values_t...>::is_void()) {
@@ -75,12 +57,65 @@ namespace detail {
                     }
                     _shared_future_it = data.shared_futures.erase(_shared_future_it);
                     if (data.futures.empty() && data.shared_futures.empty()) {
-                        global().events.notify_erase(data.raw_event);
+                        global().events.updatables_to_erase.push_back(data.raw);
                     }
                 } else
                     _shared_future_it++;
             }
         };
+    }
+
+    template <typename... values_t>
+    event_data<values_t...>::event_data()
+    {        
+        raw = raw_cast(this); // create a new id
+        (_data.update_data.kinds.push_back(typeid(values_t)), ...);
+    }
+
+    template <typename... values_t>
+    event_data<values_t...>::event_data(const event_data& other)
+    {
+        *this = other;
+    }
+
+    template <typename... values_t>
+    event_data<values_t...>& event_data<values_t...>::operator=(const event_data<values_t...>& other)
+    {
+        raw = raw_cast(this); // create a new id
+        callbacks = other.callbacks;
+        (_data.update_data.kinds.push_back(typeid(values_t)), ...);
+        return *this;
+    }
+
+    template <typename... values_t>
+    event_data<values_t...>::event_data(event_data&& other)
+    {
+        *this = std::move(other);
+    }
+
+    template <typename... values_t>
+    event_data<values_t...>& event_data<values_t...>::operator=(event_data<values_t...>&& other)
+    {
+        raw = other.raw; // keep the same id
+        callbacks = std::move(other.callbacks);
+        futures = std::move(other.futures);
+        shared_futures = std::move(other.shared_futures);
+        (_data.update_data.kinds.push_back(typeid(values_t)), ...);
+        global_manager_data& _global = global();
+        if (_global.events.updatables.find(raw) != _global.events.updatables.end()) {
+            _global.events.updatables.at(raw) = std::ref(update_data);
+            assign_ticker(*this);
+        }
+        return *this;
+    }
+    
+    template <typename... values_t>
+    event_data<values_t...>::~event_data()
+    {
+        global_manager_data& _global = global();
+        if (_global.events.updatables.find(raw) != _global.events.updatables.end()) {
+            _global.events.updatables_to_erase.push_back(raw);
+        }
     }
 }
 
@@ -126,18 +161,17 @@ event<values_t...>& event<values_t...>::trigger(values_t&&... values) const
 template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& future_value)
 {
-    std::uintptr_t _raw_event = detail::raw_cast<event<values_t...>>(this);
-    if (!detail::global().events.contains(_raw_event)) {
-        detail::event_update_data& _update_data = detail::global().events[_raw_event];
-        _data.raw_event = _raw_event;
-        (_update_data.kinds.push_back(typeid(values_t)), ...);
-        detail::assign_ticker(_data, _update_data);
+    detail::global_manager_data& _global = detail::global();
+    if (_global.events.updatables.find(_data.raw) != _global.events.updatables.end()) {
+        // error because event is being waited on already
+    }
+    _global.events.updatables.insert({ _data.raw, std::ref(_data.update_data) });
+    detail::assign_ticker(_data);
 #if BUNGEEGUM_USE_OVERLAY
         // for (const std::type_index& _type_index : _update_data.kinds) {
         //     _update_data.clean_typenames.push_back(detail::pipelines_manager::to_clean_typename(_type_index.name()));
         // }
 #endif
-    }
     _data.futures.push_back(std::move(future_value));
     return *this;
 }
@@ -145,18 +179,17 @@ event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& fut
 template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_values>& shared_future_value)
 {
-    std::uintptr_t _raw_event = detail::raw_cast<event<values_t...>>(this);
-    if (!detail::global().events.contains(_raw_event)) {
-        detail::event_update_data& _update_data = detail::global().events[_raw_event];
-        _data.raw_event = _raw_event;
-        (_update_data.kinds.push_back(typeid(values_t)), ...);
-        detail::assign_ticker(_data, _update_data);
+    detail::global_manager_data& _global = detail::global();
+    if (_global.events.updatables(_data.raw) != _global.events.updatables.end()) {
+        // error because event is being waited on already
+    }
+    _global.events.updatables.insert({ _data.raw, std::ref(_data.update_data) });
+    detail::assign_ticker(_data);
 #if BUNGEEGUM_USE_OVERLAY
         // for (const std::type_index& _type_index : _update_data.kinds) {
         //     _update_data.clean_typenames.push_back(detail::global().pipelines.to_clean_typename(_type_index.name()));
         // }
 #endif
-    }
     _data.shared_futures.push_back(shared_future_value);
     return *this;
 }

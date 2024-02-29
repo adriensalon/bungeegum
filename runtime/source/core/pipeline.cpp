@@ -214,7 +214,15 @@ namespace detail {
         _global.pipelines.current.value().get().steps_chronometer.end_task("animations");
 
         _global.pipelines.current.value().get().steps_chronometer.begin_task("events");
-        _global.events.update();
+        // We cleanup first so that event objects whose lifetimes have expired
+        // are not iterated in the next step.
+        for (const std::uintptr_t _raw_event : _global.events.updatables_to_erase) {
+            _global.events.updatables.erase(_raw_event);
+        }
+        _global.events.updatables_to_erase.clear();
+        for (std::pair<const uintptr_t, std::reference_wrapper<detail::event_update_data>>& _update_data : _global.events.updatables) {
+            _update_data.second.get().ticker();
+        }
 		std::this_thread::sleep_for(std::chrono::milliseconds(3));
         _global.pipelines.current.value().get().steps_chronometer.end_task("events");
 

@@ -234,33 +234,33 @@ struct draw_command {
     void draw_curve_filled();
 
     /// @brief
-    /// @param texture
+    /// @param user_texture
     /// @param min_point
     /// @param max_point
-    void draw_texture(texture_ref& texture, const float2 min_point, const float2 max_point);
+    void draw_texture(texture_ref& user_texture, const float2 min_point, const float2 max_point);
     
     /// @brief 
-    /// @param texture 
+    /// @param user_texture 
     /// @param top_left_corner 
     /// @param top_right_corner 
     /// @param bottom_left_corner 
     /// @param bottom_right_corner 
-    void draw_texture_quad(texture_ref& texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner);
+    void draw_texture_quad(texture_ref& user_texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner);
 
     /// @brief
-    /// @param texture
+    /// @param user_texture
     /// @param min_point
     /// @param max_point
     /// @param rounding
-    void draw_texture_rounded(texture_ref& texture, const float2 min_point, const float2 max_point, const float rounding);
+    void draw_texture_rounded(texture_ref& user_texture, const float2 min_point, const float2 max_point, const float rounding);
 
     /// @brief 
-    /// @param font 
+    /// @param user_font 
     /// @param font_size 
     /// @param position 
     /// @param color 
     /// @param text 
-    void draw_text(font_ref& font, const float font_size, const float2 position, const float4 color, const std::string& text);
+    void draw_text(font_ref& user_font, const float font_size, const float2 position, const float4 color, const std::string& text);
 
     /// @brief
     /// @param first_point
@@ -326,8 +326,8 @@ struct draw_command {
     void draw_triangle_filled(const float2 first_corner, const float2 second_corner, const float2 third_corner, const float4 color);
     
     /// @brief
-    /// @param shader
-    void use_shader_custom(shader_ref& shader);
+    /// @param user_shader
+    void use_shader_custom(const shader& user_shader);
 
     /// @brief
     void use_shader_default();

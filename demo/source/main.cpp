@@ -163,34 +163,55 @@ int main()
     _texture_res.size(1, 2);
     bungeegum::texture_ref _tex = bungeegum::make_texture("my tex 1", _texture_res);
 
-    bungeegum::shader_resource _shader1_res;
-    _shader1_res.fragment(R"(
-		struct PSInput
-		{
-			float4 pos : SV_POSITION;
-			float4 col : COLOR;
-			float2 uv  : TEXCOORD;
-		};
+    // bungeegum::shader_resource _shader1_res;
+    // _shader1_res.fragment(R"(
+	// 	struct PSInput
+	// 	{
+	// 		float4 pos : SV_POSITION;
+	// 		float4 col : COLOR;
+	// 		float2 uv  : TEXCOORD;
+	// 	};
 
-		Texture2D    Texture;
-		SamplerState Texture_sampler;
+	// 	Texture2D    Texture;
+	// 	SamplerState Texture_sampler;
 
-		float4 main(in PSInput PSIn) : SV_Target
-		{
-			return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
-		}
-		)",
-        {});
-    _shader1_res.depth({});
-    _shader1_res.stencil({});
-    bungeegum::make_shader("my shader 1", _shader1_res);
+	// 	float4 main(in PSInput PSIn) : SV_Target
+	// 	{
+	// 		return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
+	// 	}
+	// 	)",
+    //     {});
+    // bungeegum::make_shader("my shader 1", _shader1_res);
 
     // bungeegum::font_resource _font1_res;
     // _font1_res.compressed(nullptr, 0);
     // _font1_res.size(13.4f);
 
-    bungeegum::shader_ref _shader1 = bungeegum::get_shader("my shader 1");
-    _shader1.uniform<float>("okok", 44.f);
+
+    bungeegum::event _myevnt;
+    _myevnt.on_trigger([] () {
+        std::cout << "helloooo" << std::endl;
+    });
+    _myevnt.trigger(std::async([] () {
+        std::this_thread::sleep_for(std::chrono::milliseconds{ 2000 });
+    }));
+    
+    bungeegum::event _myevnt2;
+    _myevnt2.on_trigger([] () {
+        std::cout << "helloooo 222" << std::endl;
+    });
+    _myevnt2.trigger(std::async([] () {
+        std::this_thread::sleep_for(std::chrono::milliseconds{ 2000 });
+    }));
+    bungeegum::event _myevnt33 = std::move(_myevnt2);
+    bungeegum::event _myevnt3 = (_myevnt2);
+    _myevnt3.on_trigger([] () {
+        std::cout << "helloooo 33" << std::endl;
+    });
+    _myevnt3.trigger(std::async([] () {
+        std::this_thread::sleep_for(std::chrono::milliseconds{ 1000 });
+    }));
+
 
     _my_pipeline.root(bungeegum::make<drawerwidget>());
     // _my_pipeline.run(60, true);

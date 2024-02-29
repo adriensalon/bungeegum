@@ -420,13 +420,13 @@ namespace detail {
         void draw_async_events_tab()
         {
             const events_manager& _events_manager = global().events;
-            std::string _title = "async events (" + std::to_string(_events_manager.size()) + ")";
+            std::string _title = "async events (" + std::to_string(_events_manager.updatables.size()) + ")";
             if (ImGui::BeginTabItem((_title + tag("async_events_tab")).c_str())) {
 
                 // GO ALGORITHM
                 //
                 std::size_t _args_count = 0;
-                for (const std::pair<const uintptr_t, event_update_data>& _event_data : _events_manager) {
+                for (const std::pair<const uintptr_t, event_update_data>& _event_data : _events_manager.updatables) {
                     _args_count = std::max(_args_count, _event_data.second.clean_typenames.size());
                 }
                 //
@@ -435,7 +435,7 @@ namespace detail {
                 static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
                 if (ImGui::BeginTable(tag("async_events_table").c_str(), static_cast<int>(_args_count + 1), _table_flags)) {
 
-                    for (const std::pair<const uintptr_t, event_update_data>& _event_data : _events_manager) {
+                    for (const std::pair<const uintptr_t, event_update_data>& _event_data : _events_manager.updatables) {
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
                         ImGui::Text("event");

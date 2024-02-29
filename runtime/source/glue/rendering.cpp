@@ -338,7 +338,9 @@ namespace detail {
         rasterizer_handle& rasterizer,
         const void* ttf,
         const std::size_t count,
-        const float size)
+        const float size,
+        const std::optional<font_config>& config,
+        unsigned short* ranges)
     {
         if (!rasterizer.has_value()) {
             throw backtraced_exception { "[rendering] Impossible to create font because rasterizer has no value" };
@@ -349,14 +351,20 @@ namespace detail {
         unsigned char* _raw_pixels = nullptr;
         ImGui::SetCurrentContext(rasterizer._imgui_context);
         ImGuiIO& _io = ImGui::GetIO();
-        _imgui_font = _io.Fonts->AddFontFromMemoryCompressedTTF(ttf, static_cast<int>(count), size);
-
-        // // font awesome for the glyphs
-        // // ImFontConfig config;
-        // // config.MergeMode = true;
-        // // config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
-        // // static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-        // // icons_font = io.Fonts->AddFontFromMemoryCompressedTTF(fa4_compressed_data, fa4_compressed_size, 13.0f, &config, icon_ranges);
+ 
+        ImFontConfig _imgui_config; 
+        if (config.has_value()) {
+            const font_config& _font_config = config.value();      
+            _imgui_config.FontNo = static_cast<int>(_font_config.index);
+            _imgui_config.OversampleH = static_cast<int>(_font_config.oversample_horizontal);
+            _imgui_config.OversampleV = static_cast<int>(_font_config.oversample_vertical);
+            _imgui_config.PixelSnapH = _font_config.pixel_snap_horizontal;
+            _imgui_config.GlyphExtraSpacing = ImVec2 { _font_config.glyph_extra_spacing.x, _font_config.glyph_extra_spacing.y };
+            _imgui_config.GlyphOffset = ImVec2 { _font_config.glyph_extra_spacing.x, _font_config.glyph_extra_spacing.y };
+            _imgui_config.GlyphMinAdvanceX = _font_config.glyph_min_advance; // Use if you want to make the icon monospaced
+            // static const unsigned short _ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+        }
+        _imgui_font = _io.Fonts->AddFontFromMemoryCompressedTTF(ttf, static_cast<int>(count), size, &_imgui_config, ranges);
 
         _io.Fonts->Build();
         _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);

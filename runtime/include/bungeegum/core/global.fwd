@@ -18,7 +18,6 @@ namespace detail {
         log_manager_data logs = {};
         pipeline_manager_data pipelines = {};
         widget_manager_data widgets = {};
-        shader_manager_data shaders = {};
         font_manager_data fonts = {};
         texture_manager_data textures = {};
     };

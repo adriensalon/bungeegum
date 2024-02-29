@@ -137,6 +137,34 @@ namespace detail {
         friend struct rasterizer_handle;
     };
 
+    /// @brief 
+    struct font_config {   
+        
+        /// @brief 
+        std::size_t index = 0;
+
+        /// @brief 
+        std::size_t oversample_horizontal = 3;
+
+        /// @brief 
+        std::size_t oversample_vertical = 3;
+
+        /// @brief 
+        bool pixel_snap_horizontal = false;
+
+        /// @brief 
+        float2 glyph_extra_spacing = { 0.f, 0.f };
+
+        /// @brief 
+        float2 glyph_offset = { 0.f, 0.f };
+
+        /// @brief 
+        float rasterizer_multiply = 1.f;
+
+        /// @brief 
+        float glyph_min_advance = 0.f;
+    };
+
     struct rasterizer_handle;
 
     ///
@@ -152,11 +180,15 @@ namespace detail {
         /// @param ttf
         /// @param count
         /// @param size
+        /// @param config
+        /// @param ranges
         void emplace(
             rasterizer_handle& rasterizer,
             const void* ttf,
             const std::size_t count,
-            const float size);
+            const float size,
+            const std::optional<font_config>& config = std::nullopt,
+            unsigned short* ranges = nullptr);
 
         /// @brief
         /// @return

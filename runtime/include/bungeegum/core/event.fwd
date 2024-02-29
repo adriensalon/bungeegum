@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <future>
+#include <optional>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
@@ -10,22 +11,7 @@
 #include <bungeegum/glue/foreach.hpp>
 
 namespace bungeegum {
-namespace detail {    
-
-    template <typename... values_t>
-    struct event_data {
-        event_data() = default;
-        event_data(const event_data& other);
-        event_data& operator=(const event_data& other);
-        event_data(event_data&& other) = default;
-        event_data& operator=(event_data&& other) = default;
-        ~event_data();
-
-        std::uintptr_t raw_event = 0;
-        std::vector<std::function<void(values_t...)>> callbacks = {};
-        std::vector<std::future<variadic_reduce_t<values_t...>>> futures = {};
-        std::vector<std::shared_future<variadic_reduce_t<values_t...>>> shared_futures = {};
-    };
+namespace detail {
 
     struct event_update_data {
         std::vector<std::type_index> kinds = {};
@@ -35,6 +21,22 @@ namespace detail {
 #endif
     };
 
+    template <typename... values_t>
+    struct event_data {
+        event_data();
+        event_data(const event_data& other); // deep copy
+        event_data& operator=(const event_data& other); // deep copy
+        event_data(event_data&& other); // move garde raw update ref
+        event_data& operator=(event_data&& other); // move garde raw update ref
+        ~event_data(); // notify erase if being updated
+
+        std::uintptr_t raw = {};
+        std::vector<std::function<void(values_t...)>> callbacks = {};
+        std::vector<std::future<variadic_reduce_t<values_t...>>> futures = {};
+        std::vector<std::shared_future<variadic_reduce_t<values_t...>>> shared_futures = {};
+        event_update_data update_data = {};
+    }; 
+
     struct events_manager {
         events_manager() = default;
         events_manager(const events_manager& other) = delete;
@@ -42,26 +44,8 @@ namespace detail {
         events_manager(events_manager&& other) = delete;
         events_manager& operator=(events_manager&& other) = delete;
 
-        // expected unqualified id (name clash ig)
-        // using const_iterator = std::unordered_map<std::uintptr_t, event_update_data>::template const_iterator;
-
-        [[nodiscard]] std::unordered_map<std::uintptr_t, event_update_data>::const_iterator begin() const;
-
-        [[nodiscard]] bool contains(const std::uintptr_t raw_event) const;
-
-        [[nodiscard]] std::unordered_map<std::uintptr_t, event_update_data>::const_iterator end() const;
-
-        void notify_erase(const std::uintptr_t raw_event);
-
-        [[nodiscard]] event_update_data& operator[](const std::uintptr_t raw_event);
-
-        std::size_t size() const;
-
-        void update();
-
-    private:
-        std::unordered_map<std::uintptr_t, event_update_data> _updatables = {};
-        std::vector<std::uintptr_t> _updatables_to_erase = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<event_update_data>> updatables = {};
+        std::vector<std::uintptr_t> updatables_to_erase = {};
     };
 }
 }
