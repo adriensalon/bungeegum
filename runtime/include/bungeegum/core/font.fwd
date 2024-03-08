@@ -4,39 +4,41 @@
 #include <memory>
 #include <string>
 
-#include <imgui.h>
-
 #include <bungeegum/glue/rendering.hpp>
 
 namespace bungeegum {
 
-struct font_resource;
-struct font_ref;
+struct font;
 
 namespace detail {
 
-    struct font_resource_data {
-        void* compressed = nullptr;
-        std::size_t count = 0;
-        float size = 0.f;
-    };
-
-    struct font_ref_data {
+    struct font_data {
+        font_data();
+        font_data(const font_data& other);
+        font_data& operator=(const font_data& other);
+        font_data(font_data&& other);
+        font_data& operator=(font_data&& other);
+        ~font_data();
+        
+        std::uintptr_t raw = 0u;
         std::unordered_map<std::uintptr_t, font_handle> fonts = {};
+        void* creation_ttf = nullptr;
+        std::size_t creation_count = 0u;
+        float creation_size = 0.f;
     };
 
-    struct font_manager_data {
-        std::unordered_map<std::string, font_ref_data> fonts = {};
+    struct fonts_manager_data {
+        fonts_manager_data() = default;
+        fonts_manager_data(const fonts_manager_data& other) = delete;
+        fonts_manager_data& operator=(const fonts_manager_data& other) = delete;
+        fonts_manager_data(fonts_manager_data&& other) = delete;
+        fonts_manager_data& operator=(fonts_manager_data&& other) = delete;
+
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<font_data>> fonts = {};
     };
 
-    struct font_resource_access {
-        [[nodiscard]] static font_resource make_from_data(const font_resource_data& data);
-        [[nodiscard]] static font_resource_data& get_data(font_resource& object);
-    };
-
-    struct font_ref_access {
-        [[nodiscard]] static font_ref make_from_data(const font_ref_data& data);
-        [[nodiscard]] static font_ref_data& get_data(font_ref& object);
+    struct font_access {
+        [[nodiscard]] static const font_data& get_data(const font& object);
     };
 
 }

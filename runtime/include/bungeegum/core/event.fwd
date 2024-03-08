@@ -11,11 +11,17 @@
 #include <bungeegum/glue/foreach.hpp>
 
 namespace bungeegum {
+    
+    template <typename... values_t>
+    struct event;
+
 namespace detail {
+
+    struct events_manager_data;
 
     struct event_update_data {
         std::vector<std::type_index> kinds = {};
-        std::function<void()> ticker = nullptr;
+        std::function<void(events_manager_data& manager_data)> ticker = nullptr;
 #if BUNGEEGUM_USE_OVERLAY
         std::vector<std::string> clean_typenames = {};
 #endif
@@ -24,28 +30,33 @@ namespace detail {
     template <typename... values_t>
     struct event_data {
         event_data();
-        event_data(const event_data& other); // deep copy
-        event_data& operator=(const event_data& other); // deep copy
-        event_data(event_data&& other); // move garde raw update ref
-        event_data& operator=(event_data&& other); // move garde raw update ref
-        ~event_data(); // notify erase if being updated
+        event_data(const event_data& other);
+        event_data& operator=(const event_data& other);
+        event_data(event_data&& other);
+        event_data& operator=(event_data&& other);
+        ~event_data();
 
-        std::uintptr_t raw = {};
+        std::uintptr_t raw = 0u;
         std::vector<std::function<void(values_t...)>> callbacks = {};
         std::vector<std::future<variadic_reduce_t<values_t...>>> futures = {};
         std::vector<std::shared_future<variadic_reduce_t<values_t...>>> shared_futures = {};
         event_update_data update_data = {};
     }; 
 
-    struct events_manager {
-        events_manager() = default;
-        events_manager(const events_manager& other) = delete;
-        events_manager& operator=(const events_manager& other) = delete;
-        events_manager(events_manager&& other) = delete;
-        events_manager& operator=(events_manager&& other) = delete;
+    struct events_manager_data {
+        events_manager_data() = default;
+        events_manager_data(const events_manager_data& other) = delete;
+        events_manager_data& operator=(const events_manager_data& other) = delete;
+        events_manager_data(events_manager_data&& other) = delete;
+        events_manager_data& operator=(events_manager_data&& other) = delete;
 
         std::unordered_map<std::uintptr_t, std::reference_wrapper<event_update_data>> updatables = {};
         std::vector<std::uintptr_t> updatables_to_erase = {};
+    };
+    
+    template <typename... values_t>
+    struct event_access {
+        [[nodiscard]] static const event_data<values_t...>& get_data(const event<values_t...>& object);
     };
 }
 }

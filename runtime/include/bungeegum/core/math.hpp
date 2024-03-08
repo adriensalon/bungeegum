@@ -67,7 +67,7 @@ using bool4x4 = detail::simd_matrix<bool, 4>;
 /// @brief
 /// @tparam value_t
 template <typename value_t>
-constexpr inline static value_t zero = static_cast<value_t>(0.0);
+constexpr inline static value_t zero = static_cast<value_t>(0);
 
 /// @brief
 /// @tparam value_t
@@ -99,9 +99,91 @@ constexpr bool is_finite(const value_t value);
 template <typename value_t>
 std::string to_string(const value_t& value);
 
+/// @brief 
+enum struct curve_preset {
+	linear,
+	bounce_in
+};
+
+/// @brief Instance of this struct represent immutable 2D spline curves that can be evaluated
+/// and sampled after they have been created from points and optional departure (0, d) and arrival
+/// (1, a) values.
+/// @details Instances of this struct can be copied (performing deep copy) and moved.
+struct curve {
+
+    /// @brief
+	curve() = default;
+
+    /// @brief
+    /// @param other
+	curve(const curve& other) = default;
+
+    /// @brief
+    /// @param other
+	curve& operator=(const curve& other) = default;
+
+    /// @brief
+    /// @param other
+	curve(curve&& other) = default;
+
+    /// @brief
+    /// @param other
+	curve& operator=(curve&& other) = default;
+
+	/// @brief
+	/// @param preset
+	curve(const curve_preset& preset);
+
+	/// @brief Creates an instance from strided control points.
+	curve(const std::vector<float>& strided_controls);
+
+	/// @brief Creates an instance from control points.
+	curve(const std::vector<float2>& controls);
+
+	/// @brief Creates an instance from strided control points and departure and arrival values.
+	curve(const float departure, const float arrival, const std::vector<float>& strided_controls);
+
+	/// @brief Creates an instance from control points and departure and arrival values.
+	curve(const float departure, const float arrival, const std::vector<float2>& controls);
+
+	/// @brief
+	/// @param preset
+	curve& emplace(const curve_preset& preset);
+
+	/// @brief 
+	/// @param controls 
+	curve& emplace(const std::vector<float2>& controls);
+
+	/// @brief 
+	/// @param departure 
+	/// @param arrival 
+	/// @param controls 
+	curve& emplace(const float departure, const float arrival, const std::vector<float2>& controls);
+
+	/// @brief 
+	/// @param departure 
+	/// @param arrival 
+	/// @param strided_controls 
+	curve& emplace(const float departure, const float arrival, const std::vector<float>& strided_controls);
+
+	/// @brief Evaluates the curve at the given fraction.
+	/// @details Clamps fraction between 0.f and 1.f.
+	float evaluate_1d(const float fraction);
+
+	/// @brief Evaluates the curve at the given fraction.
+	/// @details Clamps fraction between 0.f and 1.f.
+	float2 evaluate_2d(const float fraction);
+
+	/// @brief Samples the curve given a sample count.
+	std::vector<float> get_strided_samples(const std::size_t count);
+
+private:
+	detail::curve_data _data;
+};
+
 namespace math {
 
-    using namespace glm;
+    using namespace glm;	
 
 	/// @brief 
 	/// @param position 

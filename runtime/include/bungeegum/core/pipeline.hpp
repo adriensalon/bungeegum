@@ -24,12 +24,22 @@ enum struct renderer_backend {
 constexpr renderer_backend preferred_renderer_backend = BUNGEEGUM_USE_PREFERRED_PIPELINE_RENDERER;
 
 /// @brief 
-struct pipeline_provider {
-	std::string emscripten_canvas_id = "canvas";
-	void* native_window_ptr = nullptr;
-	void* directx_device_ptr = nullptr;
-	void* directx_swapchain_ptr = nullptr;
-	bool opengl_attach_to_existing = false;
+struct pipeline_bindings {
+	
+    /// @brief 
+    std::string emscripten_canvas_id = "canvas";
+	
+    /// @brief 
+    void* native_window_ptr = nullptr;
+	
+    /// @brief 
+    void* directx_device_ptr = nullptr;
+	
+    /// @brief 
+    void* directx_swapchain_ptr = nullptr;
+	
+    /// @brief 
+    bool opengl_attach_to_existing = false;
 };
 
 /// @brief
@@ -41,11 +51,11 @@ struct pipeline {
     pipeline& operator=(pipeline&& other) = default;
 	
     /// @brief 
-    /// @tparam backend_t 
+    /// @param backend 
     /// @param provider 
-    /// @return 
-    template <renderer_backend backend_t = preferred_renderer_backend>
-	pipeline& setup(const pipeline_provider& provider);
+	pipeline& emplace(
+        const renderer_backend backend = preferred_renderer_backend, 
+        const pipeline_bindings& provider = {});
 
     /// @brief
     /// @param frames_per_second

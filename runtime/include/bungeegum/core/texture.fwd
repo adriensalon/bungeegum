@@ -9,33 +9,36 @@
 
 namespace bungeegum {
 
-struct texture_resource;
-struct texture_ref;
+struct texture;
 
 namespace detail {
 
-    struct texture_resource_data {
+    struct texture_data {
+        texture_data();
+        texture_data(const texture_data& other);
+        texture_data& operator=(const texture_data& other);
+        texture_data(texture_data&& other);
+        texture_data& operator=(texture_data&& other);
+        ~texture_data();
+
+        std::unordered_map<std::uintptr_t, texture_handle> textures = {};
 		std::size_t height = 0;
 		std::size_t width = 0;
 		std::vector<unsigned char> pixels = {};
     };
 
-    struct texture_ref_data {
-        std::unordered_map<std::uintptr_t, texture_handle> textures = {};
-    };
+	struct textures_manager_data {
+        textures_manager_data() = default;
+        textures_manager_data(const textures_manager_data& other) = delete;
+        textures_manager_data& operator=(const textures_manager_data& other) = delete;
+        textures_manager_data(textures_manager_data&& other) = delete;
+        textures_manager_data& operator=(textures_manager_data&& other) = delete;
 
-	struct texture_manager_data {
-        std::unordered_map<std::string, texture_ref_data> textures = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<texture_data>> textures = {};
 	};
 	
-    struct texture_resource_access {
-        [[nodiscard]] static texture_resource make_from_data(const texture_resource_data& data);
-        [[nodiscard]] static texture_resource_data& get_data(texture_resource& object);
-    };
-	
-    struct texture_ref_access {
-        [[nodiscard]] static texture_ref make_from_data(const texture_ref_data& data);
-        [[nodiscard]] static texture_ref_data& get_data(texture_ref& object);
+    struct texture_access {
+        [[nodiscard]] static const texture_data& get_data(const texture& object);
     };
 
 }

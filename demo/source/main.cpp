@@ -150,43 +150,13 @@ int main()
     // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
     // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
 
-    bungeegum::pipeline_provider _provider;
+    bungeegum::pipeline_bindings _provider;
     _provider.emscripten_canvas_id = "canvas";
     _provider.native_window_ptr = nullptr;
 
     bungeegum::pipeline _my_pipeline;
-    _my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
-    // _my_pipeline.setup<bungeegum::renderer_backend::directx11>(_provider);
-
-    bungeegum::texture_resource _texture_res;
-    _texture_res.pixels({ 0u });
-    _texture_res.size(1, 2);
-    bungeegum::texture_ref _tex = bungeegum::make_texture("my tex 1", _texture_res);
-
-    // bungeegum::shader_resource _shader1_res;
-    // _shader1_res.fragment(R"(
-	// 	struct PSInput
-	// 	{
-	// 		float4 pos : SV_POSITION;
-	// 		float4 col : COLOR;
-	// 		float2 uv  : TEXCOORD;
-	// 	};
-
-	// 	Texture2D    Texture;
-	// 	SamplerState Texture_sampler;
-
-	// 	float4 main(in PSInput PSIn) : SV_Target
-	// 	{
-	// 		return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
-	// 	}
-	// 	)",
-    //     {});
-    // bungeegum::make_shader("my shader 1", _shader1_res);
-
-    // bungeegum::font_resource _font1_res;
-    // _font1_res.compressed(nullptr, 0);
-    // _font1_res.size(13.4f);
-
+    // _my_pipeline.emplace(bungeegum::renderer_backend::directx11, _provider);
+    _my_pipeline.emplace(bungeegum::renderer_backend::opengl, _provider);
 
     bungeegum::event _myevnt;
     _myevnt.on_trigger([] () {

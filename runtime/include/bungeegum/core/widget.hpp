@@ -237,7 +237,7 @@ struct draw_command {
     /// @param user_texture
     /// @param min_point
     /// @param max_point
-    void draw_texture(texture_ref& user_texture, const float2 min_point, const float2 max_point);
+    void draw_texture(texture& user_texture, const float2 min_point, const float2 max_point);
     
     /// @brief 
     /// @param user_texture 
@@ -245,14 +245,14 @@ struct draw_command {
     /// @param top_right_corner 
     /// @param bottom_left_corner 
     /// @param bottom_right_corner 
-    void draw_texture_quad(texture_ref& user_texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner);
+    void draw_texture_quad(texture& user_texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner);
 
     /// @brief
     /// @param user_texture
     /// @param min_point
     /// @param max_point
     /// @param rounding
-    void draw_texture_rounded(texture_ref& user_texture, const float2 min_point, const float2 max_point, const float rounding);
+    void draw_texture_rounded(texture& user_texture, const float2 min_point, const float2 max_point, const float rounding);
 
     /// @brief 
     /// @param user_font 
@@ -260,7 +260,7 @@ struct draw_command {
     /// @param position 
     /// @param color 
     /// @param text 
-    void draw_text(font_ref& user_font, const float font_size, const float2 position, const float4 color, const std::string& text);
+    void draw_text(const font& user_font, const float font_size, const float2 position, const float4 color, const std::string& text);
 
     /// @brief
     /// @param first_point

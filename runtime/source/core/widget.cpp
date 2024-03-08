@@ -269,20 +269,20 @@ void draw_command::draw_curve_filled()
 {
 }
 
-void draw_command::draw_texture(texture_ref& user_texture, const float2 min_point, const float2 max_point)
+void draw_command::draw_texture(texture& user_texture, const float2 min_point, const float2 max_point)
 {
-    const detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(user_texture);
-    const detail::texture_handle& _texture_handle = _texture_ref_data.textures.at(_data.raw_pipeline);
+    const detail::texture_data& _texture_data = detail::texture_access::get_data(user_texture);
+    const detail::texture_handle& _texture_handle = _texture_data.textures.at(_data.raw_pipeline);
     ImTextureID _id = _texture_handle.get();
     ImVec2 _min_point { min_point.x, min_point.y };
     ImVec2 _max_point { max_point.x, max_point.y };
     _data.draw_list->AddImage(_id, _min_point, _max_point);
 }
 
-void draw_command::draw_texture_quad(texture_ref& user_texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner)
+void draw_command::draw_texture_quad(texture& user_texture, const float2 top_left_corner, const float2 top_right_corner, const float2 bottom_right_corner, const float2 bottom_left_corner)
 {
-    const detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(user_texture);
-    const detail::texture_handle& _texture_handle = _texture_ref_data.textures.at(_data.raw_pipeline);
+    const detail::texture_data& _texture_data = detail::texture_access::get_data(user_texture);
+    const detail::texture_handle& _texture_handle = _texture_data.textures.at(_data.raw_pipeline);
     ImTextureID _id = _texture_handle.get();
     ImVec2 _top_left_corner { top_left_corner.x, top_left_corner.y };
     ImVec2 _top_right_corner { top_right_corner.x, top_right_corner.y };
@@ -291,20 +291,20 @@ void draw_command::draw_texture_quad(texture_ref& user_texture, const float2 top
     _data.draw_list->AddImageQuad(_id, _top_left_corner, _top_right_corner, _bottom_right_corner, _bottom_left_corner);
 }
 
-void draw_command::draw_texture_rounded(texture_ref& user_texture, const float2 min_point, const float2 max_point, const float rounding)
+void draw_command::draw_texture_rounded(texture& user_texture, const float2 min_point, const float2 max_point, const float rounding)
 {
-    const detail::texture_ref_data& _texture_ref_data = detail::texture_ref_access::get_data(user_texture);
-    const detail::texture_handle& _texture_handle = _texture_ref_data.textures.at(_data.raw_pipeline);
+    const detail::texture_data& _texture_data = detail::texture_access::get_data(user_texture);
+    const detail::texture_handle& _texture_handle = _texture_data.textures.at(_data.raw_pipeline);
     ImTextureID _id = _texture_handle.get();
     ImVec2 _min_point { min_point.x, min_point.y };
     ImVec2 _max_point { max_point.x, max_point.y };
     _data.draw_list->AddImageRounded(_id, _min_point, _max_point, ImVec2(0.f, 0.f), ImVec2(0.f, 0.f), 4294967295U, rounding, ImDrawCornerFlags_All);
 }
 
-void draw_command::draw_text(font_ref& user_font, const float font_size, const float2 position, const float4 color, const std::string& text)
+void draw_command::draw_text(const font& user_font, const float font_size, const float2 position, const float4 color, const std::string& text)
 {
-    const detail::font_ref_data& _font_ref_data = detail::font_ref_access::get_data(user_font);
-    const detail::font_handle& _font_handle = _font_ref_data.fonts.at(_data.raw_pipeline);
+    const detail::font_data& _font_data = detail::font_access::get_data(user_font);
+    const detail::font_handle& _font_handle = _font_data.fonts.at(_data.raw_pipeline);
     ImFont* _font = _font_handle.get();
     const char* _ctext = text.c_str();
     ImVec2 _position { position.x, position.y };

@@ -1,6 +1,5 @@
 #include <imgui.h>
 
-
 #include <bungeegum/glue/toolchain.hpp>
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <SDL.h> // event only omg
@@ -64,8 +63,8 @@ namespace detail {
         };
         _traverse_function(root_updatable);
 #else
-		(void)archive_path;
-		(void)root_updatable;
+        (void)archive_path;
+        (void)root_updatable;
 #endif
     }
 
@@ -83,8 +82,8 @@ namespace detail {
         };
         _traverse_function(root_updatable);
 #else
-		(void)archive_path;
-		(void)root_updatable;
+        (void)archive_path;
+        (void)root_updatable;
 #endif
     }
 
@@ -126,11 +125,11 @@ namespace detail {
         _pipeline_manager.current.value().get().steps_chronometer.begin_task("resolve");
 #endif
         bool _resolve_done = false;
-		std::vector<std::uintptr_t> _ids;
+        std::vector<std::uintptr_t> _ids;
         while (!_resolve_done) {
             for (std::pair<const std::uintptr_t, resolve_command_data>& _it : _widget_manager.resolvables) {
-				_ids.push_back(_it.first);
-				widget_update_data& _updatable = _it.second.get();
+                _ids.push_back(_it.first);
+                widget_update_data& _updatable = _it.second.get();
                 if (_updatable.raw == root_updatable.raw) {
                     _updatable.local_min_size = viewport_size;
                     _updatable.local_max_size = viewport_size;
@@ -144,7 +143,7 @@ namespace detail {
 #endif
 
                 protect_userspace(_log_manager.userspace_errors, [&_updatable]() {
-					resolve_command_data _data = { _updatable };
+                    resolve_command_data _data = { _updatable };
                     resolve_command _command = detail::resolve_command_access::make_from_data(_data);
                     _updatable.resolver(_command);
                 });
@@ -152,11 +151,11 @@ namespace detail {
                 _pipeline_manager.current.value().get().widgets_chronometer.end_task(_updatable.clean_typename);
 #endif
             }
-			for (const std::uintptr_t _id : _ids) {
-				_widget_manager.resolvables.erase(_id);
-			}
-			_ids.clear();
-			_resolve_done = _widget_manager.resolvables.empty();
+            for (const std::uintptr_t _id : _ids) {
+                _widget_manager.resolvables.erase(_id);
+            }
+            _ids.clear();
+            _resolve_done = _widget_manager.resolvables.empty();
         }
 #if BUNGEEGUM_USE_OVERLAY
         _pipeline_manager.current.value().get().steps_chronometer.end_task("resolve");
@@ -167,13 +166,13 @@ namespace detail {
     {
         global_manager_data& _global = global();
         bool _draw_done = false;
-		std::vector<std::uintptr_t> _ids;
+        std::vector<std::uintptr_t> _ids;
         const std::uintptr_t _raw_pipeline = _global.pipelines.current.value().get().raw; // get from func args
         while (!_draw_done) {
             for (std::pair<const std::uintptr_t, bungeegum::detail::resolve_command_data>& _it : _global.widgets.drawables) {
-				_ids.push_back(_it.first);
+                _ids.push_back(_it.first);
                 widget_update_data& _updatable = _it.second.get();
-				if (_updatable.parent.has_value()) {
+                if (_updatable.parent.has_value()) {
                     widget_update_data& _parent_updatable = _updatable.parent.value().get();
                     _parent_updatable.local_position += _updatable.local_position;
                 }
@@ -196,11 +195,37 @@ namespace detail {
                 // #endif
                 // _widget_drawer_command._data.draw(imgui_drawlist);
             };
-			for (const std::uintptr_t _id : _ids) {
-				_global.widgets.drawables.erase(_id);
-			}
-			_ids.clear();
+            for (const std::uintptr_t _id : _ids) {
+                _global.widgets.drawables.erase(_id);
+            }
+            _ids.clear();
             _draw_done = _global.widgets.drawables.empty();
+        }
+    }
+
+    void process_events(detail::events_manager_data& events)
+    {
+        // We cleanup first so that event objects whose lifetimes have expired
+        // are not iterated in the next step
+        for (const std::uintptr_t _raw_event : events.updatables_to_erase) {
+            events.updatables.erase(_raw_event);
+        }
+        events.updatables_to_erase.clear();
+        for (std::pair<const uintptr_t, std::reference_wrapper<detail::event_update_data>>& _update_data : events.updatables) {
+            _update_data.second.get().ticker(events);
+        }
+    }
+
+    void process_animations(detail::animations_manager_data& animations, const std::chrono::milliseconds& delta_time)
+    {
+        // We cleanup first so that animation objects whose lifetimes have expired
+        // are not iterated in the next step
+        for (const std::uintptr_t _raw_event : animations.updatables_to_erase) {
+            animations.updatables.erase(_raw_event);
+        }
+        animations.updatables_to_erase.clear();
+        for (std::pair<const uintptr_t, std::reference_wrapper<detail::animation_update_data>>& _update_data : animations.updatables) {
+            _update_data.second.get().ticker(delta_time);
         }
     }
 
@@ -209,27 +234,19 @@ namespace detail {
         global_manager_data& _global = global();
 
         _global.pipelines.current.value().get().steps_chronometer.begin_task("animations");
-        _global.animations.update(delta_time);
-		std::this_thread::sleep_for(std::chrono::milliseconds(3));
+        process_animations(_global.animations, delta_time);
         _global.pipelines.current.value().get().steps_chronometer.end_task("animations");
 
         _global.pipelines.current.value().get().steps_chronometer.begin_task("events");
-        // We cleanup first so that event objects whose lifetimes have expired
-        // are not iterated in the next step.
-        for (const std::uintptr_t _raw_event : _global.events.updatables_to_erase) {
-            _global.events.updatables.erase(_raw_event);
-        }
-        _global.events.updatables_to_erase.clear();
-        for (std::pair<const uintptr_t, std::reference_wrapper<detail::event_update_data>>& _update_data : _global.events.updatables) {
-            _update_data.second.get().ticker();
-        }
-		std::this_thread::sleep_for(std::chrono::milliseconds(3));
+        process_events(_global.events);
         _global.pipelines.current.value().get().steps_chronometer.end_task("events");
 
+        _global.pipelines.current.value().get().steps_chronometer.begin_task("interact pass");
         // interact_widgets();
+        _global.pipelines.current.value().get().steps_chronometer.end_task("interact pass");
+
         _global.pipelines.current.value().get().steps_chronometer.begin_task("resolve pass");
         resolve_widgets(viewport_size, root_updatable);
-		std::this_thread::sleep_for(std::chrono::milliseconds(3));
         _global.pipelines.current.value().get().steps_chronometer.end_task("resolve pass");
 
         // return (has_userspace_thrown() || !global().widgets.drawables.empty());
@@ -241,7 +258,7 @@ namespace detail {
         return !_global.widgets.drawables.empty();
     }
 
-    void setup_window(window_handle& pipeline_window, const pipeline_provider& provider)
+    void setup_window(window_handle& pipeline_window, const pipeline_bindings& provider)
     {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         pipeline_window.attach_emscripten(provider.emscripten_canvas_id);
@@ -254,14 +271,87 @@ namespace detail {
 #endif
     }
 
-    void setup_shaders(pipeline_data& data) 
+    void emplace_directx11(pipeline_data& data, const pipeline_bindings& provider)
+    {
+#if !BUNGEEGUM_USE_DIRECTX
+        throw backtraced_exception("");
+#else
+        if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
+            // data.pipeline_renderer.attach_directx11(data.pipeline_window,
+            //     provider.directx_device_ptr,
+            //     provider.directx_swapchain_ptr);
+        } else {
+            data.pipeline_renderer.emplace_new_directx11(data.pipeline_window);
+        }
+#endif
+    }
+
+    void emplace_directx12(pipeline_data& data, const pipeline_bindings& provider)
+    {
+#if !BUNGEEGUM_USE_DIRECTX
+        throw backtraced_exception("");
+#else
+        if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
+            // data.pipeline_renderer.attach_directx12(data.pipeline_window,
+            //     provider.directx_device_ptr,
+            //     provider.directx_swapchain_ptr);
+        } else {
+            data.pipeline_renderer.emplace_new_directx12(data.pipeline_window);
+        }
+#endif
+    }
+
+    void emplace_opengl(pipeline_data& data, const pipeline_bindings& provider)
+    {
+#if !BUNGEEGUM_USE_OPENGL
+        throw backtraced_exception("");
+#else
+        if (provider.opengl_attach_to_existing) {
+            // data.pipeline_renderer.attach_opengl(data.pipeline_window);
+        } else {
+            data.pipeline_renderer.emplace_new_opengl(data.pipeline_window);
+        }
+#endif
+    }
+
+    void emplace_vulkan(pipeline_data& data, const pipeline_bindings& provider)
+    {
+#if !BUNGEEGUM_USE_VULKAN
+        throw backtraced_exception("");
+#else
+        // todo
+#endif
+    }
+
+    void setup_renderer(pipeline_data& data, const renderer_backend backend, const pipeline_bindings& provider)
+    {
+        switch (backend) {
+        case renderer_backend::directx11:
+            emplace_directx11(data, provider);
+            break;
+        case renderer_backend::directx12:
+            emplace_directx12(data, provider);
+            break;
+        case renderer_backend::opengl:
+            emplace_opengl(data, provider);
+            break;
+        case renderer_backend::vulkan:
+            emplace_vulkan(data, provider);
+            break;
+        default:
+            throw backtraced_exception("");
+            break;
+        }
+    }
+
+    void setup_shaders(pipeline_data& data)
     {
         shader_depth_descriptor _default_depth;
         _default_depth.function = Diligent::COMPARISON_FUNC_LESS;
-        data.default_shader.emplace(data.user_context, shader_fragment_default(), {}, _default_depth);     
-        
-		shader_blend_descriptor _mask_blend;
-		_mask_blend.color_mask = Diligent::COLOR_MASK::COLOR_MASK_NONE;
+        data.default_shader.emplace(data.user_context, shader_fragment_default(), {}, _default_depth);
+
+        shader_blend_descriptor _mask_blend;
+        _mask_blend.color_mask = Diligent::COLOR_MASK::COLOR_MASK_NONE;
         shader_depth_descriptor _mask_depth;
         _mask_depth.enable_write = true;
         _mask_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
@@ -278,8 +368,6 @@ namespace detail {
         data.overlay_shader.emplace(data.overlay_context, shader_fragment_default(), {}, _overlay_depth);
 #endif
     }
-
-
 
     void update_hotswap_frame(const std::filesystem::path& serialize_path, widget_update_data& root_updatable)
     {
@@ -327,21 +415,20 @@ namespace detail {
     void update_process_frame(pipeline_data& data, const float2 viewport_size, const BUNGEEGUM_USE_TIME_UNIT& delta_time, const bool force_rendering, const bool exclusive_rendering)
     {
         global_manager_data& _global = global();
-		pipeline_data& _pipeline = _global.pipelines.current.value().get();
+        pipeline_data& _pipeline = _global.pipelines.current.value().get();
         _pipeline.steps_chronometer.new_frame();
         _pipeline.widgets_chronometer.new_frame();
-			
-		
-		if constexpr (BUNGEEGUM_USE_OVERLAY || force_rendering) {
-			widget_update_data& _root_updatable = _pipeline.root_updatable.value().get();
-			_global.widgets.drawables = { { _root_updatable.raw, std::ref(_root_updatable) } };
-		}
-		process_widgets(viewport_size, delta_time, data.root_updatable.value());
-		if (!_global.widgets.drawables.empty()) {
+
+        if constexpr (BUNGEEGUM_USE_OVERLAY || force_rendering) {
+            widget_update_data& _root_updatable = _pipeline.root_updatable.value().get();
+            _global.widgets.drawables = { { _root_updatable.raw, std::ref(_root_updatable) } };
+        }
+        process_widgets(viewport_size, delta_time, data.root_updatable.value());
+        if (!_global.widgets.drawables.empty()) {
             _pipeline.steps_chronometer.begin_task("draw pass");
             if (exclusive_rendering) {
-				data.pipeline_renderer.clear_screen();
-			}
+                data.pipeline_renderer.clear_screen();
+            }
 
             data.user_context.new_frame();
             data.user_context.use_projection_orthographic();
@@ -358,99 +445,28 @@ namespace detail {
             data.overlay_context.render();
 #endif
 
-			if (exclusive_rendering) {
-            	data.pipeline_renderer.present();
-			}
+            if (exclusive_rendering) {
+                data.pipeline_renderer.present();
+            }
             _pipeline.steps_chronometer.end_task("draw pass");
         }
     }
 }
 
-#if BUNGEEGUM_USE_DIRECTX
-template <>
-pipeline& pipeline::setup<renderer_backend::directx11>(const pipeline_provider& provider)
+pipeline& pipeline::emplace(const renderer_backend backend, const pipeline_bindings& provider)
 {
     detail::setup_global_if_required();
     detail::setup_window(_data.pipeline_window, provider);
-    if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
-        // _data.pipeline_renderer.attach_directx11(_data.pipeline_window,
-        //     provider.directx_device_ptr,
-        //     provider.directx_swapchain_ptr);
-    } else {
-        _data.pipeline_renderer.emplace_new_directx11(_data.pipeline_window);
-    }
+    detail::setup_renderer(_data, backend, provider);
 #if BUNGEEGUM_USE_OVERLAY
     _data.overlay_context.emplace(_data.pipeline_renderer, nullptr);
     detail::setup_overlay(_data.overlay_context);
 #endif
+    _data.raw = detail::raw_cast(this);
     _data.user_context.emplace(_data.pipeline_renderer, nullptr);
     detail::setup_shaders(_data);
-    _data.raw = detail::raw_cast(this);
-	detail::global_manager_data& _global = detail::global();
-	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
-    return *this;
-}
-
-template <>
-pipeline& pipeline::setup<renderer_backend::directx12>(const pipeline_provider& provider)
-{
-    detail::setup_global_if_required();
-    detail::setup_window(_data.pipeline_window, provider);
-    if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
-        // _data.pipeline_renderer.attach_directx12(_data.pipeline_window,
-        //     provider.directx_device_ptr,
-        //     provider.directx_swapchain_ptr);
-    } else {
-        _data.pipeline_renderer.emplace_new_directx12(_data.pipeline_window);
-    }
-#if BUNGEEGUM_USE_OVERLAY
-    detail::setup_overlay(_data.overlay_context);
-#endif
-    _data.user_context.emplace(_data.pipeline_renderer, nullptr);
-    detail::setup_shaders(_data);
-    _data.raw = detail::raw_cast(this);
-	detail::global_manager_data& _global = detail::global();
-	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
-    return *this;
-}
-#endif
-
-template <>
-pipeline& pipeline::setup<renderer_backend::opengl>(const pipeline_provider& provider)
-{
-#if !BUNGEEGUM_USE_OPENGL
-    static_assert(false, "DirectX must be enabled");
-#endif
-    detail::setup_global_if_required();
-    detail::setup_window(_data.pipeline_window, provider);
-    if (provider.opengl_attach_to_existing) {
-        // _data.pipeline_renderer.attach_opengl(_data.pipeline_window);
-    } else {
-        _data.pipeline_renderer.emplace_new_opengl(_data.pipeline_window);
-    }
-#if BUNGEEGUM_USE_OVERLAY
-	_data.overlay_context.emplace(_data.pipeline_renderer, nullptr);
-    detail::setup_overlay(_data.overlay_context);
-#endif
-    _data.user_context.emplace(_data.pipeline_renderer, nullptr);
-    detail::setup_shaders(_data);
-    _data.raw = detail::raw_cast(this);
-	detail::global_manager_data& _global = detail::global();
-	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
-    return *this;
-}
-
-template <>
-pipeline& pipeline::setup<renderer_backend::vulkan>(const pipeline_provider& provider)
-{
-    detail::setup_global_if_required();
-    detail::setup_window(_data.pipeline_window, provider);
-
-    detail::setup_shaders(_data);
-    _data.raw = detail::raw_cast(this);
-	detail::global_manager_data& _global = detail::global();
-	_global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
-    // TODO
+    detail::global_manager_data& _global = detail::global();
+    _global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
     return *this;
 }
 
@@ -461,7 +477,7 @@ void pipeline::run(const std::optional<unsigned int> frames_per_second, const bo
     }
     _data.pipeline_window.update_loop(frames_per_second, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
         detail::protect_library([this, &delta_time, force_rendering]() {
-			detail::global().pipelines.current = std::ref(_data);
+            detail::global().pipelines.current = std::ref(_data);
             detail::update_input_frame(_data);
             float2 _viewport_size = _data.pipeline_window.get_size();
             detail::update_process_frame(_data, _viewport_size, delta_time, force_rendering, true);
@@ -476,8 +492,8 @@ pipeline& pipeline::run_once(const bool force_rendering)
         // throw
     }
     _data.pipeline_window.update_once(9999u, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
-        detail::protect_library([this, &delta_time, force_rendering]() {			
-			detail::global().pipelines.current = std::ref(_data);
+        detail::protect_library([this, &delta_time, force_rendering]() {
+            detail::global().pipelines.current = std::ref(_data);
             detail::update_input_frame(_data);
             float2 _viewport_size = _data.pipeline_window.get_size();
             detail::update_process_frame(_data, _viewport_size, delta_time, force_rendering, false);

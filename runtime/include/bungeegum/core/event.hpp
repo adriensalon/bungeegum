@@ -21,6 +21,33 @@ struct event {
     /// for std::future and std::shared_future
     using future_values = detail::variadic_reduce_t<values_t...>;
 
+    /// @brief
+    event() = default;
+
+    /// @brief
+    event(const on_trigger_callback& trigger_callback);
+
+    /// @brief
+    event(const event& other) = default;
+
+    /// @brief
+    event& operator=(const event& other) = default;
+
+    /// @brief
+    event(event&& other) = default;
+
+    /// @brief
+    event& operator=(event&& other) = default;
+    
+    /// @brief Gets a reference to stored callbacks.
+    std::vector<on_trigger_callback>& get_callbacks();
+
+    /// @brief Gets a const reference to stored callbacks.
+    const std::vector<on_trigger_callback>& get_callbacks() const;
+
+    /// @brief
+    bool is_waiting() const;
+
     /// @brief Merges another event by adding its callbacks.
     event& merge(const event& other);
 
@@ -39,13 +66,10 @@ struct event {
     /// @brief Triggers all contained callbacks on future completion with the resulting values.
     event& trigger(const std::shared_future<future_values>& shared_future_value);
 
-    /// @brief Gets a reference to stored callbacks.
-    std::vector<on_trigger_callback>& callbacks();
-
-    /// @brief Gets a const reference to stored callbacks.
-    const std::vector<on_trigger_callback>& callbacks() const;
 
 private:
+    template <typename... values_t>
+    friend struct detail::event_access;
     detail::event_data<values_t...> _data;
 };
 }

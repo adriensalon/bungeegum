@@ -7,45 +7,36 @@
 
 namespace bungeegum {
 
-struct shader_resource;
 struct shader;
 
 namespace detail {
 
-    struct shader_blend_options_data {
-        shader_blend_descriptor options = {};
-    };
-
-    struct shader_resource_data {
-        std::string fragment = {};
-        shader_blend_descriptor blend = {};
-    };
-
     struct shader_data {
-        shader_data() = default;
-        shader_data(const shader_data& other) = default; // NOOOO deep copy
-        shader_data& operator=(const shader_data& other) = default; // NOOOO deep copy
-        shader_data(shader_data&& other) = default;
-        shader_data& operator=(shader_data&& other) = default;
+        shader_data();
+        shader_data(const shader_data& other);
+        shader_data& operator=(const shader_data& other);
+        shader_data(shader_data&& other);
+        shader_data& operator=(shader_data&& other);
+        ~shader_data();
 
+        std::uintptr_t raw = 0u;
         std::unordered_map<std::uintptr_t, shader_handle> shaders = {};
+        bool is_compiled = false;
+        std::string creation_fragment = {};
+        shader_blend_descriptor creation_blend = {};
     };
 
-    struct shader_depth_options_access {
-    };
+    struct shaders_manager_data {
+        shaders_manager_data() = default;
+        shaders_manager_data(const shaders_manager_data& other) = delete;
+        shaders_manager_data& operator=(const shaders_manager_data& other) = delete;
+        shaders_manager_data(shaders_manager_data&& other) = delete;
+        shaders_manager_data& operator=(shaders_manager_data&& other) = delete;
 
-    struct shader_stencil_options_access {
-    };
-
-    struct shader_resource_access {
-        [[nodiscard]] static shader_resource make_from_data(const shader_resource_data& data);
-        [[nodiscard]] static shader_resource_data& get_data(shader_resource& object);
-        [[nodiscard]] static const shader_resource_data& get_data(const shader_resource& object);
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<shader_data>> shaders = {};
     };
 
     struct shader_access {
-        [[nodiscard]] static shader make_from_data(const shader_data& data);
-        [[nodiscard]] static shader_data& get_data(shader& object);
         [[nodiscard]] static const shader_data& get_data(const shader& object);
     };
 

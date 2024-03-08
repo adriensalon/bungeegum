@@ -3,7 +3,6 @@
 #include <algorithm>
 
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/glue/raw.hpp>
 
 namespace bungeegum {
 namespace detail {    
@@ -15,7 +14,7 @@ namespace detail {
         using future_iterator = typename std::vector<std::future<typename event<values_t...>::future_values>>::iterator;
         using shared_future_iterator = typename std::vector<std::shared_future<typename event<values_t...>::future_values>>::iterator;
         
-        data.update_data.ticker = [&]() {
+        data.update_data.ticker = [&data](events_manager_data& manager_data) {
 
             for (future_iterator _future_it = data.futures.begin(); _future_it != data.futures.end();) {
                 if (_future_it->wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
@@ -32,10 +31,7 @@ namespace detail {
                                 _callback_it(std::forward<values_t>(_vals)...);
                         }
                     }
-                    _future_it = data.futures.erase(_future_it);
-                    if (data.futures.empty() && data.shared_futures.empty()) {
-                        global().events.updatables_to_erase.push_back(data.raw);
-                    }
+                    _future_it = data.futures.erase(_future_it);                    
                 } else
                     _future_it++;
             }
@@ -56,11 +52,13 @@ namespace detail {
                         }
                     }
                     _shared_future_it = data.shared_futures.erase(_shared_future_it);
-                    if (data.futures.empty() && data.shared_futures.empty()) {
-                        global().events.updatables_to_erase.push_back(data.raw);
-                    }
                 } else
                     _shared_future_it++;
+            }
+            
+            if (data.futures.empty() && data.shared_futures.empty()) {
+                manager_data.updatables_to_erase.push_back(data.raw);
+                return;
             }
         };
     }
@@ -69,7 +67,7 @@ namespace detail {
     event_data<values_t...>::event_data()
     {        
         raw = raw_cast(this); // create a new id
-        (_data.update_data.kinds.push_back(typeid(values_t)), ...);
+        (update_data.kinds.push_back(typeid(values_t)), ...);
     }
 
     template <typename... values_t>
@@ -82,8 +80,8 @@ namespace detail {
     event_data<values_t...>& event_data<values_t...>::operator=(const event_data<values_t...>& other)
     {
         raw = raw_cast(this); // create a new id
+        update_data.kinds = other.update_data.kinds;
         callbacks = other.callbacks;
-        (_data.update_data.kinds.push_back(typeid(values_t)), ...);
         return *this;
     }
 
@@ -118,6 +116,20 @@ namespace detail {
         }
     }
 }
+
+template <typename... values_t>
+std::vector<std::function<void(const values_t&...)>>& event<values_t...>::get_callbacks()
+{
+    return _data.callbacks;
+}
+
+template <typename... values_t>
+const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::get_callbacks() const
+{
+    return _data.callbacks;
+}
+
+// is waiting
 
 template <typename... values_t>
 event<values_t...>& event<values_t...>::merge(const event<values_t...>& other)
@@ -192,17 +204,5 @@ event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_
 #endif
     _data.shared_futures.push_back(shared_future_value);
     return *this;
-}
-
-template <typename... values_t>
-std::vector<std::function<void(const values_t&...)>>& event<values_t...>::callbacks()
-{
-    return _data.callbacks;
-}
-
-template <typename... values_t>
-const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::callbacks() const
-{
-    return _data.callbacks;
 }
 }

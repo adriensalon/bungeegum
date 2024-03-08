@@ -13,13 +13,13 @@ namespace bungeegum {
 namespace detail {
 
     struct global_manager_data {
-        animations_manager animations = {};
-        events_manager events = {};
+        animations_manager_data animations = {};
+        events_manager_data events = {};
+        fonts_manager_data fonts = {};
         log_manager_data logs = {};
         pipeline_manager_data pipelines = {};
+        textures_manager_data textures = {};
         widget_manager_data widgets = {};
-        font_manager_data fonts = {};
-        texture_manager_data textures = {};
     };
 
     void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)

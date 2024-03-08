@@ -1,11 +1,11 @@
 #pragma once
 
-#include <tinysplinecxx.h> // replace by custom impl
 
 #include <array>
 #include <cstddef>
 #include <chrono>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <bungeegum/core/math.hpp>
@@ -15,35 +15,14 @@ namespace bungeegum {
 
 enum struct animation_mode;
 
+template <typename value_t>
+struct animation;
+
 namespace detail {
-
-	using curve_data = tinyspline::BSpline;
-
-    template <typename value_t>
-    struct animation_data {
-        animation_data() = default;
-        animation_data(const animation_data& other) = default;
-        animation_data& operator=(const animation_data& other) = default;
-        animation_data(animation_data&& other) = default;
-        animation_data& operator=(animation_data&& other) = default;
-        ~animation_data();
-
-        std::uintptr_t raw = 0;
-        std::unique_ptr<value_t> min_value = nullptr;
-        std::unique_ptr<value_t> max_value = nullptr;
-        event_data<value_t> on_value_changed_event;
-        event_data<> on_end_event;
-        curve_data bspline = {};
-        float duration_seconds = 0.f;
-        bool is_playing = false;
-        float playing_cursor_seconds = 0.f;
-		animation_mode mode = {};
-    };
 
     struct animation_update_data {
         std::unique_ptr<std::type_index> kind = nullptr;
         std::function<void(const std::chrono::milliseconds&)> ticker = nullptr;
-
 #if BUNGEEGUM_USE_OVERLAY
         std::string clean_typename = {};
         std::vector<float> overlay_samples = {};
@@ -51,32 +30,42 @@ namespace detail {
 #endif
     };
 
-    struct animations_manager {
-        animations_manager() = default;
-        animations_manager(const animations_manager& other) = delete;
-        animations_manager& operator=(const animations_manager& other) = delete;
-        animations_manager(animations_manager&& other) = delete;
-        animations_manager& operator=(animations_manager&& other) = delete;
+    template <typename value_t>
+    struct animation_data {
+        animation_data();
+        animation_data(const animation_data& other);
+        animation_data& operator=(const animation_data& other);
+        animation_data(animation_data&& other);
+        animation_data& operator=(animation_data&& other);
+        ~animation_data();
 
-        using const_iterator = std::unordered_map<std::uintptr_t, animation_update_data>::const_iterator;
+        std::uintptr_t raw = 0u;
+        std::optional<value_t> min_value = std::nullopt;
+        std::optional<value_t> max_value = std::nullopt;
+        event_data<value_t> on_value_changed_event = {};
+        event_data<> on_end_event = {};
+        curve_data bspline = {};
+        float duration_seconds = 0.f;
+        bool is_playing = false;
+        float playing_cursor_seconds = 0.f;
+		animation_mode mode = animation_mode::forward;
+        animation_update_data update_data = {};
+    };
 
-        [[nodiscard]] const_iterator begin() const;
+    struct animations_manager_data {
+        animations_manager_data() = default;
+        animations_manager_data(const animations_manager_data& other) = delete;
+        animations_manager_data& operator=(const animations_manager_data& other) = delete;
+        animations_manager_data(animations_manager_data&& other) = delete;
+        animations_manager_data& operator=(animations_manager_data&& other) = delete;
 
-        [[nodiscard]] bool contains(const std::uintptr_t raw_animation) const;
-
-        [[nodiscard]] const_iterator end() const;
-
-        void notify_erase(const std::uintptr_t raw_animation);
-
-        [[nodiscard]] animation_update_data& operator[](const std::uintptr_t raw_animation);
-
-        std::size_t size() const;
-
-        void update(const std::chrono::milliseconds& delta_time);
-
-    private:
-        std::unordered_map<std::uintptr_t, animation_update_data> _updatables = {};
-        std::vector<std::uintptr_t> _updatables_to_erase = {};
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<animation_update_data>> updatables = {};
+        std::vector<std::uintptr_t> updatables_to_erase = {};
+    };
+    
+    template <typename value_t>
+    struct animation_access {
+        [[nodiscard]] static const animation_data<value_t>& get_data(const animation<value_t>& object);
     };
 }
 }

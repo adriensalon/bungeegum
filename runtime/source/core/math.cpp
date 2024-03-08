@@ -1,50 +1,21 @@
-#include <bungeegum/core/animation.hpp>
+#include <bungeegum/core/math.hpp>
 
-namespace bungeegum {
-namespace detail {
-
-    animations_manager::const_iterator animations_manager::begin() const
-    {
-        return _updatables.begin();
-    }
-
-    bool animations_manager::contains(const std::uintptr_t raw_animation) const
-    {
-        return _updatables.find(raw_animation) != _updatables.end();
-    }
-
-    animations_manager::const_iterator animations_manager::end() const
-    {
-        return _updatables.end();
-    }
-
-    void animations_manager::notify_erase(const std::uintptr_t raw_animation)
-    {
-        _updatables_to_erase.push_back(raw_animation);
-    }
-
-    animation_update_data& animations_manager::operator[](const std::uintptr_t raw_animation)
-    {
-        return _updatables[raw_animation];
-    }
-
-    std::size_t animations_manager::size() const
-    {
-        return _updatables.size();
-    }
-
-    void animations_manager::update(const std::chrono::milliseconds& delta_time)
-    {
-        // We cleanup first so that event objects whose lifetimes have expired
-        // are not iterated in the next step.
-        for (const std::uintptr_t& _raw_animation : _updatables_to_erase) {
-            _updatables.erase(_raw_animation);
-        }
-        _updatables_to_erase.clear();
-        for (std::pair<const uintptr_t, bungeegum::detail::animation_update_data>& _update_data : _updatables) {
-            _update_data.second.ticker(delta_time);
-        }
-    }
+namespace bungeegum { 
+    
+curve::curve(const curve_preset& preset)
+{
+    (void)preset;
+    // switch (preset)
+    // {
+    // case /* constant-expression */:
+    //     /* code */
+        
+    //     return curve({ { 0.f, 0.f }, { 1.f, 1.f } });
+    //     break;
+    
+    // default:
+    //     break;
+    // }
 }
 
 curve::curve(const std::vector<float>& strided_controls)
@@ -92,21 +63,21 @@ curve::curve(const float departure, const float arrival, const std::vector<float
     _data = tinyspline::BSpline::interpolateCubicNatural(_controls_data, 2);
 }
 
-curve curve::linear()
-{
-    return curve({ { 0.f, 0.f }, { 1.f, 1.f } });
-}
+// curve curve::linear()
+// {
+//     return curve({ { 0.f, 0.f }, { 1.f, 1.f } });
+// }
 
-curve curve::bounce_in()
-{
-    return curve(
-        {
-            { 0.f, 0.f },
-            { 0.5f, 0.8f },
-            { 0.8f, 0.6f },
-            { 1.f, 1.f },
-        }); // TODOOOOO
-}
+// curve curve::bounce_in()
+// {
+//     return curve(
+//         {
+//             { 0.f, 0.f },
+//             { 0.5f, 0.8f },
+//             { 0.8f, 0.6f },
+//             { 1.f, 1.f },
+//         }); // TODOOOOO
+// }
 
 float curve::evaluate_1d(const float fraction)
 {
@@ -126,4 +97,5 @@ std::vector<float> curve::get_strided_samples(const std::size_t count)
 {
     return (_data.sample(count));
 }
+
 }

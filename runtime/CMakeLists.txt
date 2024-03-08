@@ -35,12 +35,11 @@ set(bungeegum_runtime_source
 	"source/glue/rendering.cpp"
 	"source/glue/window.cpp"
 
-	"source/core/animation.cpp"
-	"source/core/event.cpp"
 	"source/core/font.cpp"
 	"source/core/global.cpp"
 	"source/core/hotswap.cpp"
 	"source/core/log.cpp"
+	"source/core/math.cpp"
 	"source/core/pipeline.cpp"
 	"source/core/shader.cpp"
 	"source/core/texture.cpp"

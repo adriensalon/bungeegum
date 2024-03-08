@@ -419,7 +419,7 @@ namespace detail {
 
         void draw_async_events_tab()
         {
-            const events_manager& _events_manager = global().events;
+            const events_manager_data& _events_manager = global().events;
             std::string _title = "async events (" + std::to_string(_events_manager.updatables.size()) + ")";
             if (ImGui::BeginTabItem((_title + tag("async_events_tab")).c_str())) {
 
@@ -435,11 +435,11 @@ namespace detail {
                 static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
                 if (ImGui::BeginTable(tag("async_events_table").c_str(), static_cast<int>(_args_count + 1), _table_flags)) {
 
-                    for (const std::pair<const uintptr_t, event_update_data>& _event_data : _events_manager.updatables) {
+                    for (const std::pair<const uintptr_t, std::reference_wrapper<event_update_data>>& _event_data : _events_manager.updatables) {
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
                         ImGui::Text("event");
-                        const std::vector<std::string>& _clean_typenames = _event_data.second.clean_typenames;
+                        const std::vector<std::string>& _clean_typenames = _event_data.second.get().clean_typenames;
                         int _index = 1;
                         for (const std::string& _clean_typename : _clean_typenames) {
                             ImGui::TableSetColumnIndex(_index);
@@ -455,12 +455,12 @@ namespace detail {
 
         void draw_running_animations_tab()
         {
-            const animations_manager& _animations_manager = global().animations;
-            std::string _title = "running animations (" + std::to_string(_animations_manager.size()) + ")";
+            const animations_manager_data& _animations_manager = global().animations;
+            std::string _title = "running animations (" + std::to_string(_animations_manager.updatables.size()) + ")";
             if (ImGui::BeginTabItem((_title + tag("running_animations_tab")).c_str())) {
                 static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
                 if (ImGui::BeginTable(tag("async_events_table").c_str(), 2, _table_flags)) {
-                    for (const std::pair<const uintptr_t, animation_update_data>& _animation_data : _animations_manager) {
+                    for (const std::pair<const uintptr_t, std::reference_wrapper<animation_update_data>>& _animation_data : _animations_manager.updatables) {
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
                         bool _selected = false;
@@ -474,8 +474,8 @@ namespace detail {
                                     ImPlot::SetupAxisLimits(ImAxis_X1, 0, 1, ImGuiCond_Always);
                                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
                                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
-                                    auto _samples = _animation_data.second.overlay_samples;
-                                    auto _point = _animation_data.second.overlay_position;
+                                    auto _samples = _animation_data.second.get().overlay_samples;
+                                    auto _point = _animation_data.second.get().overlay_position;
                                     ImPlot::PlotLine("", _samples.data(), &(_samples[1]), 100, 0, 0, 2 * sizeof(float));
                                     ImPlot::PlotScatter("", _point.data(), _point.data() + 1, 1, 0, 0, 2 * sizeof(float));
                                     ImPlot::EndPlot();
@@ -485,7 +485,7 @@ namespace detail {
                             }
                         }
                         ImGui::TableSetColumnIndex(1);
-                        ImGui::Text(_animation_data.second.clean_typename);
+                        ImGui::Text(_animation_data.second.get().clean_typename);
                     }
                     ImGui::EndTable();
                 }

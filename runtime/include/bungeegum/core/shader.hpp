@@ -4,50 +4,119 @@
 
 namespace bungeegum {
 
-// BLEND
+enum struct shader_blend_factor {
+    
+    /// The blend factor is zero.\n
+    zero,
+    
+    /// The blend factor is one.\n
+    one,
+    
+    /// The blend factor is RGB data from a pixel shader.\n
+    src_color,
+    
+    /// The blend factor is 1-RGB, where RGB is the data from a pixel shader.\n
+    inv_src_color,
+    
+    /// The blend factor is alpha (A) data from a render target.\n
+    src_alpha,
+    
+    /// The blend factor is 1-A, where A is alpha data from a pixel shader.\n
+    inv_src_alpha,
 
-/// @brief
-struct shader_resource {
+    /// The blend factor is RGB data from a render target.\n
+    dest_color,
 
-    /// @brief
-    /// @param source
-    /// @param args
-    /// @return
-    shader_resource& fragment(const std::string& source, std::initializer_list<int> args);
+    /// The blend factor is 1-RGB, where RGB is the data from a render target.\n
+    inv_dest_color,
+    
+    /// The blend factor is alpha (A) data from a render target.\n
+    dest_alpha,
 
-    /// @brief
-    /// @param options
-    /// @return
-    // shader_resource& blend(const shader_depth_options& options);
+    /// The blend factor is 1-A, where A is alpha data from a render target.\n
+    inv_dest_alpha,
+};
 
-    // uniforms
+enum struct shader_blend_operation {
 
-    // textures
+    /// Add source and destination color components.\n
+    add,
 
-private:
-    friend struct detail::shader_resource_access;
-    shader_resource(const detail::shader_resource_data& data);
-    detail::shader_resource_data _data;
+    /// Subtract destination color components from source color components.\n
+    subtract,
+
+    /// Subtract source color components from destination color components.\n
+    rev_subtract,
+
+    /// Compute the minimum of source and destination color components.\n
+    min,
+
+    /// Compute the maximum of source and destination color components.\n
+    max
+
 };
 
 /// @brief
-/// @details Deep copy + move
+struct shader_blend_options {
+
+    /// @brief
+    bool enable = false;
+
+    /// @brief
+    shader_blend_factor src = shader_blend_factor::src_alpha;
+
+    /// @brief
+    shader_blend_factor dest = shader_blend_factor::inv_src_alpha;
+
+    /// @brief
+    shader_blend_operation op = shader_blend_operation::add;
+
+    /// @brief
+    shader_blend_factor src_alpha = shader_blend_factor::inv_src_alpha;
+
+    /// @brief
+    shader_blend_factor dest_alpha = shader_blend_factor::zero;
+
+    /// @brief
+    shader_blend_operation alpha_op = shader_blend_operation::add;
+};
+
+/// @brief
 struct shader {
 
+    /// @brief
+    shader() = default;
+
     /// @brief 
-    /// @param resource 
-    /// @return 
-    shader& emplace(const shader_resource& resource);
+    /// @param fragment 
+    /// @param blend 
+    shader(const std::string& fragment, const shader_blend_options& blend = {});
+
+    /// @brief
+    /// @param other
+    shader(const shader& other) = default;
+
+    /// @brief
+    /// @param other
+    shader& operator=(const shader& other) = default;
+
+    /// @brief
+    /// @param other
+    shader(shader&& other) = default;
+
+    /// @brief
+    /// @param other
+    shader& operator=(shader&& other) = default;
+
+    /// @brief 
+    /// @param fragment 
+    /// @param blend 
+    shader& compile(const std::string& fragment, const shader_blend_options& blend = {});
     
     /// @brief Gets if this shader has a value. Default created shaders don't have a value until 
     /// the emplace() method is called. Shaders don't have a value anymore after the reset() method
     /// is called
-    [[nodiscard]] bool has_value() const;
-
-    /// @brief Resets this shader if it has a value. Default created shaders don't have a value 
-    /// until the emplace() method is called. Shaders don't have a value anymore after the reset()
-    /// method is called
-    shader& reset();
+    [[nodiscard]] bool is_compiled() const;
 
     /// @brief
     /// @tparam value_t
@@ -59,7 +128,6 @@ struct shader {
 
 private:
     friend struct detail::shader_access;
-    shader(const detail::shader_data& data);
     detail::shader_data _data;
 };
 
