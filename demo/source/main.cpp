@@ -1,6 +1,8 @@
 #include <bungeegum/bungeegum.hpp>
 #include <bungeegum_widgets/bungeegum_widgets.hpp>
 
+#include <myfont.cpp>
+
 #include <iostream>
 #include <sstream>
 
@@ -88,6 +90,14 @@ struct Composed {
 
 struct drawerwidget {
 
+    bungeegum::font myfont;
+
+    drawerwidget& build()
+    {
+        myfont.compile(myfont_compressed_data, myfont_compressed_size, 17.f);
+        return *this;
+    }
+
     void draw(bungeegum::draw_command& command)
     {
         bungeegum::float2 _min_point = bungeegum::float2 { 500.f, 500.f };
@@ -99,7 +109,7 @@ struct drawerwidget {
         
         command.use_shader_default();
         command.draw_rect_filled(_min_point, _max_point_2, { 1.f, 0.5f, 0.5f, 1.f });
-
+        command.draw_text(myfont, 17.f, { 400, 500 }, { 1.f, 0.5f, 1.f, 1.f }, "HELLO GuYS");
         // bungeegum::log_error("yaaaaa");
     }
 
@@ -183,7 +193,9 @@ int main()
     }));
 
 
-    _my_pipeline.root(bungeegum::make<drawerwidget>());
+
+
+    _my_pipeline.root(bungeegum::make<drawerwidget>().build());
     // _my_pipeline.run(60, true);
     _my_pipeline.run();
 

@@ -22,6 +22,7 @@ namespace detail {
         
         std::uintptr_t raw = 0u;
         std::unordered_map<std::uintptr_t, font_handle> fonts = {};
+        bool is_compiled = false;
         void* creation_ttf = nullptr;
         std::size_t creation_count = 0u;
         float creation_size = 0.f;

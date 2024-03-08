@@ -85,12 +85,12 @@ namespace detail {
             return _retval;
         }
 
-        void reset_shaders(shader_data* data)
+        void reset_shaders(shader_data& data)
         {
-            for (std::pair<const std::uintptr_t, shader_handle>& _it : data->shaders) {
+            for (std::pair<const std::uintptr_t, shader_handle>& _it : data.shaders) {
                 _it.second.reset();
             }
-            data->shaders.clear();
+            data.shaders.clear();
         }
     }
 
@@ -111,7 +111,7 @@ namespace detail {
 
     shader_data& shader_data::operator=(const shader_data& other)
     {
-        reset_shaders(this);
+        reset_shaders(*this);
         raw = raw_cast(this); // create a new id
         is_compiled = other.is_compiled;
         creation_fragment = other.creation_fragment;
@@ -136,7 +136,7 @@ namespace detail {
 
     shader_data& shader_data::operator=(shader_data&& other)
     {        
-        reset_shaders(this);
+        reset_shaders(*this);
         raw = other.raw; // keep the same id
         is_compiled = std::move(other.is_compiled);
         creation_fragment = std::move(other.creation_fragment);
@@ -147,14 +147,14 @@ namespace detail {
 
     shader_data::~shader_data()
     {
-        reset_shaders(this);
+        reset_shaders(*this);
     }
 
 }
 
 shader& shader::compile(const std::string& fragment, const shader_blend_options& blend)
 {
-    reset_shaders(this);
+    detail::reset_shaders(_data);
     _data.creation_fragment = fragment;
     _data.creation_blend = detail::convert_to_blend_options(blend);
     detail::global_manager_data& _global = detail::global();

@@ -12,6 +12,9 @@ struct texture {
 	
 	/// @brief
 	texture(const std::vector<unsigned char>& pixels, const uint2 size);
+	
+	/// @brief
+	texture(const void* handle);
 
 	/// @brief
 	texture(const texture& other) = default;
@@ -27,6 +30,9 @@ struct texture {
 	
 	/// @brief
 	texture& compile(const std::vector<unsigned char>& pixels, const uint2 size);
+
+	/// @brief
+	texture& import(const void* handle);
 		
 	/// @brief
     [[nodiscard]] bool is_compiled() const;
