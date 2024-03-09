@@ -1,19 +1,8 @@
 project(bungeegum_demo)
 
-add_subdirectory("external")
-
-set(bungeegum_demo_source
-	"source/main.cpp"
-
-	"static/myfont.cpp"
-)
-
-add_executable(bungeegum_demo ${bungeegum_demo_source})
-
+add_executable(bungeegum_demo "source/main.cpp")
 target_include_directories(bungeegum_demo PRIVATE "static")
-
 set_property(TARGET bungeegum_demo PROPERTY CXX_STANDARD 17)
-
 target_link_libraries(bungeegum_demo bungeegum_runtime)
 target_link_libraries(bungeegum_demo bungeegum_widgets)
 

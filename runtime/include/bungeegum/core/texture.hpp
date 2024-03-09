@@ -29,6 +29,9 @@ struct texture {
 	texture& operator=(texture&& other) = default;
 	
 	/// @brief
+	texture& compile(const std::filesystem::path& filename);
+	
+	/// @brief
 	texture& compile(const std::vector<unsigned char>& pixels, const uint2 size);
 
 	/// @brief

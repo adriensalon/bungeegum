@@ -21,10 +21,12 @@ namespace detail {
         texture_data& operator=(texture_data&& other);
         ~texture_data();
 
+        std::uintptr_t raw = 0u;
         std::unordered_map<std::uintptr_t, texture_handle> textures = {};
-		std::size_t height = 0;
-		std::size_t width = 0;
-		std::vector<unsigned char> pixels = {};
+        bool is_compiled = false;
+		std::filesystem::path creation_filename = {};
+		std::vector<unsigned char> creation_pixels = {};
+		uint2 creation_size = zero<uint2>;
     };
 
 	struct textures_manager_data {
