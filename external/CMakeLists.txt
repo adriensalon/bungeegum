@@ -3,6 +3,7 @@ add_subdirectory("imgui")
 add_subdirectory("implot")
 add_subdirectory("tinyspline")
 add_subdirectory("cereal")
+add_subdirectory("stb")
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 	if(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE MATCHES "Debug") # CMake defaults undefined build type to Debug

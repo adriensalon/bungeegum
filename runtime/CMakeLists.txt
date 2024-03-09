@@ -65,6 +65,7 @@ set_property(TARGET bungeegum_runtime PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(bungeegum_runtime glm)
 target_link_libraries(bungeegum_runtime imgui)
+target_link_libraries(bungeegum_runtime stb_image)
 target_link_libraries(bungeegum_runtime tinysplinecxx)
 target_link_libraries(bungeegum_runtime Diligent-BuildSettings)
 target_link_libraries(bungeegum_runtime Diligent-Common)

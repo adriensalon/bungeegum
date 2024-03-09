@@ -12,7 +12,7 @@
 #include <imgui.h>
 #include <implot.h>
 
-
+#include <stb_image.h>
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN && !defined(PLATFORM_EMSCRIPTEN)
 #define PLATFORM_EMSCRIPTEN
@@ -336,6 +336,49 @@ namespace detail {
 
     void font_handle::emplace(
         rasterizer_handle& rasterizer,
+        const std::filesystem::path& filename,
+        const float size,
+        const std::optional<font_config>& config,
+        unsigned short* ranges)
+    {
+        if (!rasterizer.has_value()) {
+            throw backtraced_exception { "[rendering] Impossible to create font because rasterizer has no value" };
+        }
+        reset();
+
+        int _raw_width, _raw_height = 0;
+        unsigned char* _raw_pixels = nullptr;
+        ImGui::SetCurrentContext(rasterizer._imgui_context);
+        ImGuiIO& _io = ImGui::GetIO();
+
+        std::string _spath = filename.generic_string();
+        const char* _cpath = _spath.c_str();
+        ImFontConfig _imgui_config; 
+        if (config.has_value()) {
+            const font_config& _font_config = config.value();      
+            _imgui_config.FontNo = static_cast<int>(_font_config.index);
+            _imgui_config.OversampleH = static_cast<int>(_font_config.oversample_horizontal);
+            _imgui_config.OversampleV = static_cast<int>(_font_config.oversample_vertical);
+            _imgui_config.PixelSnapH = _font_config.pixel_snap_horizontal;
+            _imgui_config.GlyphExtraSpacing = ImVec2 { _font_config.glyph_extra_spacing.x, _font_config.glyph_extra_spacing.y };
+            _imgui_config.GlyphOffset = ImVec2 { _font_config.glyph_extra_spacing.x, _font_config.glyph_extra_spacing.y };
+            _imgui_config.GlyphMinAdvanceX = _font_config.glyph_min_advance; // Use if you want to make the icon monospaced
+        }
+        _imgui_font = _io.Fonts->AddFontFromFileTTF(_cpath, size, &_imgui_config, ranges);
+
+        _io.Fonts->Build();
+        _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
+        rasterizer._font_texture.emplace(
+            rasterizer,
+            std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)),
+            static_cast<std::size_t>(_raw_width),
+            static_cast<std::size_t>(_raw_height));
+        _io.Fonts->TexID = rasterizer._font_texture.get();
+        _has_value = true;
+    }
+    
+    void font_handle::emplace(
+        rasterizer_handle& rasterizer,
         const void* ttf,
         const std::size_t count,
         const float size,
@@ -396,6 +439,40 @@ namespace detail {
             _imgui_font = nullptr;
             _has_value = false;
         }
+    }
+    
+    void texture_handle::emplace(
+        rasterizer_handle& rasterizer,
+        const std::filesystem::path filename)
+    {
+        if (!rasterizer.has_value()) {
+            throw backtraced_exception { "[rendering exception] impossible to create texture because rasterizer has no value" };
+        }
+        reset();
+
+        std::string _spath = filename.generic_string();
+        const char* _cpath = _spath.c_str();
+        int _width, _height, _channels;
+        unsigned char* _data = stbi_load(_cpath, &_width, &_height, &_channels, 4);
+        if (_channels < 3 || _channels > 4) {
+            throw backtraced_exception("invalid channels");
+        }
+        std::vector<unsigned char> _pixels(_data, _data + 4 * _width * _height);
+        stbi_image_free(_data);
+
+        Diligent::TextureDesc _texture_desc;
+        _texture_desc.Name = "uiw user texture";
+        _texture_desc.Type = Diligent::RESOURCE_DIM_TEX_2D;
+        _texture_desc.Width = static_cast<Diligent::Uint32>(_width);
+        _texture_desc.Height = static_cast<Diligent::Uint32>(_height);
+        _texture_desc.Format = Diligent::TEX_FORMAT_RGBA8_UNORM;
+        _texture_desc.BindFlags = Diligent::BIND_SHADER_RESOURCE;
+        _texture_desc.Usage = Diligent::USAGE_IMMUTABLE;
+        Diligent::TextureSubResData _texture_subres_data[] = { { _pixels.data(), 4 * Diligent::Uint64 { _texture_desc.Width } } };
+        Diligent::TextureData _texture_data(_texture_subres_data, _countof(_texture_subres_data));
+        rasterizer._diligent_render_device->CreateTexture(_texture_desc, &_texture_data, &_diligent_texture);
+        _diligent_texture_view = _diligent_texture->GetDefaultView(Diligent::TEXTURE_VIEW_SHADER_RESOURCE);
+        _has_value = true;
     }
 
     void texture_handle::emplace(

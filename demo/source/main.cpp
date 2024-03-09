@@ -91,10 +91,12 @@ struct Composed {
 struct drawerwidget {
 
     bungeegum::font myfont;
+    // bungeegum::texture mytexture;
 
     drawerwidget& build()
     {
-        myfont.compile(myfont_compressed_data, myfont_compressed_size, 17.f);
+        myfont.compile("D:/bungeegum/demo/static/Lobster.ttf", 17.f);
+        // myfont.compile(myfont_compressed_data, myfont_compressed_size, 17.f);
         return *this;
     }
 

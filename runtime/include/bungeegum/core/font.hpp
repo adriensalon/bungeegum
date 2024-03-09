@@ -26,6 +26,9 @@ struct font {
 	font& operator=(font&& other) = default;
 
 	/// @brief
+	font& compile(const std::filesystem::path& filename, const float size);
+
+	/// @brief
 	font& compile(const void* ttf, const std::size_t count, const float size);
 
 	/// @brief

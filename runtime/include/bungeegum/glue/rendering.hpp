@@ -175,6 +175,18 @@ namespace detail {
         font_handle(font_handle&& other) = default;
         font_handle& operator=(font_handle&& other) = default;
 
+        /// @brief 
+        /// @param path 
+        /// @param size 
+        /// @param config 
+        /// @param ranges 
+        void emplace(
+            rasterizer_handle& rasterizer,
+            const std::filesystem::path& filename,
+            const float size,
+            const std::optional<font_config>& config = std::nullopt,
+            unsigned short* ranges = nullptr);
+
         /// @brief
         /// @param rasterizer
         /// @param ttf
@@ -216,6 +228,15 @@ namespace detail {
         texture_handle& operator=(const texture_handle& other) = default;
         texture_handle(texture_handle&& other) = default;
         texture_handle& operator=(texture_handle&& other) = default;
+
+        /// @brief
+        /// @param rasterizer
+        /// @param pixels
+        /// @param width
+        /// @param height
+        void emplace(
+            rasterizer_handle& rasterizer,
+            const std::filesystem::path filename);
 
         /// @brief
         /// @param rasterizer
@@ -339,6 +360,19 @@ namespace detail {
         shader_handle& operator=(const shader_handle& other) = default;
         shader_handle(shader_handle&& other) = default;
         shader_handle& operator=(shader_handle&& other) = default;
+
+        /// @brief
+        /// @param rasterizer
+        /// @param filename
+        /// @param blend
+        /// @param depth
+        /// @param stencil
+        void emplace(
+            rasterizer_handle& rasterizer,
+            const std::filesystem::path& filename,
+            const shader_blend_descriptor& blend = {},
+            const shader_depth_descriptor& depth = {},
+            const shader_stencil_descriptor& stencil = {});
 
         /// @brief
         /// @param rasterizer
