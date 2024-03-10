@@ -11,10 +11,10 @@ struct texture {
 	texture() = default;
 	
 	/// @brief
-	texture(const std::vector<unsigned char>& pixels, const uint2 size);
+	texture(const std::filesystem::path& filename);
 	
 	/// @brief
-	texture(const void* handle);
+	texture(const std::vector<unsigned char>& pixels, const uint2 size);
 
 	/// @brief
 	texture(const texture& other) = default;
@@ -33,9 +33,6 @@ struct texture {
 	
 	/// @brief
 	texture& compile(const std::vector<unsigned char>& pixels, const uint2 size);
-
-	/// @brief
-	texture& import(const void* handle);
 		
 	/// @brief
     [[nodiscard]] bool is_compiled() const;
@@ -47,6 +44,8 @@ private:
 	friend struct detail::texture_access;
 	detail::texture_data _data;
 };
+
+
 	
 	
 }

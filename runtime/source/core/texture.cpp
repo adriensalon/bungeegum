@@ -82,6 +82,16 @@ namespace detail {
     }
 }
 
+texture::texture(const std::filesystem::path& filename)
+{
+    compile(filename);
+}
+
+texture::texture(const std::vector<unsigned char>& pixels, const uint2 size)
+{
+    compile(pixels, size);
+}
+
 texture& texture::compile(const std::filesystem::path& filename)
 {
     detail::global_manager_data& _global = detail::global();
@@ -109,11 +119,25 @@ texture& texture::compile(const std::vector<unsigned char>& pixels, const uint2 
     _data.creation_pixels = pixels;
     _data.creation_size = size;
     return *this;
-        // texture_view = pFontTex->GetDefaultView(Diligent::TEXTURE_VIEW_SHADER_RESOURCE);
-        // rnd._diligent_texture_resource.Release();
-        // rnd._diligent_ignore_stencil_pipeline->CreateShaderResourceBinding(&(rnd._diligent_texture_resource), true);
-        // rnd._diligent_texture_variable = rnd._diligent_texture_resource->GetVariableByName(Diligent::SHADER_TYPE_PIXEL, "Texture");
-        // VERIFY_EXPR(rnd._diligent_texture_variable != nullptr);
+}
+
+bool texture::is_compiled() const
+{
+    return _data.is_compiled;
+}
+
+texture& texture::region(const std::vector<unsigned char>& pixels, const uint2 min_point, const uint2 max_point)
+{
+    (void)pixels;
+    (void)min_point;
+    (void)max_point;
+    // for (std::pair<const std::uintptr_t, detail::texture_handle>& _it : _data.textures) {
+	// 	_it.second.region(
+	// 		pixels, 
+	// 		static_cast<std::size_t>(size.x), 
+	// 		static_cast<std::size_t>(size.y));
+    // }
+    return *this;
 }
 
 }

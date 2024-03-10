@@ -4,6 +4,7 @@
 
 namespace bungeegum {
 
+/// @brief
 enum struct shader_blend_factor {
     
     /// The blend factor is zero.\n
@@ -37,6 +38,7 @@ enum struct shader_blend_factor {
     inv_dest_alpha,
 };
 
+/// @brief
 enum struct shader_blend_operation {
 
     /// Add source and destination color components.\n
