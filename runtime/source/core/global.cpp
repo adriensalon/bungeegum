@@ -13,8 +13,11 @@ namespace detail {
             std::wstringstream _setup_stream;
             __bungeegum_global_manager.widgets.hotswap_reloader = std::make_unique<detail::reloader>(_setup_stream.rdbuf());
             std::string _setup_str = narrow(_setup_stream.str());
-			__bungeegum_global_manager.logs.hotswap_output.push_back(std::move(_setup_str));
-        	__bungeegum_global_manager.widgets.hotswap_reloader->set_global_data(&__bungeegum_global_manager);
+            std::cout << _setup_str << std::endl;
+			// __bungeegum_global_manager.pipelines.hotswap_output.push_back(std::move(_setup_str));
+        	
+            // mandatory !!
+            __bungeegum_global_manager.widgets.hotswap_reloader->set_global_data(&__bungeegum_global_manager);
         }
 #endif
     }

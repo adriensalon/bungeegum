@@ -88,15 +88,8 @@ struct Composed {
 
 struct drawerwidget {
 
-    bungeegum::font myfont;
-    bungeegum::texture mytexture;
-
-    drawerwidget& build()
-    {
-        myfont.compile("D:/bungeegum/demo/static/Lobster.ttf", 17.f);
-        mytexture.compile("D:/bungeegum/demo/static/Image.jpg");
-        return *this;
-    }
+    bungeegum::font myfont = { "D:/bungeegum/demo/static/Lobster.ttf", 17.f };
+    bungeegum::texture mytexture = { "D:/bungeegum/demo/static/Image.jpg" };
 
     void draw(bungeegum::draw_command& command)
     {
@@ -165,9 +158,9 @@ int main()
     _provider.emscripten_canvas_id = "canvas";
     _provider.native_window_ptr = nullptr;
 
-    bungeegum::pipeline _my_pipeline;
+    bungeegum::pipeline<bungeegum::renderer_backend::opengl> _my_pipeline = { _provider };
     // _my_pipeline.emplace(bungeegum::renderer_backend::directx11, _provider);
-    _my_pipeline.emplace(bungeegum::renderer_backend::opengl, _provider);
+    // _my_pipeline.emplace(bungeegum::renderer_backend::opengl, _provider);
 
     bungeegum::event _myevnt;
     _myevnt.on_trigger([] () {
@@ -196,7 +189,7 @@ int main()
 
 
 
-    _my_pipeline.root(bungeegum::make<drawerwidget>().build());
+    _my_pipeline.root(bungeegum::make<drawerwidget>());
     // _my_pipeline.run(60, true);
     _my_pipeline.run();
 

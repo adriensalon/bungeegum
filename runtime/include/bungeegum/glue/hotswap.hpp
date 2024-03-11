@@ -275,7 +275,7 @@ namespace detail {
 }
 }
 
-#include <bungeegum/glue/reload.inl>
+#include <bungeegum/glue/hotswap.inl>
 
 #else
 

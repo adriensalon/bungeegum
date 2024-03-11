@@ -76,7 +76,7 @@ namespace detail {
 }
 
 
-font& font::compile(const std::filesystem::path& filename, const float size)
+font::font(const std::filesystem::path& filename, const float size)
 {
     detail::global_manager_data& _global = detail::global();
     for (std::pair<const uintptr_t, std::reference_wrapper<bungeegum::detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
@@ -86,10 +86,9 @@ font& font::compile(const std::filesystem::path& filename, const float size)
             filename,
             size);
     }
-    return *this;
 }
 
-font& font::compile(const void* ttf, const std::size_t count, const float size)
+font::font(const void* ttf, const std::size_t count, const float size)
 {
     detail::global_manager_data& _global = detail::global();
     for (std::pair<const uintptr_t, std::reference_wrapper<bungeegum::detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
@@ -100,7 +99,6 @@ font& font::compile(const void* ttf, const std::size_t count, const float size)
             count,
             size);
     }
-    return *this;
 }
 
 }

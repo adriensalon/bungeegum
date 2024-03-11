@@ -9,9 +9,9 @@
 #include <bungeegum/glue/theme.hpp>
 #include <bungeegum/glue/rendering.hpp>
 
-#include "compressed/font_awesome.hpp"
-#include "compressed/inter_extrabold.cpp"
-#include "compressed/inter_regular.cpp"
+// #include "static/font_awesome.hpp"
+#include <inter_extrabold.cpp>
+#include <inter_regular.cpp>
 
 namespace bungeegum {
 namespace detail {

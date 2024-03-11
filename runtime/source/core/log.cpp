@@ -1,5 +1,5 @@
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/core/log.hpp>
+#include <bungeegum/core/pipeline.hpp>
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/console.hpp>
@@ -8,7 +8,6 @@ namespace bungeegum {
 namespace detail {
     namespace {
 
-#if !BUNGEEGUM_USE_OVERLAY
         void console_log_exception(const backtraced_exception& exception, const log_color color)
         {
             log("\"" + std::string(exception.what()) + "\"", log_color::black_or_white);
@@ -19,11 +18,11 @@ namespace detail {
             } else {
                 log(" with trace : \n", color);
                 for (const backtraced_step& _result : exception.tracing) {
-                    std::string _trace_location = "[" + _result.primary.file.filename().generic_string();
-                    _trace_location += ", Ln " + std::to_string(_result.primary.line);
-                    _trace_location += ", Col " + std::to_string(_result.primary.column) + "] ";
+                    std::string _trace_location = "[" + _result.file.filename().generic_string();
+                    _trace_location += ", Ln " + std::to_string(_result.line);
+                    _trace_location += ", Col " + std::to_string(_result.column) + "] ";
                     log(_trace_location, log_color::black_or_white);
-                    log(_result.primary.function + "\n", log_color::black_or_white);
+                    log(_result.function + "\n", log_color::black_or_white);
                 }
             }
 #else
@@ -49,7 +48,6 @@ namespace detail {
 			console_log_exception(exception, log_color::blue);
 		}
 
-#endif
     }
 
 //     void protect_library(const std::function<void()>& try_callback)
@@ -81,12 +79,17 @@ namespace detail {
 
 void log_error(const std::string& what, const bool must_throw)
 {
-    detail::backtraced_exception _exception(what, 1u);	
+    detail::global_manager_data& _global = detail::global();
+    detail::backtraced_exception _exception(what, 1u);
+    if (!_global.pipelines.current.has_value()) {
+        detail::console_log_error(_exception);
+    } else {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global().logs.userspace_errors.push_back(_exception);
+        _global.pipelines.current.value().get().userspace_errors.push_back(_exception);
 #else
-    detail::console_log_error(_exception);
+        detail::console_log_error(_exception);
 #endif
+    }
 	if (must_throw) {
 		throw _exception;
 	}
@@ -94,12 +97,17 @@ void log_error(const std::string& what, const bool must_throw)
 
 void log_error(const std::wstring& what, const bool must_throw)
 {
-	detail::backtraced_exception _exception(what, 1u);	
+	detail::global_manager_data& _global = detail::global();
+    detail::backtraced_exception _exception(what, 1u);
+    if (!_global.pipelines.current.has_value()) {
+        detail::console_log_error(_exception);
+    } else {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global().logs.userspace_errors.push_back(_exception);
+        _global.pipelines.current.value().get().userspace_errors.push_back(_exception);
 #else
-    detail::console_log_error(_exception);
+        detail::console_log_error(_exception);
 #endif
+    }
 	if (must_throw) {
 		throw _exception;
 	}
@@ -107,37 +115,61 @@ void log_error(const std::wstring& what, const bool must_throw)
 
 void log_warning(const std::string& what)
 {
+    detail::global_manager_data& _global = detail::global();
+    detail::backtraced_exception _exception(what, 1u);
+    if (!_global.pipelines.current.has_value()) {
+        detail::console_log_warning(_exception);
+    } else {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global().logs.userspace_warnings.push_back(detail::backtraced_exception(what, 1u));
+        _global.pipelines.current.value().get().userspace_warnings.push_back(_exception);
 #else
-    detail::console_log_warning(detail::backtraced_exception(what, 1u));
+        detail::console_log_warning(_exception);
 #endif
+    }
 }
 
 void log_warning(const std::wstring& what)
 {
+    detail::global_manager_data& _global = detail::global();
+    detail::backtraced_exception _exception(what, 1u);
+    if (!_global.pipelines.current.has_value()) {
+        detail::console_log_warning(_exception);
+    } else {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global().logs.userspace_warnings.push_back(detail::backtraced_exception(what, 1u));
+        _global.pipelines.current.value().get().userspace_warnings.push_back(_exception);
 #else
-    detail::console_log_warning(detail::backtraced_exception(what, 1u));
+        detail::console_log_warning(_exception);
 #endif
+    }
 }
 
 void log_message(const std::string& what)
 {
+    detail::global_manager_data& _global = detail::global();
+    detail::backtraced_exception _exception(what, 1u);
+    if (!_global.pipelines.current.has_value()) {
+        detail::console_log_message(_exception);
+    } else {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global().logs.userspace_messages.push_back(detail::backtraced_exception(what, 1u));
+        _global.pipelines.current.value().get().userspace_messages.push_back(_exception);
 #else
-    detail::console_log_message(detail::backtraced_exception(what, 1u));
+        detail::console_log_message(_exception);
 #endif
+    }
 }
 
 void log_message(const std::wstring& what)
 {
+    detail::global_manager_data& _global = detail::global();
+    detail::backtraced_exception _exception(what, 1u);
+    if (!_global.pipelines.current.has_value()) {
+        detail::console_log_message(_exception);
+    } else {
 #if BUNGEEGUM_USE_OVERLAY
-    detail::global().logs.userspace_messages.push_back(detail::backtraced_exception(what, 1u));
+        _global.pipelines.current.value().get().userspace_messages.push_back(_exception);
 #else
-    detail::console_log_message(detail::backtraced_exception(what, 1u));
+        detail::console_log_message(_exception);
 #endif
+    }
 }
 }

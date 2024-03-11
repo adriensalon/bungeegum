@@ -1,7 +1,6 @@
 #include <imgui.h>
 
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/widget.hpp>
 
 
@@ -210,7 +209,7 @@ float2 resolve_command::resolve_child(const widget_id child_id, const float2 min
     _global.pipelines.current.value().get().widgets_chronometer.end_task(_updatable.clean_typename);
     _global.pipelines.current.value().get().widgets_chronometer.begin_task(_child_updatable.clean_typename);
 #endif
-    detail::protect_userspace(_global.logs.userspace_errors, [&_child_updatable]() {
+    detail::protect_userspace(_global.pipelines.current.value().get().userspace_errors, [&_child_updatable]() {
         resolve_command _command = detail::resolve_command_access::make_from_data(_child_updatable);
         _child_updatable.resolver(_command);
     });
@@ -503,6 +502,41 @@ void destroy(const widget_id& widget)
     // detail::global().widgets->.accessors.erase(_void_widget);
 }
 
+std::vector<std::string>& get_hotswap_defines()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::global_manager_data& _global = detail::global();
+    return _global.widgets.hotswap_reloader->defines();
+}
+
+std::vector<std::filesystem::path>& get_hotswap_include_directories()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::global_manager_data& _global = detail::global();
+    return _global.widgets.hotswap_reloader->include_directories();
+}
+
+std::vector<std::filesystem::path>& get_hotswap_source_directories()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::global_manager_data& _global = detail::global();
+    return _global.widgets.hotswap_reloader->source_directories();
+}
+template <renderer_backend backend_t>
+std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::global_manager_data& _global = detail::global();
+    return _global.widgets.hotswap_reloader->force_compiled_source_files();
+}
+
+std::vector<std::filesystem::path>& get_hotswap_libraries()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::global_manager_data& _global = detail::global();
+    return _global.widgets.hotswap_reloader->libraries();
+}
+
 widget_id get_parent(const widget_id id)
 {
     detail::widget_manager_data& _manager = detail::global().widgets;
@@ -514,6 +548,7 @@ widget_id get_parent(const widget_id id)
     detail::widget_update_data& _parent_updatable = _updatable.parent.value();
     return detail::widget_id_access::make_from_data(_parent_updatable.raw);
 }
+
 
 bool has_parent(const widget_id id)
 {

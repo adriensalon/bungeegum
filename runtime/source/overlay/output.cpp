@@ -5,7 +5,6 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/glue/theme.hpp>
 #include <bungeegum/glue/string.hpp>
@@ -136,9 +135,9 @@ namespace detail {
         }
         ImGui::End();
 
-        transfer_to_map(global().logs.userspace_errors, error_logs);
-        transfer_to_map(global().logs.userspace_warnings, warning_logs);
-        transfer_to_map(global().logs.userspace_messages, message_logs);
+        transfer_to_map(global().pipelines.current.value().get().userspace_errors, error_logs);
+        transfer_to_map(global().pipelines.current.value().get().userspace_warnings, warning_logs);
+        transfer_to_map(global().pipelines.current.value().get().userspace_messages, message_logs);
     }
 }
 }

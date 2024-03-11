@@ -84,16 +84,6 @@ namespace detail {
 
 texture::texture(const std::filesystem::path& filename)
 {
-    compile(filename);
-}
-
-texture::texture(const std::vector<unsigned char>& pixels, const uint2 size)
-{
-    compile(pixels, size);
-}
-
-texture& texture::compile(const std::filesystem::path& filename)
-{
     detail::global_manager_data& _global = detail::global();
     for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
         detail::pipeline_data& _pipeline_data = _it.second.get();
@@ -102,10 +92,9 @@ texture& texture::compile(const std::filesystem::path& filename)
 			filename);
     }
     _data.creation_filename = filename;
-    return *this;
 }
 
-texture& texture::compile(const std::vector<unsigned char>& pixels, const uint2 size)
+texture::texture(const std::vector<unsigned char>& pixels, const uint2 size)
 {
     detail::global_manager_data& _global = detail::global();
     for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
@@ -118,12 +107,6 @@ texture& texture::compile(const std::vector<unsigned char>& pixels, const uint2 
     }
     _data.creation_pixels = pixels;
     _data.creation_size = size;
-    return *this;
-}
-
-bool texture::is_compiled() const
-{
-    return _data.is_compiled;
 }
 
 texture& texture::region(const std::vector<unsigned char>& pixels, const uint2 min_point, const uint2 max_point)

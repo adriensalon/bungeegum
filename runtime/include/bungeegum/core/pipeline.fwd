@@ -29,6 +29,9 @@
 
 namespace bungeegum {
 
+enum struct renderer_backend;
+
+template <renderer_backend backend_t>
 struct pipeline;
 
 namespace detail {
@@ -37,45 +40,38 @@ namespace detail {
     using frames_chronometer_task = chronometer_task<BUNGEEGUM_USE_TIME_UNIT>;
 
     struct pipeline_data {
-        std::uintptr_t raw = {};
-        
+        std::uintptr_t raw = {};        
+        std::optional<std::reference_wrapper<widget_update_data>> root_updatable = std::nullopt;        
         window_handle pipeline_window = {};
         renderer_handle pipeline_renderer = {};
-        
-
+        rasterizer_handle user_context = {};
         shader_handle default_shader = {};
         shader_handle mask_shader = {};
-
-        rasterizer_handle user_context = {};
+        stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
 #if BUNGEEGUM_USE_OVERLAY
         shader_handle overlay_shader = {};
-        rasterizer_handle overlay_context = {};
-#endif
-
-        std::optional<std::reference_wrapper<widget_update_data>> root_updatable = std::nullopt;
-        stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
-
-#if BUNGEEGUM_USE_OVERLAY
-        std::string renderer_info = {};
-        // etc
-        BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};
+        rasterizer_handle overlay_context = {};        
         frames_chronometer steps_chronometer = {};
-        frames_chronometer widgets_chronometer = {};
-#endif
+        frames_chronometer widgets_chronometer = {};        
+        std::vector<backtraced_exception> userspace_errors = {};
+        std::vector<backtraced_exception> userspace_warnings = {};
+        std::vector<backtraced_exception> userspace_messages = {};        
+        std::string renderer_info = {};
+        BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};
+#endif        
     };
 
     struct pipeline_manager_data {
         std::unordered_map<std::uintptr_t, std::reference_wrapper<pipeline_data>> pipelines = {};
         std::optional<std::reference_wrapper<pipeline_data>> current = std::nullopt;
-
 #if BUNGEEGUM_USE_OVERLAY
         std::optional<std::uintptr_t> inspector_selected = std::nullopt;
 #endif
     };
 
     struct pipeline_access {
-        [[nodiscard]] static pipeline make_from_data(const pipeline_data& data);
-        [[nodiscard]] static pipeline_data& get_data(pipeline& object);
+        template <renderer_backend backend_t>
+        [[nodiscard]] static pipeline_data& get_data(pipeline<backend_t>& object);
     };
 
 }

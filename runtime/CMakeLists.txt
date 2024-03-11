@@ -10,7 +10,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "iOS")
 
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	option(BUNGEEGUM_ENABLE_DIRECTX "Build DirectX renderer backend." ON)
-	option(BUNGEEGUM_ENABLE_VULKAN "Build Vulkan renderer backend." ON)
+	option(BUNGEEGUM_ENABLE_VULKAN "Build Vulkan renderer backend." OFF)
 	option(BUNGEEGUM_ENABLE_OPENGL "Build OpenGL renderer backend." ON)
 
 elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
@@ -52,13 +52,14 @@ set(bungeegum_runtime_source
 	"source/overlay/output.cpp"
 	"source/overlay/profiling.cpp"
 	
-	"source/overlay/compressed/inter_extrabold.cpp"
-	"source/overlay/compressed/inter_regular.cpp"
+	"static/inter_extrabold.cpp"
+	"static/inter_regular.cpp"
 )
 
 add_library(bungeegum_runtime ${bungeegum_runtime_source})
 
 target_include_directories(bungeegum_runtime PUBLIC "include/")
+target_include_directories(bungeegum_runtime PUBLIC "static/")
 target_include_directories(bungeegum_runtime PUBLIC "${CMAKE_SOURCE_DIR}/external/diligentcore/")
 
 set_property(TARGET bungeegum_runtime PROPERTY CXX_STANDARD 17)

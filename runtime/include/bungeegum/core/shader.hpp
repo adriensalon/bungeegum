@@ -90,9 +90,14 @@ struct shader {
     shader() = default;
 
     /// @brief 
+    /// @param filename 
+    /// @param compiled_blend 
+    shader(const std::filesystem::path& filename, const shader_blend_options& compiled_blend = {});
+
+    /// @brief 
     /// @param fragment 
-    /// @param blend 
-    shader(const std::string& fragment, const shader_blend_options& blend = {});
+    /// @param compiled_blend 
+    shader(const std::string& fragment, const shader_blend_options& compiled_blend = {});
 
     /// @brief
     /// @param other
@@ -109,16 +114,6 @@ struct shader {
     /// @brief
     /// @param other
     shader& operator=(shader&& other) = default;
-
-    /// @brief 
-    /// @param fragment 
-    /// @param blend 
-    shader& compile(const std::string& fragment, const shader_blend_options& blend = {});
-    
-    /// @brief Gets if this shader has a value. Default created shaders don't have a value until 
-    /// the emplace() method is called. Shaders don't have a value anymore after the reset() method
-    /// is called
-    [[nodiscard]] bool is_compiled() const;
 
     /// @brief
     /// @tparam value_t

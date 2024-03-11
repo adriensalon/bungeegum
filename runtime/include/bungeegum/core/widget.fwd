@@ -11,7 +11,7 @@
 #include <bungeegum/core/pipeline.fwd>
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/raw.hpp>
-#include <bungeegum/glue/reload.hpp>
+#include <bungeegum/glue/hotswap.hpp>
 #include <bungeegum/glue/window.hpp>
 #include <bungeegum/glue/rendering.hpp>
 
@@ -95,13 +95,19 @@ namespace detail {
     using widget_ref_data = reference_type_t<widget_t>;	
 	
     struct widget_manager_data {
-#if BUNGEEGUM_USE_HOTSWAP
-        std::unique_ptr<reloader> hotswap_reloader = nullptr;
-#endif
+        widget_manager_data() = default;
+        widget_manager_data(const widget_manager_data& other) = delete;
+        widget_manager_data& operator=(const widget_manager_data& other) = delete;
+        widget_manager_data(widget_manager_data&& other) = default;
+        widget_manager_data& operator=(widget_manager_data&& other) = default;
+
         std::unordered_map<std::uintptr_t, widget_update_data> updatables = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> resolvables = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> interactables = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> drawables = {};
+#if BUNGEEGUM_USE_HOTSWAP
+        std::unique_ptr<reloader> hotswap_reloader = nullptr;
+#endif
     };
 
     struct resolve_command_access {

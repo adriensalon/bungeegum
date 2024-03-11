@@ -13,13 +13,6 @@
 namespace bungeegum {
 namespace detail {
 
-	/// @brief 
-	/// @param try_callback 
-	/// @param catch_callback 
-	void protect(
-		const std::function<void()>& try_callback,
-		const std::function<void(const std::string&)>& catch_callback = nullptr);
-
     /// @brief Instance of this struct store data from a backtraced call.
     struct backtraced_step {
         
@@ -68,5 +61,13 @@ namespace detail {
     private:
         std::string _what;
     };
+
+	/// @brief 
+	/// @param try_callback 
+	/// @param catch_callback 
+	void protect(
+		const std::function<void()>& try_callback,
+		const std::function<void(const std::string&)>& catch_callback = nullptr);
+
 }
 }

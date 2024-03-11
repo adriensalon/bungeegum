@@ -2,7 +2,6 @@
 
 #include <bungeegum/core/animation.fwd>
 #include <bungeegum/core/context.fwd>
-#include <bungeegum/core/log.fwd>
 #include <bungeegum/core/pipeline.fwd>
 #include <bungeegum/core/widget.fwd>
 #include <bungeegum/core/shader.fwd>
@@ -16,7 +15,6 @@ namespace detail {
         animations_manager_data animations = {};
         events_manager_data events = {};
         fonts_manager_data fonts = {};
-        log_manager_data logs = {};
         pipeline_manager_data pipelines = {};
         textures_manager_data textures = {};
         widget_manager_data widgets = {};

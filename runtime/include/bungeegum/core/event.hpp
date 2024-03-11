@@ -38,15 +38,6 @@ struct event {
 
     /// @brief
     event& operator=(event&& other) = default;
-    
-    /// @brief Gets a reference to stored callbacks.
-    std::vector<on_trigger_callback>& get_callbacks();
-
-    /// @brief Gets a const reference to stored callbacks.
-    const std::vector<on_trigger_callback>& get_callbacks() const;
-
-    /// @brief
-    bool is_waiting() const;
 
     /// @brief Merges another event by adding its callbacks.
     event& merge(const event& other);

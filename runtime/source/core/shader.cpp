@@ -1,6 +1,6 @@
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/shader.hpp>
-#include <bungeegum/core/log.hpp>
+#include <bungeegum/core/pipeline.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -152,7 +152,7 @@ namespace detail {
 
 }
 
-shader& shader::compile(const std::string& fragment, const shader_blend_options& blend)
+shader::shader(const std::string& fragment, const shader_blend_options& blend)
 {
     detail::reset_shaders(_data);
     _data.creation_fragment = fragment;
@@ -166,12 +166,6 @@ shader& shader::compile(const std::string& fragment, const shader_blend_options&
             _data.creation_blend);
     }
     _data.is_compiled = true;
-    return *this;
-}
-
-bool shader::is_compiled() const
-{
-    return _data.is_compiled;
 }
 
 template <>

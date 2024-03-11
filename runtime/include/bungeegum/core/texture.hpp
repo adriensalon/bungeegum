@@ -10,11 +10,14 @@ struct texture {
 	/// @brief
 	texture() = default;
 	
-	/// @brief
+	/// @brief 
+	/// @param filename 
 	texture(const std::filesystem::path& filename);
 	
-	/// @brief
-	texture(const std::vector<unsigned char>& pixels, const uint2 size);
+	/// @brief 
+	/// @param pixels 
+	/// @param size 
+	texture(const std::vector<unsigned char>& pixels, const uint2 compiled_size);
 
 	/// @brief
 	texture(const texture& other) = default;
@@ -27,17 +30,15 @@ struct texture {
 	
 	/// @brief
 	texture& operator=(texture&& other) = default;
-	
-	/// @brief
-	texture& compile(const std::filesystem::path& filename);
-	
-	/// @brief
-	texture& compile(const std::vector<unsigned char>& pixels, const uint2 size);
-		
-	/// @brief
-    [[nodiscard]] bool is_compiled() const;
 
-	/// @brief
+	/// @brief  
+	[[nodiscard]] uint2 get_compiled_size() const;
+
+	/// @brief 
+	/// @param pixels 
+	/// @param min_point 
+	/// @param max_point 
+	/// @return 
 	texture& region(const std::vector<unsigned char>& pixels, const uint2 min_point = zero<uint2>, const uint2 max_point = infinity<uint2>);
 
 private:

@@ -117,17 +117,17 @@ namespace detail {
     }
 }
 
-template <typename... values_t>
-std::vector<std::function<void(const values_t&...)>>& event<values_t...>::get_callbacks()
-{
-    return _data.callbacks;
-}
+// template <typename... values_t>
+// std::vector<std::function<void(const values_t&...)>>& event<values_t...>::get_callbacks()
+// {
+//     return _data.callbacks;
+// }
 
-template <typename... values_t>
-const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::get_callbacks() const
-{
-    return _data.callbacks;
-}
+// template <typename... values_t>
+// const std::vector<std::function<void(const values_t&...)>>& event<values_t...>::get_callbacks() const
+// {
+//     return _data.callbacks;
+// }
 
 // is waiting
 

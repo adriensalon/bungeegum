@@ -43,19 +43,34 @@ struct pipeline_bindings {
 };
 
 /// @brief
+template <renderer_backend backend_t = preferred_renderer_backend>
 struct pipeline {
-    pipeline() = default;
-    pipeline(const pipeline& other) = delete;
-    pipeline& operator=(const pipeline& other) = delete;
-    pipeline(pipeline&& other) = default;
-    pipeline& operator=(pipeline&& other) = default;
-	
+    
+    /// @brief
+    pipeline() = delete;
+    
     /// @brief 
-    /// @param backend 
     /// @param provider 
-	pipeline& emplace(
-        const renderer_backend backend = preferred_renderer_backend, 
-        const pipeline_bindings& provider = {});
+    pipeline(const pipeline_bindings& provider = {});
+    
+    /// @brief
+    pipeline(const pipeline& other) = default;
+    
+    /// @brief
+    pipeline& operator=(const pipeline& other) = default;
+    
+    /// @brief
+    pipeline(pipeline&& other) = default;
+    
+    /// @brief
+    pipeline& operator=(pipeline&& other) = default;
+
+    /// @brief
+    pipeline& color(const float4 rgba);
+
+    /// @brief
+    /// @param id
+    pipeline& root(const widget_id root_id);
 
     /// @brief
     /// @param frames_per_second
@@ -69,19 +84,50 @@ struct pipeline {
     pipeline& run_once(const bool force_rendering = false);
 
     /// @brief
-    /// @param id
-    pipeline& root(const widget_id root_id);
-
-    /// @brief
-    pipeline& color(const float4 rgba);
-
-    /// @brief
     pipeline& title(const std::string& description);
 
 private:
 	friend struct detail::pipeline_access;
-	pipeline(const detail::pipeline_data& data);
     detail::pipeline_data _data;
 };
+
+/// @brief
+void exit_run();
+
+/// @brief Logs an error and exits userspace without crashing the program.
+/// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the error will be sent to the overlay, otherwise
+/// it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the error will
+/// include stack trace information.
+void log_error(const std::string& what, const bool must_throw = true);
+
+/// @brief Logs an error and exits userspace without crashing the program.
+/// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the error will be sent to the overlay, otherwise
+/// it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the error will
+/// include stack trace information.
+void log_error(const std::wstring& what, const bool must_throw = true);
+
+/// @brief Logs a warning and exits userspace without crashing the program.
+/// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the warning will be sent to the overlay,
+/// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
+/// warning will include stack trace information.
+void log_warning(const std::string& what);
+
+/// @brief Logs a warning and exits userspace without crashing the program.
+/// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the warning will be sent to the overlay,
+/// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
+/// warning will include stack trace information.
+void log_warning(const std::wstring& what);
+
+/// @brief Logs a message and exits userspace without crashing the program.
+/// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the message will be sent to the overlay,
+/// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
+/// message will include stack trace information.
+void log_message(const std::string& what);
+
+/// @brief Logs a message and exits userspace without crashing the program.
+/// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the message will be sent to the overlay,
+/// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
+/// message will include stack trace information.
+void log_message(const std::wstring& what);
 
 }

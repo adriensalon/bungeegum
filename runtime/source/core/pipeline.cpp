@@ -12,7 +12,7 @@
 #include <bungeegum/core/widget.hpp>
 #include <bungeegum/glue/console.hpp>
 #include <bungeegum/glue/raw.hpp>
-#include <bungeegum/glue/reload.hpp>
+#include <bungeegum/glue/hotswap.hpp>
 #include <bungeegum/glue/string.hpp>
 
 namespace bungeegum {
@@ -118,7 +118,6 @@ namespace detail {
 
     void resolve_widgets(const float2 viewport_size, widget_update_data& root_updatable)
     {
-        log_manager_data& _log_manager = global().logs;
         pipeline_manager_data& _pipeline_manager = global().pipelines;
         widget_manager_data& _widget_manager = global().widgets;
 #if BUNGEEGUM_USE_OVERLAY
@@ -142,7 +141,7 @@ namespace detail {
                 _pipeline_manager.current.value().get().widgets_chronometer.begin_task(_updatable.clean_typename);
 #endif
 
-                protect_userspace(_log_manager.userspace_errors, [&_updatable]() {
+                protect_userspace(_pipeline_manager.current.value().get().userspace_errors, [&_updatable]() {
                     resolve_command_data _data = { _updatable };
                     resolve_command _command = detail::resolve_command_access::make_from_data(_data);
                     _updatable.resolver(_command);
@@ -185,7 +184,7 @@ namespace detail {
                 //                         std::string _clean_typename = global().pipelines.to_clean_typename(_updatable.inplace_data.type().name());
                 //                         global().pipelines.profiler_draw_chronometer.begin_task(_clean_typename);
                 // #endif
-                protect_userspace(_global.logs.userspace_errors, [&_updatable, imgui_drawlist, _raw_pipeline]() {
+                protect_userspace(_global.pipelines.current.value().get().userspace_errors, [&_updatable, imgui_drawlist, _raw_pipeline]() {
                     draw_command_data _data = { _updatable, _raw_pipeline, imgui_drawlist };
                     draw_command _command = detail::draw_command_access::make_from_data(_data);
                     _updatable.drawer(_command);
@@ -271,7 +270,7 @@ namespace detail {
 #endif
     }
 
-    void emplace_directx11(pipeline_data& data, const pipeline_bindings& provider)
+    void setup_renderer_directx11(pipeline_data& data, const pipeline_bindings& provider)
     {
 #if !BUNGEEGUM_USE_DIRECTX
         throw backtraced_exception("");
@@ -286,7 +285,7 @@ namespace detail {
 #endif
     }
 
-    void emplace_directx12(pipeline_data& data, const pipeline_bindings& provider)
+    void setup_renderer_directx12(pipeline_data& data, const pipeline_bindings& provider)
     {
 #if !BUNGEEGUM_USE_DIRECTX
         throw backtraced_exception("");
@@ -301,7 +300,7 @@ namespace detail {
 #endif
     }
 
-    void emplace_opengl(pipeline_data& data, const pipeline_bindings& provider)
+    void setup_renderer_opengl(pipeline_data& data, const pipeline_bindings& provider)
     {
 #if !BUNGEEGUM_USE_OPENGL
         throw backtraced_exception("");
@@ -314,34 +313,13 @@ namespace detail {
 #endif
     }
 
-    void emplace_vulkan(pipeline_data& data, const pipeline_bindings& provider)
+    void setup_renderer_vulkan(pipeline_data& data, const pipeline_bindings& provider)
     {
 #if !BUNGEEGUM_USE_VULKAN
         throw backtraced_exception("");
 #else
         // todo
 #endif
-    }
-
-    void setup_renderer(pipeline_data& data, const renderer_backend backend, const pipeline_bindings& provider)
-    {
-        switch (backend) {
-        case renderer_backend::directx11:
-            emplace_directx11(data, provider);
-            break;
-        case renderer_backend::directx12:
-            emplace_directx12(data, provider);
-            break;
-        case renderer_backend::opengl:
-            emplace_opengl(data, provider);
-            break;
-        case renderer_backend::vulkan:
-            emplace_vulkan(data, provider);
-            break;
-        default:
-            throw backtraced_exception("");
-            break;
-        }
     }
 
     void setup_shaders(pipeline_data& data)
@@ -376,7 +354,9 @@ namespace detail {
         std::wstringstream _update_stream;
         reload_state _reload_result = _global.widgets.hotswap_reloader->update(_update_stream.rdbuf());
         std::string _update_str = narrow(_update_stream.str());
-        _global.logs.hotswap_output.push_back(std::move(_update_str));
+        (void)_update_str;
+        // std::cout << _update_str << std::endl;
+        // _global.pipelines.current.value().get().userspace_messages.push_back(std::move(_update_str));
         if (_reload_result == reload_state::started_compiling) {
             save_widgets(serialize_path, root_updatable);
         } else if (_reload_result == reload_state::performed_swap) {
@@ -451,26 +431,91 @@ namespace detail {
             _pipeline.steps_chronometer.end_task("draw pass");
         }
     }
+
+    void setup_pipeline(pipeline_data& data)
+    {
+#if BUNGEEGUM_USE_OVERLAY
+        data.overlay_context.emplace(data.pipeline_renderer, nullptr);
+        detail::setup_overlay(data.overlay_context);
+#endif
+        data.user_context.emplace(data.pipeline_renderer, nullptr);
+        detail::setup_shaders(data);
+        detail::global_manager_data& _global = detail::global();
+        _global.pipelines.pipelines.insert({ data.raw, std::ref(data) });
+    }
 }
 
-pipeline& pipeline::emplace(const renderer_backend backend, const pipeline_bindings& provider)
+template <>
+pipeline<renderer_backend::directx11>::pipeline(const pipeline_bindings& provider)
 {
+    static_assert(BUNGEEGUM_USE_DIRECTX, "AAAAAAAAA");
+    _data.raw = detail::raw_cast(this);
     detail::setup_global_if_required();
     detail::setup_window(_data.pipeline_window, provider);
-    detail::setup_renderer(_data, backend, provider);
-#if BUNGEEGUM_USE_OVERLAY
-    _data.overlay_context.emplace(_data.pipeline_renderer, nullptr);
-    detail::setup_overlay(_data.overlay_context);
-#endif
-    _data.raw = detail::raw_cast(this);
-    _data.user_context.emplace(_data.pipeline_renderer, nullptr);
-    detail::setup_shaders(_data);
-    detail::global_manager_data& _global = detail::global();
-    _global.pipelines.pipelines.insert({ _data.raw, std::ref(_data) });
-    return *this;
+    detail::setup_renderer_directx11(_data, provider);
+    detail::setup_pipeline(_data);
 }
 
-void pipeline::run(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
+template <>
+pipeline<renderer_backend::directx12>::pipeline(const pipeline_bindings& provider)
+{
+    static_assert(BUNGEEGUM_USE_DIRECTX, "AAAAAAAAA");
+    _data.raw = detail::raw_cast(this);
+    detail::setup_global_if_required();
+    detail::setup_window(_data.pipeline_window, provider);
+    detail::setup_renderer_directx12(_data, provider);
+    detail::setup_pipeline(_data);
+}
+
+template <>
+pipeline<renderer_backend::opengl>::pipeline(const pipeline_bindings& provider)
+{
+    static_assert(BUNGEEGUM_USE_OPENGL, "AAAAAAAAA");
+    _data.raw = detail::raw_cast(this);
+    detail::setup_global_if_required();
+    detail::setup_window(_data.pipeline_window, provider);
+    detail::setup_renderer_opengl(_data, provider);
+    detail::setup_pipeline(_data);
+}
+
+template <>
+pipeline<renderer_backend::vulkan>::pipeline(const pipeline_bindings& provider)
+{
+    static_assert(BUNGEEGUM_USE_VULKAN, "AAAAAAAAA");
+    _data.raw = detail::raw_cast(this);
+    detail::setup_global_if_required();
+    detail::setup_window(_data.pipeline_window, provider);
+    detail::setup_renderer_vulkan(_data, provider);
+    detail::setup_pipeline(_data);
+}
+
+template <renderer_backend backend_t>
+pipeline<backend_t>& pipeline<backend_t>::color(const float4 rgba)
+{
+    (void)rgba;
+    // _data.pipeline_window.color(rgba);
+    return *this;
+}
+template pipeline<renderer_backend::directx11>& pipeline<renderer_backend::directx11>::color(const float4 rgba);
+template pipeline<renderer_backend::directx12>& pipeline<renderer_backend::directx12>::color(const float4 rgba);
+template pipeline<renderer_backend::opengl>& pipeline<renderer_backend::opengl>::color(const float4 rgba);
+template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>::color(const float4 rgba);
+
+template <renderer_backend backend_t>
+pipeline<backend_t>& pipeline<backend_t>::root(const widget_id root_id)
+{
+    detail::global_manager_data& _global = detail::global();
+    const std::uintptr_t _raw = detail::widget_id_access::get_data(root_id);
+    _data.root_updatable = _global.widgets.updatables[_raw];
+    return *this;
+}
+template pipeline<renderer_backend::directx11>& pipeline<renderer_backend::directx11>::root(const widget_id root_id);
+template pipeline<renderer_backend::directx12>& pipeline<renderer_backend::directx12>::root(const widget_id root_id);
+template pipeline<renderer_backend::opengl>& pipeline<renderer_backend::opengl>::root(const widget_id root_id);
+template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>::root(const widget_id root_id);
+
+template <renderer_backend backend_t>
+void pipeline<backend_t>::run(const std::optional<unsigned int> frames_per_second, const bool force_rendering)
 {
     if (!_data.root_updatable.has_value()) {
         // throw
@@ -485,8 +530,13 @@ void pipeline::run(const std::optional<unsigned int> frames_per_second, const bo
         });
     });
 }
+template void pipeline<renderer_backend::directx11>::run(const std::optional<unsigned int> frames_per_second, const bool force_rendering);
+template void pipeline<renderer_backend::directx12>::run(const std::optional<unsigned int> frames_per_second, const bool force_rendering);
+template void pipeline<renderer_backend::opengl>::run(const std::optional<unsigned int> frames_per_second, const bool force_rendering);
+template void pipeline<renderer_backend::vulkan>::run(const std::optional<unsigned int> frames_per_second, const bool force_rendering);
 
-pipeline& pipeline::run_once(const bool force_rendering)
+template <renderer_backend backend_t>
+pipeline<backend_t>& pipeline<backend_t>::run_once(const bool force_rendering)
 {
     if (!_data.root_updatable.has_value()) {
         // throw
@@ -502,29 +552,24 @@ pipeline& pipeline::run_once(const bool force_rendering)
     });
     return *this;
 }
+template pipeline<renderer_backend::directx11>& pipeline<renderer_backend::directx11>::run_once(const bool force_rendering);
+template pipeline<renderer_backend::directx12>& pipeline<renderer_backend::directx12>::run_once(const bool force_rendering);
+template pipeline<renderer_backend::opengl>& pipeline<renderer_backend::opengl>::run_once(const bool force_rendering);
+template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>::run_once(const bool force_rendering);
 
-pipeline& pipeline::root(const widget_id root_id)
-{
-    detail::setup_global_if_required();
-    detail::global_manager_data& _global = detail::global();
-    const std::uintptr_t _raw = detail::widget_id_access::get_data(root_id);
-    _data.root_updatable = _global.widgets.updatables[_raw];
-    return *this;
-}
-
-pipeline& pipeline::color(const float4 rgba)
-{
-    (void)rgba;
-    // _data.pipeline_window.color(rgba);
-    return *this;
-}
-
-pipeline& pipeline::title(const std::string& description)
+template <renderer_backend backend_t>
+pipeline<backend_t>& pipeline<backend_t>::title(const std::string& description)
 {
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
     _data.pipeline_window.title(description);
 #endif
     return *this;
 }
+template pipeline<renderer_backend::directx11>& pipeline<renderer_backend::directx11>::title(const std::string& description);
+template pipeline<renderer_backend::directx12>& pipeline<renderer_backend::directx12>::title(const std::string& description);
+template pipeline<renderer_backend::opengl>& pipeline<renderer_backend::opengl>::title(const std::string& description);
+template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>::title(const std::string& description);
+
+
 
 }

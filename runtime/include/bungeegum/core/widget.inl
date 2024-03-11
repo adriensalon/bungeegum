@@ -1,7 +1,6 @@
 #pragma once
 
 #include <bungeegum/core/global.fwd>
-#include <bungeegum/core/log.fwd>
 
 namespace bungeegum {
 	
