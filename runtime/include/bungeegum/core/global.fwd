@@ -1,7 +1,6 @@
 #pragma once
 
 #include <bungeegum/core/animation.fwd>
-#include <bungeegum/core/context.fwd>
 #include <bungeegum/core/pipeline.fwd>
 #include <bungeegum/core/widget.fwd>
 #include <bungeegum/core/shader.fwd>
