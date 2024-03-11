@@ -68,7 +68,7 @@ namespace detail {
         void update_compilation_libraries(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& libraries)
         {
             if (libraries.second.size() != libraries.first) {
-                hotswapper->ClearLibraries();
+                // hotswapper->ClearLibraries();
                 for (const std::filesystem::path& _force_compiled_source_file : libraries.second) {
                     hotswapper->AddLibrary(_force_compiled_source_file);
                 }
@@ -85,6 +85,15 @@ namespace detail {
         _swapper = std::make_shared<hscpp::Hotswapper>();
         _manager = std::make_shared<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>>(hscpp::mem::MemoryManager::Create());
         _swapper->SetAllocator((_manager.get()->operator->()));
+        _swapper->ClearCompileOptions();
+        _swapper->AddCompileOption("/nologo");
+        _swapper->AddCompileOption("/Z7");
+        _swapper->AddCompileOption("/FC");
+        _swapper->AddCompileOption("/EHsc");
+        _swapper->AddCompileOption("/MP");
+        _swapper->AddCompileOption("/MDd");
+        _swapper->AddCompileOption("/LDd");
+        _swapper->AddCompileOption("/std:c++17");
     }
 
     std::size_t reloader::allocated_blocks_count()

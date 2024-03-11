@@ -99,9 +99,9 @@ namespace detail {
         futures = std::move(other.futures);
         shared_futures = std::move(other.shared_futures);
         (_data.update_data.kinds.push_back(typeid(values_t)), ...);
-        global_manager_data& _global = global();
-        if (_global.events.updatables.find(raw) != _global.events.updatables.end()) {
-            _global.events.updatables.at(raw) = std::ref(update_data);
+        swapped_manager_data& _swapped = swapped_global();
+        if (_swapped.events.updatables.find(raw) != _swapped.events.updatables.end()) {
+            _swapped.events.updatables.at(raw) = std::ref(update_data);
             assign_ticker(*this);
         }
         return *this;
@@ -110,9 +110,9 @@ namespace detail {
     template <typename... values_t>
     event_data<values_t...>::~event_data()
     {
-        global_manager_data& _global = global();
-        if (_global.events.updatables.find(raw) != _global.events.updatables.end()) {
-            _global.events.updatables_to_erase.push_back(raw);
+        swapped_manager_data& _swapped = swapped_global();
+        if (_swapped.events.updatables.find(raw) != _swapped.events.updatables.end()) {
+            _swapped.events.updatables_to_erase.push_back(raw);
         }
     }
 }
@@ -173,11 +173,11 @@ event<values_t...>& event<values_t...>::trigger(values_t&&... values) const
 template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& future_value)
 {
-    detail::global_manager_data& _global = detail::global();
-    if (_global.events.updatables.find(_data.raw) != _global.events.updatables.end()) {
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    if (_swapped.events.updatables.find(_data.raw) != _swapped.events.updatables.end()) {
         // error because event is being waited on already
     }
-    _global.events.updatables.insert({ _data.raw, std::ref(_data.update_data) });
+    _swapped.events.updatables.insert({ _data.raw, std::ref(_data.update_data) });
     detail::assign_ticker(_data);
 #if BUNGEEGUM_USE_OVERLAY
         // for (const std::type_index& _type_index : _update_data.kinds) {
@@ -191,11 +191,11 @@ event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& fut
 template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_values>& shared_future_value)
 {
-    detail::global_manager_data& _global = detail::global();
-    if (_global.events.updatables(_data.raw) != _global.events.updatables.end()) {
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    if (_swapped.events.updatables(_data.raw) != _swapped.events.updatables.end()) {
         // error because event is being waited on already
     }
-    _global.events.updatables.insert({ _data.raw, std::ref(_data.update_data) });
+    _swapped.events.updatables.insert({ _data.raw, std::ref(_data.update_data) });
     detail::assign_ticker(_data);
 #if BUNGEEGUM_USE_OVERLAY
         // for (const std::type_index& _type_index : _update_data.kinds) {

@@ -10,6 +10,34 @@
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
 
+#if !defined(PLATFORM_ANDROID)
+#define PLATFORM_ANDROID TOOLCHAIN_PLATFORM_ANDROID
+#endif
+
+#if !defined(PLATFORM_EMSCRIPTEN)
+#define PLATFORM_EMSCRIPTEN TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#endif
+
+#if !defined(PLATFORM_IOS)
+#define PLATFORM_IOS TOOLCHAIN_PLATFORM_IOS
+#endif
+
+#if !defined(PLATFORM_LINUX)
+#define PLATFORM_LINUX TOOLCHAIN_PLATFORM_LINUX
+#endif
+
+#if !defined(PLATFORM_MACOS)
+#define PLATFORM_MACOS TOOLCHAIN_PLATFORM_MACOS
+#endif
+
+#if !defined(PLATFORM_UNIVERSAL_WINDOWS)
+#define PLATFORM_UNIVERSAL_WINDOWS TOOLCHAIN_PLATFORM_UWP
+#endif
+
+#if !defined(PLATFORM_WIN32)
+#define PLATFORM_WIN32 TOOLCHAIN_PLATFORM_WIN32
+#endif
+
 #include <Common/interface/RefCntAutoPtr.hpp>
 #include <Graphics/GraphicsEngine/interface/Buffer.h>
 #include <Graphics/GraphicsEngine/interface/DepthStencilState.h>

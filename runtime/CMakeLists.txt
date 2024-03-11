@@ -27,7 +27,7 @@ set(bungeegum_runtime_source
 	"source/glue/backtrace.cpp"
 	"source/glue/console.cpp"
 	"source/glue/dialog.cpp"
-	"source/glue/reload.cpp"
+	"source/glue/hotswap.cpp"
 	"source/glue/serialize.cpp"
 	"source/glue/string.cpp"
 	"source/glue/theme.cpp"
@@ -37,7 +37,6 @@ set(bungeegum_runtime_source
 
 	"source/core/font.cpp"
 	"source/core/global.cpp"
-	"source/core/hotswap.cpp"
 	"source/core/log.cpp"
 	"source/core/math.cpp"
 	"source/core/pipeline.cpp"
@@ -47,7 +46,7 @@ set(bungeegum_runtime_source
 	
 	"source/overlay/build.cpp"
 	"source/overlay/hierarchy.cpp"
-	"source/overlay/hotswap.cpp"
+	"source/overlay/gobuild.cpp"
 	"source/overlay/menu.cpp"
 	"source/overlay/output.cpp"
 	"source/overlay/profiling.cpp"
@@ -143,10 +142,10 @@ if(NOT EMSCRIPTEN)
 	endif()
 endif()
 
-if(DEFINED BUNGEEGUM_INSTALL_DIR)
-	file(
-		COPY "${CMAKE_CURRENT_LIST_DIR}/include/"
-		DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/")
+# if(DEFINED BUNGEEGUM_INSTALL_DIR)
+	# file(
+	# 	COPY "${CMAKE_CURRENT_LIST_DIR}/include/"
+	# 	DESTINATION "${BUNGEEGUM_INSTALL_DIR}/runtime/include/")
 
 	list(APPEND static_libs bungeegum_runtime)
 
@@ -190,11 +189,17 @@ if(DEFINED BUNGEEGUM_INSTALL_DIR)
 	_recursively_collect_dependencies(bungeegum_runtime)
 	list(REMOVE_DUPLICATES static_libs)
 
+	string(REPLACE ";" "," static_libs_str "${static_libs}")
+	message(${static_libs_str})
+	target_compile_definitions(bungeegum_runtime PUBLIC -DBUNGEEGUM_LIBS="${static_libs_str}")
+	target_compile_definitions(bungeegum_runtime PUBLIC -DBUNGEEGUM_LIBS_PATH="${CMAKE_CURRENT_LIST_DIR}/../build/bin/")
+
 	foreach(lib IN LISTS static_libs)
+		# message(${lib})
 		add_custom_command(
 			TARGET bungeegum_runtime POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_directory
 			$<TARGET_FILE_DIR:${lib}>
-			"${BUNGEEGUM_INSTALL_DIR}/runtime/bin/")
+			"${CMAKE_CURRENT_LIST_DIR}/../build/bin/")
 	endforeach()
-endif()
+# endif()

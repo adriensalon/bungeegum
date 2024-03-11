@@ -39,18 +39,18 @@ namespace detail {
         }
 
         void transfer_to_map(
-            std::vector<backtraced_exception>& from,
+            std::vector<log_data>& from,
             std::unordered_map<std::string, counted_backtraced_results>& to,
             const std::size_t max_count = BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGES)
         {
-            for (backtraced_exception& _exception : from) {
-                std::string _key = truncate_to_key(_exception.what());
-                if (to.find(_key) == to.end()) {
-                    to.emplace(_key, std::make_pair<std::size_t, backtraced_results>(1u, std::move(_exception.tracing)));
-                } else if (to.at(_key).first < max_count) {
-                    to.at(_key).first++;
-                }
-            }
+            // for (backtraced_exception& _exception : from) {
+            //     std::string _key = truncate_to_key(_exception.what());
+            //     if (to.find(_key) == to.end()) {
+            //         to.emplace(_key, std::make_pair<std::size_t, backtraced_results>(1u, std::move(_exception.tracing)));
+            //     } else if (to.at(_key).first < max_count) {
+            //         to.at(_key).first++;
+            //     }
+            // }
             from.clear();
         }
 
@@ -135,9 +135,9 @@ namespace detail {
         }
         ImGui::End();
 
-        transfer_to_map(global().pipelines.current.value().get().userspace_errors, error_logs);
-        transfer_to_map(global().pipelines.current.value().get().userspace_warnings, warning_logs);
-        transfer_to_map(global().pipelines.current.value().get().userspace_messages, message_logs);
+        transfer_to_map(swapped_global().logs.userspace_errors, error_logs);
+        transfer_to_map(swapped_global().logs.userspace_warnings, warning_logs);
+        transfer_to_map(swapped_global().logs.userspace_messages, message_logs);
     }
 }
 }

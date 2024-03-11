@@ -2,7 +2,6 @@
 
 #include <bungeegum/config/feature.hpp>
 #include <bungeegum/glue/serialize.hpp>
-#include <bungeegum/glue/toolchain.hpp>
 
 #if BUNGEEGUM_USE_HOTSWAP
 
@@ -27,10 +26,8 @@
 /// between recompilations.
 #define HOTSWAP_CLASS(classname, ...)                                                                                                                                                               \
     friend class cereal::access;                                                                                                                                                                    \
-    friend struct bungeegum::access;                                                                                                                                                                \
-    template <typename value_t>                                                                                                                                                                     \
-    friend struct bungeegum::detail::reloaded_wrapper;                                                                                                                                              \
-    friend struct bungeegum::detail::widget_manager_data;                                                                                                                                               \
+    friend struct bungeegum::access;                                                                                                                                                                    \
+    friend struct bungeegum::detail::swapped_access;                                                                                                                                              \
     HSCPP_TRACK(classname, #classname)                                                                                                                                                              \
     std::uintptr_t _bungeegum_object_reference = 0;                                                                                                                                                 \
     hscpp_virtual std::uintptr_t _bungeegum_this()                                                                                                                                                  \
@@ -41,13 +38,13 @@
     {                                                                                                                                                                                               \
         return sizeof(classname);                                                                                                                                                                   \
     }                                                                                                                                                                                               \
-    hscpp_virtual void _bungeegum_load(cereal::JSONInputArchive& archive)                                                                                                                           \
+    hscpp_virtual void load(cereal::JSONInputArchive& archive)                                                                                                                           \
     {                                                                                                                                                                                               \
-        bungeegum::detail::serialize_fields<cereal::JSONInputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__);  \
+        bungeegum::detail::serialize_fields(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__);  \
     }                                                                                                                                                                                               \
-    hscpp_virtual void _bungeegum_save(cereal::JSONOutputArchive& archive)                                                                                                                          \
+    hscpp_virtual void save(cereal::JSONOutputArchive& archive) const                                                                                                                         \
     {                                                                                                                                                                                               \
-        bungeegum::detail::serialize_fields<cereal::JSONOutputArchive>(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__); \
+        bungeegum::detail::serialize_fields(archive, std::string("BUNGEEGUM_OBJECT_REFERENCE, ") + std::string(#__VA_ARGS__), _bungeegum_object_reference, __VA_ARGS__); \
     }
 
 /// @brief Implements hotswapping functionnality to methods of struct that already use the
@@ -62,30 +59,105 @@ namespace mem {
     class MemoryManager;
 }
 }
-
 /// @endcond
 
 namespace bungeegum {
-namespace detail {
+namespace detail {    
+
+    template <typename value_t>
+    struct swapped;
+
+    namespace traits {
+        
+        template <typename value_t>
+        using detected_this_function = decltype(std::declval<value_t>()._bungeegum_this());
+
+        template <typename value_t>
+        using detected_sizeof_function = decltype(std::declval<value_t>()._bungeegum_sizeof());
+
+        template <typename value_t>
+        constexpr bool has_this_function_v = detail::is_detected_exact_v<std::uintptr_t, detected_this_function, value_t>;
+
+        template <typename value_t>
+        constexpr bool has_sizeof_function_v = detail::is_detected_exact_v<std::size_t, detected_sizeof_function, value_t>;
+
+        /// @brief True if value_t uses the HOTSWAP_CLASS macro.
+        template <typename value_t>
+        constexpr bool is_reloadable_v = (has_this_function_v<value_t> && has_sizeof_function_v<value_t>);
+    }
+
+    template <typename value_t, typename = void>
+    struct value_type {
+        using type = value_t;
+    };
+
+    template <typename value_t>
+    struct value_type<value_t, std::enable_if_t<traits::is_reloadable_v<value_t>>> {
+        using type = swapped<value_t>;
+    };
+
+    template <typename value_t, typename = void>
+    struct reference_type {
+        using type = std::reference_wrapper<value_t>;
+    };
+
+    template <typename value_t>
+    struct reference_type<value_t, std::enable_if_t<traits::is_reloadable_v<value_t>>> {
+        using type = swapped<value_t>;
+    };
+
+    /// @brief Equals to reloaded<value_t> if value_t is reloadable, and to value_t otherwise.
+    template <typename value_t>
+    using value_type_t = typename value_type<value_t>::type;
+
+    /// @brief Equals to reloaded<value_t> if value_t is reloadable, and to value_t& otherwise.
+    template <typename value_t>
+    using reference_type_t = typename reference_type<value_t>::type;
+
+
+    /// @brief 
+    struct swapped_access {
+
+        /// @brief 
+        /// @tparam swapped_t 
+        /// @param object 
+        /// @return 
+        template <typename swapped_t>
+        [[nodiscard]] static std::uintptr_t& get_object_reference(swapped_t& object);
+
+        /// @brief 
+        /// @tparam swapped_t 
+        /// @param object 
+        /// @return 
+        template <typename swapped_t>
+        [[nodiscard]] static std::uintptr_t get_this(swapped_t& object);
+
+        /// @brief 
+        /// @tparam swapped_t 
+        /// @param object 
+        /// @return 
+        template <typename swapped_t>
+        [[nodiscard]] static std::size_t get_sizeof(swapped_t& object);
+    };
 
     /// @brief Instances of this struct wrap values so they can be accessed between recompilations
     /// and method calls can be updated too.
     /// @details Instances of this struct can be both copied (shallow copy) and moved.
     /// @tparam value_t is the type to use as value.
     template <typename value_t>
-    struct reloaded {
-        reloaded();
-        reloaded(const reloaded& other);
-        reloaded& operator=(const reloaded& other);
-        reloaded(reloaded&& other);
-        reloaded& operator=(reloaded&& other);
+    struct swapped {
+        swapped();
+        swapped(const swapped& other);
+        swapped& operator=(const swapped& other);
+        swapped(swapped&& other);
+        swapped& operator=(swapped&& other);
 
         /// @brief Gets a non-const reference to the underlying value.
         [[nodiscard]] value_t& get() const;
 
     private:
         hscpp::mem::UniqueRef<value_t> _ref;
-        reloaded(hscpp::mem::UniqueRef<value_t>&& ref);
+        swapped(hscpp::mem::UniqueRef<value_t>&& ref);
         friend struct reloader;
     };
 
@@ -113,10 +185,10 @@ namespace detail {
         reloader(std::wstreambuf* buffer);
 
         /// @brief Allocates a new object that can be hotswapped, taking no argument.
-        /// @exception Throws a compile-time exception if the widget type is not default-
+        /// @exception Throws a compile-time exception if the swapped type is not default-
         /// constructible.
         template <typename value_t>
-        [[nodiscard]] reloaded<value_t> allocate();
+        [[nodiscard]] swapped<value_t> allocate();
 
         /// @brief Gets a modifiable list of the preprocessor definitions for recompilation.
         [[nodiscard]] std::vector<std::string>& defines();
@@ -180,7 +252,7 @@ namespace detail {
         /// the same file.
         /// @tparam value_t is the type to use as value.
         template <typename value_t>
-        void load(reloaded<value_t>& value);
+        void load(const swapped<value_t>& value);
 
     private:
         std::optional<std::reference_wrapper<std::stringstream>> _sstream = std::nullopt;
@@ -208,7 +280,7 @@ namespace detail {
         /// same file.
         /// @tparam value_t is the type to use as value.
         template <typename value_t>
-        void save(reloaded<value_t>& value);
+        void save(const swapped<value_t>& value);
 
     private:
         std::optional<std::reference_wrapper<std::stringstream>> _sstream = std::nullopt;
@@ -220,58 +292,7 @@ namespace detail {
     /// @tparam value_t
     template <typename value_t>
     [[nodiscard]] value_t& get_global_data();
-}
-}
-
-namespace bungeegum {
-namespace detail {
-    namespace traits {
-
-        template <typename value_t>
-        using detected_load_function = decltype(std::declval<value_t>()._bungeegum_load(std::declval<cereal::JSONInputArchive&>()));
-
-        template <typename value_t>
-        using detected_save_function = decltype(std::declval<value_t>()._bungeegum_save(std::declval<cereal::JSONOutputArchive&>()));
-
-        template <typename value_t>
-        constexpr bool has_load_function_v = detail::is_detected_exact_v<void, detected_load_function, value_t>;
-
-        template <typename value_t>
-        constexpr bool has_save_function_v = detail::is_detected_exact_v<void, detected_save_function, value_t>;
-
-        /// @brief True if value_t uses the HOTSWAP_CLASS macro.
-        template <typename value_t>
-        constexpr bool is_reloadable_v = (has_load_function_v<value_t> && has_save_function_v<value_t>);
-
-    }
-
-    template <typename value_t, typename = void>
-    struct value_type {
-        using type = value_t;
-    };
-
-    template <typename value_t>
-    struct value_type<value_t, std::enable_if_t<traits::is_reloadable_v<value_t>>> {
-        using type = reloaded<value_t>;
-    };
-
-    template <typename value_t, typename = void>
-    struct reference_type {
-        using type = std::reference_wrapper<value_t>;
-    };
-
-    template <typename value_t>
-    struct reference_type<value_t, std::enable_if_t<traits::is_reloadable_v<value_t>>> {
-        using type = reloaded<value_t>;
-    };
-
-    /// @brief Equals to reloaded<value_t> if value_t is reloadable, and to value_t otherwise.
-    template <typename value_t>
-    using value_type_t = typename value_type<value_t>::type;
-
-    /// @brief Equals to reloaded<value_t> if value_t is reloadable, and to value_t& otherwise.
-    template <typename value_t>
-    using reference_type_t = typename reference_type<value_t>::type;
+    
 }
 }
 
@@ -288,18 +309,6 @@ namespace detail {
 
 namespace bungeegum {
 namespace detail {
-
-    namespace traits {
-
-        template <typename value_t>
-        constexpr bool has_load_function_v = false;
-
-        template <typename value_t>
-        constexpr bool has_save_function_v = false;
-
-        template <typename value_t>
-        constexpr bool is_reloadable_v = false;
-    }
 
     template <typename value_t>
     using value_type_t = value_t;

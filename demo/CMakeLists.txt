@@ -1,6 +1,6 @@
 project(bungeegum_demo)
 
-add_executable(bungeegum_demo "source/main.cpp")
+add_executable(bungeegum_demo "source/main.cpp" "source/testclass.cpp")
 target_include_directories(bungeegum_demo PRIVATE "static")
 set_property(TARGET bungeegum_demo PROPERTY CXX_STANDARD 17)
 target_link_libraries(bungeegum_demo bungeegum_runtime)

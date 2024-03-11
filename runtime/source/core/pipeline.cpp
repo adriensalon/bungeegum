@@ -35,13 +35,12 @@ namespace detail {
         });
     }
 
-    void protect_userspace(std::vector<backtraced_exception>& container, const std::function<void()>& try_callback)
+    void protect_userspace(std::vector<log_data>& container, const std::function<void()>& try_callback)
     {
         protect(try_callback, [&container](const std::string& _what) {
             // uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
-            backtraced_exception _exception(_what, 0, 0);
 #if BUNGEEGUM_USE_OVERLAY
-            container.push_back(_exception);
+            // container.push_back(_exception);
 #else
                 console_log_error(_exception);
                 (void)container;
@@ -51,7 +50,7 @@ namespace detail {
 
     void save_widgets(const std::filesystem::path& archive_path, widget_update_data& root_updatable)
     {
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
         reloaded_saver _archiver(archive_path);
         std::function<void(widget_update_data&)> _traverse_function = [&_archiver, &_traverse_function](widget_update_data& _updatable) {
             if (_updatable.saver) {
@@ -70,7 +69,7 @@ namespace detail {
 
     void load_widgets(const std::filesystem::path& archive_path, widget_update_data& root_updatable)
     {
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
         reloaded_loader _archiver(archive_path);
         std::function<void(widget_update_data&)> _traverse_function = [&_archiver, &_traverse_function](widget_update_data& _updatable) {
             if (_updatable.loader) {
@@ -118,15 +117,17 @@ namespace detail {
 
     void resolve_widgets(const float2 viewport_size, widget_update_data& root_updatable)
     {
-        pipeline_manager_data& _pipeline_manager = global().pipelines;
-        widget_manager_data& _widget_manager = global().widgets;
-#if BUNGEEGUM_USE_OVERLAY
-        _pipeline_manager.current.value().get().steps_chronometer.begin_task("resolve");
-#endif
+        swapped_manager_data& _swapped = swapped_global();
+
+        // pipeline_manager_data& _pipeline_manager = global().pipelines;
+        // widget_manager_data& _widget_manager = global().widgets;
+// #if BUNGEEGUM_USE_OVERLAY
+//         _pipeline_manager.current.value().get().steps_chronometer.begin_task("resolve");
+// #endif
         bool _resolve_done = false;
         std::vector<std::uintptr_t> _ids;
         while (!_resolve_done) {
-            for (std::pair<const std::uintptr_t, resolve_command_data>& _it : _widget_manager.resolvables) {
+            for (std::pair<const std::uintptr_t, resolve_command_data>& _it : _swapped.widgets.resolvables) {
                 _ids.push_back(_it.first);
                 widget_update_data& _updatable = _it.second.get();
                 if (_updatable.raw == root_updatable.raw) {
@@ -137,39 +138,40 @@ namespace detail {
                     _updatable.local_min_size = _parent_updatable.local_min_size;
                     _updatable.local_max_size = _parent_updatable.local_max_size;
                 }
-#if BUNGEEGUM_USE_OVERLAY
-                _pipeline_manager.current.value().get().widgets_chronometer.begin_task(_updatable.clean_typename);
-#endif
+// #if BUNGEEGUM_USE_OVERLAY
+//                 _pipeline_manager.current.value().get().widgets_chronometer.begin_task(_updatable.clean_typename);
+// #endif
 
-                protect_userspace(_pipeline_manager.current.value().get().userspace_errors, [&_updatable]() {
+                protect_userspace(_swapped.logs.userspace_errors, [&_updatable]() {
                     resolve_command_data _data = { _updatable };
                     resolve_command _command = detail::resolve_command_access::make_from_data(_data);
                     _updatable.resolver(_command);
                 });
-#if BUNGEEGUM_USE_OVERLAY
-                _pipeline_manager.current.value().get().widgets_chronometer.end_task(_updatable.clean_typename);
-#endif
+// #if BUNGEEGUM_USE_OVERLAY
+//                 _pipeline_manager.current.value().get().widgets_chronometer.end_task(_updatable.clean_typename);
+// #endif
             }
             for (const std::uintptr_t _id : _ids) {
-                _widget_manager.resolvables.erase(_id);
+                _swapped.widgets.resolvables.erase(_id);
             }
             _ids.clear();
-            _resolve_done = _widget_manager.resolvables.empty();
+            _resolve_done = _swapped.widgets.resolvables.empty();
         }
-#if BUNGEEGUM_USE_OVERLAY
-        _pipeline_manager.current.value().get().steps_chronometer.end_task("resolve");
-#endif
+// #if BUNGEEGUM_USE_OVERLAY
+//         _pipeline_manager.current.value().get().steps_chronometer.end_task("resolve");
+// #endif
     }
 
     void draw_widgets(ImDrawList* imgui_drawlist)
     {
-        global_manager_data& _global = global();
+        swapped_manager_data& _swapped = swapped_global();
         bool _draw_done = false;
         std::vector<std::uintptr_t> _ids;
-        const std::uintptr_t _raw_pipeline = _global.pipelines.current.value().get().raw; // get from func args
+        const std::uintptr_t _raw_pipeline = _swapped.current; // get from func args
         while (!_draw_done) {
-            for (std::pair<const std::uintptr_t, bungeegum::detail::resolve_command_data>& _it : _global.widgets.drawables) {
+            for (std::pair<const std::uintptr_t, bungeegum::detail::resolve_command_data>& _it : _swapped.widgets.drawables) {
                 _ids.push_back(_it.first);
+                const std::uintptr_t _raw_updatable = _it.first;
                 widget_update_data& _updatable = _it.second.get();
                 if (_updatable.parent.has_value()) {
                     widget_update_data& _parent_updatable = _updatable.parent.value().get();
@@ -184,8 +186,8 @@ namespace detail {
                 //                         std::string _clean_typename = global().pipelines.to_clean_typename(_updatable.inplace_data.type().name());
                 //                         global().pipelines.profiler_draw_chronometer.begin_task(_clean_typename);
                 // #endif
-                protect_userspace(_global.pipelines.current.value().get().userspace_errors, [&_updatable, imgui_drawlist, _raw_pipeline]() {
-                    draw_command_data _data = { _updatable, _raw_pipeline, imgui_drawlist };
+                protect_userspace(_swapped.logs.userspace_errors, [&_updatable, _raw_updatable, imgui_drawlist, _raw_pipeline]() {
+                    draw_command_data _data = { _raw_updatable, _raw_pipeline, imgui_drawlist };
                     draw_command _command = detail::draw_command_access::make_from_data(_data);
                     _updatable.drawer(_command);
                 });
@@ -195,10 +197,10 @@ namespace detail {
                 // _widget_drawer_command._data.draw(imgui_drawlist);
             };
             for (const std::uintptr_t _id : _ids) {
-                _global.widgets.drawables.erase(_id);
+                _swapped.widgets.drawables.erase(_id);
             }
             _ids.clear();
-            _draw_done = _global.widgets.drawables.empty();
+            _draw_done = _swapped.widgets.drawables.empty();
         }
     }
 
@@ -230,31 +232,31 @@ namespace detail {
 
     bool process_widgets(const float2 viewport_size, const std::chrono::milliseconds& delta_time, widget_update_data& root_updatable)
     {
-        global_manager_data& _global = global();
+        swapped_manager_data& _swapped = swapped_global();
 
-        _global.pipelines.current.value().get().steps_chronometer.begin_task("animations");
-        process_animations(_global.animations, delta_time);
-        _global.pipelines.current.value().get().steps_chronometer.end_task("animations");
+        // _global.pipelines.current.value().get().steps_chronometer.begin_task("animations");
+        process_animations(_swapped.animations, delta_time);
+        // _global.pipelines.current.value().get().steps_chronometer.end_task("animations");
 
-        _global.pipelines.current.value().get().steps_chronometer.begin_task("events");
-        process_events(_global.events);
-        _global.pipelines.current.value().get().steps_chronometer.end_task("events");
+        // _global.pipelines.current.value().get().steps_chronometer.begin_task("events");
+        process_events(_swapped.events);
+        // _global.pipelines.current.value().get().steps_chronometer.end_task("events");
 
-        _global.pipelines.current.value().get().steps_chronometer.begin_task("interact pass");
+        // _global.pipelines.current.value().get().steps_chronometer.begin_task("interact pass");
         // interact_widgets();
-        _global.pipelines.current.value().get().steps_chronometer.end_task("interact pass");
+        // _global.pipelines.current.value().get().steps_chronometer.end_task("interact pass");
 
-        _global.pipelines.current.value().get().steps_chronometer.begin_task("resolve pass");
+        // _global.pipelines.current.value().get().steps_chronometer.begin_task("resolve pass");
         resolve_widgets(viewport_size, root_updatable);
-        _global.pipelines.current.value().get().steps_chronometer.end_task("resolve pass");
+        // _global.pipelines.current.value().get().steps_chronometer.end_task("resolve pass");
 
         // return (has_userspace_thrown() || !global().widgets.drawables.empty());
 
-#if BUNGEEGUM_USE_OVERLAY
-        _global.pipelines.current.value().get().lifetime_duration += delta_time;
-#endif
+// #if BUNGEEGUM_USE_OVERLAY
+//         _global.pipelines.current.value().get().lifetime_duration += delta_time;
+// #endif
 
-        return !_global.widgets.drawables.empty();
+        return !_swapped.widgets.drawables.empty();
     }
 
     void setup_window(window_handle& pipeline_window, const pipeline_bindings& provider)
@@ -350,9 +352,9 @@ namespace detail {
     void update_hotswap_frame(const std::filesystem::path& serialize_path, widget_update_data& root_updatable)
     {
 #if BUNGEEGUM_USE_HOTSWAP
-        global_manager_data& _global = global();
+        swapped_manager_data& _swapped = swapped_global();
         std::wstringstream _update_stream;
-        reload_state _reload_result = _global.widgets.hotswap_reloader->update(_update_stream.rdbuf());
+        reload_state _reload_result = _swapped.widgets.hotswap_reloader->update(_update_stream.rdbuf());
         std::string _update_str = narrow(_update_stream.str());
         (void)_update_str;
         // std::cout << _update_str << std::endl;
@@ -394,18 +396,17 @@ namespace detail {
 
     void update_process_frame(pipeline_data& data, const float2 viewport_size, const BUNGEEGUM_USE_TIME_UNIT& delta_time, const bool force_rendering, const bool exclusive_rendering)
     {
-        global_manager_data& _global = global();
-        pipeline_data& _pipeline = _global.pipelines.current.value().get();
-        _pipeline.steps_chronometer.new_frame();
-        _pipeline.widgets_chronometer.new_frame();
+        swapped_manager_data& _swapped = swapped_global();
+        // _pipeline.steps_chronometer.new_frame();
+        // _pipeline.widgets_chronometer.new_frame();
 
         if constexpr (BUNGEEGUM_USE_OVERLAY || force_rendering) {
-            widget_update_data& _root_updatable = _pipeline.root_updatable.value().get();
-            _global.widgets.drawables = { { _root_updatable.raw, std::ref(_root_updatable) } };
+            widget_update_data& _root_updatable = data.root_updatable.value().get();
+            _swapped.widgets.drawables = { { _root_updatable.raw, std::ref(_root_updatable) } };
         }
         process_widgets(viewport_size, delta_time, data.root_updatable.value());
-        if (!_global.widgets.drawables.empty()) {
-            _pipeline.steps_chronometer.begin_task("draw pass");
+        if (!_swapped.widgets.drawables.empty()) {
+            // _pipeline.steps_chronometer.begin_task("draw pass");
             if (exclusive_rendering) {
                 data.pipeline_renderer.clear_screen();
             }
@@ -428,7 +429,7 @@ namespace detail {
             if (exclusive_rendering) {
                 data.pipeline_renderer.present();
             }
-            _pipeline.steps_chronometer.end_task("draw pass");
+            // _pipeline.steps_chronometer.end_task("draw pass");
         }
     }
 
@@ -439,8 +440,13 @@ namespace detail {
         detail::setup_overlay(data.overlay_context);
 #endif
         data.user_context.emplace(data.pipeline_renderer, nullptr);
+        
+
+        detail::swapped_manager_data& _swapped = detail::swapped_global();
+        _swapped.rasterizers.insert({ data.raw, std::ref(data.user_context) });
+
         detail::setup_shaders(data);
-        detail::global_manager_data& _global = detail::global();
+        detail::global_manager_data& _global = detail::global2();
         _global.pipelines.pipelines.insert({ data.raw, std::ref(data) });
     }
 }
@@ -504,9 +510,9 @@ template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>:
 template <renderer_backend backend_t>
 pipeline<backend_t>& pipeline<backend_t>::root(const widget_id root_id)
 {
-    detail::global_manager_data& _global = detail::global();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
     const std::uintptr_t _raw = detail::widget_id_access::get_data(root_id);
-    _data.root_updatable = _global.widgets.updatables[_raw];
+    _data.root_updatable = _swapped.widgets.updatables.at(_raw);
     return *this;
 }
 template pipeline<renderer_backend::directx11>& pipeline<renderer_backend::directx11>::root(const widget_id root_id);
@@ -522,7 +528,13 @@ void pipeline<backend_t>::run(const std::optional<unsigned int> frames_per_secon
     }
     _data.pipeline_window.update_loop(frames_per_second, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
         detail::protect_library([this, &delta_time, force_rendering]() {
-            detail::global().pipelines.current = std::ref(_data);
+
+            // ICI SET LOOP RUN    
+            detail::swapped_global().current = _data.raw;
+            detail::swapped_global().default_shader = _data.default_shader;
+            detail::swapped_global().mask_shader = _data.mask_shader;
+
+
             detail::update_input_frame(_data);
             float2 _viewport_size = _data.pipeline_window.get_size();
             detail::update_process_frame(_data, _viewport_size, delta_time, force_rendering, true);
@@ -543,11 +555,17 @@ pipeline<backend_t>& pipeline<backend_t>::run_once(const bool force_rendering)
     }
     _data.pipeline_window.update_once(9999u, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
         detail::protect_library([this, &delta_time, force_rendering]() {
-            detail::global().pipelines.current = std::ref(_data);
+            
+            // ICI SET LOOP RUN    
+            detail::swapped_global().current = _data.raw;
+            detail::swapped_global().default_shader = _data.default_shader;
+            detail::swapped_global().mask_shader = _data.mask_shader;
+
             detail::update_input_frame(_data);
             float2 _viewport_size = _data.pipeline_window.get_size();
             detail::update_process_frame(_data, _viewport_size, delta_time, force_rendering, false);
             detail::update_hotswap_frame("C:/Users/adri/desktop/ok.json", _data.root_updatable.value());
+            
         });
     });
     return *this;
@@ -569,7 +587,6 @@ template pipeline<renderer_backend::directx11>& pipeline<renderer_backend::direc
 template pipeline<renderer_backend::directx12>& pipeline<renderer_backend::directx12>::title(const std::string& description);
 template pipeline<renderer_backend::opengl>& pipeline<renderer_backend::opengl>::title(const std::string& description);
 template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>::title(const std::string& description);
-
 
 
 }

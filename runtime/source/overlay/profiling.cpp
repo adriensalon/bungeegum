@@ -24,7 +24,7 @@ namespace detail {
 
         float backend_lifetime_duration()
         {
-            return 0.001f * static_cast<float>(global().pipelines.current.value().get().lifetime_duration.count());
+            return 0.001f; // * static_cast<float>(global().pipelines.current.value().get().lifetime_duration.count());
         }
 
         static std::string filter_text = "";
@@ -254,8 +254,8 @@ namespace detail {
 
     void setup_profiler_overlay()
     {
-        steps_profiler.setup(global().pipelines.current.value().get().steps_chronometer);
-        widgets_profiler.setup(global().pipelines.current.value().get().widgets_chronometer);
+        // steps_profiler.setup(global().pipelines.current.value().get().steps_chronometer);
+        // widgets_profiler.setup(global().pipelines.current.value().get().widgets_chronometer);
     }
 
     void draw_profiling_overlay()
@@ -268,8 +268,8 @@ namespace detail {
             static float _history = 10.f;
             ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
             if (ImGui::BeginTabBar(tag("tab_bar").c_str(), tab_bar_flags)) {
-                draw_profiler_tab(global().pipelines.current.value().get().steps_chronometer, steps_profiler, _history);
-                draw_profiler_tab_with_regex(global().pipelines.current.value().get().widgets_chronometer, widgets_profiler, _history);
+                // draw_profiler_tab(global().pipelines.current.value().get().steps_chronometer, steps_profiler, _history);
+                // draw_profiler_tab_with_regex(global().pipelines.current.value().get().widgets_chronometer, widgets_profiler, _history);
             }
             ImGui::EndTabBar();
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);

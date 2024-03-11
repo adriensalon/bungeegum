@@ -93,9 +93,9 @@ namespace detail {
         playing_cursor_seconds = std::move(other.playing_cursor_seconds);
         mode = std::move(other.mode);
 
-        global_manager_data& _global = global();
-        if (_global.animations.updatables.find(raw) != _global.animations.updatables.end()) {
-            _global.animations.updatables.at(raw) = std::ref(update_data); // update ref
+        swapped_manager_data& _swapped = swapped_global();
+        if (_swapped.animations.updatables.find(raw) != _swapped.animations.updatables.end()) {
+            _swapped.animations.updatables.at(raw) = std::ref(update_data); // update ref
             assign_ticker(*this);
         }
         return *this;
@@ -104,9 +104,9 @@ namespace detail {
     template <typename value_t>
     animation_data<value_t>::~animation_data()
     {
-        global_manager_data& _global = global();
-        if (_global.animations.updatables.find(raw) != _global.animations.updatables.end()) {
-            _global.animations.updatables_to_erase.push_back(raw);
+        swapped_manager_data& _swapped = swapped_global();
+        if (_swapped.animations.updatables.find(raw) != _swapped.animations.updatables.end()) {
+            _swapped.animations.updatables_to_erase.push_back(raw);
         }
     }
 }
@@ -143,8 +143,8 @@ template <typename value_t>
 animation<value_t>& animation<value_t>::start()
 {
     std::uintptr_t _raw_animation = detail::raw_cast<animation<value_t>>(this);
-    if (!detail::global().animations.contains(_raw_animation)) {
-        detail::animation_update_data& _update_data = detail::global().animations[_raw_animation];
+    if (!detail::swapped_global().animations.contains(_raw_animation)) {
+        detail::animation_update_data& _update_data = detail::swapped_global().animations[_raw_animation];
         _data.raw_animation = _raw_animation;
         _update_data.kind = std::make_unique<std::type_index>(typeid(value_t));
         detail::assign_ticker(_data, _update_data);

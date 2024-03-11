@@ -1,0 +1,25 @@
+#pragma once
+
+#include <bungeegum/glue/backtrace.hpp>
+
+namespace bungeegum { 
+namespace detail {
+
+
+    struct log_data {
+        std::size_t count = 0u;
+        std::string tag = "bungeegum";
+        std::string what = {};
+        std::string widget = {};
+        std::vector<backtraced_step> steps = {};
+    };
+
+
+    struct logs_manager_data {        
+        std::vector<log_data> userspace_errors = {};
+        std::vector<log_data> userspace_warnings = {};
+        std::vector<log_data> userspace_messages = {}; 
+    };
+
+}
+}

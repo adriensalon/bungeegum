@@ -8,12 +8,9 @@
 #include <vector>
 
 #include <bungeegum/core/math.hpp>
-#include <bungeegum/core/pipeline.fwd>
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/raw.hpp>
 #include <bungeegum/glue/hotswap.hpp>
-#include <bungeegum/glue/window.hpp>
-#include <bungeegum/glue/rendering.hpp>
 
 struct ImDrawList;
 
@@ -84,7 +81,7 @@ namespace detail {
 	using resolve_command_data = std::reference_wrapper<widget_update_data>;
 	
 	struct draw_command_data {
-		std::reference_wrapper<widget_update_data> updatable;
+		std::uintptr_t raw_updatable;
 		std::uintptr_t raw_pipeline;
 		ImDrawList* draw_list = nullptr;
 	};
@@ -134,6 +131,7 @@ namespace detail {
     struct widget_ref_access {
         [[nodiscard]] static widget_ref<widget_t> make_from_data(const widget_ref_data<widget_t>& data);
         [[nodiscard]] static widget_ref_data<widget_t>& get_data(widget_ref<widget_t>& object);
+        [[nodiscard]] static const widget_ref_data<widget_t>& get_data(const widget_ref<widget_t>& object);
     };
 }
 }

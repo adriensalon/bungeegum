@@ -199,30 +199,30 @@ void resolve_command::resize(const float2 size)
 
 float2 resolve_command::resolve_child(const widget_id child_id, const float2 min_size, const float2 max_size) const
 {
-    detail::global_manager_data& _global = detail::global();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
-    detail::widget_update_data& _child_updatable = _global.widgets.updatables[_child_raw];
-    detail::widget_update_data& _updatable = _data.get();
+    detail::widget_update_data& _child_updatable = _swapped.widgets.updatables[_child_raw];
+    // detail::widget_update_data& _updatable = _data.get();
     _child_updatable.local_min_size = min_size;
     _child_updatable.local_max_size = max_size;
-#if BUNGEEGUM_USE_OVERLAY
-    _global.pipelines.current.value().get().widgets_chronometer.end_task(_updatable.clean_typename);
-    _global.pipelines.current.value().get().widgets_chronometer.begin_task(_child_updatable.clean_typename);
-#endif
-    detail::protect_userspace(_global.pipelines.current.value().get().userspace_errors, [&_child_updatable]() {
+// #if BUNGEEGUM_USE_OVERLAY
+//     _swapped.pipelines.current.value().get().widgets_chronometer.end_task(_updatable.clean_typename);
+//     _swapped.pipelines.current.value().get().widgets_chronometer.begin_task(_child_updatable.clean_typename);
+// #endif
+    // detail::protect_userspace(_swapped.logs.userspace_errors, [&_child_updatable]() {
         resolve_command _command = detail::resolve_command_access::make_from_data(_child_updatable);
         _child_updatable.resolver(_command);
-    });
-#if BUNGEEGUM_USE_OVERLAY
-    _global.pipelines.current.value().get().widgets_chronometer.end_task(_child_updatable.clean_typename);
-    _global.pipelines.current.value().get().widgets_chronometer.begin_task(_updatable.clean_typename);
-#endif
+    // });
+// #if BUNGEEGUM_USE_OVERLAY
+//     _swapped.pipelines.current.value().get().widgets_chronometer.end_task(_child_updatable.clean_typename);
+//     _swapped.pipelines.current.value().get().widgets_chronometer.begin_task(_updatable.clean_typename);
+// #endif
     return _child_updatable.resolved_size;
 }
 
 void resolve_command::position_child(const widget_id child_id, const float2 position, const bool absolute)
 {
-    detail::widget_manager_data& _manager = detail::global().widgets;
+    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
     detail::widget_update_data& _child_updatable = _manager.updatables[_child_raw];
     if (absolute) {
@@ -248,7 +248,8 @@ draw_command::draw_command(const detail::draw_command_data& data)
 
 float2 draw_command::get_size() const
 {
-    return _data.updatable.get().resolved_size;
+    // return _data.updatable.get().resolved_size;
+    return {0, 0};
 }
 
 void draw_command::draw_child(const widget_id child_id)
@@ -388,9 +389,8 @@ void use_shader_callback(const ImDrawList* parent_list, const ImDrawCmd* cmd)
 {
     detail::shader_handle _shader;
     _shader.emplace(cmd->UserCallbackData);    
-    detail::global_manager_data& _global = detail::global();
-    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();    
-    _pipeline_data.user_context.use_shader(_shader);
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    _swapped.rasterizers.at(_swapped.current).get().use_shader(_shader);
 }
 
 void draw_command::use_shader_custom(const shader& user_shader)
@@ -402,16 +402,14 @@ void draw_command::use_shader_custom(const shader& user_shader)
 
 void draw_command::use_shader_default()
 {
-    detail::global_manager_data& _global = detail::global();
-    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();  
-    _data.draw_list->AddCallback(use_shader_callback, _pipeline_data.default_shader.get());
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    _data.draw_list->AddCallback(use_shader_callback, _swapped.default_shader.get());
 }
 
 void draw_command::use_shader_mask()
 {
-    detail::global_manager_data& _global = detail::global();
-    detail::pipeline_data& _pipeline_data = _global.pipelines.current.value().get();
-    _data.draw_list->AddCallback(use_shader_callback, _pipeline_data.mask_shader.get());
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    _data.draw_list->AddCallback(use_shader_callback, _swapped.mask_shader.get());
 }
 
 void draw_command::clear_mask()
@@ -459,7 +457,7 @@ widget_id::widget_id(const detail::widget_id_data& data)
 
 void adopt(const widget_id parent_id, const widget_id child_id)
 {
-    detail::widget_manager_data& _manager = detail::global().widgets;
+    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
     const std::uintptr_t _parent_raw = detail::widget_id_access::get_data(parent_id);
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
     detail::widget_update_data& _parent_updatable = _manager.updatables[_parent_raw];
@@ -470,7 +468,7 @@ void adopt(const widget_id parent_id, const widget_id child_id)
 
 void abandon(const widget_id parent_id, const widget_id child_id)
 {
-    detail::widget_manager_data& _manager = detail::global().widgets;
+    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
     const std::uintptr_t _parent_raw = detail::widget_id_access::get_data(parent_id);
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
     detail::widget_update_data& _parent_updatable = _manager.updatables[_parent_raw];
@@ -502,44 +500,52 @@ void destroy(const widget_id& widget)
     // detail::global().widgets->.accessors.erase(_void_widget);
 }
 
+
+
+
 std::vector<std::string>& get_hotswap_defines()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::global_manager_data& _global = detail::global();
-    return _global.widgets.hotswap_reloader->defines();
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->defines();
 }
 
 std::vector<std::filesystem::path>& get_hotswap_include_directories()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::global_manager_data& _global = detail::global();
-    return _global.widgets.hotswap_reloader->include_directories();
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->include_directories();
 }
 
 std::vector<std::filesystem::path>& get_hotswap_source_directories()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::global_manager_data& _global = detail::global();
-    return _global.widgets.hotswap_reloader->source_directories();
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->source_directories();
 }
-template <renderer_backend backend_t>
+
 std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::global_manager_data& _global = detail::global();
-    return _global.widgets.hotswap_reloader->force_compiled_source_files();
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->force_compiled_source_files();
 }
 
 std::vector<std::filesystem::path>& get_hotswap_libraries()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::global_manager_data& _global = detail::global();
-    return _global.widgets.hotswap_reloader->libraries();
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->libraries();
 }
 
 widget_id get_parent(const widget_id id)
 {
-    detail::widget_manager_data& _manager = detail::global().widgets;
+    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
     if (!_updatable.parent.has_value()) {
@@ -552,7 +558,7 @@ widget_id get_parent(const widget_id id)
 
 bool has_parent(const widget_id id)
 {
-    detail::widget_manager_data& _manager = detail::global().widgets;
+    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
     return _updatable.parent.has_value();
@@ -560,7 +566,7 @@ bool has_parent(const widget_id id)
 
 void must_resolve(const widget_id id)
 {
-    detail::widget_manager_data& _manager = detail::global().widgets;
+    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
     if (_manager.resolvables.find(_raw) != _manager.resolvables.end()) {
@@ -570,7 +576,7 @@ void must_resolve(const widget_id id)
 
 void must_draw(const widget_id id)
 {
-    detail::widget_manager_data& _manager = detail::global().widgets;
+    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
 	if (_manager.drawables.find(_raw) != _manager.drawables.end()) {

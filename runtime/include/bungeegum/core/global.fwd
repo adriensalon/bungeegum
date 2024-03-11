@@ -2,33 +2,53 @@
 
 #include <bungeegum/core/animation.fwd>
 #include <bungeegum/core/pipeline.fwd>
+#include <bungeegum/core/log.fwd>
 #include <bungeegum/core/widget.fwd>
 #include <bungeegum/core/shader.fwd>
 #include <bungeegum/core/font.fwd>
 #include <bungeegum/core/texture.fwd>
 
+#include <unordered_set>
+
 namespace bungeegum {
 namespace detail {
 
-    struct global_manager_data {
+    struct swapped_manager_data {
+        swapped_manager_data() = default;
+        swapped_manager_data(const swapped_manager_data& other) = delete;
+        swapped_manager_data& operator=(const swapped_manager_data& other) = delete;
+        swapped_manager_data(swapped_manager_data&& other) = delete;
+        swapped_manager_data& operator=(swapped_manager_data&& other) = delete;
+        
         animations_manager_data animations = {};
         events_manager_data events = {};
         fonts_manager_data fonts = {};
-        pipeline_manager_data pipelines = {};
+        logs_manager_data logs = {};
         textures_manager_data textures = {};
         widget_manager_data widgets = {};
+
+        std::unordered_map<std::uintptr_t, std::reference_wrapper<rasterizer_handle>> rasterizers = {};
+        std::uintptr_t current = 0u;
+        shader_handle default_shader = {};
+        shader_handle mask_shader = {};
+    };
+
+    struct global_manager_data {        
+        pipeline_manager_data pipelines = {};
     };
 
     void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)
 
 #if BUNGEEGUM_USE_HOTSWAP
-    inline global_manager_data& global() // This has to be inline for reload (?)
+    inline swapped_manager_data& swapped_global() // This has to be inline for reload (?)
     {
-        return get_global_data<global_manager_data>();
+        return get_global_data<swapped_manager_data>();
     }
 #else
-    global_manager_data& global();
+    swapped_manager_data& swapped_global();
 #endif
+
+    global_manager_data& global2();
 
 }
 }

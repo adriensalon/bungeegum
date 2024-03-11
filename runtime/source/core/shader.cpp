@@ -42,8 +42,8 @@ namespace detail {
                 return Diligent::BLEND_FACTOR_INV_DEST_ALPHA;
             
             default:
-                log_error("[runtime/core/shader.cpp] invalid enum value"); 
-                return Diligent::BLEND_FACTOR_ZERO;               
+                throw backtraced_exception("[runtime/core/shader.cpp] invalid enum value"); 
+                // return Diligent::BLEND_FACTOR_ZERO;               
             }
         }
 
@@ -67,8 +67,8 @@ namespace detail {
                 return Diligent::BLEND_OPERATION_MAX;
             
             default:
-                log_error("[runtime/core/shader.cpp] invalid enum value");
-                return Diligent::BLEND_OPERATION_ADD;
+                throw backtraced_exception("[runtime/core/shader.cpp] invalid enum value");
+                // return Diligent::BLEND_OPERATION_ADD;
             }
         }
 
@@ -117,11 +117,10 @@ namespace detail {
         creation_fragment = other.creation_fragment;
         creation_blend = other.creation_blend;
         if (is_compiled) {
-            detail::global_manager_data& _global = detail::global();
-            for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-                detail::pipeline_data& _pipeline_data = _it.second.get();        
-                shaders[_it.first].emplace(
-                    _pipeline_data.user_context,
+            detail::swapped_manager_data& _swapped = detail::swapped_global();
+            for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
+                shaders[_pipeline.first].emplace(
+                    _pipeline.second.get(),
                     creation_fragment,
                     creation_blend);
             }
@@ -157,11 +156,10 @@ shader::shader(const std::string& fragment, const shader_blend_options& blend)
     detail::reset_shaders(_data);
     _data.creation_fragment = fragment;
     _data.creation_blend = detail::convert_to_blend_options(blend);
-    detail::global_manager_data& _global = detail::global();
-    for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-        detail::pipeline_data& _pipeline_data = _it.second.get();        
-        _data.shaders[_it.first].emplace(
-            _pipeline_data.user_context,
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
+        _data.shaders[_pipeline.first].emplace(
+            _pipeline.second.get(),
             _data.creation_fragment,
             _data.creation_blend);
     }

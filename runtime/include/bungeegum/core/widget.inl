@@ -10,7 +10,7 @@ struct access {
     constexpr static std::uintptr_t get_raw(widget_t& widget)
     {
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-            return widget._bungeegum_object_reference;
+            return detail::swapped_access::get_object_reference(widget);
         } else {
             return detail::raw_cast<widget_t>(widget);
         }
@@ -20,7 +20,7 @@ struct access {
     constexpr static std::uintptr_t get_sizeof(widget_t& widget)
     {
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-            return widget._bungeegum_sizeof();
+            return detail::swapped_access::get_sizeof(widget);
         } else {
             return sizeof(widget_t);
         }
@@ -30,7 +30,7 @@ struct access {
     constexpr static std::uintptr_t get_this(widget_t& widget)
     {
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-            return widget._bungeegum_this();
+            return detail::swapped_access::get_this(widget);
         } else {
             return detail::raw_cast<widget_t>(widget);
         }
@@ -68,6 +68,12 @@ namespace detail {
 
     template <typename widget_t>
     reference_type_t<widget_t>& widget_ref_access<widget_t>::get_data(widget_ref<widget_t>& ref)
+    {
+        return ref._data;
+    }
+
+    template <typename widget_t>
+    const reference_type_t<widget_t>& widget_ref_access<widget_t>::get_data(const widget_ref<widget_t>& ref)
     {
         return ref._data;
     }
@@ -128,9 +134,9 @@ namespace detail {
     template <typename widget_t>
     constexpr void install_on_load(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-            updatable.loader = [&reference](detail::reloaded_loader& archiver) {
+            updatable.loader = [reference](detail::reloaded_loader& archiver) {
                 archiver.load<widget_t>(widget_ref_access<widget_t>::get_data(reference));
             };
         }
@@ -143,9 +149,9 @@ namespace detail {
     template <typename widget_t>
     constexpr void install_on_save(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-            updatable.saver = [&reference](detail::reloaded_saver& archiver) {
+            updatable.saver = [reference](detail::reloaded_saver& archiver) {
                 archiver.save<widget_t>(widget_ref_access<widget_t>::get_data(reference));
             };
         }
@@ -158,7 +164,7 @@ namespace detail {
     template <typename widget_t>
     constexpr void install_on_sizeof(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
         updatable.true_sizeof = [reference]() {
             return bungeegum::access::get_sizeof<widget_t>(reference.get());
         };
@@ -171,7 +177,7 @@ namespace detail {
     template <typename widget_t>
     constexpr void install_on_this(widget_ref<widget_t>& reference, detail::widget_update_data& updatable)
     {
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
         updatable.true_ptr = [reference]() {
             return bungeegum::access::get_this<widget_t>(reference.get());
         };
@@ -260,12 +266,12 @@ widget_ref<widget_t> make_reference()
     std::uintptr_t _raw_widget;
     std::any _inplace_data;
 
-#if BUNGEEGUM_USE_HOTRELOAD
+#if BUNGEEGUM_USE_HOTSWAP
     if constexpr (detail::traits::is_reloadable_v<widget_t>) {
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>(
-            detail::global().widgets.hotswap_reloader->allocate<widget_t>()));
+            detail::swapped_global().widgets.hotswap_reloader->allocate<widget_t>()));
         _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
-        _widget_ptr->get()._bungeegum_object_reference = _raw_widget;
+        detail::swapped_access::get_object_reference(_widget_ptr->get()) = _raw_widget;
     } else {
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>());
         _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
@@ -274,7 +280,7 @@ widget_ref<widget_t> make_reference()
 	_widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>());
 	_raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
 #endif
-    detail::widget_update_data& _updatable = detail::global().widgets.updatables[_raw_widget];
+    detail::widget_update_data& _updatable = detail::swapped_global().widgets.updatables[_raw_widget];
     _updatable.raw = _raw_widget;
     _updatable.inplace_data = std::move(_inplace_data);
     widget_ref<widget_t> _reference = detail::widget_ref_access<widget_t>::make_from_data(*_widget_ptr);

@@ -39,11 +39,10 @@ namespace detail {
         creation_count = other.creation_count;
         creation_size = other.creation_size;
         if (is_compiled) {
-            detail::global_manager_data& _global = detail::global();
-            for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-                detail::pipeline_data& _pipeline_data = _it.second.get();        
-                fonts[_it.first].emplace(
-                    _pipeline_data.user_context,
+            swapped_manager_data& _swapped = swapped_global();
+            for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
+                fonts[_pipeline.first].emplace(
+                    _pipeline.second.get(),
                     creation_ttf,
                     creation_count,
                     creation_size);
@@ -78,11 +77,10 @@ namespace detail {
 
 font::font(const std::filesystem::path& filename, const float size)
 {
-    detail::global_manager_data& _global = detail::global();
-    for (std::pair<const uintptr_t, std::reference_wrapper<bungeegum::detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-        detail::pipeline_data& _pipeline_data = _it.second.get();
-        _data.fonts[_it.first].emplace(
-            _pipeline_data.user_context,
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
+        _data.fonts[_pipeline.first].emplace(
+            _pipeline.second.get(),
             filename,
             size);
     }
@@ -90,11 +88,10 @@ font::font(const std::filesystem::path& filename, const float size)
 
 font::font(const void* ttf, const std::size_t count, const float size)
 {
-    detail::global_manager_data& _global = detail::global();
-    for (std::pair<const uintptr_t, std::reference_wrapper<bungeegum::detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-        detail::pipeline_data& _pipeline_data = _it.second.get();
-        _data.fonts[_it.first].emplace(
-            _pipeline_data.user_context,
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
+        _data.fonts[_pipeline.first].emplace(
+            _pipeline.second.get(),
             ttf,
             count,
             size);

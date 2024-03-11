@@ -1,5 +1,4 @@
-#include <bungeegum/bungeegum.hpp>
-#include <bungeegum_widgets/bungeegum_widgets.hpp>
+#include "testclass.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -85,29 +84,18 @@ struct Composed {
     bungeegum::widget_ref<ColoredBox> _box2 = bungeegum::make_reference<ColoredBox>();
 };
 
-
-struct drawerwidget {
-
-    bungeegum::font myfont = { "D:/bungeegum/demo/static/Lobster.ttf", 17.f };
-    bungeegum::texture mytexture = { "D:/bungeegum/demo/static/Image.jpg" };
-
-    void draw(bungeegum::draw_command& command)
-    {
-        bungeegum::float2 _min_point = bungeegum::float2 { 500.f, 500.f };
-        bungeegum::float2 _max_point_1 = _min_point + bungeegum::float2 { 100.f, 100.f };
-        bungeegum::float2 _max_point_2 = _min_point + bungeegum::float2 { 500.f, 500.f };
-        command.use_shader_mask();
-        command.draw_rect_filled(_min_point - bungeegum::float2 {10.f, 10.f }, _max_point_1, { 1.f, 1.f, 0.5f, 1.f });
-        command.draw_rect_filled(_min_point + bungeegum::float2 {10.f, 10.f }, _max_point_1 + bungeegum::float2 {30.f, 30.f }, { 1.f, 1.f, 0.5f, 1.f });
-        
-        command.use_shader_default();
-        command.draw_texture(mytexture, _min_point, _max_point_2);
-        // command.draw_rect_filled(_min_point, _max_point_2, { 1.f, 0.5f, 0.5f, 1.f });
-        command.draw_text(myfont, 17.f, { 400, 500 }, { 1.f, 0.5f, 1.f, 1.f }, "HELLO GuYS");
-        // bungeegum::log_error("yaaaaa");
+std::vector<std::string> splitString(const std::string &s, char delimiter = ',') {
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
     }
+    
+    return tokens;
+}
 
-};
 
 int main()
 {
@@ -119,46 +107,65 @@ int main()
     // constexpr auto ii = bungeegum::is_finite<bungeegum::float2>({ 44.f, 0.f });
     // static std::wostringstream _osstream2;
 
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_DIRECTX");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_BACKTRACE");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_HOTRELOAD");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_STANDALONE");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_ENABLE_OVERLAY");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_DIRECTX 1");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_BACKTRACE 1");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_HOTRELOAD 1");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_STANDALONE 1");
-    // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_DIRECTX");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_BACKTRACE");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_HOTRELOAD");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_STANDALONE");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_OVERLAY");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_DIRECTX 1");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_BACKTRACE 1");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_HOTSWAP 1");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_STANDALONE 1");
+    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
 
-    // bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/glm/");
-    // bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/entt/src");
-    // bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/cereal/include/");
-    // bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/include");
-    // bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/extensions/mem/include");
-    // bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/runtime/include/");
+    bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/external/glm/");
+    bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/external/diligentcore");
+    bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/external/tinyspline/src");
+    bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/external/cereal/include/");
+    bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/external/hscpp/include");
+    bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/external/hscpp/extensions/mem/include");
+    bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/runtime/include/");
 
-    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Release/bungeegum_runtime.lib");
-    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Release/bungeegum_widgets.lib");
-    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Release/hscpp.lib");
-    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Release/hscpp-mem.lib");
-    // bungeegum::libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Release/imgui.lib");
+    // bungeegum::get_libraries().push_back("D:/bungeegum/build/runtime/Release/bungeegum_runtime.lib");
+    // bungeegum::get_libraries().push_back("D:/bungeegum/build/widgets/Release/bungeegum_widgets.lib");
+    // bungeegum::get_libraries().push_back("D:/bungeegum/build/external/hscpp/Release/hscpp.lib");
+    // bungeegum::get_libraries().push_back("D:/bungeegum/build/external/hscpp/extensions/mem/Release/hscpp-mem.lib");
+    // bungeegum::get_libraries().push_back("D:/bungeegum/build/external/imgui/Release/imgui.lib");
 
-    // bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/runtime/Debug/bungeegum_runtime.lib");
-    // bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/widgets/Debug/bungeegum_widgets.lib");
-    // bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/Debug/hscpp.lib");
-    // bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
-    // bungeegum::hotswap::get_libraries().push_back("C:/Users/adri/dev/bungeegum/build/external/imgui/Debug/imgui.lib");
+    std::vector<std::string> _libs = splitString(std::string(BUNGEEGUM_LIBS));
+    for (auto _lib : _libs)
+    {
+        // bungeegum::get_hotswap_libraries().push_back(std::string(BUNGEEGUM_LIBS_PATH) + _lib + ".lib");
+    }
+    bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/widgets/Debug/bungeegum_widgets.lib");
+    bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/runtime/Debug/bungeegum_runtime.lib");
+    bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/imgui/Debug/imgui.lib");
+    bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/hscpp/Debug/hscpp.lib");
+    bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/hscpp/extensions/mem/Debug/hscpp-mem.lib");
+    bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/stb/Debug/stb_image.lib");
+    bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/implot/Debug/implot.lib");
+    // bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/diligentcore/Common/Debug/Diligent-Common.lib");
+    // bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/diligentcore/Primitives/Debug/Diligent-Primitives.lib");
+    // bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/diligentcore/Platforms/Basic/Debug/Diligent-BasicPlatform.lib");
+    // bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/diligentcore/Platforms/Win32/Debug/Diligent-Win32Platform.lib");
+    // bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/diligentcore/Graphics/GraphicsEngine/Debug/Diligent-GraphicsEngine.lib");
+    // bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/diligentcore/Graphics/GraphicsEngineD3D11/Debug/Diligent-GraphicsEngineD3D11-static.lib");
+    // bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/diligentcore/Graphics/GraphicsEngineOpenGL/Debug/Diligent-GraphicsEngineOpenGL-static.lib");
+    // bungeegum::get_hotswap_libraries().push_back("D:/bungeegum/build/external/sdl/Debug/SDL2.lib");
 
-    // bungeegum::hotswap::get_include_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/include/");
-    // bungeegum::hotswap::get_source_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/");
-    // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
-    // bungeegum::hotswap::get_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
+    bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/widgets/include/");
+    bungeegum::get_hotswap_source_directories().push_back("D:/bungeegum/widgets/source/widgets/");
+    bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/widgets/source/core/Color.cpp");
+    bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/widgets/source/widgets/ColoredBox.cpp");
+    bungeegum::get_hotswap_source_directories().push_back("D:/bungeegum/demo/source/");
+    bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/demo/source/testclass.cpp");
+    bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/external/hscpp/src/module/Module.cpp");
 
     bungeegum::pipeline_bindings _provider;
     _provider.emscripten_canvas_id = "canvas";
     _provider.native_window_ptr = nullptr;
 
-    bungeegum::pipeline<bungeegum::renderer_backend::opengl> _my_pipeline = { _provider };
+    bungeegum::pipeline<bungeegum::renderer_backend::directx11> _my_pipeline = { _provider };
     // _my_pipeline.emplace(bungeegum::renderer_backend::directx11, _provider);
     // _my_pipeline.emplace(bungeegum::renderer_backend::opengl, _provider);
 
@@ -187,9 +194,9 @@ int main()
     }));
 
 
+    
 
-
-    _my_pipeline.root(bungeegum::make<drawerwidget>());
+    _my_pipeline.root(bungeegum::make<testclass>());
     // _my_pipeline.run(60, true);
     _my_pipeline.run();
 

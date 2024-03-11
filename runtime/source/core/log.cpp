@@ -28,100 +28,115 @@ namespace detail {
 #else
             log(". \n", color);
 #endif
-        }		
+        }
 
-		void console_log_error(const backtraced_exception& exception)
-		{
-			log("Error ", log_color::red);
-			console_log_exception(exception, log_color::red);
-		}
+        void console_log_error(const backtraced_exception& exception)
+        {
+            log("Error ", log_color::red);
+            console_log_exception(exception, log_color::red);
+        }
 
-		void console_log_warning(const backtraced_exception& exception)
-		{
-			log("Warning ", log_color::yellow);
-			console_log_exception(exception, log_color::yellow);
-		}
+        void console_log_warning(const backtraced_exception& exception)
+        {
+            log("Warning ", log_color::yellow);
+            console_log_exception(exception, log_color::yellow);
+        }
 
-		void console_log_message(const backtraced_exception& exception)
-		{
-			log("Message ", log_color::blue);
-			console_log_exception(exception, log_color::blue);
-		}
+        void console_log_message(const backtraced_exception& exception)
+        {
+            log("Message ", log_color::blue);
+            console_log_exception(exception, log_color::blue);
+        }
 
     }
 
-//     void protect_library(const std::function<void()>& try_callback)
-//     {
-// 		protect(try_callback, [] (const std::string& _what) {
-//        	 	log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", log_color::red);
-// #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+    //     void protect_library(const std::function<void()>& try_callback)
+    //     {
+    // 		protect(try_callback, [] (const std::string& _what) {
+    //        	 	log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", log_color::red);
+    // #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
-// #else
-// 			std::terminate();
-// #endif
-// 		});
-//     }
+    // #else
+    // 			std::terminate();
+    // #endif
+    // 		});
+    //     }
 
-//     void protect_userspace(std::vector<backtraced_exception>& container, const std::function<void()>& try_callback)
-//     {		
-// 		protect(try_callback, [&container] (const std::string& _what) {
-// 			// uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
-// 			backtraced_exception _exception(_what, 0, 0);
-// #if BUNGEEGUM_USE_OVERLAY
-//             container.push_back(_exception);
-// #else
-//             console_log_error(_exception);
-//             (void)container;
-// #endif
-// 		});
-//     }
+    //     void protect_userspace(std::vector<backtraced_exception>& container, const std::function<void()>& try_callback)
+    //     {
+    // 		protect(try_callback, [&container] (const std::string& _what) {
+    // 			// uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
+    // 			backtraced_exception _exception(_what, 0, 0);
+    // #if BUNGEEGUM_USE_OVERLAY
+    //             container.push_back(_exception);
+    // #else
+    //             console_log_error(_exception);
+    //             (void)container;
+    // #endif
+    // 		});
+    //     }
 }
 
 void log_error(const std::string& what, const bool must_throw)
 {
-    detail::global_manager_data& _global = detail::global();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
     detail::backtraced_exception _exception(what, 1u);
-    if (!_global.pipelines.current.has_value()) {
+    if (_swapped.current == 0u) {
         detail::console_log_error(_exception);
     } else {
 #if BUNGEEGUM_USE_OVERLAY
-        _global.pipelines.current.value().get().userspace_errors.push_back(_exception);
+        _swapped.logs.userspace_errors.push_back(detail::log_data {
+            1u,
+            "tag",
+            _exception.what(),
+            "_swapped.widgets.current",
+            _exception.tracing });
 #else
         detail::console_log_error(_exception);
 #endif
     }
-	if (must_throw) {
-		throw _exception;
-	}
+    if (must_throw) {
+        throw _exception;
+    }
 }
 
 void log_error(const std::wstring& what, const bool must_throw)
 {
-	detail::global_manager_data& _global = detail::global();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
     detail::backtraced_exception _exception(what, 1u);
-    if (!_global.pipelines.current.has_value()) {
+    if (_swapped.current == 0u) {
         detail::console_log_error(_exception);
     } else {
 #if BUNGEEGUM_USE_OVERLAY
-        _global.pipelines.current.value().get().userspace_errors.push_back(_exception);
+        _swapped.logs.userspace_errors.push_back(detail::log_data {
+            1u,
+            "tag",
+            _exception.what(),
+            "_swapped.widgets.current",
+            _exception.tracing });
 #else
         detail::console_log_error(_exception);
 #endif
     }
-	if (must_throw) {
-		throw _exception;
-	}
+    if (must_throw) {
+        throw _exception;
+    }
 }
 
 void log_warning(const std::string& what)
 {
-    detail::global_manager_data& _global = detail::global();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
     detail::backtraced_exception _exception(what, 1u);
-    if (!_global.pipelines.current.has_value()) {
+    if (_swapped.current == 0u) {
         detail::console_log_warning(_exception);
     } else {
 #if BUNGEEGUM_USE_OVERLAY
-        _global.pipelines.current.value().get().userspace_warnings.push_back(_exception);
+        _swapped.logs.userspace_warnings.push_back(detail::log_data {
+            1u,
+            "tag",
+            _exception.what(),
+            "_swapped.widgets.current",
+            _exception.tracing });
 #else
         detail::console_log_warning(_exception);
 #endif
@@ -130,13 +145,18 @@ void log_warning(const std::string& what)
 
 void log_warning(const std::wstring& what)
 {
-    detail::global_manager_data& _global = detail::global();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
     detail::backtraced_exception _exception(what, 1u);
-    if (!_global.pipelines.current.has_value()) {
+    if (_swapped.current == 0u) {
         detail::console_log_warning(_exception);
     } else {
 #if BUNGEEGUM_USE_OVERLAY
-        _global.pipelines.current.value().get().userspace_warnings.push_back(_exception);
+        _swapped.logs.userspace_warnings.push_back(detail::log_data {
+            1u,
+            "tag",
+            _exception.what(),
+            "_swapped.widgets.current",
+            _exception.tracing });
 #else
         detail::console_log_warning(_exception);
 #endif
@@ -145,13 +165,18 @@ void log_warning(const std::wstring& what)
 
 void log_message(const std::string& what)
 {
-    detail::global_manager_data& _global = detail::global();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
     detail::backtraced_exception _exception(what, 1u);
-    if (!_global.pipelines.current.has_value()) {
+    if (_swapped.current == 0u) {
         detail::console_log_message(_exception);
     } else {
 #if BUNGEEGUM_USE_OVERLAY
-        _global.pipelines.current.value().get().userspace_messages.push_back(_exception);
+        _swapped.logs.userspace_messages.push_back(detail::log_data {
+            1u,
+            "tag",
+            _exception.what(),
+            "_swapped.widgets.current",
+            _exception.tracing });
 #else
         detail::console_log_message(_exception);
 #endif
@@ -160,13 +185,18 @@ void log_message(const std::string& what)
 
 void log_message(const std::wstring& what)
 {
-    detail::global_manager_data& _global = detail::global();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
     detail::backtraced_exception _exception(what, 1u);
-    if (!_global.pipelines.current.has_value()) {
+    if (_swapped.current == 0u) {
         detail::console_log_message(_exception);
     } else {
 #if BUNGEEGUM_USE_OVERLAY
-        _global.pipelines.current.value().get().userspace_messages.push_back(_exception);
+        _swapped.logs.userspace_messages.push_back(detail::log_data {
+            1u,
+            "tag",
+            _exception.what(),
+            "_swapped.widgets.current",
+            _exception.tracing });
 #else
         detail::console_log_message(_exception);
 #endif

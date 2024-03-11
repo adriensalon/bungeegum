@@ -3,21 +3,47 @@
 namespace bungeegum {
 namespace detail {
 
+    template <typename swapped_t>
+    std::uintptr_t& swapped_access::get_object_reference(swapped_t& object)
+    {
+        static_assert(traits::is_reloadable_v<swapped_t>, "ERROR TODO");
+        return object._bungeegum_object_reference;
+    }
+
+    template <typename swapped_t>
+    std::uintptr_t swapped_access::get_this(swapped_t& object)
+    {
+        static_assert(traits::is_reloadable_v<swapped_t>, "ERROR TODO");
+        return object._bungeegum_this();
+    }
+
+    template <typename swapped_t>
+    std::size_t swapped_access::get_sizeof(swapped_t& object)
+    {
+        static_assert(traits::is_reloadable_v<swapped_t>, "ERROR TODO");
+        return object._bungeegum_sizeof();
+    } 
+
+
+
+
+
+
     template <typename value_t>
-    reloaded<value_t>::reloaded()
+    swapped<value_t>::swapped()
     {
         static_assert(traits::is_reloadable_v<value_t>, "ERROR TODO");
     }
 
     template <typename value_t>
-    reloaded<value_t>::reloaded(const reloaded<value_t>& other)
+    swapped<value_t>::swapped(const swapped<value_t>& other)
     {
         _ref.m_Id = other._ref.m_Id;
         _ref.m_pMemoryManager = other._ref.m_pMemoryManager;
     }
 
     template <typename value_t>
-    reloaded<value_t>& reloaded<value_t>::operator=(const reloaded<value_t>& other)
+    swapped<value_t>& swapped<value_t>::operator=(const swapped<value_t>& other)
     {
         _ref.m_Id = other._ref.m_Id;
         _ref.m_pMemoryManager = other._ref.m_pMemoryManager;
@@ -25,32 +51,32 @@ namespace detail {
     }
 
     template <typename value_t>
-    reloaded<value_t>::reloaded(reloaded<value_t>&& other)
+    swapped<value_t>::swapped(swapped<value_t>&& other)
     {
         *this = std::move(other);
     }
 
     template <typename value_t>
-    reloaded<value_t>& reloaded<value_t>::operator=(reloaded<value_t>&& other)
+    swapped<value_t>& swapped<value_t>::operator=(swapped<value_t>&& other)
     {
         _ref = std::move(other._ref);
         return *this;
     }
 
     template <typename value_t>
-    value_t& reloaded<value_t>::get() const
+    value_t& swapped<value_t>::get() const
     {
         return *(_ref.operator->());
     }
 
     template <typename value_t>
-    reloaded<value_t>::reloaded(hscpp::mem::UniqueRef<value_t>&& ref)
+    swapped<value_t>::swapped(hscpp::mem::UniqueRef<value_t>&& ref)
         : _ref(std::move(ref))
     {
     }
 
     template <typename value_t>
-    reloaded<value_t> reloader::allocate()
+    swapped<value_t> reloader::allocate()
     {
         return _manager.get()->operator->()->Allocate<value_t>();
     }
@@ -62,39 +88,15 @@ namespace detail {
     }
 
     template <typename value_t>
-    struct reloaded_wrapper {
-        reloaded_wrapper(reloaded<value_t>& value)
-            : _ref(value)
-        {
-        }
-
-        template <typename archive_t>
-        void load(archive_t& archive)
-        {
-            _ref.get()._bungeegum_load(archive);
-        }
-
-        template <typename archive_t>
-        void save(archive_t& archive) const
-        {
-            _ref.get()._bungeegum_save(archive);
-        }
-
-        reloaded<value_t>& _ref;
-    };
-
-    template <typename value_t>
-    void reloaded_loader::load(reloaded<value_t>& value)
+    void reloaded_loader::load(const swapped<value_t>& value)
     {
-        reloaded_wrapper<value_t> _wrapper(value);
-        _archive(_wrapper);
+        _archive(value.get());
     }
 
     template <typename value_t>
-    void reloaded_saver::save(reloaded<value_t>& value)
+    void reloaded_saver::save(const swapped<value_t>& value)
     {
-        reloaded_wrapper<value_t> _wrapper(value);
-        _archive(_wrapper);
+        _archive(value.get());
     }
 }
 }

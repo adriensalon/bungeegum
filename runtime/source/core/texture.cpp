@@ -40,18 +40,17 @@ namespace detail {
         creation_pixels = other.creation_pixels;
         creation_size = other.creation_size;
         if (is_compiled) {
-            detail::global_manager_data& _global = detail::global();
-            for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-                detail::pipeline_data& _pipeline_data = _it.second.get();   
+            swapped_manager_data& _swapped = swapped_global();
+            for (std::pair<const std::uintptr_t, detail::rasterizer_handle> _pipeline : _swapped.rasterizers) {    
                 if (creation_filename.empty()) {
-                    textures[_it.first].emplace(
-                        _pipeline_data.user_context,
+                    textures[_pipeline.first].emplace(
+                        _pipeline.second,
                         creation_pixels,
                         creation_size.x,
                         creation_size.y);
                 } else {
-                    textures[_it.first].emplace(
-                        _pipeline_data.user_context,
+                    textures[_pipeline.first].emplace(
+                        _pipeline.second,
                         creation_filename);
                 }
             }
@@ -84,11 +83,10 @@ namespace detail {
 
 texture::texture(const std::filesystem::path& filename)
 {
-    detail::global_manager_data& _global = detail::global();
-    for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-        detail::pipeline_data& _pipeline_data = _it.second.get();
-		_data.textures[_it.first].emplace(
-			_pipeline_data.user_context, 
+        detail::swapped_manager_data& _swapped = detail::swapped_global();
+        for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) {    
+		_data.textures[_pipeline.first].emplace(
+			_pipeline.second.get(), 
 			filename);
     }
     _data.creation_filename = filename;
@@ -96,11 +94,10 @@ texture::texture(const std::filesystem::path& filename)
 
 texture::texture(const std::vector<unsigned char>& pixels, const uint2 size)
 {
-    detail::global_manager_data& _global = detail::global();
-    for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::pipeline_data>>& _it : _global.pipelines.pipelines) {
-        detail::pipeline_data& _pipeline_data = _it.second.get();
-		_data.textures[_it.first].emplace(
-			_pipeline_data.user_context, 
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) {  
+		_data.textures[_pipeline.first].emplace(
+			_pipeline.second.get(), 
 			pixels, 
 			static_cast<std::size_t>(size.x), 
 			static_cast<std::size_t>(size.y));
