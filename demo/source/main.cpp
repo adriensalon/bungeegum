@@ -155,8 +155,8 @@ int main()
 
     bungeegum::get_hotswap_include_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/include/");
     bungeegum::get_hotswap_source_directories().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/");
-    bungeegum::get_hotswap_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
-    bungeegum::get_hotswap_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
+    // bungeegum::get_hotswap_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/core/Color.cpp");
+    // bungeegum::get_hotswap_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/widgets/source/widgets/ColoredBox.cpp");
     bungeegum::get_hotswap_source_directories().push_back("C:/Users/adri/dev/bungeegum/demo/source/swapped");
     bungeegum::get_hotswap_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/demo/source/swapped/testclass.cpp");
     // bungeegum::get_hotswap_force_compiled_source_files().push_back("C:/Users/adri/dev/bungeegum/external/hscpp/src/module/Module.cpp");
@@ -196,7 +196,8 @@ int main()
 
     
 
-    _my_pipeline.root(bungeegum::make<widgets::ColoredBox>());
+    _my_pipeline.root(bungeegum::make<IkkkOk>());
+    // _my_pipeline.root(bungeegum::make<widgets::ColoredBox>());
     // _my_pipeline.run(60, true);
     _my_pipeline.run();
 
