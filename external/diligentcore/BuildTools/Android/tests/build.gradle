@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 33
+
+    defaultConfig {
+        applicationId 		'DE.Android.Tests'
+        targetSdkVersion 	32
+        minSdkVersion 		21
+
+        ndk {
+            abiFilters "$System.env.ANDROID_ARCH"
+        }
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_static',
+						  '-DDILIGENT_NO_FORMAT_VALIDATION=ON'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            //debuggable true // to enable logcat in release
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    ndkVersion "25.2.9519653"
+
+    externalNativeBuild {
+        cmake {
+            version '3.22.1'
+            path 'src/main/jni/CMakeLists.txt'
+        }
+    }
+}

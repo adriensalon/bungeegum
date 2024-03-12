@@ -9,7 +9,7 @@
 #include <bungeegum/backend/backend.hpp>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/glue/backtrace.hpp>
-#include <bungeegum/glue/dialog.hpp>
+// #include <bungeegum/glue/dialog.hpp>
 #include <bungeegum/glue/imguarded.fwd>
 
 namespace bungeegum {
@@ -185,39 +185,39 @@ namespace detail {
             }
         }
 
-#if BUNGEEGUM_USE_DIALOG
-        template <bool is_folder_t>
-        void draw_paths_buttons(std::vector<std::filesystem::path>& paths, const std::vector<dialog_extensions_filter>& filters)
-        {
-            float _button_width = 0.5f * (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x);
-            if constexpr (is_folder_t) {
-                if (ImGui::Button("add folder...", ImVec2(_button_width, 0.f))) {
-                    std::optional<std::filesystem::path> _picked_folder = pick_folder_dialog();
-                    if (_picked_folder.has_value()) {
-                        paths.push_back(_picked_folder.value());
-                    }
-                }
-            } else {
-                if (ImGui::Button("add file...", ImVec2(_button_width, 0.f))) {
-                    std::optional<std::filesystem::path> _picked_file = open_file_dialog(filters);
-                    if (_picked_file.has_value()) {
-                        paths.push_back(_picked_file.value());
-                    }
-                }
-            }
-            ImGui::SameLine();
-            bool _disabled = selected_count == 0;
-            if (_disabled) {
-                ImGui::BeginDisabled();
-            }
-            if (ImGui::Button(is_folder_t ? "remove folders" : "remove files", ImVec2(_button_width, 0.f))) {
-                remove_selected<std::filesystem::path>(paths);
-            }
-            if (_disabled) {
-                ImGui::EndDisabled();
-            }
-        }
-#endif
+// #if BUNGEEGUM_USE_DIALOG
+//         template <bool is_folder_t>
+//         void draw_paths_buttons(std::vector<std::filesystem::path>& paths, const std::vector<dialog_extensions_filter>& filters)
+//         {
+//             float _button_width = 0.5f * (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x);
+//             if constexpr (is_folder_t) {
+//                 if (ImGui::Button("add folder...", ImVec2(_button_width, 0.f))) {
+//                     std::optional<std::filesystem::path> _picked_folder = pick_folder_dialog();
+//                     if (_picked_folder.has_value()) {
+//                         paths.push_back(_picked_folder.value());
+//                     }
+//                 }
+//             } else {
+//                 if (ImGui::Button("add file...", ImVec2(_button_width, 0.f))) {
+//                     std::optional<std::filesystem::path> _picked_file = open_file_dialog(filters);
+//                     if (_picked_file.has_value()) {
+//                         paths.push_back(_picked_file.value());
+//                     }
+//                 }
+//             }
+//             ImGui::SameLine();
+//             bool _disabled = selected_count == 0;
+//             if (_disabled) {
+//                 ImGui::BeginDisabled();
+//             }
+//             if (ImGui::Button(is_folder_t ? "remove folders" : "remove files", ImVec2(_button_width, 0.f))) {
+//                 remove_selected<std::filesystem::path>(paths);
+//             }
+//             if (_disabled) {
+//                 ImGui::EndDisabled();
+//             }
+//         }
+// #endif
 
         void draw_hotswap_button()
         {
@@ -241,32 +241,32 @@ namespace detail {
             }
         }
 
-        template <bool is_folder_t>
-        void draw_paths(const std::string& name, std::vector<std::filesystem::path>& paths, const float frame_height_without_padding, const std::vector<dialog_extensions_filter>& filters = {})
-        {
-            std::string _title = name + " (" + std::to_string(paths.size()) + ")" + tag(name + "_tab");
-            if (ImGui::BeginTabItem(_title.c_str())) {
-                ImGui::Spacing();
-                float _footer_height = 2.f * ImGui::GetFrameHeightWithSpacing();
-                // float _footer_height = 2.f * frame_height_without_padding + 3.f * ImGui::GetStyle().FramePadding.y;
-                draw_items_cards<std::filesystem::path>(name, paths, frame_height_without_padding, _footer_height);
-#if BUNGEEGUM_USE_DIALOG
-                draw_paths_buttons<is_folder_t>(paths, filters);
-#else
-                (void)filters;
-#endif
-                ImGui::EndTabItem();
-            }
-        }
+//         template <bool is_folder_t>
+//         void draw_paths(const std::string& name, std::vector<std::filesystem::path>& paths, const float frame_height_without_padding, const std::vector<dialog_extensions_filter>& filters = {})
+//         {
+//             std::string _title = name + " (" + std::to_string(paths.size()) + ")" + tag(name + "_tab");
+//             if (ImGui::BeginTabItem(_title.c_str())) {
+//                 ImGui::Spacing();
+//                 float _footer_height = 2.f * ImGui::GetFrameHeightWithSpacing();
+//                 // float _footer_height = 2.f * frame_height_without_padding + 3.f * ImGui::GetStyle().FramePadding.y;
+//                 draw_items_cards<std::filesystem::path>(name, paths, frame_height_without_padding, _footer_height);
+// // #if BUNGEEGUM_USE_DIALOG
+// //                 draw_paths_buttons<is_folder_t>(paths, filters);
+// // #else
+//                 (void)filters;
+// // #endif
+//                 ImGui::EndTabItem();
+//             }
+//         }
 
         void draw_tabs(const float frame_height_without_padding = ImGui::GetFontSize())
         {
             if (ImGui::BeginTabBar(tag("tabs").c_str())) {
                 draw_defines(hotswap::defines(), frame_height_without_padding);
-                draw_paths<true>("include dirs", hotswap::include_directories(), frame_height_without_padding);
-                draw_paths<true>("source dirs", hotswap::source_directories(), frame_height_without_padding);
-                draw_paths<false>("source files", hotswap::force_compiled_source_files(), frame_height_without_padding, { { "Source File", { "c", "cpp", "cxx", "c++", "cc" } } });
-                draw_paths<false>("libraries", hotswap::libraries(), frame_height_without_padding, { { "Library", { "lib", "dll" } } });
+                // draw_paths<true>("include dirs", hotswap::include_directories(), frame_height_without_padding);
+                // draw_paths<true>("source dirs", hotswap::source_directories(), frame_height_without_padding);
+                // draw_paths<false>("source files", hotswap::force_compiled_source_files(), frame_height_without_padding, { { "Source File", { "c", "cpp", "cxx", "c++", "cc" } } });
+                // draw_paths<false>("libraries", hotswap::libraries(), frame_height_without_padding, { { "Library", { "lib", "dll" } } });
             }
             ImGui::EndTabBar();
         }
