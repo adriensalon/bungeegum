@@ -32,6 +32,7 @@ set(bungeegum_runtime_source
 	"source/glue/serialize.cpp"
 	"source/glue/time.cpp"
 	"source/glue/renderer.cpp"
+	"source/glue/renderer2.cpp"
 	"source/glue/window.cpp"
 
 	"source/core/animation.cpp"

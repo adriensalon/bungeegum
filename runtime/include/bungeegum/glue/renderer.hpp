@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <bungeegum/core/simd.hpp>
 #include <bungeegum/glue/config.hpp>
@@ -57,6 +58,47 @@ enum struct renderer_backend {
 #error "Emscripten or iOS but no opengles"
 #endif
 #endif
+
+
+#if !defined(PLATFORM_ANDROID)
+#define PLATFORM_ANDROID TOOLCHAIN_PLATFORM_ANDROID
+#endif
+
+#if !defined(PLATFORM_EMSCRIPTEN)
+#define PLATFORM_EMSCRIPTEN TOOLCHAIN_PLATFORM_EMSCRIPTEN
+#endif
+
+#if !defined(PLATFORM_IOS)
+#define PLATFORM_IOS TOOLCHAIN_PLATFORM_IOS
+#endif
+
+#if !defined(PLATFORM_LINUX)
+#define PLATFORM_LINUX TOOLCHAIN_PLATFORM_LINUX
+#endif
+
+#if !defined(PLATFORM_MACOS)
+#define PLATFORM_MACOS TOOLCHAIN_PLATFORM_MACOS
+#endif
+
+#if !defined(PLATFORM_UNIVERSAL_WINDOWS)
+#define PLATFORM_UNIVERSAL_WINDOWS TOOLCHAIN_PLATFORM_UWP
+#endif
+
+#if !defined(PLATFORM_WIN32)
+#define PLATFORM_WIN32 TOOLCHAIN_PLATFORM_WIN32
+#endif
+
+#include <Common/interface/RefCntAutoPtr.hpp>
+#include <Graphics/GraphicsEngine/interface/Buffer.h>
+#include <Graphics/GraphicsEngine/interface/DepthStencilState.h>
+#include <Graphics/GraphicsEngine/interface/DeviceContext.h>
+#include <Graphics/GraphicsEngine/interface/PipelineState.h>
+#include <Graphics/GraphicsEngine/interface/RenderDevice.h>
+#include <Graphics/GraphicsEngine/interface/ShaderResourceBinding.h>
+#include <Graphics/GraphicsEngine/interface/SwapChain.h>
+#include <Graphics/GraphicsEngine/interface/TextureView.h>
+
+struct ImFont;
 
 namespace bungeegum {
 
@@ -127,12 +169,166 @@ namespace detail {
 
         /// @brief The color to use when clearing the screen.
         float4 clear_color = { 0.f, 0.f, 0.f, 1.f };
+        
+        struct renderer_data;
+        std::shared_ptr<renderer_data> _data = nullptr;
 
     private:
         bool1 _is_rendering = false;
 
-        struct renderer_data;
-        std::shared_ptr<renderer_data> _data = nullptr;
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /// @brief 
+    struct font_config {   
+        
+        /// @brief 
+        std::size_t index = 0;
+
+        /// @brief 
+        std::size_t oversample_horizontal = 3;
+
+        /// @brief 
+        std::size_t oversample_vertical = 3;
+
+        /// @brief 
+        bool pixel_snap_horizontal = false;
+
+        /// @brief 
+        float2 glyph_extra_spacing = { 0.f, 0.f };
+
+        /// @brief 
+        float2 glyph_offset = { 0.f, 0.f };
+
+        /// @brief 
+        float rasterizer_multiply = 1.f;
+
+        /// @brief 
+        float glyph_min_advance = 0.f;
+    };
+
+    ///
+    struct font_handle {
+        font_handle() = default;
+        font_handle(const font_handle& other) = default;
+        font_handle& operator=(const font_handle& other) = default;
+        font_handle(font_handle&& other) = default;
+        font_handle& operator=(font_handle&& other) = default;
+
+        // /// @brief 
+        // /// @param path 
+        // /// @param size 
+        // /// @param config 
+        // /// @param ranges 
+        // void emplace(
+        //     renderer& rasterizer,
+        //     const std::filesystem::path& filename,
+        //     const float size,
+        //     const std::optional<font_config>& config = std::nullopt,
+        //     unsigned short* ranges = nullptr);
+
+        /// @brief
+        /// @param rasterizer
+        /// @param ttf
+        /// @param count
+        /// @param size
+        /// @param config
+        /// @param ranges
+        void emplace(
+            renderer& rasterizer,
+            const void* ttf,
+            const std::size_t count,
+            const float size,
+            const std::optional<font_config>& config = std::nullopt,
+            unsigned short* ranges = nullptr);
+
+        /// @brief
+        /// @return
+        [[nodiscard]] ImFont* get() const;
+
+        /// @brief Gets if this instance has a value. Default created instances don't have a value
+        /// until the emplace() method is called. Instances don't have a value anymore after the
+        /// reset() method is called
+        [[nodiscard]] bool has_value() const;
+
+        /// @brief Resets this instance if it has a value. Default created instances don't have a
+        /// value until the emplace() method is called. Instances don't have a value anymore after
+        /// the reset() method is called
+        void reset();
+
+    private:
+        bool _has_value = false;
+        ImFont* _imgui_font = nullptr;
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /// @brief
+    struct texture_handle {
+        texture_handle() = default;
+        texture_handle(const texture_handle& other) = default;
+        texture_handle& operator=(const texture_handle& other) = default;
+        texture_handle(texture_handle&& other) = default;
+        texture_handle& operator=(texture_handle&& other) = default;
+
+        /// @brief
+        /// @param rasterizer
+        /// @param pixels
+        /// @param width
+        /// @param height
+        // void emplace(
+        //     renderer& rasterizer,
+        //     const std::filesystem::path filename);
+
+        /// @brief
+        /// @param rasterizer
+        /// @param pixels
+        /// @param width
+        /// @param height
+        void emplace(
+            const std::vector<unsigned char>& pixels,
+            const std::size_t width,
+            const std::size_t height);
+
+        /// @brief
+        /// @return
+        [[nodiscard]] void* get() const;
+
+        /// @brief Gets if this instance has a value. Default created instances don't have a value
+        /// until the emplace() method is called. Instances don't have a value anymore after the
+        /// reset() method is called
+        [[nodiscard]] bool has_value() const;
+
+        /// @brief Resets this instance if it has a value. Default created instances don't have a
+        /// value until the emplace() method is called. Instances don't have a value anymore after
+        /// the reset() method is called
+        void reset();
+
+    private:
+        bool _has_value = false;
+        Diligent::RefCntAutoPtr<Diligent::ITexture> _diligent_texture = {};
+        Diligent::RefCntAutoPtr<Diligent::ITextureView> _diligent_texture_view = {};
     };
 }
 }

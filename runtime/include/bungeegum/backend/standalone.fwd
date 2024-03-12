@@ -32,10 +32,14 @@ namespace detail {
 
         void update(window& current_window);
 
+        // std::unique_ptr<detail::renderer> pipeline_renderer = nullptr;
+
     private:
         std::optional<float4> _app_color = std::nullopt;
         std::optional<std::string> _app_title = std::nullopt;
 #endif
     };
+    
+    // inline static std::unique_ptr<detail::renderer> pipeline_renderer = nullptr;
 }
 }

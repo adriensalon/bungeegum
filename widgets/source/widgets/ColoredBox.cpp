@@ -23,7 +23,27 @@ namespace widgets {
 
     void ColoredBox::resolve(resolve_command& command)
     {
+        _color = Color(0xFF8899FF);
+
+        bungeegum::detail::font_handle _fh = {};
+        bungeegum::detail::texture_handle _afh = {};
+        // bungeegum::detail::renderer* _rrrr = bungeegum::detail::pipeline_renderer.get();
+        // _rrrr->clear_color = {0.f, 1.f, 0.2f, 1.f};
+        // bungeegum::detail::renderer* _rrrr = bungeegum::detail::pipeline_renderer.get();
+
+        // _afh.emplace({ 2u }, 1, 1);
+
+        _afh.reset();
+
+        // auto& cb = bungeegum::make<ColoredBox>();
+
+        // std::cout << "ddddddddd\n";
+
+        // if (_afh.has_value()) {
         // _color = Color(0xFF8888FF);
+
+        // }
+        
 
 #if defined(__HOTRELOADING__)
         // std::cout << "oui" << std::endl;

@@ -108,6 +108,7 @@ int main()
     // bungeegum::hotreload_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
 
     bungeegum::hotswap::include_directories().push_back("D:/bungeegum/external/glm/");
+    bungeegum::hotswap::include_directories().push_back("D:/bungeegum/external/diligentcore/");
     bungeegum::hotswap::include_directories().push_back("D:/bungeegum/external/entt/src");
     bungeegum::hotswap::include_directories().push_back("D:/bungeegum/external/cereal/include/");
     bungeegum::hotswap::include_directories().push_back("D:/bungeegum/external/hscpp/include");

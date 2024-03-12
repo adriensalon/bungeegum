@@ -55,6 +55,10 @@ namespace detail {
         SDL_Window* sdl_window = nullptr;
     };
 
+    static Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _global_render_device = {};
+    static Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _global_device_context = {};
+    static Diligent::RefCntAutoPtr<Diligent::ISwapChain> _global_swap_chain = {};
+
     //     renderer::renderer(const window& existing_window)
     //     {
     //         // _data = std::make_shared<renderer_data>();
@@ -105,6 +109,9 @@ namespace detail {
             _swap_chain_descriptor.ColorBufferFormat,
             _swap_chain_descriptor.DepthBufferFormat);
         ImPlot::CreateContext();
+        _global_render_device = _renderer._data->render_device;
+        _global_device_context = _renderer._data->device_context;
+        _global_swap_chain = _renderer._data->swap_chain;
         return _renderer;
     }
 
@@ -182,5 +189,227 @@ namespace detail {
     {
         _data->swap_chain->Resize(size.x, size.y);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // void font_handle::emplace(
+    //     renderer& rasterizer,
+    //     const std::filesystem::path& filename,
+    //     const float size,
+    //     const std::optional<font_config>& config,
+    //     unsigned short* ranges)
+    // {
+    //     // if (!rasterizer.has_value()) {
+    //     //     throw backtraced_exception { "[rendering] Impossible to create font because rasterizer has no value" };
+    //     // }
+    //     reset();
+    //     (void)rasterizer;
+
+    //     int _raw_width, _raw_height = 0;
+    //     unsigned char* _raw_pixels = nullptr;
+    //     // ImGui::SetCurrentContext(rasterizer._data->_imgui_context);
+    //     ImGuiIO& _io = ImGui::GetIO();
+
+    //     std::string _spath = filename.generic_string();
+    //     const char* _cpath = _spath.c_str();
+    //     ImFontConfig _imgui_config; 
+    //     if (config.has_value()) {
+    //         const font_config& _font_config = config.value();      
+    //         _imgui_config.FontNo = static_cast<int>(_font_config.index);
+    //         _imgui_config.OversampleH = static_cast<int>(_font_config.oversample_horizontal);
+    //         _imgui_config.OversampleV = static_cast<int>(_font_config.oversample_vertical);
+    //         _imgui_config.PixelSnapH = _font_config.pixel_snap_horizontal;
+    //         _imgui_config.GlyphExtraSpacing = ImVec2 { _font_config.glyph_extra_spacing.x, _font_config.glyph_extra_spacing.y };
+    //         _imgui_config.GlyphOffset = ImVec2 { _font_config.glyph_extra_spacing.x, _font_config.glyph_extra_spacing.y };
+    //         _imgui_config.GlyphMinAdvanceX = _font_config.glyph_min_advance; // Use if you want to make the icon monospaced
+    //     }
+    //     _imgui_font = _io.Fonts->AddFontFromFileTTF(_cpath, size, &_imgui_config, ranges);
+
+    //     _io.Fonts->Build();
+    //     _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
+    //     // rasterizer._font_texture.emplace(
+    //     //     rasterizer,
+    //     //     std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)),
+    //     //     static_cast<std::size_t>(_raw_width),
+    //     //     static_cast<std::size_t>(_raw_height));
+    //     // _io.Fonts->TexID = rasterizer._font_texture.get();
+    //     _has_value = true;
+    // }
+    
+    void font_handle::emplace(
+        renderer& rasterizer,
+        const void* ttf,
+        const std::size_t count,
+        const float size,
+        const std::optional<font_config>& config,
+        unsigned short* ranges)
+    {
+        // if (!rasterizer.has_value()) {
+        //     throw backtraced_exception { "[rendering] Impossible to create font because rasterizer has no value" };
+        // }
+        reset();
+        (void)rasterizer;
+
+        int _raw_width, _raw_height = 0;
+        unsigned char* _raw_pixels = nullptr;
+        // ImGui::SetCurrentContext(rasterizer._imgui_context);
+        ImGuiIO& _io = ImGui::GetIO();
+ 
+        ImFontConfig _imgui_config; 
+        if (config.has_value()) {
+            const font_config& _font_config = config.value();      
+            _imgui_config.FontNo = static_cast<int>(_font_config.index);
+            _imgui_config.OversampleH = static_cast<int>(_font_config.oversample_horizontal);
+            _imgui_config.OversampleV = static_cast<int>(_font_config.oversample_vertical);
+            _imgui_config.PixelSnapH = _font_config.pixel_snap_horizontal;
+            _imgui_config.GlyphExtraSpacing = ImVec2 { _font_config.glyph_extra_spacing.x, _font_config.glyph_extra_spacing.y };
+            _imgui_config.GlyphOffset = ImVec2 { _font_config.glyph_extra_spacing.x, _font_config.glyph_extra_spacing.y };
+            _imgui_config.GlyphMinAdvanceX = _font_config.glyph_min_advance; // Use if you want to make the icon monospaced
+            // static const unsigned short _ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+        }
+        _imgui_font = _io.Fonts->AddFontFromMemoryCompressedTTF(ttf, static_cast<int>(count), size, &_imgui_config, ranges);
+
+        _io.Fonts->Build();
+        _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
+        // rasterizer._font_texture.emplace(
+        //     rasterizer,
+        //     std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)),
+        //     static_cast<std::size_t>(_raw_width),
+        //     static_cast<std::size_t>(_raw_height));
+        // _io.Fonts->TexID = rasterizer._font_texture.get();
+        _has_value = true;
+    }
+
+    ImFont* font_handle::get() const
+    {
+        if (_has_value) {
+            return _imgui_font;
+        }
+        return nullptr;
+    }
+
+    bool font_handle::has_value() const
+    {
+        return _has_value;
+    }
+
+    void font_handle::reset()
+    {
+        if (_has_value) {
+            _imgui_font = nullptr;
+            _has_value = false;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // void texture_handle::emplace(
+    //     renderer& rasterizer,
+    //     const std::filesystem::path filename)
+    // {
+    //     // if (!rasterizer.has_value()) {
+    //     //     throw backtraced_exception { "[rendering exception] impossible to create texture because rasterizer has no value" };
+    //     // }
+    //     reset();
+
+    //     std::string _spath = filename.generic_string();
+    //     const char* _cpath = _spath.c_str();
+    //     int _width, _height, _channels;
+    //     unsigned char* _data = stbi_load(_cpath, &_width, &_height, &_channels, 4);
+    //     if (_channels < 3 || _channels > 4) {
+    //         throw backtraced_exception("invalid channels");
+    //     }
+    //     std::vector<unsigned char> _pixels(_data, _data + 4 * _width * _height);
+    //     stbi_image_free(_data);
+
+    //     Diligent::TextureDesc _texture_desc;
+    //     _texture_desc.Name = "uiw user texture";
+    //     _texture_desc.Type = Diligent::RESOURCE_DIM_TEX_2D;
+    //     _texture_desc.Width = static_cast<Diligent::Uint32>(_width);
+    //     _texture_desc.Height = static_cast<Diligent::Uint32>(_height);
+    //     _texture_desc.Format = Diligent::TEX_FORMAT_RGBA8_UNORM;
+    //     _texture_desc.BindFlags = Diligent::BIND_SHADER_RESOURCE;
+    //     _texture_desc.Usage = Diligent::USAGE_IMMUTABLE;
+    //     Diligent::TextureSubResData _texture_subres_data[] = { { _pixels.data(), 4 * Diligent::Uint64 { _texture_desc.Width } } };
+    //     Diligent::TextureData _texture_data(_texture_subres_data, _countof(_texture_subres_data));
+    //     rasterizer._data->_render_device->CreateTexture(_texture_desc, &_texture_data, &_diligent_texture);
+    //     _diligent_texture_view = _diligent_texture->GetDefaultView(Diligent::TEXTURE_VIEW_SHADER_RESOURCE);
+    //     _has_value = true;
+    // }
+
+    void texture_handle::emplace(
+        const std::vector<unsigned char>& pixels,
+        const std::size_t width,
+        const std::size_t height)
+    {
+        // if (!rasterizer.has_value()) {
+        //     throw backtraced_exception { "[rendering exception] impossible to create texture because rasterizer has no value" };
+        // }
+        reset();
+        Diligent::TextureDesc _texture_desc;
+        _texture_desc.Name = "uiw user texture";
+        _texture_desc.Type = Diligent::RESOURCE_DIM_TEX_2D;
+        _texture_desc.Width = static_cast<Diligent::Uint32>(width);
+        _texture_desc.Height = static_cast<Diligent::Uint32>(height);
+        _texture_desc.Format = Diligent::TEX_FORMAT_RGBA8_UNORM;
+        _texture_desc.BindFlags = Diligent::BIND_SHADER_RESOURCE;
+        _texture_desc.Usage = Diligent::USAGE_IMMUTABLE;
+        Diligent::TextureSubResData _texture_subres_data[] = { { pixels.data(), 4 * Diligent::Uint64 { _texture_desc.Width } } };
+        Diligent::TextureData _texture_data(_texture_subres_data, _countof(_texture_subres_data));
+        _global_render_device->CreateTexture(_texture_desc, &_texture_data, &_diligent_texture);
+        _diligent_texture_view = _diligent_texture->GetDefaultView(Diligent::TEXTURE_VIEW_SHADER_RESOURCE);
+        _has_value = true;
+    }
+
+    void* texture_handle::get() const
+    {
+        if (_has_value) {
+            return (ImTextureID)(_diligent_texture_view);
+        }
+        return nullptr;
+    }
+
+    // bool texture_handle::has_value() const
+    // {
+    //     return _has_value;
+    // }
+
+    // void texture_handle::reset()
+    // {
+    //     if (_has_value) {
+    //         _diligent_texture.Release();
+    //         _diligent_texture_view.Release();
+    //         _has_value = false;
+    //     }
+    // }
+
 }
 }

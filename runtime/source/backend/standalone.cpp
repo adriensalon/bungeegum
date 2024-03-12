@@ -82,13 +82,22 @@ void launch(const runtime_widget& widget, const renderer_backend backend)
 		// switch (backend)
 		// {
 		// // case renderer_backend::directx11:
-		// // 	detail::renderer_backend _renderer = detail::renderer::create_directx11(_window);
+			detail::renderer _renderer = detail::renderer::create_directx11(_window);
+            bungeegum::detail::texture_handle _afh = {};
+        // bungeegum::detail::renderer* _rrrr = bungeegum::detail::pipeline_renderer.get();
+        // _rrrr->clear_color = {0.f, 1.f, 0.2f, 1.f};
+        // bungeegum::detail::renderer* _rrrr = bungeegum::detail::pipeline_renderer.get();
+        _afh.emplace({ 2u }, 1, 1);
 		// // 	break;
 		
 		// default:
 		// 	break;
 		// }
-        detail::renderer _renderer = detail::renderer::create_directx11(_window);
+        // detail::pipeline_renderer = std::make_unique<detail::renderer>(detail::renderer::create_directx11(_window));
+        // detail::renderer& _renderer = *detail::pipeline_renderer.get();
+        
+        
+        // detail::renderer::create_directx11(_window);
 
 #if BUNGEEGUM_USE_HOTSWAP
         detail::global().backend.setup_if_required();
@@ -161,7 +170,7 @@ void launch(const runtime_widget& widget, const renderer_backend backend)
             }
 #endif
         });
-        _renderer.clear_color = { 1.f, 1.f, 1.f, 1.f };
+        // _renderer.clear_color = { 1.f, 1.f, 1.f, 1.f };
         _window.run_loop();
     });
 }
