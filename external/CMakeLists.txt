@@ -53,9 +53,10 @@ if(BUNGEEGUM_ENABLE_STANDALONE)
 
 	set(DILIGENT_NO_FORMAT_VALIDATION ON CACHE BOOL "" FORCE)
 	set(DILIGENT_NO_ARCHIVER ON CACHE BOOL "" FORCE) # implement later
+	add_subdirectory("diligentcore")
 	add_subdirectory("diligent")
 
-	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligentcore/")
+	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligentcore/")
 	target_include_directories(Diligent-Imgui PUBLIC "${CMAKE_SOURCE_DIR}/external/diligent/diligenttools/")
 endif()
 

@@ -3,7 +3,7 @@
 #include <bungeegum/glue/toolchain.hpp>
 
 #if BUNGEEGUM_USE_BACKTRACE
-#include <backward.hpp>
+// #include <backward.hpp>
 #endif
 
 namespace bungeegum {
@@ -11,36 +11,37 @@ namespace detail {
 
     void emplace_traces(std::vector<backtraced_result>& tracing, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
-#if BUNGEEGUM_USE_BACKTRACE
+// #if BUNGEEGUM_USE_BACKTRACE
 
-        backward::StackTrace _stack_trace;
-        backward::TraceResolver _trace_resolver;
-        std::size_t _offset = 4u + tracing_offset; // Escape backwardcpp calls + optionnaly defined count
-        _stack_trace.load_here(tracing_size + _offset);
-        _trace_resolver.load_stacktrace(_stack_trace);
-        tracing.resize(tracing_size);
-        for (std::size_t _i = 0; _i < tracing_size; _i++) {
-            backward::ResolvedTrace _trace = _trace_resolver.resolve(_stack_trace[_i + _offset]);
-            tracing[_i].address = _trace.addr;
-            tracing[_i].primary = backtraced_source { _trace.source.filename, _trace.source.function, _trace.source.line, _trace.source.col };
-            for (backward::ResolvedTrace::SourceLoc& _inliner : _trace.inliners) {
-                tracing[_i].inliners.emplace_back(backtraced_source { _inliner.filename, _inliner.function, _inliner.line, _inliner.col });
-            }
-        }
-#else
+//         backward::StackTrace _stack_trace;
+//         backward::TraceResolver _trace_resolver;
+//         std::size_t _offset = 4u + tracing_offset; // Escape backwardcpp calls + optionnaly defined count
+//         _stack_trace.load_here(tracing_size + _offset);
+//         _trace_resolver.load_stacktrace(_stack_trace);
+//         tracing.resize(tracing_size);
+//         for (std::size_t _i = 0; _i < tracing_size; _i++) {
+//             backward::ResolvedTrace _trace = _trace_resolver.resolve(_stack_trace[_i + _offset]);
+//             tracing[_i].address = _trace.addr;
+//             tracing[_i].primary = backtraced_source { _trace.source.filename, _trace.source.function, _trace.source.line, _trace.source.col };
+//             for (backward::ResolvedTrace::SourceLoc& _inliner : _trace.inliners) {
+//                 tracing[_i].inliners.emplace_back(backtraced_source { _inliner.filename, _inliner.function, _inliner.line, _inliner.col });
+//             }
+//         }
+// #else
         (void)tracing;
         (void)tracing_offset;
         (void)tracing_size;
-#endif
+// #endif
     }
 
     void protected_emplace_traces(std::vector<backtraced_result>& tracing, const std::size_t tracing_offset, const std::size_t tracing_size)
     {
 #if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
-        __try {
+        // __try {
             emplace_traces(tracing, tracing_offset, tracing_size);
-        } __except (EXCEPTION_EXECUTE_HANDLER) {			
-        }
+        // } __except (EXCEPTION_EXECUTE_HANDLER) {
+            			
+        // }
 #else
 		try {
             emplace_traces(tracing, tracing_offset, tracing_size);

@@ -321,7 +321,8 @@ void ImGuiDiligentRenderer::CreateDeviceObjects()
     InvalidateDeviceObjects();
 
     ShaderCreateInfo ShaderCI;
-    ShaderCI.UseCombinedTextureSamplers = true;
+    ShaderCI.Desc.UseCombinedTextureSamplers = true;
+    // ShaderCI.UseCombinedTextureSamplers = true;
     ShaderCI.SourceLanguage             = SHADER_SOURCE_LANGUAGE_DEFAULT;
 
     const auto DeviceType = m_pDevice->GetDeviceInfo().Type;
