@@ -9,6 +9,7 @@
 // #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/glue/string.hpp>
+#include <bungeegum/glue/time.hpp>
 
 #define BUNGEEGUM_USE_OVERLAY_PROFILER_SIZE 2000
 
@@ -124,33 +125,33 @@ namespace detail {
             {
             }
 
-            void setup(frames_chronometer& chronometer)
-            {
-                chronometer.on_new_task([&](const frames_chronometer_task& task) {
-                    _buffer_names.emplace(task.name, _buffers.size());
-                    _buffers.emplace_back(scrolling_buffer<float2>(task.name));
-                });
-                chronometer.on_new_frame_for_each_task([&](const frames_chronometer_task& task) {
-                    float _lifetime_duration = backend_lifetime_duration();
-                    std::size_t _index = _buffer_names.at(task.name);
-                    if (_buffers[_index].visible) {
-                        float _duration = static_cast<float>(task.duration.count());
-                        if (_index > 0) {
-                            _duration += _buffers[_index - 1].back().y;
-                        }
-                        _buffers[_index].emplace(float2 { _lifetime_duration, _duration });
-                        _max_value = math::max(_max_value, 1.1f * _duration);
-                    } else {
-                        _buffers[_index].emplace(float2 { _lifetime_duration, 0.f });
-                    }
-                });
-            }
+            // void setup(frames_chronometer& chronometer)
+            // {
+            //     chronometer.on_new_task([&](const frames_chronometer_task& task) {
+            //         _buffer_names.emplace(task.name, _buffers.size());
+            //         _buffers.emplace_back(scrolling_buffer<float2>(task.name));
+            //     });
+            //     chronometer.on_new_frame_for_each_task([&](const frames_chronometer_task& task) {
+            //         float _lifetime_duration = backend_lifetime_duration();
+            //         std::size_t _index = _buffer_names.at(task.name);
+            //         if (_buffers[_index].visible) {
+            //             float _duration = static_cast<float>(task.duration.count());
+            //             if (_index > 0) {
+            //                 _duration += _buffers[_index - 1].back().y;
+            //             }
+            //             _buffers[_index].emplace(float2 { _lifetime_duration, _duration });
+            //             _max_value = math::max(_max_value, 1.1f * _duration);
+            //         } else {
+            //             _buffers[_index].emplace(float2 { _lifetime_duration, 0.f });
+            //         }
+            //     });
+            // }
 
-            std::size_t update_average_frame_duration(const frames_chronometer& chronometer)
-            {
-                _average_frame_durations.emplace(chronometer.frame_duration().count());
-                return _average_frame_durations.average();
-            }
+            // std::size_t update_average_frame_duration(const frames_chronometer& chronometer)
+            // {
+            //     _average_frame_durations.emplace(chronometer.frame_duration().count());
+            //     return _average_frame_durations.average();
+            // }
 
             void draw(const float history_size_seconds, const ImVec2 size = { -1.f, -1.f })
             {
@@ -208,48 +209,48 @@ namespace detail {
         static scrolling_profiler steps_profiler = { "steps" };
         static scrolling_profiler widgets_profiler = { "widgets" };
 
-        void draw_profiler_tab(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
-        {
-            // SI TOUTES LES FRAMES
-            const std::size_t _duration_ms = profiler.update_average_frame_duration(chronometer);
-            // SINON
-            // const std::size_t _duration_ms = chronometer.frame_duration().count();
-            std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
-            if (ImGui::BeginTabItem(_title.c_str())) {
-                ImVec2 _available_size = ImGui::GetContentRegionAvail();
-                _available_size.y -= ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y;
-                profiler.draw(history_size_seconds, _available_size);
-                ImGui::EndTabItem();
-            }
-        }
+        // void draw_profiler_tab(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
+        // {
+        //     // SI TOUTES LES FRAMES
+        //     const std::size_t _duration_ms = profiler.update_average_frame_duration(chronometer);
+        //     // SINON
+        //     // const std::size_t _duration_ms = chronometer.frame_duration().count();
+        //     std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
+        //     if (ImGui::BeginTabItem(_title.c_str())) {
+        //         ImVec2 _available_size = ImGui::GetContentRegionAvail();
+        //         _available_size.y -= ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y;
+        //         profiler.draw(history_size_seconds, _available_size);
+        //         ImGui::EndTabItem();
+        //     }
+        // }
 
-        void draw_profiler_tab_with_regex(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
-        {
-            // SI TOUTES LES FRAMES
-            const std::size_t _duration_ms = profiler.update_average_frame_duration(chronometer);
-            // SINON
-            // const std::size_t _duration_ms = chronometer.frame_duration().count()
-            std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
-            if (ImGui::BeginTabItem(_title.c_str())) {
-                ImVec2 _available_size = ImGui::GetContentRegionAvail();
-                _available_size.y -= 2.f * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y);
-                profiler.draw(history_size_seconds, _available_size);
-                if (ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled)) {
-                    if (!filter_text.empty()) {
-                        profiler.clear();
-                    }
-                }
-                ImGui::SameLine();
-                ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-                if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here a widget type to match with regex...", &filter_text)) {
-                    if (filter_enabled) {
-                        profiler.clear();
-                    }
-                }
-                ImGui::PopItemWidth();
-                ImGui::EndTabItem();
-            }
-        }
+        // void draw_profiler_tab_with_regex(frames_chronometer& chronometer, scrolling_profiler& profiler, const float history_size_seconds)
+        // {
+        //     // SI TOUTES LES FRAMES
+        //     const std::size_t _duration_ms = profiler.update_average_frame_duration(chronometer);
+        //     // SINON
+        //     // const std::size_t _duration_ms = chronometer.frame_duration().count()
+        //     std::string _title = profiler.name() + " (" + std::to_string(_duration_ms) + "ms)" + tag(profiler.name() + "_tab");
+        //     if (ImGui::BeginTabItem(_title.c_str())) {
+        //         ImVec2 _available_size = ImGui::GetContentRegionAvail();
+        //         _available_size.y -= 2.f * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y);
+        //         profiler.draw(history_size_seconds, _available_size);
+        //         if (ImGui::Checkbox(tag("filter_checkbox").c_str(), &filter_enabled)) {
+        //             if (!filter_text.empty()) {
+        //                 profiler.clear();
+        //             }
+        //         }
+        //         ImGui::SameLine();
+        //         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+        //         if (ImGui::InputTextWithHint(tag("filter_input").c_str(), "type here a widget type to match with regex...", &filter_text)) {
+        //             if (filter_enabled) {
+        //                 profiler.clear();
+        //             }
+        //         }
+        //         ImGui::PopItemWidth();
+        //         ImGui::EndTabItem();
+        //     }
+        // }
     }
 
     void setup_profiler_overlay()

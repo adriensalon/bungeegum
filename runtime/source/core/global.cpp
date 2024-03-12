@@ -5,7 +5,6 @@ namespace bungeegum {
 namespace detail {
 
     static swapped_manager_data __bungeegum_swapped_manager = {};
-    static global_manager_data __bungeegum_global_manager = {};
 
     void setup_global_if_required()
     {
@@ -29,10 +28,5 @@ namespace detail {
         return __bungeegum_swapped_manager;
     }
 #endif
-    
-    global_manager_data& global2()
-    {
-        return __bungeegum_global_manager;
-    }
 }
 }

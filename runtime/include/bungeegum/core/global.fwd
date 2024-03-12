@@ -7,10 +7,6 @@
 #include <bungeegum/core/font.fwd>
 #include <bungeegum/core/texture.fwd>
 
-#if !defined(__HOTRELOADING__)
-#include <bungeegum/core/pipeline.fwd>
-#endif
-
 #include <unordered_set>
 
 namespace bungeegum {
@@ -36,12 +32,6 @@ namespace detail {
         shader_handle mask_shader = {};
     };
 
-    struct global_manager_data {  
-#if !defined(__HOTRELOADING__)      
-        pipeline_manager_data pipelines = {};
-#endif
-    };
-
     void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)
 
 #if BUNGEEGUM_USE_HOTSWAP
@@ -52,8 +42,6 @@ namespace detail {
 #else
     swapped_manager_data& swapped_global();
 #endif
-
-    global_manager_data& global2();
 
 }
 }

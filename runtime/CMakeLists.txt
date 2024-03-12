@@ -28,11 +28,13 @@ set(bungeegum_runtime_source
 	"source/glue/console.cpp"
 	"source/glue/dialog.cpp"
 	"source/glue/hotswap.cpp"
+	"source/glue/hotswap2.cpp"
 	"source/glue/serialize.cpp"
 	"source/glue/string.cpp"
 	"source/glue/theme.cpp"
 	"source/glue/time.cpp"
 	"source/glue/rendering.cpp"
+	"source/glue/rendering2.cpp"
 	"source/glue/window.cpp"
 
 	"source/core/font.cpp"
@@ -99,7 +101,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 endif()
 
 if(BUNGEEGUM_ENABLE_HOTSWAP AND BUNGEEGUM_ENABLE_OVERLAY AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-	target_link_libraries(bungeegum_runtime nfd)
+	# target_link_libraries(bungeegum_runtime nfd)
 endif()
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")

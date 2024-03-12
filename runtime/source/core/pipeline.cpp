@@ -20,6 +20,8 @@ namespace detail {
 
     static std::shared_ptr<renderer_handle> pipeline_renderer = nullptr;
 
+	static detail::pipeline_manager_data pipelines = {};
+
 #if BUNGEEGUM_USE_OVERLAY
     extern void setup_overlay(rasterizer_handle& context);
     extern void draw_overlay();
@@ -450,8 +452,7 @@ namespace detail {
         _swapped.rasterizers.insert({ data.raw, std::ref(*data.user_context.get()) });
 
         detail::setup_shaders(data);
-        detail::global_manager_data& _global = detail::global2();
-        _global.pipelines.pipelines.insert({ data.raw, std::ref(data) });
+        pipelines.pipelines.insert({ data.raw, std::ref(data) });
     }
 }
 
@@ -591,6 +592,46 @@ template pipeline<renderer_backend::directx11>& pipeline<renderer_backend::direc
 template pipeline<renderer_backend::directx12>& pipeline<renderer_backend::directx12>::title(const std::string& description);
 template pipeline<renderer_backend::opengl>& pipeline<renderer_backend::opengl>::title(const std::string& description);
 template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>::title(const std::string& description);
+
+std::vector<std::string>& get_hotswap_defines()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->defines();
+}
+
+std::vector<std::filesystem::path>& get_hotswap_include_directories()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->include_directories();
+}
+
+std::vector<std::filesystem::path>& get_hotswap_source_directories()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->source_directories();
+}
+
+std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->force_compiled_source_files();
+}
+
+std::vector<std::filesystem::path>& get_hotswap_libraries()
+{
+    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    detail::setup_global_if_required();
+    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    return _swapped.widgets.hotswap_reloader->libraries();
+}
 
 
 }

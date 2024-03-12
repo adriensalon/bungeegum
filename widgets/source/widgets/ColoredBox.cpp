@@ -23,7 +23,7 @@ namespace widgets {
 
     void ColoredBox::resolve(resolve_command& command)
     {
-        // _color = Color(0xFF8888FF);
+        _color = Color(0xFF8888FF);
 
 #if defined(__HOTRELOADING__)
         // std::cout << "oui" << std::endl;
@@ -60,9 +60,10 @@ namespace widgets {
 
     void ColoredBox::draw(draw_command& command)
     {
-        // float2 _min_point = command.resolved_position();
-        // float2 _max_point = _min_point + command.resolved_size();
-        // command.draw_rect_filled(_min_point, _max_point, _color);
+        _color = Color(0xFF8888FF);
+        float2 _min_point = {10.f, 100.f};
+        float2 _max_point = {50.f, 500.f};
+        command.draw_rect_filled(_min_point, _max_point, _color);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 

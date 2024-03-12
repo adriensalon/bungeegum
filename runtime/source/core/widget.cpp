@@ -503,46 +503,6 @@ void destroy(const widget_id& widget)
 
 
 
-std::vector<std::string>& get_hotswap_defines()
-{
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
-    return _swapped.widgets.hotswap_reloader->defines();
-}
-
-std::vector<std::filesystem::path>& get_hotswap_include_directories()
-{
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
-    return _swapped.widgets.hotswap_reloader->include_directories();
-}
-
-std::vector<std::filesystem::path>& get_hotswap_source_directories()
-{
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
-    return _swapped.widgets.hotswap_reloader->source_directories();
-}
-
-std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files()
-{
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
-    return _swapped.widgets.hotswap_reloader->force_compiled_source_files();
-}
-
-std::vector<std::filesystem::path>& get_hotswap_libraries()
-{
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
-    return _swapped.widgets.hotswap_reloader->libraries();
-}
-
 widget_id get_parent(const widget_id id)
 {
     detail::widget_manager_data& _manager = detail::swapped_global().widgets;
