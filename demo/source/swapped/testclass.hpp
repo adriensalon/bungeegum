@@ -6,8 +6,8 @@ using namespace bungeegum;
 
 struct testclass {
 
-    bungeegum::font myfont = { "D:/bungeegum/demo/static/Lobster.ttf", 17.f };
-    bungeegum::texture mytexture = { "D:/bungeegum/demo/static/Image.jpg" };
+    // bungeegum::font myfont = { "D:/bungeegum/demo/static/Lobster.ttf", 17.f };
+    // bungeegum::texture mytexture = { "D:/bungeegum/demo/static/Image.jpg" };
 
     HOTSWAP_METHOD void draw(bungeegum::draw_command& command);
 

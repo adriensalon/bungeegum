@@ -41,16 +41,16 @@ namespace detail {
         creation_size = other.creation_size;
         if (is_compiled) {
             swapped_manager_data& _swapped = swapped_global();
-            for (std::pair<const std::uintptr_t, detail::rasterizer_handle> _pipeline : _swapped.rasterizers) {    
+            for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) {    
                 if (creation_filename.empty()) {
                     textures[_pipeline.first].emplace(
-                        _pipeline.second,
+                        _pipeline.second.get(),
                         creation_pixels,
                         creation_size.x,
                         creation_size.y);
                 } else {
                     textures[_pipeline.first].emplace(
-                        _pipeline.second,
+                        _pipeline.second.get(),
                         creation_filename);
                 }
             }

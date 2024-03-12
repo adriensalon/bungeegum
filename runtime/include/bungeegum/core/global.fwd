@@ -1,12 +1,15 @@
 #pragma once
 
 #include <bungeegum/core/animation.fwd>
-#include <bungeegum/core/pipeline.fwd>
 #include <bungeegum/core/log.fwd>
 #include <bungeegum/core/widget.fwd>
 #include <bungeegum/core/shader.fwd>
 #include <bungeegum/core/font.fwd>
 #include <bungeegum/core/texture.fwd>
+
+#if !defined(__HOTRELOADING__)
+#include <bungeegum/core/pipeline.fwd>
+#endif
 
 #include <unordered_set>
 
@@ -33,8 +36,10 @@ namespace detail {
         shader_handle mask_shader = {};
     };
 
-    struct global_manager_data {        
+    struct global_manager_data {  
+#if !defined(__HOTRELOADING__)      
         pipeline_manager_data pipelines = {};
+#endif
     };
 
     void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)

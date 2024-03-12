@@ -144,40 +144,55 @@ namespace detail {
             )";
         return _fragment.data();
     }
+    
+    
+
+    struct renderer_handle::renderer_data {
+        bool _has_value = false;
+        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
+        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};
+        Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain = {};
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        SDL_Window* _sdl_window = nullptr;
+#endif
+    };
 
 #if BUNGEEGUM_USE_DIRECTX
 
-    void renderer_handle::emplace_attach_directx11(window_handle& window, void* device, void* context)
+    renderer_handle renderer_handle::emplace_attach_directx11(window_handle& window, void* device, void* context)
     {
-        if (_has_value) {
-            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
-        }
-        Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
-        Diligent::EngineD3D11CreateInfo _engine_create_info;
-        // #if defined(__DEBUG__)
-        //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
-        // #endif
-        _factory_ptr->AttachToD3D11Device(device, context, _engine_create_info, &_diligent_render_device, &_diligent_device_context);
-        Diligent::Win32NativeWindow _win32_native_window(window.get_native());        
-        Diligent::SwapChainDesc _swap_chain_descriptor;
-        _swap_chain_descriptor.DefaultStencilValue = 0u;
-        _factory_ptr->CreateSwapChainD3D11(
-            _diligent_render_device, 
-            _diligent_device_context, 
-            _swap_chain_descriptor,
-            Diligent::FullScreenModeDesc {}, 
-            _win32_native_window, 
-            &_diligent_swap_chain);
+// #if !defined(__HOTRELOADING__)
+//         if (_has_value) {
+//             throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+//         }
+//         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
+//         Diligent::EngineD3D11CreateInfo _engine_create_info;
+//         // #if defined(__DEBUG__)
+//         //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
+//         // #endif
+//         _factory_ptr->AttachToD3D11Device(device, context, _engine_create_info, &_diligent_render_device, &_diligent_device_context);
+//         Diligent::Win32NativeWindow _win32_native_window(window.get_native());        
+//         Diligent::SwapChainDesc _swap_chain_descriptor;
+//         _swap_chain_descriptor.DefaultStencilValue = 0u;
+//         _factory_ptr->CreateSwapChainD3D11(
+//             _diligent_render_device, 
+//             _diligent_device_context, 
+//             _swap_chain_descriptor,
+//             Diligent::FullScreenModeDesc {}, 
+//             _win32_native_window, 
+//             &_diligent_swap_chain);
 
-        _sdl_window = window.get_sdl();
-		_has_value = true;
+//         _sdl_window = window.get_sdl();
+// 		_has_value = true;
+// #endif
+        return {};
     }
 
-    void renderer_handle::emplace_new_directx11(window_handle& window)
+    renderer_handle renderer_handle::emplace_new_directx11(window_handle& window)
     {
-        if (_has_value) {
-            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
-        }
+        renderer_handle _renderer;
+        _renderer._data = std::make_shared<renderer_data>();
+        
         Diligent::SwapChainDesc _swap_chain_descriptor;
         _swap_chain_descriptor.DefaultStencilValue = 0u;
         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
@@ -185,104 +200,109 @@ namespace detail {
         // #if defined(__DEBUG__)
         //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
         // #endif
-        _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_diligent_render_device, &_diligent_device_context);
+        _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_renderer._data->_diligent_render_device, &_renderer._data->_diligent_device_context);
         Diligent::Win32NativeWindow _win32_native_window(window.get_native());
-        _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
-            Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
+        _factory_ptr->CreateSwapChainD3D11(_renderer._data->_diligent_render_device, _renderer._data->_diligent_device_context, _swap_chain_descriptor,
+            Diligent::FullScreenModeDesc {}, _win32_native_window, &_renderer._data->_diligent_swap_chain);
 
-        _sdl_window = window.get_sdl();
-		_has_value = true;
+        _renderer._data->_sdl_window = window.get_sdl();
+		_renderer._data->_has_value = true;
+        return _renderer;
     }
 
-    void renderer_handle::emplace_new_directx12(window_handle& existing_window)
+    renderer_handle renderer_handle::emplace_new_directx12(window_handle& existing_window)
     {
-        if (_has_value) {
-            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
-        }
-        Diligent::SwapChainDesc _swap_chain_descriptor;
-        _swap_chain_descriptor.DefaultStencilValue = 0u;
-        Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
-
-        // todo
-		_has_value = true;
-    }
-
-#endif
-
-    void renderer_handle::emplace_attach_opengl(window_handle& existing_window)
-    {
-        if (_has_value) {
-            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
-        }
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        // _data->sdl_window = existing_window->get_sdl();
-#endif
+        // if (_data->_has_value) {
+        //     throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+        // }
         // Diligent::SwapChainDesc _swap_chain_descriptor;
         // _swap_chain_descriptor.DefaultStencilValue = 0u;
-        Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
-        Diligent::EngineGLCreateInfo _engine_create_info;
-        // _engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1); marche meme pas
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
-#else
-        _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
-#endif
-        _factory->AttachToActiveGLContext(
-            _engine_create_info,
-            &_diligent_render_device,
-            &_diligent_device_context);
-        // swapchain mdr?
-		_has_value = true;
+        // Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
+
+        // // todo
+		// _data->_has_value = true;
+        return {};
     }
 
-    void renderer_handle::emplace_new_opengl(window_handle& existing_window)
+#endif
+
+    renderer_handle renderer_handle::emplace_attach_opengl(window_handle& existing_window)
     {
-        if (_has_value) {
-            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
-        }
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        // _data->sdl_window = existing_window->get_sdl();
-#endif
-        Diligent::SwapChainDesc _swap_chain_descriptor;
-        _swap_chain_descriptor.DefaultStencilValue = 0u;
-        Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
-        Diligent::EngineGLCreateInfo _engine_create_info;
-        // _engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1); marche meme pas
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
-#else
-        _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
-#endif
-        _factory->CreateDeviceAndSwapChainGL(
-            _engine_create_info,
-            &_diligent_render_device,
-            &_diligent_device_context,
-            _swap_chain_descriptor,
-            &_diligent_swap_chain);
-		_has_value = true;
+//         if (_has_value) {
+//             throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+//         }
+// #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+//         // _data->sdl_window = existing_window->get_sdl();
+// #endif
+//         // Diligent::SwapChainDesc _swap_chain_descriptor;
+//         // _swap_chain_descriptor.DefaultStencilValue = 0u;
+//         Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
+//         Diligent::EngineGLCreateInfo _engine_create_info;
+//         // _engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1); marche meme pas
+// #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+//         _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
+// #else
+//         _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
+// #endif
+//         _factory->AttachToActiveGLContext(
+//             _engine_create_info,
+//             &_diligent_render_device,
+//             &_diligent_device_context);
+//         // swapchain mdr?
+// 		_has_value = true;
+        return {};
+    }
+
+    renderer_handle renderer_handle::emplace_new_opengl(window_handle& existing_window)
+    {
+//         if (_has_value) {
+//             throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+//         }
+// #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+//         // _data->sdl_window = existing_window->get_sdl();
+// #endif
+//         Diligent::SwapChainDesc _swap_chain_descriptor;
+//         _swap_chain_descriptor.DefaultStencilValue = 0u;
+//         Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
+//         Diligent::EngineGLCreateInfo _engine_create_info;
+//         // _engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1); marche meme pas
+// #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+//         _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
+// #else
+//         _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
+// #endif
+//         _factory->CreateDeviceAndSwapChainGL(
+//             _engine_create_info,
+//             &_diligent_render_device,
+//             &_diligent_device_context,
+//             _swap_chain_descriptor,
+//             &_diligent_swap_chain);
+// 		_has_value = true;
+        return {};
     }
 
 #if BUNGEEGUM_USE_VULKAN
     
-    void renderer_handle::emplace_new_vulkan(window_handle& existing)
+    renderer_handle renderer_handle::emplace_new_vulkan(window_handle& existing)
     {
-        if (_has_value) {
-            throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
-        }
-        (void)existing;
-		_has_value = true;
+        // if (_data->_has_value) {
+        //     throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
+        // }
+        // (void)existing;
+		// _data->_has_value = true;
+        return {};
     }
 
 #endif
 
     bool renderer_handle::has_value() const
     {
-        return _has_value;
+        return _data->_has_value;
     }
 
     void renderer_handle::reset() 
     {
-		if (_has_value) {
+		if (_data->_has_value) {
 			
 		}
     }
@@ -293,27 +313,66 @@ namespace detail {
     {
         (void)clear_color_buffer;
         (void)clear_depth_buffer;
-        Diligent::ITextureView* _rtv_ptr = _diligent_swap_chain->GetCurrentBackBufferRTV();
-        Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
-        _diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        Diligent::ITextureView* _rtv_ptr = _data->_diligent_swap_chain->GetCurrentBackBufferRTV();
+        Diligent::ITextureView* _dsv_ptr = _data->_diligent_swap_chain->GetDepthBufferDSV();
+        _data->_diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
 
         const std::array<float, 4> _clear_color_array = { clear_color.x, clear_color.y, clear_color.z, clear_color.w };
-        _diligent_device_context->ClearRenderTarget(_rtv_ptr, _clear_color_array.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        _diligent_device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        _data->_diligent_device_context->ClearRenderTarget(_rtv_ptr, _clear_color_array.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        _data->_diligent_device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         // _diligent_device_context->SetStencilRef(8);
+    }
+    
+    rasterizer_handle renderer_handle::make_rasterizer()
+    {
+        rasterizer_handle _rasterizer;
+        _rasterizer._diligent_render_device = _data->_diligent_render_device;
+        _rasterizer._diligent_device_context = _data->_diligent_device_context;
+        _rasterizer._diligent_swap_chain = _data->_diligent_swap_chain;
+
+        _rasterizer._is_base_vertex_supported = _data->_diligent_render_device->GetAdapterInfo().DrawCommand.CapFlags & Diligent::DRAW_COMMAND_CAP_FLAG_BASE_VERTEX;
+        _rasterizer._imgui_context = ImGui::CreateContext();
+        _rasterizer._implot_context = ImPlot::CreateContext();
+        ImGui::SetCurrentContext(_rasterizer._imgui_context);
+
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        ImGuiIO& _io = ImGui::GetIO();
+        _io.KeyMap[ImGuiKey_Tab] = DOM_VK_TAB;
+        _io.KeyMap[ImGuiKey_LeftArrow] = DOM_VK_LEFT;
+        _io.KeyMap[ImGuiKey_RightArrow] = DOM_VK_RIGHT;
+        _io.KeyMap[ImGuiKey_UpArrow] = DOM_VK_UP;
+        _io.KeyMap[ImGuiKey_DownArrow] = DOM_VK_DOWN;
+        _io.KeyMap[ImGuiKey_PageUp] = DOM_VK_PAGE_UP;
+        _io.KeyMap[ImGuiKey_PageDown] = DOM_VK_PAGE_DOWN;
+        _io.KeyMap[ImGuiKey_Home] = DOM_VK_HOME;
+        _io.KeyMap[ImGuiKey_End] = DOM_VK_END;
+        _io.KeyMap[ImGuiKey_Delete] = DOM_VK_DELETE;
+        _io.KeyMap[ImGuiKey_Backspace] = DOM_VK_BACK_SPACE;
+        _io.KeyMap[ImGuiKey_Enter] = DOM_VK_ENTER;
+        _io.KeyMap[ImGuiKey_Escape] = DOM_VK_ESCAPE;
+        _io.KeyMap[ImGuiKey_A] = DOM_VK_A;
+        _io.KeyMap[ImGuiKey_C] = DOM_VK_C;
+        _io.KeyMap[ImGuiKey_V] = DOM_VK_V;
+        _io.KeyMap[ImGuiKey_X] = DOM_VK_X;
+        _io.KeyMap[ImGuiKey_Y] = DOM_VK_Y;
+        _io.KeyMap[ImGuiKey_Z] = DOM_VK_Z;
+#else
+        ImGui_ImplSDL2_InitForOpenGL(_data->_sdl_window, nullptr);
+#endif
+        return _rasterizer;
     }
 
     void renderer_handle::present()
     {
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        _diligent_swap_chain->Present();
+        _data->_diligent_swap_chain->Present();
 #endif
     }
 
     void renderer_handle::resize(const float2 display_size)
     {
         float2 _rounded = math::round(display_size);
-        _diligent_swap_chain->Resize(
+        _data->_diligent_swap_chain->Resize(
             static_cast<unsigned int>(_rounded.x),
             static_cast<unsigned int>(_rounded.y),
             Diligent::SURFACE_TRANSFORM_OPTIMAL);
@@ -686,48 +745,15 @@ namespace detail {
 
 #endif
 
-    void rasterizer_handle::emplace(
-        renderer_handle& renderer,
-        ImFontAtlas* atlas)
+    void rasterizer_handle::emplace()
     {
         if (_has_value) {
             reset();
         }
 
-        _is_base_vertex_supported = renderer._diligent_render_device->GetAdapterInfo().DrawCommand.CapFlags & Diligent::DRAW_COMMAND_CAP_FLAG_BASE_VERTEX;
-        _imgui_context = ImGui::CreateContext(atlas);
-        _implot_context = ImPlot::CreateContext();
+        
         ImGui::SetCurrentContext(_imgui_context);
         ImGuiIO& _io = ImGui::GetIO();
-
-        _io.IniFilename = nullptr;
-        _io.BackendPlatformName = default_imgui_backend_name.data();
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        _io.KeyMap[ImGuiKey_Tab] = DOM_VK_TAB;
-        _io.KeyMap[ImGuiKey_LeftArrow] = DOM_VK_LEFT;
-        _io.KeyMap[ImGuiKey_RightArrow] = DOM_VK_RIGHT;
-        _io.KeyMap[ImGuiKey_UpArrow] = DOM_VK_UP;
-        _io.KeyMap[ImGuiKey_DownArrow] = DOM_VK_DOWN;
-        _io.KeyMap[ImGuiKey_PageUp] = DOM_VK_PAGE_UP;
-        _io.KeyMap[ImGuiKey_PageDown] = DOM_VK_PAGE_DOWN;
-        _io.KeyMap[ImGuiKey_Home] = DOM_VK_HOME;
-        _io.KeyMap[ImGuiKey_End] = DOM_VK_END;
-        _io.KeyMap[ImGuiKey_Delete] = DOM_VK_DELETE;
-        _io.KeyMap[ImGuiKey_Backspace] = DOM_VK_BACK_SPACE;
-        _io.KeyMap[ImGuiKey_Enter] = DOM_VK_ENTER;
-        _io.KeyMap[ImGuiKey_Escape] = DOM_VK_ESCAPE;
-        _io.KeyMap[ImGuiKey_A] = DOM_VK_A;
-        _io.KeyMap[ImGuiKey_C] = DOM_VK_C;
-        _io.KeyMap[ImGuiKey_V] = DOM_VK_V;
-        _io.KeyMap[ImGuiKey_X] = DOM_VK_X;
-        _io.KeyMap[ImGuiKey_Y] = DOM_VK_Y;
-        _io.KeyMap[ImGuiKey_Z] = DOM_VK_Z;
-#else
-        ImGui_ImplSDL2_InitForOpenGL(renderer._sdl_window, nullptr);
-#endif
-        _diligent_device_context = renderer._diligent_device_context;
-        _diligent_render_device = renderer._diligent_render_device;
-        _diligent_swap_chain = renderer._diligent_swap_chain;
 
         // create uniform buffer
         {

@@ -11,6 +11,7 @@
 #include <bungeegum/glue/detection.hpp>
 #include <bungeegum/glue/raw.hpp>
 #include <bungeegum/glue/hotswap.hpp>
+#include <bungeegum/glue/window.hpp>
 
 struct ImDrawList;
 

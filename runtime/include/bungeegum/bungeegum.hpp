@@ -9,7 +9,10 @@
 #include <bungeegum/core/font.hpp>
 #include <bungeegum/core/log.hpp>
 #include <bungeegum/core/math.hpp>
-#include <bungeegum/core/pipeline.hpp>
 #include <bungeegum/core/shader.hpp>
 #include <bungeegum/core/texture.hpp>
 #include <bungeegum/core/widget.hpp>
+
+#if !defined(__HOTRELOADING__)
+#include <bungeegum/core/pipeline.hpp>
+#endif

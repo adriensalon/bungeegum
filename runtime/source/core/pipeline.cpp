@@ -18,6 +18,8 @@
 namespace bungeegum {
 namespace detail {
 
+    static std::shared_ptr<renderer_handle> pipeline_renderer = nullptr;
+
 #if BUNGEEGUM_USE_OVERLAY
     extern void setup_overlay(rasterizer_handle& context);
     extern void draw_overlay();
@@ -282,7 +284,7 @@ namespace detail {
             //     provider.directx_device_ptr,
             //     provider.directx_swapchain_ptr);
         } else {
-            data.pipeline_renderer.emplace_new_directx11(data.pipeline_window);
+            pipeline_renderer = std::make_shared<renderer_handle>(renderer_handle::emplace_new_directx11(data.pipeline_window));
         }
 #endif
     }
@@ -297,7 +299,7 @@ namespace detail {
             //     provider.directx_device_ptr,
             //     provider.directx_swapchain_ptr);
         } else {
-            data.pipeline_renderer.emplace_new_directx12(data.pipeline_window);
+            pipeline_renderer = std::make_shared<renderer_handle>(renderer_handle::emplace_new_directx12(data.pipeline_window));
         }
 #endif
     }
@@ -310,7 +312,7 @@ namespace detail {
         if (provider.opengl_attach_to_existing) {
             // data.pipeline_renderer.attach_opengl(data.pipeline_window);
         } else {
-            data.pipeline_renderer.emplace_new_opengl(data.pipeline_window);
+            pipeline_renderer = std::make_shared<renderer_handle>(renderer_handle::emplace_new_opengl(data.pipeline_window));
         }
 #endif
     }
@@ -328,7 +330,7 @@ namespace detail {
     {
         shader_depth_descriptor _default_depth;
         _default_depth.function = Diligent::COMPARISON_FUNC_LESS;
-        data.default_shader.emplace(data.user_context, shader_fragment_default(), {}, _default_depth);
+        data.default_shader.emplace(*data.user_context.get(), shader_fragment_default(), {}, _default_depth);
 
         shader_blend_descriptor _mask_blend;
         _mask_blend.color_mask = Diligent::COLOR_MASK::COLOR_MASK_NONE;
@@ -337,7 +339,7 @@ namespace detail {
         _mask_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
         // std::string _fragment = shader_fragment("return float4(1, 0, 0, 1) * UIW_SAMPLE(0, 0);");
         // data.mask_shader.emplace(data.user_context, _fragment, {}, _mask_depth);
-        data.mask_shader.emplace(data.user_context, shader_fragment_default(), _mask_blend, _mask_depth);
+        data.mask_shader.emplace(*data.user_context.get(), shader_fragment_default(), _mask_blend, _mask_depth);
 
 #if BUNGEEGUM_USE_OVERLAY
         shader_depth_descriptor _overlay_depth;
@@ -345,7 +347,7 @@ namespace detail {
         // _overlay_depth.enable = true;
         // _overlay_depth.enable_write = false;
         // _mask_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
-        data.overlay_shader.emplace(data.overlay_context, shader_fragment_default(), {}, _overlay_depth);
+        data.overlay_shader.emplace(*data.overlay_context.get(), shader_fragment_default(), {}, _overlay_depth);
 #endif
     }
 
@@ -371,24 +373,24 @@ namespace detail {
     {
         data.pipeline_window.poll();
         if (!data.pipeline_window.window_resized_events.empty()) {
-            data.pipeline_renderer.resize(data.pipeline_window.window_resized_events.back().new_size);
+            pipeline_renderer->resize(data.pipeline_window.window_resized_events.back().new_size);
         }
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        data.user_context.consume_emscripten_key_events(data.pipeline_window.get_emscripten_key_events());
-        data.user_context.consume_emscripten_mouse_events(data.pipeline_window.get_emscripten_mouse_events());
-        data.user_context.consume_emscripten_wheel_events(data.pipeline_window.get_emscripten_wheel_events());
+        data.user_context->consume_emscripten_key_events(data.pipeline_window.get_emscripten_key_events());
+        data.user_context->consume_emscripten_mouse_events(data.pipeline_window.get_emscripten_mouse_events());
+        data.user_context->consume_emscripten_wheel_events(data.pipeline_window.get_emscripten_wheel_events());
 #if BUNGEEGUM_USE_OVERLAY
-        data.overlay_context.consume_emscripten_key_events(data.pipeline_window.get_emscripten_key_events());
-        data.overlay_context.consume_emscripten_mouse_events(data.pipeline_window.get_emscripten_mouse_events());
-        data.overlay_context.consume_emscripten_wheel_events(data.pipeline_window.get_emscripten_wheel_events());
+        data.overlay_context->consume_emscripten_key_events(data.pipeline_window.get_emscripten_key_events());
+        data.overlay_context->consume_emscripten_mouse_events(data.pipeline_window.get_emscripten_mouse_events());
+        data.overlay_context->consume_emscripten_wheel_events(data.pipeline_window.get_emscripten_wheel_events());
 #endif
         data.pipeline_window.get_emscripten_key_events().clear();
         data.pipeline_window.get_emscripten_mouse_events().clear();
         data.pipeline_window.get_emscripten_wheel_events().clear();
 #else
-        data.user_context.consume_sdl_events(data.pipeline_window.get_sdl_events());
+        data.user_context->consume_sdl_events(data.pipeline_window.get_sdl_events());
 #if BUNGEEGUM_USE_OVERLAY
-        data.overlay_context.consume_sdl_events(data.pipeline_window.get_sdl_events());
+        data.overlay_context->consume_sdl_events(data.pipeline_window.get_sdl_events());
 #endif
         data.pipeline_window.get_sdl_events().clear();
 #endif
@@ -408,26 +410,26 @@ namespace detail {
         if (!_swapped.widgets.drawables.empty()) {
             // _pipeline.steps_chronometer.begin_task("draw pass");
             if (exclusive_rendering) {
-                data.pipeline_renderer.clear_screen();
+                pipeline_renderer->clear_screen();
             }
 
-            data.user_context.new_frame();
-            data.user_context.use_projection_orthographic();
-            data.user_context.use_shader(data.default_shader);
+            data.user_context->new_frame();
+            data.user_context->use_projection_orthographic();
+            data.user_context->use_shader(data.default_shader);
             ImDrawList* _drawlist = ImGui::GetBackgroundDrawList();
             draw_widgets(_drawlist);
-            data.user_context.render();
+            data.user_context->render();
 
 #if BUNGEEGUM_USE_OVERLAY
-            data.overlay_context.new_frame();
-            data.overlay_context.use_projection_orthographic();
-            data.overlay_context.use_shader(data.overlay_shader);
+            data.overlay_context->new_frame();
+            data.overlay_context->use_projection_orthographic();
+            data.overlay_context->use_shader(data.overlay_shader);
             draw_overlay();
-            data.overlay_context.render();
+            data.overlay_context->render();
 #endif
 
             if (exclusive_rendering) {
-                data.pipeline_renderer.present();
+                pipeline_renderer->present();
             }
             // _pipeline.steps_chronometer.end_task("draw pass");
         }
@@ -436,14 +438,16 @@ namespace detail {
     void setup_pipeline(pipeline_data& data)
     {
 #if BUNGEEGUM_USE_OVERLAY
-        data.overlay_context.emplace(data.pipeline_renderer, nullptr);
-        detail::setup_overlay(data.overlay_context);
+        data.overlay_context = std::make_unique<rasterizer_handle>(std::move(pipeline_renderer->make_rasterizer()));
+        data.overlay_context->emplace();
+        detail::setup_overlay(*data.overlay_context.get());
 #endif
-        data.user_context.emplace(data.pipeline_renderer, nullptr);
+        data.user_context = std::make_unique<rasterizer_handle>(std::move(pipeline_renderer->make_rasterizer()));
+        data.user_context->emplace();
         
 
         detail::swapped_manager_data& _swapped = detail::swapped_global();
-        _swapped.rasterizers.insert({ data.raw, std::ref(data.user_context) });
+        _swapped.rasterizers.insert({ data.raw, std::ref(*data.user_context.get()) });
 
         detail::setup_shaders(data);
         detail::global_manager_data& _global = detail::global2();

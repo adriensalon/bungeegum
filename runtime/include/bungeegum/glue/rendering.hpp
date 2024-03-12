@@ -62,12 +62,19 @@ struct ImPlotContext;
 namespace bungeegum {
 namespace detail {
 
+    struct rasterizer_handle;
+
+#if !__HOTRELOADING__
+
     /// @brief Instances of this struct contain owning references to GPU render devices, swapchains
     /// and device contexts depending on the platform. They manage low level access to a rendering
     /// pipeline. Only one instance can be attached to a single OS window
     /// @details Instances of this struct can only be moved
     struct renderer_handle {
+    private:
         renderer_handle() = default;
+    
+    public:
         renderer_handle(const renderer_handle& other) = delete;
         renderer_handle& operator=(const renderer_handle& other) = delete;
         renderer_handle(renderer_handle&& other) = default;
@@ -80,24 +87,24 @@ namespace detail {
         /// @param window OS window that has a value
         /// @param device User provided ID3D11Device* that is not nullptr
         /// @param context User provided ID3D11DeviceContext* that is not nullptr
-        void emplace_attach_directx11(window_handle& window, void* device, void* context);
+        static renderer_handle emplace_attach_directx11(window_handle& window, void* device, void* context);
 
         /// @brief Defines a value for this instance from an OS window by creating a new DirectX 11
         /// context
         /// @param window OS window that has a value
-        void emplace_new_directx11(window_handle& window);
+        static renderer_handle emplace_new_directx11(window_handle& window);
 
         /// @brief Defines a value for this instance from an OS window and a DirectX 12 context
         /// already created by the user
         /// @param window OS window that has a value
         /// @param device User provided ID3D12Device* that is not nullptr
         /// @param context User provided ID3D12DeviceContext* that is not nullptr
-        void emplace_attach_directx12(window_handle& window, void* device, void* context);
+        static renderer_handle emplace_attach_directx12(window_handle& window, void* device, void* context);
 
         /// @brief Defines a value for this instance from an OS window by creating a new DirectX 12
         /// context
         /// @param window OS window that has a value
-        void emplace_new_directx12(window_handle& window);
+        static renderer_handle emplace_new_directx12(window_handle& window);
 
 #endif
 
@@ -106,12 +113,12 @@ namespace detail {
         /// @brief Defines a value for this instance from an OS window using an OpenGL context
         /// already created by the user
         /// @param window OS window that has a value
-        void emplace_attach_opengl(window_handle& window);
+        static renderer_handle emplace_attach_opengl(window_handle& window);
 
         /// @brief Defines a value for this instance from an OS window by creating a new OpenGL
         /// context
         /// @param window OS window that has a value
-        void emplace_new_opengl(window_handle& window);
+        static renderer_handle emplace_new_opengl(window_handle& window);
 
 #endif
 
@@ -120,12 +127,12 @@ namespace detail {
         /// @brief Defines a value for this instance from an OS window using a Vulkan context
         /// already created by the user
         /// @param window OS window that has a value
-        void emplace_attach_vulkan(window_handle& window);
+        static renderer_handle emplace_attach_vulkan(window_handle& window);
 
         /// @brief Defines a value for this instance from an OS window by creating a new Vulkan
         /// context
         /// @param window OS window that has a value
-        void emplace_new_vulkan(window_handle& window);
+        static renderer_handle emplace_new_vulkan(window_handle& window);
 
 #endif
 
@@ -144,6 +151,10 @@ namespace detail {
         /// @param depth
         void clear_screen(const bool color = true, const bool depth = true);
 
+        /// @brief 
+        /// @return 
+        rasterizer_handle make_rasterizer();
+
         /// @brief Ends the frame, disabling all drawing commands. Swaps the window buffers
         void present();
 
@@ -155,15 +166,20 @@ namespace detail {
         float4 clear_color = { 1.f, 1.f, 1.f, 1.f };
 
     private:
-        bool _has_value = false;
-        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
-        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};
-        Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain = {};
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        SDL_Window* _sdl_window = nullptr;
-#endif
-        friend struct rasterizer_handle;
+        struct renderer_data;
+        std::shared_ptr<renderer_data> _data = nullptr;
+
+//         bool _has_value = false;
+//         Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
+//         Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};
+//         Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain = {};
+// #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+//         SDL_Window* _sdl_window = nullptr;
+// #endif
+//         friend struct rasterizer_handle;
     };
+
+#endif
 
     /// @brief 
     struct font_config {   
@@ -192,8 +208,6 @@ namespace detail {
         /// @brief 
         float glyph_min_advance = 0.f;
     };
-
-    struct rasterizer_handle;
 
     ///
     struct font_handle {
@@ -448,14 +462,14 @@ namespace detail {
     /// @brief
     struct rasterizer_handle {
         rasterizer_handle() = default;
-        rasterizer_handle(const rasterizer_handle& other) = default;
-        rasterizer_handle& operator=(const rasterizer_handle& other) = default;
+        rasterizer_handle(const rasterizer_handle& other) = delete;
+        rasterizer_handle& operator=(const rasterizer_handle& other) = delete;
         rasterizer_handle(rasterizer_handle&& other) = default;
         rasterizer_handle& operator=(rasterizer_handle&& other) = default;
 
         /// @brief
         /// @param renderer
-        void emplace(renderer_handle& renderer, ImFontAtlas* atlas = nullptr);
+        void emplace();
 
         /// @brief Gets if this instance has a value. Default created instances don't have a value
         /// until the emplace() method is called. Instances don't have a value anymore after the
@@ -506,7 +520,7 @@ namespace detail {
         /// @param fov
         void use_projection_perspective(const float fov);
 
-    private:
+    // private:
         bool _has_value = false;
         Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
         Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};

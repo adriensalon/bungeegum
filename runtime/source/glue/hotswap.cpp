@@ -14,7 +14,7 @@ namespace detail {
         void update_compilation_defines(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::string>>& defines)
         {
             if (defines.second.size() != defines.first) {
-                hotswapper->ClearPreprocessorDefinitions();
+                // hotswapper->ClearPreprocessorDefinitions();
                 for (const std::string& _define : defines.second) {
                     hotswapper->AddPreprocessorDefinition(_define);
                 }
@@ -35,7 +35,7 @@ namespace detail {
         void update_compilation_include_directories(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& include_directories)
         {
             if (include_directories.second.size() != include_directories.first) {
-                hotswapper->ClearIncludeDirectories();
+                // hotswapper->ClearIncludeDirectories();
                 for (const std::filesystem::path& _include_directory : include_directories.second) {
                     hotswapper->AddIncludeDirectory(_include_directory);
                 }
@@ -46,7 +46,7 @@ namespace detail {
         void update_compilation_source_directories(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& source_directories)
         {
             if (source_directories.second.size() != source_directories.first) {
-                hotswapper->ClearSourceDirectories();
+                // hotswapper->ClearSourceDirectories();
                 for (const std::filesystem::path& _source_directory : source_directories.second) {
                     hotswapper->AddSourceDirectory(_source_directory);
                 }
@@ -57,7 +57,7 @@ namespace detail {
         void update_compilation_force_compiled_source_files(hscpp::Hotswapper* hotswapper, std::pair<std::size_t, std::vector<std::filesystem::path>>& force_compiled_source_files)
         {
             if (force_compiled_source_files.second.size() != force_compiled_source_files.first) {
-                hotswapper->ClearForceCompiledSourceFiles();
+                // hotswapper->ClearForceCompiledSourceFiles();
                 for (const std::filesystem::path& _force_compiled_source_file : force_compiled_source_files.second) {
                     hotswapper->AddForceCompiledSourceFile(_force_compiled_source_file);
                 }
@@ -85,15 +85,19 @@ namespace detail {
         _swapper = std::make_shared<hscpp::Hotswapper>();
         _manager = std::make_shared<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>>(hscpp::mem::MemoryManager::Create());
         _swapper->SetAllocator((_manager.get()->operator->()));
-        _swapper->ClearCompileOptions();
-        _swapper->AddCompileOption("/nologo");
-        _swapper->AddCompileOption("/Z7");
-        _swapper->AddCompileOption("/FC");
-        _swapper->AddCompileOption("/EHsc");
-        _swapper->AddCompileOption("/MP");
-        _swapper->AddCompileOption("/MDd");
-        _swapper->AddCompileOption("/LDd");
-        _swapper->AddCompileOption("/std:c++17");
+        // _swapper->ClearCompileOptions();
+        // _swapper->AddCompileOption("/nologo");
+        // _swapper->AddCompileOption("/Z7");
+        // _swapper->AddCompileOption("/FC");
+        // _swapper->AddCompileOption("/EHsc");
+        // _swapper->AddCompileOption("/MP");
+        // _swapper->AddCompileOption("/MDd");
+        // _swapper->AddCompileOption("/LDd");
+        // _swapper->AddCompileOption("/std:c++17");
+        // // _swapper->AddLinkOption("/VERBOSE");
+        // // _swapper->AddLinkOption("/LTCG:OFF");
+        // _swapper->AddLinkOption("/OPT:NOREF");
+        // _swapper->AddLinkOption("/OPT:ICF");
     }
 
     std::size_t reloader::allocated_blocks_count()

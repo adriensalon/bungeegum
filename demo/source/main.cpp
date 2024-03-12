@@ -1,4 +1,4 @@
-#include "testclass.hpp"
+#include "swapped/testclass.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -107,16 +107,16 @@ int main()
     // constexpr auto ii = bungeegum::is_finite<bungeegum::float2>({ 44.f, 0.f });
     // static std::wostringstream _osstream2;
 
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_DIRECTX");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_BACKTRACE");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_HOTRELOAD");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_STANDALONE");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_OVERLAY");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_DIRECTX 1");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_BACKTRACE 1");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_HOTSWAP 1");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_STANDALONE 1");
-    bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_DIRECTX");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_BACKTRACE");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_HOTRELOAD");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_STANDALONE");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_ENABLE_OVERLAY");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_DIRECTX 1");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_BACKTRACE 1");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_HOTSWAP 1");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_STANDALONE 1");
+    // bungeegum::get_hotswap_defines().push_back("BUNGEEGUM_USE_OVERLAY 1");
 
     bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/external/glm/");
     bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/external/diligentcore");
@@ -155,11 +155,11 @@ int main()
 
     bungeegum::get_hotswap_include_directories().push_back("D:/bungeegum/widgets/include/");
     bungeegum::get_hotswap_source_directories().push_back("D:/bungeegum/widgets/source/widgets/");
-    bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/widgets/source/core/Color.cpp");
+    // bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/widgets/source/core/Color.cpp");
     bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/widgets/source/widgets/ColoredBox.cpp");
-    bungeegum::get_hotswap_source_directories().push_back("D:/bungeegum/demo/source/");
-    bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/demo/source/testclass.cpp");
-    bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/external/hscpp/src/module/Module.cpp");
+    bungeegum::get_hotswap_source_directories().push_back("D:/bungeegum/demo/source/swapped");
+    // bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/demo/source/swapped/testclass.cpp");
+    // bungeegum::get_hotswap_force_compiled_source_files().push_back("D:/bungeegum/external/hscpp/src/module/Module.cpp");
 
     bungeegum::pipeline_bindings _provider;
     _provider.emscripten_canvas_id = "canvas";
@@ -169,29 +169,29 @@ int main()
     // _my_pipeline.emplace(bungeegum::renderer_backend::directx11, _provider);
     // _my_pipeline.emplace(bungeegum::renderer_backend::opengl, _provider);
 
-    bungeegum::event _myevnt;
-    _myevnt.on_trigger([] () {
-        std::cout << "helloooo" << std::endl;
-    });
-    _myevnt.trigger(std::async([] () {
-        std::this_thread::sleep_for(std::chrono::milliseconds{ 2000 });
-    }));
+    // bungeegum::event _myevnt;
+    // _myevnt.on_trigger([] () {
+    //     std::cout << "helloooo" << std::endl;
+    // });
+    // _myevnt.trigger(std::async([] () {
+    //     std::this_thread::sleep_for(std::chrono::milliseconds{ 2000 });
+    // }));
     
-    bungeegum::event _myevnt2;
-    _myevnt2.on_trigger([] () {
-        std::cout << "helloooo 222" << std::endl;
-    });
-    _myevnt2.trigger(std::async([] () {
-        std::this_thread::sleep_for(std::chrono::milliseconds{ 2000 });
-    }));
-    bungeegum::event _myevnt33 = std::move(_myevnt2);
-    bungeegum::event _myevnt3 = (_myevnt2);
-    _myevnt3.on_trigger([] () {
-        std::cout << "helloooo 33" << std::endl;
-    });
-    _myevnt3.trigger(std::async([] () {
-        std::this_thread::sleep_for(std::chrono::milliseconds{ 1000 });
-    }));
+    // bungeegum::event _myevnt2;
+    // _myevnt2.on_trigger([] () {
+    //     std::cout << "helloooo 222" << std::endl;
+    // });
+    // _myevnt2.trigger(std::async([] () {
+    //     std::this_thread::sleep_for(std::chrono::milliseconds{ 2000 });
+    // }));
+    // bungeegum::event _myevnt33 = std::move(_myevnt2);
+    // bungeegum::event _myevnt3 = (_myevnt2);
+    // _myevnt3.on_trigger([] () {
+    //     std::cout << "helloooo 33" << std::endl;
+    // });
+    // _myevnt3.trigger(std::async([] () {
+    //     std::this_thread::sleep_for(std::chrono::milliseconds{ 1000 });
+    // }));
 
 
     
