@@ -269,7 +269,7 @@ widget_ref<widget_t> make_reference()
 #if BUNGEEGUM_USE_HOTSWAP
     if constexpr (detail::traits::is_reloadable_v<widget_t>) {
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>(
-            detail::get_swapped_global().widgets.hotswap_reloader->allocate<widget_t>()));
+            detail::get_swapped_global().widgets.hotswap_reloader.allocate<widget_t>()));
         _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
         detail::swapped_access::get_object_reference(_widget_ptr->get()) = _raw_widget;
     } else {

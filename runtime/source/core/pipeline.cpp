@@ -279,13 +279,16 @@ namespace detail {
 #if !BUNGEEGUM_USE_DIRECTX
         throw backtraced_exception("");
 #else
+        std::stringstream _info_stream;
         if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
             // data.renderer.attach_directx11(data.window,
             //     provider.directx_device_ptr,
             //     provider.directx_swapchain_ptr);
         } else {
-            data.renderer.emplace_new_directx11(data.window);
+            data.renderer.emplace_new_directx11(data.window, _info_stream.rdbuf());
         }
+        std::string _info = _info_stream.str();
+        std::cout << _info;
 #endif
     }
 
@@ -356,10 +359,10 @@ namespace detail {
 #if BUNGEEGUM_USE_HOTSWAP
         swapped_manager_data& _swapped = get_swapped_global();
         std::wstringstream _update_stream;
-        swapper_state _reload_result = _swapped.widgets.hotswap_reloader->update(_update_stream.rdbuf());
+        swapper_state _reload_result = _swapped.widgets.hotswap_reloader.update(_update_stream.rdbuf());
         std::string _update_str = narrow(_update_stream.str());
         (void)_update_str;
-        // std::cout << _update_str << std::endl;
+        std::cout << _update_str; // << std::endl;
         // _global.pipelines.current.value().get().userspace_messages.push_back(std::move(_update_str));
         if (_reload_result == swapper_state::started_compiling) {
             save_widgets(serialize_path, root_updatable);
@@ -456,7 +459,7 @@ pipeline<renderer_backend::directx11>::pipeline(const pipeline_bindings& provide
 {
     static_assert(BUNGEEGUM_USE_DIRECTX, "AAAAAAAAA");
     _data.raw = detail::raw_cast(this);
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::setup_window(_data.window, provider);
     detail::setup_renderer_directx11(_data, provider);
     detail::setup_pipeline(_data);
@@ -467,7 +470,7 @@ pipeline<renderer_backend::directx12>::pipeline(const pipeline_bindings& provide
 {
     static_assert(BUNGEEGUM_USE_DIRECTX, "AAAAAAAAA");
     _data.raw = detail::raw_cast(this);
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::setup_window(_data.window, provider);
     detail::setup_renderer_directx12(_data, provider);
     detail::setup_pipeline(_data);
@@ -478,7 +481,7 @@ pipeline<renderer_backend::opengl>::pipeline(const pipeline_bindings& provider)
 {
     static_assert(BUNGEEGUM_USE_OPENGL, "AAAAAAAAA");
     _data.raw = detail::raw_cast(this);
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::setup_window(_data.window, provider);
     detail::setup_renderer_opengl(_data, provider);
     detail::setup_pipeline(_data);
@@ -489,7 +492,7 @@ pipeline<renderer_backend::vulkan>::pipeline(const pipeline_bindings& provider)
 {
     static_assert(BUNGEEGUM_USE_VULKAN, "AAAAAAAAA");
     _data.raw = detail::raw_cast(this);
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::setup_window(_data.window, provider);
     detail::setup_renderer_vulkan(_data, provider);
     detail::setup_pipeline(_data);
@@ -591,41 +594,41 @@ template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>:
 std::vector<std::string>& get_hotswap_defines()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    return _swapped.widgets.hotswap_reloader->defines();
+    return _swapped.widgets.hotswap_reloader.defines();
 }
 
 std::vector<std::filesystem::path>& get_hotswap_include_directories()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    return _swapped.widgets.hotswap_reloader->include_directories();
+    return _swapped.widgets.hotswap_reloader.include_directories();
 }
 
 std::vector<std::filesystem::path>& get_hotswap_source_directories()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    return _swapped.widgets.hotswap_reloader->source_directories();
+    return _swapped.widgets.hotswap_reloader.source_directories();
 }
 
 std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    return _swapped.widgets.hotswap_reloader->force_compiled_source_files();
+    return _swapped.widgets.hotswap_reloader.force_compiled_source_files();
 }
 
 std::vector<std::filesystem::path>& get_hotswap_libraries()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
-    detail::setup_global_if_required();
+    detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    return _swapped.widgets.hotswap_reloader->libraries();
+    return _swapped.widgets.hotswap_reloader.libraries();
 }
 
 

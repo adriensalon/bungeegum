@@ -33,10 +33,10 @@ namespace detail {
         std::optional<std::reference_wrapper<shader_handle>> mask_shader = std::nullopt;
     };
 
-    void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)
+    void setup_swapped_global_if_required();
 
 #if BUNGEEGUM_USE_HOTSWAP
-    inline swapped_manager_data& get_swapped_global() // This has to be inline for reload (?)
+    inline swapped_manager_data& get_swapped_global()
     {
         return get_global_data<swapped_manager_data>();
     }

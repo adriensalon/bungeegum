@@ -104,7 +104,7 @@ namespace detail {
         std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> interactables = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> drawables = {};
 #if BUNGEEGUM_USE_HOTSWAP
-        std::unique_ptr<swapper_handle> hotswap_reloader = nullptr;
+        swapper_handle hotswap_reloader = {};
 #endif
     };
 

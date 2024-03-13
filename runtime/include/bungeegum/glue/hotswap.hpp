@@ -174,7 +174,7 @@ namespace detail {
     /// compilation and manage the files and directories to provide to the compiler.
     /// @details Instances of this struct can only be moved.
     struct swapper_handle {
-        swapper_handle() = delete;
+        swapper_handle() = default;
         swapper_handle(const swapper_handle& other) = delete;
         swapper_handle& operator=(const swapper_handle& other) = delete;
         swapper_handle(swapper_handle&& other) = default;
@@ -182,7 +182,13 @@ namespace detail {
 
         /// @brief Creates an instance from a std::wstreambuf and writes an initialization
         /// message to it.
-        swapper_handle(std::wstreambuf* buffer);
+        void emplace(std::wstreambuf* info = nullptr);
+
+        /// @brief 
+        [[nodiscard]] bool has_value() const;
+
+        /// @brief 
+        void reset();
 
         /// @brief Allocates a new object that can be hotswapped, taking no argument.
         /// @exception Throws a compile-time exception if the swapped type is not default-
@@ -209,7 +215,7 @@ namespace detail {
         [[nodiscard]] std::size_t allocated_blocks_count();
 
         /// @brief Forces an update, blocking the thread until recompilation has finished.
-        void force_update();
+        void force_update(std::wstreambuf* buffer);
 
         /// @brief Asynchronously waits for changes in the provided files and folders, triggers
         /// recompilation when needed and hotswaps allocated objects. It takes a std::wstreambuf
@@ -222,14 +228,14 @@ namespace detail {
         void set_global_data(void* data_ptr);
 
     private:
+        bool _has_value = false;
         std::pair<std::size_t, std::vector<std::string>> _defines = { false, {} };
         std::pair<std::size_t, std::vector<std::filesystem::path>> _include_directories = { false, {} };
         std::pair<std::size_t, std::vector<std::filesystem::path>> _source_directories = { false, {} };
         std::pair<std::size_t, std::vector<std::filesystem::path>> _force_compiled_source_files = { false, {} };
         std::pair<std::size_t, std::vector<std::filesystem::path>> _libraries = { false, {} };
-        std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
         std::shared_ptr<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>> _manager = nullptr;
-		std::vector<std::string> _logs = {};
+        std::shared_ptr<hscpp::Hotswapper> _swapper = nullptr;
     };
 
     /// @brief Instances of this struct represent a cereal JSON input archive to load data agter

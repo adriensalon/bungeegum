@@ -79,24 +79,24 @@ namespace detail {
         /// @param window OS window that has a value
         /// @param device User provided ID3D11Device* that is not nullptr
         /// @param context User provided ID3D11DeviceContext* that is not nullptr
-        void emplace_attach_directx11(window_handle& window, void* device, void* context);
+        void emplace_attach_directx11(window_handle& window, void* device, void* context, std::streambuf* info = nullptr);
 
         /// @brief Defines a value for this instance from an OS window by creating a new DirectX 11
         /// context
         /// @param window OS window that has a value
-        void emplace_new_directx11(window_handle& window);
+        void emplace_new_directx11(window_handle& window, std::streambuf* info = nullptr);
 
         /// @brief Defines a value for this instance from an OS window and a DirectX 12 context
         /// already created by the user
         /// @param window OS window that has a value
         /// @param device User provided ID3D12Device* that is not nullptr
         /// @param context User provided ID3D12DeviceContext* that is not nullptr
-        void emplace_attach_directx12(window_handle& window, void* device, void* context);
+        void emplace_attach_directx12(window_handle& window, void* device, void* context, std::streambuf* info = nullptr);
 
         /// @brief Defines a value for this instance from an OS window by creating a new DirectX 12
         /// context
         /// @param window OS window that has a value
-        void emplace_new_directx12(window_handle& window);
+        void emplace_new_directx12(window_handle& window, std::streambuf* info = nullptr);
 
 #endif
 
@@ -105,12 +105,12 @@ namespace detail {
         /// @brief Defines a value for this instance from an OS window using an OpenGL context
         /// already created by the user
         /// @param window OS window that has a value
-        void emplace_attach_opengl(window_handle& window);
+        void emplace_attach_opengl(window_handle& window, std::streambuf* info = nullptr);
 
         /// @brief Defines a value for this instance from an OS window by creating a new OpenGL
         /// context
         /// @param window OS window that has a value
-        void emplace_new_opengl(window_handle& window);
+        void emplace_new_opengl(window_handle& window, std::streambuf* info = nullptr);
 
 #endif
 
@@ -119,12 +119,12 @@ namespace detail {
         /// @brief Defines a value for this instance from an OS window using a Vulkan context
         /// already created by the user
         /// @param window OS window that has a value
-        void emplace_attach_vulkan(window_handle& window);
+        void emplace_attach_vulkan(window_handle& window, std::streambuf* info = nullptr);
 
         /// @brief Defines a value for this instance from an OS window by creating a new Vulkan
         /// context
         /// @param window OS window that has a value
-        void emplace_new_vulkan(window_handle& window);
+        void emplace_new_vulkan(window_handle& window, std::streambuf* info = nullptr);
 
 #endif
 

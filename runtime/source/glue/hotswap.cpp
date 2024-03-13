@@ -78,10 +78,10 @@ namespace detail {
 
     }
 
-    swapper_handle::swapper_handle(std::wstreambuf* buffer)
+    void swapper_handle::emplace(std::wstreambuf* buffer)
     {
-        (void)buffer;
-        // redirect_wide_guard _redirect(buffer);
+        reset();
+        redirect_wide_guard _redirect(buffer);
         _swapper = std::make_shared<hscpp::Hotswapper>();
         _manager = std::make_shared<hscpp::mem::UniqueRef<hscpp::mem::MemoryManager>>(hscpp::mem::MemoryManager::Create());
         _swapper->SetAllocator((_manager.get()->operator->()));
@@ -98,6 +98,19 @@ namespace detail {
         // // _swapper->AddLinkOption("/LTCG:OFF");
         // _swapper->AddLinkOption("/OPT:NOREF");
         // _swapper->AddLinkOption("/OPT:ICF");
+        _has_value = true;
+    }
+    
+    bool swapper_handle::has_value() const
+    {
+        return _has_value;
+    }
+
+    void swapper_handle::reset()
+    {
+        if (_has_value) {
+
+        }
     }
 
     swapper_state swapper_handle::update(std::wstreambuf* buffer)
@@ -107,22 +120,19 @@ namespace detail {
         update_compilation_source_directories(_swapper.get(), _source_directories);
         update_compilation_force_compiled_source_files(_swapper.get(), _force_compiled_source_files);
         update_compilation_libraries(_swapper.get(), _libraries);
-        // redirect_wide_guard _redirect(buffer);
-        (void)buffer;
+        redirect_wide_guard _redirect(buffer);
         return static_cast<swapper_state>(_swapper->Update());
     }
 
-    void swapper_handle::force_update(/*take 2 callbacks for save and load + buffer to redirect*/)
+    void swapper_handle::force_update(std::wstreambuf* buffer)
     {
         update_compilation_defines(_swapper.get(), _defines);
         update_compilation_include_directories(_swapper.get(), _include_directories);
         update_compilation_source_directories(_swapper.get(), _source_directories);
         update_compilation_force_compiled_source_files(_swapper.get(), _force_compiled_source_files);
         update_compilation_libraries(_swapper.get(), _libraries);
-        // redirect_wide_guard _redirect(buffer);
-        // save widgets
+        redirect_wide_guard _redirect(buffer);
         _swapper->TriggerManualBuild();
-        // load widgets
     }
 
     std::size_t swapper_handle::allocated_blocks_count()

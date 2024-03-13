@@ -34,31 +34,18 @@
 
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/raw.hpp>
+#include <bungeegum/glue/console.hpp>
 
 namespace bungeegum {
 namespace detail {
 
     namespace {
-
         constexpr std::string_view default_imgui_backend_name = "bungeegum backend";
-
     }
-    
-    
-
-//     struct renderer_handle::renderer_data {
-//         bool _has_value = false;
-//         Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
-//         Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};
-//         Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain = {};
-// #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-//         SDL_Window* _sdl_window = nullptr;
-// #endif
-//     };
 
 #if BUNGEEGUM_USE_DIRECTX
 
-    void renderer_handle::emplace_attach_directx11(window_handle& window, void* device, void* context)
+    void renderer_handle::emplace_attach_directx11(window_handle& window, void* device, void* context, std::streambuf* info)
     {
 // #if !defined(__HOTRELOADING__)
 //         if (_has_value) {
@@ -86,40 +73,49 @@ namespace detail {
 // #endif
     }
 
-    void renderer_handle::emplace_new_directx11(window_handle& window)
+    void renderer_handle::emplace_new_directx11(window_handle& window, std::streambuf* info)
     {        
+        reset();
         Diligent::SwapChainDesc _swap_chain_descriptor;
-        _swap_chain_descriptor.DefaultStencilValue = 0u;
         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
         Diligent::EngineD3D11CreateInfo _engine_create_info;
         // #if defined(__DEBUG__)
         //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
         // #endif
-        _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_diligent_render_device, &_diligent_device_context);
-        Diligent::Win32NativeWindow _win32_native_window(window.get_native());
-        _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
-            Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
-
+        {
+            redirect_guard _console_redirect(info);
+            _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_diligent_render_device, &_diligent_device_context);
+            Diligent::Win32NativeWindow _win32_native_window(window.get_native());
+            _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
+                Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
+        }        
         _sdl_window = window.get_sdl();
 		_has_value = true;
     }
 
-    void renderer_handle::emplace_new_directx12(window_handle& existing_window)
+    void renderer_handle::emplace_new_directx12(window_handle& window, std::streambuf* info)
     {
-        // if (_has_value) {
-        //     throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
-        // }
-        // Diligent::SwapChainDesc _swap_chain_descriptor;
-        // _swap_chain_descriptor.DefaultStencilValue = 0u;
-        // Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
-
-        // // todo
-		// _has_value = true;
+        reset();
+        Diligent::SwapChainDesc _swap_chain_descriptor;
+        Diligent::IEngineFactoryD3D12* _factory_ptr = Diligent::GetEngineFactoryD3D12();
+        Diligent::EngineD3D12CreateInfo _engine_create_info;
+        // #if defined(__DEBUG__)
+        //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
+        // #endif
+        {
+            redirect_guard _console_redirect(info);
+            _factory_ptr->CreateDeviceAndContextsD3D12(_engine_create_info, &_diligent_render_device, &_diligent_device_context);
+            Diligent::Win32NativeWindow _win32_native_window(window.get_native());
+            _factory_ptr->CreateSwapChainD3D12(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
+                Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
+        }        
+        _sdl_window = window.get_sdl();
+		_has_value = true;
     }
 
 #endif
 
-    void renderer_handle::emplace_attach_opengl(window_handle& existing_window)
+    void renderer_handle::emplace_attach_opengl(window_handle& existing_window, std::streambuf* info)
     {
 //         if (_has_value) {
 //             throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
@@ -145,7 +141,7 @@ namespace detail {
 // 		_has_value = true;
     }
 
-    void renderer_handle::emplace_new_opengl(window_handle& existing_window)
+    void renderer_handle::emplace_new_opengl(window_handle& existing_window, std::streambuf* info)
     {
 //         if (_has_value) {
 //             throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
@@ -174,7 +170,7 @@ namespace detail {
 
 #if BUNGEEGUM_USE_VULKAN
     
-    void renderer_handle::emplace_new_vulkan(window_handle& existing)
+    void renderer_handle::emplace_new_vulkan(window_handle& existing, std::streambuf* info)
     {
         // if (_has_value) {
         //     throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
