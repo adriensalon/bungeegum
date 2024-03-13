@@ -147,19 +147,19 @@ namespace detail {
     
     
 
-    struct renderer_handle::renderer_data {
-        bool _has_value = false;
-        Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
-        Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};
-        Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain = {};
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        SDL_Window* _sdl_window = nullptr;
-#endif
-    };
+//     struct renderer_handle::renderer_data {
+//         bool _has_value = false;
+//         Diligent::RefCntAutoPtr<Diligent::IRenderDevice> _diligent_render_device = {};
+//         Diligent::RefCntAutoPtr<Diligent::IDeviceContext> _diligent_device_context = {};
+//         Diligent::RefCntAutoPtr<Diligent::ISwapChain> _diligent_swap_chain = {};
+// #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+//         SDL_Window* _sdl_window = nullptr;
+// #endif
+//     };
 
 #if BUNGEEGUM_USE_DIRECTX
 
-    renderer_handle renderer_handle::emplace_attach_directx11(window_handle& window, void* device, void* context)
+    void renderer_handle::emplace_attach_directx11(window_handle& window, void* device, void* context)
     {
 // #if !defined(__HOTRELOADING__)
 //         if (_has_value) {
@@ -185,14 +185,10 @@ namespace detail {
 //         _sdl_window = window.get_sdl();
 // 		_has_value = true;
 // #endif
-        return {};
     }
 
-    renderer_handle renderer_handle::emplace_new_directx11(window_handle& window)
-    {
-        renderer_handle _renderer;
-        _renderer._data = std::make_shared<renderer_data>();
-        
+    void renderer_handle::emplace_new_directx11(window_handle& window)
+    {        
         Diligent::SwapChainDesc _swap_chain_descriptor;
         _swap_chain_descriptor.DefaultStencilValue = 0u;
         Diligent::IEngineFactoryD3D11* _factory_ptr = Diligent::GetEngineFactoryD3D11();
@@ -200,19 +196,18 @@ namespace detail {
         // #if defined(__DEBUG__)
         //         _engine_create_info.SetValidationLevel(Diligent::VALIDATION_LEVEL_2);
         // #endif
-        _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_renderer._data->_diligent_render_device, &_renderer._data->_diligent_device_context);
+        _factory_ptr->CreateDeviceAndContextsD3D11(_engine_create_info, &_diligent_render_device, &_diligent_device_context);
         Diligent::Win32NativeWindow _win32_native_window(window.get_native());
-        _factory_ptr->CreateSwapChainD3D11(_renderer._data->_diligent_render_device, _renderer._data->_diligent_device_context, _swap_chain_descriptor,
-            Diligent::FullScreenModeDesc {}, _win32_native_window, &_renderer._data->_diligent_swap_chain);
+        _factory_ptr->CreateSwapChainD3D11(_diligent_render_device, _diligent_device_context, _swap_chain_descriptor,
+            Diligent::FullScreenModeDesc {}, _win32_native_window, &_diligent_swap_chain);
 
-        _renderer._data->_sdl_window = window.get_sdl();
-		_renderer._data->_has_value = true;
-        return _renderer;
+        _sdl_window = window.get_sdl();
+		_has_value = true;
     }
 
-    renderer_handle renderer_handle::emplace_new_directx12(window_handle& existing_window)
+    void renderer_handle::emplace_new_directx12(window_handle& existing_window)
     {
-        // if (_data->_has_value) {
+        // if (_has_value) {
         //     throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
         // }
         // Diligent::SwapChainDesc _swap_chain_descriptor;
@@ -220,19 +215,18 @@ namespace detail {
         // Diligent::Win32NativeWindow _win32_native_window(existing_window.get_native());
 
         // // todo
-		// _data->_has_value = true;
-        return {};
+		// _has_value = true;
     }
 
 #endif
 
-    renderer_handle renderer_handle::emplace_attach_opengl(window_handle& existing_window)
+    void renderer_handle::emplace_attach_opengl(window_handle& existing_window)
     {
 //         if (_has_value) {
 //             throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
 //         }
 // #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-//         // _data->sdl_window = existing_window->get_sdl();
+//         // sdl_window = existing_window->get_sdl();
 // #endif
 //         // Diligent::SwapChainDesc _swap_chain_descriptor;
 //         // _swap_chain_descriptor.DefaultStencilValue = 0u;
@@ -250,16 +244,15 @@ namespace detail {
 //             &_diligent_device_context);
 //         // swapchain mdr?
 // 		_has_value = true;
-        return {};
     }
 
-    renderer_handle renderer_handle::emplace_new_opengl(window_handle& existing_window)
+    void renderer_handle::emplace_new_opengl(window_handle& existing_window)
     {
 //         if (_has_value) {
 //             throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
 //         }
 // #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-//         // _data->sdl_window = existing_window->get_sdl();
+//         // sdl_window = existing_window->get_sdl();
 // #endif
 //         Diligent::SwapChainDesc _swap_chain_descriptor;
 //         _swap_chain_descriptor.DefaultStencilValue = 0u;
@@ -278,31 +271,29 @@ namespace detail {
 //             _swap_chain_descriptor,
 //             &_diligent_swap_chain);
 // 		_has_value = true;
-        return {};
     }
 
 #if BUNGEEGUM_USE_VULKAN
     
-    renderer_handle renderer_handle::emplace_new_vulkan(window_handle& existing)
+    void renderer_handle::emplace_new_vulkan(window_handle& existing)
     {
-        // if (_data->_has_value) {
+        // if (_has_value) {
         //     throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
         // }
         // (void)existing;
-		// _data->_has_value = true;
-        return {};
+		// _has_value = true;
     }
 
 #endif
 
     bool renderer_handle::has_value() const
     {
-        return _data->_has_value;
+        return _has_value;
     }
 
     void renderer_handle::reset() 
     {
-		if (_data->_has_value) {
+		if (_has_value) {
 			
 		}
     }
@@ -313,27 +304,48 @@ namespace detail {
     {
         (void)clear_color_buffer;
         (void)clear_depth_buffer;
-        Diligent::ITextureView* _rtv_ptr = _data->_diligent_swap_chain->GetCurrentBackBufferRTV();
-        Diligent::ITextureView* _dsv_ptr = _data->_diligent_swap_chain->GetDepthBufferDSV();
-        _data->_diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        Diligent::ITextureView* _rtv_ptr = _diligent_swap_chain->GetCurrentBackBufferRTV();
+        Diligent::ITextureView* _dsv_ptr = _diligent_swap_chain->GetDepthBufferDSV();
+        _diligent_device_context->SetRenderTargets(1, &_rtv_ptr, _dsv_ptr, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
 
         const std::array<float, 4> _clear_color_array = { clear_color.x, clear_color.y, clear_color.z, clear_color.w };
-        _data->_diligent_device_context->ClearRenderTarget(_rtv_ptr, _clear_color_array.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
-        _data->_diligent_device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        _diligent_device_context->ClearRenderTarget(_rtv_ptr, _clear_color_array.data(), Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+        _diligent_device_context->ClearDepthStencil(_dsv_ptr, Diligent::CLEAR_DEPTH_FLAG, 1.f, 0, Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         // _diligent_device_context->SetStencilRef(8);
     }
     
-    rasterizer_handle renderer_handle::make_rasterizer()
-    {
-        rasterizer_handle _rasterizer;
-        _rasterizer._diligent_render_device = _data->_diligent_render_device;
-        _rasterizer._diligent_device_context = _data->_diligent_device_context;
-        _rasterizer._diligent_swap_chain = _data->_diligent_swap_chain;
 
-        _rasterizer._is_base_vertex_supported = _data->_diligent_render_device->GetAdapterInfo().DrawCommand.CapFlags & Diligent::DRAW_COMMAND_CAP_FLAG_BASE_VERTEX;
-        _rasterizer._imgui_context = ImGui::CreateContext();
-        _rasterizer._implot_context = ImPlot::CreateContext();
-        ImGui::SetCurrentContext(_rasterizer._imgui_context);
+    void renderer_handle::present()
+    {
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        _diligent_swap_chain->Present();
+#endif
+    }
+	
+    void renderer_handle::resize(const float2 display_size)
+    {
+        float2 _rounded = math::round(display_size);
+        _diligent_swap_chain->Resize(
+            static_cast<unsigned int>(_rounded.x),
+            static_cast<unsigned int>(_rounded.y),
+            Diligent::SURFACE_TRANSFORM_OPTIMAL);
+    }
+
+	
+    void rasterizer_handle::emplace(renderer_handle& renderer)
+    {
+        if (_has_value) {
+            reset();
+        }
+
+        _diligent_render_device = renderer._diligent_render_device;
+        _diligent_device_context = renderer._diligent_device_context;
+        _diligent_swap_chain = renderer._diligent_swap_chain;
+
+        _is_base_vertex_supported = _diligent_render_device->GetAdapterInfo().DrawCommand.CapFlags & Diligent::DRAW_COMMAND_CAP_FLAG_BASE_VERTEX;
+        _imgui_context = ImGui::CreateContext();
+        _implot_context = ImPlot::CreateContext();
+        ImGui::SetCurrentContext(_imgui_context);
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         ImGuiIO& _io = ImGui::GetIO();
@@ -357,28 +369,35 @@ namespace detail {
         _io.KeyMap[ImGuiKey_Y] = DOM_VK_Y;
         _io.KeyMap[ImGuiKey_Z] = DOM_VK_Z;
 #else
-        ImGui_ImplSDL2_InitForOpenGL(_data->_sdl_window, nullptr);
+        ImGui_ImplSDL2_InitForOpenGL(renderer._sdl_window, nullptr);
 #endif
-        return _rasterizer;
-    }
+        
+        ImGuiIO& _io = ImGui::GetIO();
 
-    void renderer_handle::present()
-    {
-#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        _data->_diligent_swap_chain->Present();
-#endif
-    }
-	
-    void renderer_handle::resize(const float2 display_size)
-    {
-        float2 _rounded = math::round(display_size);
-        _data->_diligent_swap_chain->Resize(
-            static_cast<unsigned int>(_rounded.x),
-            static_cast<unsigned int>(_rounded.y),
-            Diligent::SURFACE_TRANSFORM_OPTIMAL);
-    }
+        // create uniform buffer
+        {
+            Diligent::BufferDesc _diligent_uniform_buffer_desc;
+            _diligent_uniform_buffer_desc.Size = sizeof(float4x4);
+            _diligent_uniform_buffer_desc.Usage = Diligent::USAGE_DYNAMIC;
+            _diligent_uniform_buffer_desc.BindFlags = Diligent::BIND_UNIFORM_BUFFER;
+            _diligent_uniform_buffer_desc.CPUAccessFlags = Diligent::CPU_ACCESS_WRITE;
+            _diligent_render_device->CreateBuffer(_diligent_uniform_buffer_desc, nullptr, &_diligent_uniform_buffer);
+        }
 
-	
+        _io.Fonts->AddFontDefault();
+        _io.Fonts->Build();
+        int _raw_width, _raw_height = 0;
+        unsigned char* _raw_pixels = nullptr;
+        _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
+
+        _has_value = true; // we do it now because required for creating texture
+        _font_texture.emplace(
+            *this,
+            std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)),
+            static_cast<std::size_t>(_raw_width),
+            static_cast<std::size_t>(_raw_height));
+        _io.Fonts->TexID = _font_texture.get();
+    }
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
@@ -386,7 +405,7 @@ namespace detail {
     {
         ImGui::SetCurrentContext(_imgui_context);
         // for (const emscripten_key_event& _event : events) {
-        //     _data->imgui_renderer->OnKeyEvent(_event.event_type, _event.event);
+        //     imgui_renderer->OnKeyEvent(_event.event_type, _event.event);
         // }
     }
 
@@ -406,7 +425,7 @@ namespace detail {
     {
         ImGui::SetCurrentContext(_imgui_context);
         // for (const emscripten_wheel_event& _event : events) {
-        //     _data->imgui_renderer->OnWheelEvent(_event.event_type, _event.event);
+        //     imgui_renderer->OnWheelEvent(_event.event_type, _event.event);
         // }
     }
 

@@ -403,13 +403,13 @@ void draw_command::use_shader_custom(const shader& user_shader)
 void draw_command::use_shader_default()
 {
     detail::swapped_manager_data& _swapped = detail::swapped_global();
-    _data.draw_list->AddCallback(use_shader_callback, _swapped.default_shader.get());
+    _data.draw_list->AddCallback(use_shader_callback, _swapped.default_shader.value().get().get());
 }
 
 void draw_command::use_shader_mask()
 {
     detail::swapped_manager_data& _swapped = detail::swapped_global();
-    _data.draw_list->AddCallback(use_shader_callback, _swapped.mask_shader.get());
+    _data.draw_list->AddCallback(use_shader_callback, _swapped.mask_shader.value().get().get());
 }
 
 void draw_command::clear_mask()

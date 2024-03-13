@@ -369,40 +369,6 @@ namespace detail {
         }
     }
 
-    void rasterizer_handle::emplace()
-    {
-        if (_has_value) {
-            reset();
-        }
-
-        
-        ImGui::SetCurrentContext(_imgui_context);
-        ImGuiIO& _io = ImGui::GetIO();
-
-        // create uniform buffer
-        {
-            Diligent::BufferDesc _diligent_uniform_buffer_desc;
-            _diligent_uniform_buffer_desc.Size = sizeof(float4x4);
-            _diligent_uniform_buffer_desc.Usage = Diligent::USAGE_DYNAMIC;
-            _diligent_uniform_buffer_desc.BindFlags = Diligent::BIND_UNIFORM_BUFFER;
-            _diligent_uniform_buffer_desc.CPUAccessFlags = Diligent::CPU_ACCESS_WRITE;
-            _diligent_render_device->CreateBuffer(_diligent_uniform_buffer_desc, nullptr, &_diligent_uniform_buffer);
-        }
-
-        _io.Fonts->AddFontDefault();
-        _io.Fonts->Build();
-        int _raw_width, _raw_height = 0;
-        unsigned char* _raw_pixels = nullptr;
-        _io.Fonts->GetTexDataAsRGBA32(&_raw_pixels, &_raw_width, &_raw_height);
-
-        _has_value = true; // we do it now because required for creating texture
-        _font_texture.emplace(
-            *this,
-            std::vector<unsigned char>(_raw_pixels, _raw_pixels + (4 * _raw_width * _raw_height)),
-            static_cast<std::size_t>(_raw_width),
-            static_cast<std::size_t>(_raw_height));
-        _io.Fonts->TexID = _font_texture.get();
-    }
 
     void rasterizer_handle::reset()
     {
