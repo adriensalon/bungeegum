@@ -166,7 +166,7 @@ namespace detail {
                     ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
                     for (int _k = static_cast<int>(_buffers.size()) - 1; _k >= 0; --_k) {
                         if (!_buffers[_k].empty()) {
-                            _buffers[_k].visible = (!filter_enabled || (regex_search(_buffers[_k].name(), filter_text)));
+                            _buffers[_k].visible = (!filter_enabled || (contains(_buffers[_k].name(), filter_text)));
                             if (_buffers[_k].visible) {
                                 ImPlot::PlotShaded(
                                     _buffers[_k].name().c_str(), // label id

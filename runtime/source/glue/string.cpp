@@ -5,6 +5,17 @@
 
 namespace bungeegum {
 namespace detail {
+
+    bool contains(const std::string& str, const std::string& regex_str)
+    {
+        std::regex _regex(regex_str, std::regex_constants::ECMAScript);
+        return std::regex_search(str, _regex);
+    }
+
+    bool contains(const std::string& str, const std::regex& regex)
+    {
+        return std::regex_search(str, regex);
+    }
     
     std::wstring widen(const std::string& str)
     {
@@ -20,30 +31,37 @@ namespace detail {
         return std::string(_buffer.data(), _buffer.size());
     }
 
-    bool regex_search(const std::string& str, const std::string& regex_str)
+    std::string replace(const std::string& str, const std::string& to_replace, const std::string& replace_with)
     {
-        std::regex _regex(regex_str, std::regex_constants::ECMAScript);
-        return std::regex_search(str, _regex);
-    }
-
-    bool regex_search(const std::string& str, const std::regex& regex)
-    {
-        return std::regex_search(str, regex);
+        std::size_t _pos = 0;
+        std::size_t _cursor = 0;
+        std::size_t _rep_len = to_replace.length();
+        std::stringstream _builder;
+        do {
+            _pos = str.find(to_replace, _cursor);
+            if (std::string::npos != _pos) {
+                _builder << str.substr(_cursor, _pos - _cursor);
+                _builder << replace_with;
+                _cursor = _pos + _rep_len;
+            }
+        } while (std::string::npos != _pos);
+        _builder << str.substr(_cursor);
+        return _builder.str();
     }
 
     std::vector<std::string> split(const std::string& str, const char sep)
     {
-        std::vector<std::string> _names;
-        std::stringstream _sstream(str);
-        while (_sstream.good()) {
+        std::vector<std::string> _retval;
+        std::stringstream _builder(str);
+        while (_builder.good()) {
             std::string _substr;
-            std::getline(_sstream, _substr, sep);
+            std::getline(_builder, _substr, sep);
             if (_substr[0] == ' ') {
                 _substr = _substr.substr(1, _substr.length() - 1);
             }
-            _names.push_back(_substr);
+            _retval.push_back(_substr);
         }
-        return _names;
+        return _retval;
     }
 }
 }

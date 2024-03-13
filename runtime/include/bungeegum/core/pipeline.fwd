@@ -47,13 +47,9 @@ namespace detail {
         shader_handle mask_shader = {};
         stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
 #if BUNGEEGUM_USE_OVERLAY
+        rasterizer_handle overlay_context = {};
         shader_handle overlay_shader = {};
-        rasterizer_handle overlay_context = {};        
-        frames_chronometer steps_chronometer = {};
-        frames_chronometer widgets_chronometer = {};        
-        std::vector<backtraced_exception> userspace_errors = {};
-        std::vector<backtraced_exception> userspace_warnings = {};
-        std::vector<backtraced_exception> userspace_messages = {};        
+        frames_chronometer widgets_chronometer = {};
         std::string renderer_info = {};
         BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};
 #endif        

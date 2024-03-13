@@ -1,4 +1,5 @@
 #include <bungeegum/glue/rendering.hpp>
+#include <bungeegum/glue/string.hpp>
 
 #include <imgui.h>
 #include <implot.h>
@@ -41,27 +42,6 @@ namespace detail {
                 PSIn.uv  = VSIn.uv;
             }
             )";
-
-        std::string string_replace(
-            const std::string& source,
-            const std::string& to_replace,
-            const std::string& replace_with)
-        {
-            std::size_t _pos = 0;
-            std::size_t _cursor = 0;
-            std::size_t _rep_len = to_replace.length();
-            std::stringstream _builder;
-            do {
-                _pos = source.find(to_replace, _cursor);
-                if (std::string::npos != _pos) {
-                    _builder << source.substr(_cursor, _pos - _cursor);
-                    _builder << replace_with;
-                    _cursor = _pos + _rep_len;
-                }
-            } while (std::string::npos != _pos);
-            _builder << source.substr(_cursor);
-            return (_builder.str());
-        }
     }
 
     std::string shader_fragment(
@@ -88,10 +68,10 @@ namespace detail {
         constexpr std::string_view _suffix = R"(
             })";
         std::string _main_function_replaced { main_function };
-        _main_function_replaced = string_replace(_main_function_replaced, position_alias, "PSIn.pos");
-        _main_function_replaced = string_replace(_main_function_replaced, color_alias, "PSIn.col");
-        _main_function_replaced = string_replace(_main_function_replaced, texcoord_alias, "PSIn.uv");
-        _main_function_replaced = string_replace(_main_function_replaced, sample_alias + "(", "Texture.Sample(Texture_sampler, ");
+        _main_function_replaced = replace(_main_function_replaced, position_alias, "PSIn.pos");
+        _main_function_replaced = replace(_main_function_replaced, color_alias, "PSIn.col");
+        _main_function_replaced = replace(_main_function_replaced, texcoord_alias, "PSIn.uv");
+        _main_function_replaced = replace(_main_function_replaced, sample_alias + "(", "Texture.Sample(Texture_sampler, ");
         return std::string(_prefix.data()) + _main_function_replaced + std::string(_suffix.data());
     }
 

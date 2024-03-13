@@ -356,7 +356,7 @@ namespace detail {
         //         ImGui::BeginChild(tag("child_tt").c_str(), _outer_size, false);
         //         // unsigned int _id = 0;
         //         // std::function<void(const widget_update_data&)> _draw_tree_recursive = [&](const widget_update_data& _widget_data) {
-        //         //     if (!filter_enabled || (regex_search(_widget_data.clean_typename, filter_text))) {
+        //         //     if (!filter_enabled || (contains(_widget_data.clean_typename, filter_text))) {
         //         //         _id++;
         //         //         std::string _clean_id_typename = _widget_data.clean_typename + "###__hierarchy__" + std::to_string(_id);
         //         //         // ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_OpenOnArrow ;

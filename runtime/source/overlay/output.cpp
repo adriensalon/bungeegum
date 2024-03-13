@@ -69,7 +69,7 @@ namespace detail {
 
                     for (std::pair<const std::string, counted_backtraced_results>& _log : map) {
                         const std::string& _log_description = _log.first;
-                        if (!filter_enabled || (regex_search(_log_description, filter_text))) {
+                        if (!filter_enabled || (contains(_log_description, filter_text))) {
                             std::size_t& _log_count = _log.second.first;
                             const std::vector<backtraced_step>& _results = _log.second.second;
 
