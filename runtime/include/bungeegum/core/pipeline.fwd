@@ -42,9 +42,9 @@ namespace detail {
     struct pipeline_data {
         std::uintptr_t raw = {};        
         std::optional<std::reference_wrapper<widget_update_data>> root_updatable = std::nullopt;        
-        window_handle pipeline_window = {};
-        renderer_handle pipeline_renderer = {};
-        rasterizer_handle user_context = {};
+        window_handle window = {};
+        renderer_handle renderer = {};
+        rasterizer_handle user_rasterizer = {};
         shader_handle default_shader = {};
         shader_handle mask_shader = {};
         stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps

@@ -14,14 +14,13 @@
 
 #include <stb_image.h>
 
-
-#if BUNGEEGUM_USE_OPENGL
-#include <Graphics/GraphicsEngineOpenGL/interface/EngineFactoryOpenGL.h>
-#endif
-
 #if BUNGEEGUM_USE_DIRECTX
 #include <Graphics/GraphicsEngineD3D11/interface/EngineFactoryD3D11.h>
 #include <Graphics/GraphicsEngineD3D12/interface/EngineFactoryD3D12.h>
+#endif
+
+#if BUNGEEGUM_USE_OPENGL
+#include <Graphics/GraphicsEngineOpenGL/interface/EngineFactoryOpenGL.h>
 #endif
 
 #if BUNGEEGUM_USE_VULKAN
@@ -43,106 +42,6 @@ namespace detail {
 
         constexpr std::string_view default_imgui_backend_name = "bungeegum backend";
 
-        constexpr std::string_view default_vertex_shader_source = R"(
-            cbuffer Constants
-            {
-                float4x4 ProjectionMatrix;
-            }
-
-            struct VSInput
-            {
-                float2 pos : ATTRIB0;
-                float2 uv  : ATTRIB1;
-                float4 col : ATTRIB2;
-            };
-
-            struct PSInput
-            {
-                float4 pos : SV_POSITION;
-                float4 col : COLOR;
-                float2 uv  : TEXCOORD;
-            };
-
-            void main(in VSInput VSIn, out PSInput PSIn)
-            {
-                PSIn.pos = mul(ProjectionMatrix, float4(VSIn.pos.xy, 0.0, 1.0));
-                PSIn.col = VSIn.col;
-                PSIn.uv  = VSIn.uv;
-            }
-            )";
-
-        std::string string_replace(
-            const std::string& source,
-            const std::string& to_replace,
-            const std::string& replace_with)
-        {
-            std::size_t _pos = 0;
-            std::size_t _cursor = 0;
-            std::size_t _rep_len = to_replace.length();
-            std::stringstream _builder;
-            do {
-                _pos = source.find(to_replace, _cursor);
-                if (std::string::npos != _pos) {
-                    _builder << source.substr(_cursor, _pos - _cursor);
-                    _builder << replace_with;
-                    _cursor = _pos + _rep_len;
-                }
-            } while (std::string::npos != _pos);
-            _builder << source.substr(_cursor);
-            return (_builder.str());
-        }
-    }
-
-    std::string shader_fragment(
-        const std::string& main_function,
-        const std::string& position_alias,
-        const std::string& color_alias,
-        const std::string& texcoord_alias,
-        const std::string& sample_alias)
-    {
-        constexpr std::string_view _prefix = R"(
-            struct  PSInput
-            {
-                float4 pos : SV_POSITION;
-                float4 col : COLOR;
-                float2 uv : TEXCOORD;
-            };
-
-            Texture2D Texture;
-            SamplerState Texture_sampler;
-
-            float4 main(in PSInput PSIn) : SV_Target
-            {
-            )";
-        constexpr std::string_view _suffix = R"(
-            })";
-        std::string _main_function_replaced { main_function };
-        _main_function_replaced = string_replace(_main_function_replaced, position_alias, "PSIn.pos");
-        _main_function_replaced = string_replace(_main_function_replaced, color_alias, "PSIn.col");
-        _main_function_replaced = string_replace(_main_function_replaced, texcoord_alias, "PSIn.uv");
-        _main_function_replaced = string_replace(_main_function_replaced, sample_alias + "(", "Texture.Sample(Texture_sampler, ");
-        return std::string(_prefix.data()) + _main_function_replaced + std::string(_suffix.data());
-    }
-
-    std::string shader_fragment_default()
-    {
-        constexpr std::string_view _fragment = R"(
-            struct  PSInput
-            {
-                float4 pos : SV_POSITION;
-                float4 col : COLOR;
-                float2 uv  : TEXCOORD;
-            };
-
-            Texture2D    Texture;
-            SamplerState Texture_sampler;
-
-            float4 main(in PSInput PSIn) : SV_Target
-            {
-                return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
-            }
-            )";
-        return _fragment.data();
     }
     
     

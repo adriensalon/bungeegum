@@ -10,11 +10,11 @@
 
 #include <Graphics/GraphicsTools/interface/MapHelper.hpp>
 
-namespace bungeegum { 
-namespace detail { 
-	
-	namespace {
-		constexpr std::string_view default_vertex_shader_source = R"(
+namespace bungeegum {
+namespace detail {
+
+    namespace {
+        constexpr std::string_view default_vertex_shader_source = R"(
             cbuffer Constants
             {
                 float4x4 ProjectionMatrix;
@@ -41,8 +41,80 @@ namespace detail {
                 PSIn.uv  = VSIn.uv;
             }
             )";
-	}
 
+        std::string string_replace(
+            const std::string& source,
+            const std::string& to_replace,
+            const std::string& replace_with)
+        {
+            std::size_t _pos = 0;
+            std::size_t _cursor = 0;
+            std::size_t _rep_len = to_replace.length();
+            std::stringstream _builder;
+            do {
+                _pos = source.find(to_replace, _cursor);
+                if (std::string::npos != _pos) {
+                    _builder << source.substr(_cursor, _pos - _cursor);
+                    _builder << replace_with;
+                    _cursor = _pos + _rep_len;
+                }
+            } while (std::string::npos != _pos);
+            _builder << source.substr(_cursor);
+            return (_builder.str());
+        }
+    }
+
+    std::string shader_fragment(
+        const std::string& main_function,
+        const std::string& position_alias,
+        const std::string& color_alias,
+        const std::string& texcoord_alias,
+        const std::string& sample_alias)
+    {
+        constexpr std::string_view _prefix = R"(
+            struct  PSInput
+            {
+                float4 pos : SV_POSITION;
+                float4 col : COLOR;
+                float2 uv : TEXCOORD;
+            };
+
+            Texture2D Texture;
+            SamplerState Texture_sampler;
+
+            float4 main(in PSInput PSIn) : SV_Target
+            {
+            )";
+        constexpr std::string_view _suffix = R"(
+            })";
+        std::string _main_function_replaced { main_function };
+        _main_function_replaced = string_replace(_main_function_replaced, position_alias, "PSIn.pos");
+        _main_function_replaced = string_replace(_main_function_replaced, color_alias, "PSIn.col");
+        _main_function_replaced = string_replace(_main_function_replaced, texcoord_alias, "PSIn.uv");
+        _main_function_replaced = string_replace(_main_function_replaced, sample_alias + "(", "Texture.Sample(Texture_sampler, ");
+        return std::string(_prefix.data()) + _main_function_replaced + std::string(_suffix.data());
+    }
+
+    std::string shader_fragment_default()
+    {
+        constexpr std::string_view _fragment = R"(
+            struct  PSInput
+            {
+                float4 pos : SV_POSITION;
+                float4 col : COLOR;
+                float2 uv  : TEXCOORD;
+            };
+
+            Texture2D    Texture;
+            SamplerState Texture_sampler;
+
+            float4 main(in PSInput PSIn) : SV_Target
+            {
+                return PSIn.col * Texture.Sample(Texture_sampler, PSIn.uv);
+            }
+            )";
+        return _fragment.data();
+    }
 
     void font_handle::emplace(
         rasterizer_handle& rasterizer,
@@ -63,9 +135,9 @@ namespace detail {
 
         std::string _spath = filename.generic_string();
         const char* _cpath = _spath.c_str();
-        ImFontConfig _imgui_config; 
+        ImFontConfig _imgui_config;
         if (config.has_value()) {
-            const font_config& _font_config = config.value();      
+            const font_config& _font_config = config.value();
             _imgui_config.FontNo = static_cast<int>(_font_config.index);
             _imgui_config.OversampleH = static_cast<int>(_font_config.oversample_horizontal);
             _imgui_config.OversampleV = static_cast<int>(_font_config.oversample_vertical);
@@ -86,7 +158,7 @@ namespace detail {
         _io.Fonts->TexID = rasterizer._font_texture.get();
         _has_value = true;
     }
-    
+
     void font_handle::emplace(
         rasterizer_handle& rasterizer,
         const void* ttf,
@@ -104,10 +176,10 @@ namespace detail {
         unsigned char* _raw_pixels = nullptr;
         ImGui::SetCurrentContext(rasterizer._imgui_context);
         ImGuiIO& _io = ImGui::GetIO();
- 
-        ImFontConfig _imgui_config; 
+
+        ImFontConfig _imgui_config;
         if (config.has_value()) {
-            const font_config& _font_config = config.value();      
+            const font_config& _font_config = config.value();
             _imgui_config.FontNo = static_cast<int>(_font_config.index);
             _imgui_config.OversampleH = static_cast<int>(_font_config.oversample_horizontal);
             _imgui_config.OversampleV = static_cast<int>(_font_config.oversample_vertical);
@@ -150,7 +222,7 @@ namespace detail {
             _has_value = false;
         }
     }
-    
+
     void texture_handle::emplace(
         rasterizer_handle& rasterizer,
         const std::filesystem::path filename)
@@ -368,7 +440,6 @@ namespace detail {
             _has_value = false;
         }
     }
-
 
     void rasterizer_handle::reset()
     {

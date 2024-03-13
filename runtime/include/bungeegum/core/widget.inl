@@ -136,7 +136,7 @@ namespace detail {
     {
 #if BUNGEEGUM_USE_HOTSWAP
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-            updatable.loader = [reference](detail::reloaded_loader& archiver) {
+            updatable.loader = [reference](detail::swapped_load_guard& archiver) {
                 archiver.load<widget_t>(widget_ref_access<widget_t>::get_data(reference));
             };
         }
@@ -151,7 +151,7 @@ namespace detail {
     {
 #if BUNGEEGUM_USE_HOTSWAP
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
-            updatable.saver = [reference](detail::reloaded_saver& archiver) {
+            updatable.saver = [reference](detail::swapped_save_guard& archiver) {
                 archiver.save<widget_t>(widget_ref_access<widget_t>::get_data(reference));
             };
         }

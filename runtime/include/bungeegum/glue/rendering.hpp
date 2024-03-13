@@ -5,11 +5,6 @@
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/glue/window.hpp>
 
-#if TOOLCHAIN_COMPILER_CLANG
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-#endif
-
 #if !defined(PLATFORM_ANDROID)
 #define PLATFORM_ANDROID TOOLCHAIN_PLATFORM_ANDROID
 #endif
@@ -38,6 +33,11 @@
 #define PLATFORM_WIN32 TOOLCHAIN_PLATFORM_WIN32
 #endif
 
+#if TOOLCHAIN_COMPILER_CLANG
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
+
 #include <Common/interface/RefCntAutoPtr.hpp>
 #include <Graphics/GraphicsEngine/interface/Buffer.h>
 #include <Graphics/GraphicsEngine/interface/DepthStencilState.h>
@@ -52,8 +52,6 @@
 #pragma clang diagnostic pop
 #endif
 
-#include <vector>
-
 struct ImFont;
 struct ImFontAtlas;
 struct ImGuiContext;
@@ -63,8 +61,6 @@ namespace bungeegum {
 namespace detail {
 
     struct rasterizer_handle;
-
-// #if !__HOTRELOADING__
 
     /// @brief Instances of this struct contain owning references to GPU render devices, swapchains
     /// and device contexts depending on the platform. They manage low level access to a rendering
@@ -169,33 +165,31 @@ namespace detail {
         friend struct rasterizer_handle;
     };
 
-// #endif
+    /// @brief
+    struct font_config {
 
-    /// @brief 
-    struct font_config {   
-        
-        /// @brief 
+        /// @brief
         std::size_t index = 0;
 
-        /// @brief 
+        /// @brief
         std::size_t oversample_horizontal = 3;
 
-        /// @brief 
+        /// @brief
         std::size_t oversample_vertical = 3;
 
-        /// @brief 
+        /// @brief
         bool pixel_snap_horizontal = false;
 
-        /// @brief 
+        /// @brief
         float2 glyph_extra_spacing = { 0.f, 0.f };
 
-        /// @brief 
+        /// @brief
         float2 glyph_offset = { 0.f, 0.f };
 
-        /// @brief 
+        /// @brief
         float rasterizer_multiply = 1.f;
 
-        /// @brief 
+        /// @brief
         float glyph_min_advance = 0.f;
     };
 
@@ -207,11 +201,11 @@ namespace detail {
         font_handle(font_handle&& other) = default;
         font_handle& operator=(font_handle&& other) = default;
 
-        /// @brief 
-        /// @param path 
-        /// @param size 
-        /// @param config 
-        /// @param ranges 
+        /// @brief
+        /// @param path
+        /// @param size
+        /// @param config
+        /// @param ranges
         void emplace(
             rasterizer_handle& rasterizer,
             const std::filesystem::path& filename,
@@ -473,22 +467,22 @@ namespace detail {
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
-        /// @brief 
-        /// @param events 
+        /// @brief
+        /// @param events
         void consume_emscripten_mouse_events(std::vector<emscripten_mouse_event>& events);
 
-        /// @brief 
-        /// @param events 
+        /// @brief
+        /// @param events
         void consume_emscripten_wheel_events(std::vector<emscripten_wheel_event>& events);
 
-        /// @brief 
-        /// @param events 
+        /// @brief
+        /// @param events
         void consume_emscripten_key_events(std::vector<emscripten_key_event>& events);
 
 #else
 
-        /// @brief 
-        /// @param events 
+        /// @brief
+        /// @param events
         void consume_sdl_events(std::vector<SDL_Event>& events);
 
 #endif

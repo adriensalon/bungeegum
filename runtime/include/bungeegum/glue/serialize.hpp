@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include <cereal/access.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
@@ -17,10 +14,7 @@
     }
 
 namespace bungeegum {
-namespace detail {
-
-    /// @brief
-    [[nodiscard]] std::vector<std::string> split_names(const std::string& comma_separated_names);
+namespace detail {    
 
     /// @brief Serializes with cereal a struct that implements the HOTSWAP_CLASS macro with fields.
     /// @tparam archive_t is the cereal archive type. This allows us to use the same function for

@@ -158,11 +158,11 @@ namespace detail {
     private:
         hscpp::mem::UniqueRef<value_t> _ref;
         swapped(hscpp::mem::UniqueRef<value_t>&& ref);
-        friend struct reloader;
+        friend struct swapper_handle;
     };
 
     /// @brief Current state of the hotswapping.
-    enum struct reload_state {
+    enum struct swapper_state {
         idle,
         compiling,
         started_compiling,
@@ -173,16 +173,16 @@ namespace detail {
     /// @brief Instances of this struct allocate memory that can be hotswapped. They trigger
     /// compilation and manage the files and directories to provide to the compiler.
     /// @details Instances of this struct can only be moved.
-    struct reloader {
-        reloader() = delete;
-        reloader(const reloader& other) = delete;
-        reloader& operator=(const reloader& other) = delete;
-        reloader(reloader&& other) = default;
-        reloader& operator=(reloader&& other) = default;
+    struct swapper_handle {
+        swapper_handle() = delete;
+        swapper_handle(const swapper_handle& other) = delete;
+        swapper_handle& operator=(const swapper_handle& other) = delete;
+        swapper_handle(swapper_handle&& other) = default;
+        swapper_handle& operator=(swapper_handle&& other) = default;
 
         /// @brief Creates an instance from a std::wstreambuf and writes an initialization
         /// message to it.
-        reloader(std::wstreambuf* buffer);
+        swapper_handle(std::wstreambuf* buffer);
 
         /// @brief Allocates a new object that can be hotswapped, taking no argument.
         /// @exception Throws a compile-time exception if the swapped type is not default-
@@ -214,7 +214,7 @@ namespace detail {
         /// @brief Asynchronously waits for changes in the provided files and folders, triggers
         /// recompilation when needed and hotswaps allocated objects. It takes a std::wstreambuf
         /// to be filled with what would go to std::wcout otherwise.
-        reload_state update(std::wstreambuf* buffer);
+        swapper_state update(std::wstreambuf* buffer);
 
         /// @brief Sets an instance of any object as the global data. This instance will be shared
         /// with the hotswapped modules, and can be accessed anywhere with the get_global_data()
@@ -235,18 +235,18 @@ namespace detail {
     /// @brief Instances of this struct represent a cereal JSON input archive to load data agter
     /// recompilation.
     /// @details Instances of this struct can only be moved.
-    struct reloaded_loader {
-        reloaded_loader() = delete;
-        reloaded_loader(const reloaded_loader& other) = delete;
-        reloaded_loader& operator=(const reloaded_loader& other) = delete;
-        reloaded_loader(reloaded_loader&& other) = delete;
-        reloaded_loader& operator=(reloaded_loader&& other) = delete;
+    struct swapped_load_guard {
+        swapped_load_guard() = delete;
+        swapped_load_guard(const swapped_load_guard& other) = delete;
+        swapped_load_guard& operator=(const swapped_load_guard& other) = delete;
+        swapped_load_guard(swapped_load_guard&& other) = delete;
+        swapped_load_guard& operator=(swapped_load_guard&& other) = delete;
 
         /// @brief Creates an instance of this struct from a file path.
-        reloaded_loader(const std::filesystem::path& archive_path);
+        swapped_load_guard(const std::filesystem::path& archive_path);
 
         /// @brief Creates an instance of this struct from a stringstream.
-        reloaded_loader(std::stringstream& archive_stream);
+        swapped_load_guard(std::stringstream& archive_stream);
 
         /// @brief Loads a reloaded value. Can be used multiple times to load many values from
         /// the same file.
@@ -263,18 +263,18 @@ namespace detail {
     /// @brief Instances of this struct represent a cereal JSON output archive to save data after
     /// recompilation.
     /// @details Instances of this struct can only be moved.
-    struct reloaded_saver {
-        reloaded_saver() = delete;
-        reloaded_saver(const reloaded_saver& other) = delete;
-        reloaded_saver& operator=(const reloaded_saver& other) = delete;
-        reloaded_saver(reloaded_saver&& other) = delete;
-        reloaded_saver& operator=(reloaded_saver&& other) = delete;
+    struct swapped_save_guard {
+        swapped_save_guard() = delete;
+        swapped_save_guard(const swapped_save_guard& other) = delete;
+        swapped_save_guard& operator=(const swapped_save_guard& other) = delete;
+        swapped_save_guard(swapped_save_guard&& other) = delete;
+        swapped_save_guard& operator=(swapped_save_guard&& other) = delete;
 
         /// @brief Creates an instance of this struct from a file path.
-        reloaded_saver(const std::filesystem::path& archive_path);
+        swapped_save_guard(const std::filesystem::path& archive_path);
 
         /// @brief Creates an instance of this struct from a stringstream.
-        reloaded_saver(std::stringstream& archive_stream);
+        swapped_save_guard(std::stringstream& archive_stream);
 
         /// @brief Saves a reloaded value. Can be used multiple times to save many values to the
         /// same file.

@@ -1,6 +1,7 @@
 #include <bungeegum/glue/string.hpp>
 
 #include <locale>
+#include <sstream>
 
 namespace bungeegum {
 namespace detail {
@@ -28,6 +29,21 @@ namespace detail {
     bool regex_search(const std::string& str, const std::regex& regex)
     {
         return std::regex_search(str, regex);
+    }
+
+    std::vector<std::string> split(const std::string& str, const char sep)
+    {
+        std::vector<std::string> _names;
+        std::stringstream _sstream(str);
+        while (_sstream.good()) {
+            std::string _substr;
+            std::getline(_sstream, _substr, sep);
+            if (_substr[0] == ' ') {
+                _substr = _substr.substr(1, _substr.length() - 1);
+            }
+            _names.push_back(_substr);
+        }
+        return _names;
     }
 }
 }

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <bungeegum/glue/foreach.hpp>
+#include <bungeegum/glue/string.hpp>
+
 #include <tuple>
 #include <variant>
 
@@ -31,15 +34,13 @@
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 
-#include <bungeegum/glue/foreach.hpp>
-
 namespace bungeegum {
 namespace detail {
 
     template <typename archive_t, typename... fields_t>
     void serialize_fields(archive_t& archive, const std::string& names, fields_t&&... fields)
     {
-        std::vector<std::string> _names = split_names(names);
+        std::vector<std::string> _names = split(names, ',');
         std::tuple<fields_t&...> _tuple((fields)...);
         constexpr std::size_t _count = std::variant_size_v<std::variant<fields_t...>>;
         constexpr_for<0, _count, 1>([&archive, &_names, &_tuple](auto _index) {

@@ -91,6 +91,21 @@ private:
     detail::pipeline_data _data;
 };
 
+/// @brief Gets a modifiable list of the preprocessor definitions for recompilation.
+[[nodiscard]] std::vector<std::string>& get_hotswap_defines();
+
+/// @brief Gets a modifiable list of the include directories for recompilation.
+[[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_include_directories();
+
+/// @brief Gets a modifiable list of the source directories for recompilation.
+[[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_source_directories();
+
+/// @brief Gets a modifiable list of the force compiled source files for recompilation.
+[[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files();
+
+/// @brief Gets a modifiable list of the libraries for recompilation.
+[[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_libraries();
+
 /// @brief
 void exit_run();
 

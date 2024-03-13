@@ -430,21 +430,6 @@ void abandon(const widget_id parent_id, const widget_id child_id);
 /// @param id
 void destroy(const widget_id id);
 
-/// @brief Gets a modifiable list of the preprocessor definitions for recompilation.
-[[nodiscard]] std::vector<std::string>& get_hotswap_defines();
-
-/// @brief Gets a modifiable list of the include directories for recompilation.
-[[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_include_directories();
-
-/// @brief Gets a modifiable list of the source directories for recompilation.
-[[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_source_directories();
-
-/// @brief Gets a modifiable list of the force compiled source files for recompilation.
-[[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files();
-
-/// @brief Gets a modifiable list of the libraries for recompilation.
-[[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_libraries();
-
 /// @brief
 /// @param id
 /// @return

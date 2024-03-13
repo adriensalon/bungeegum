@@ -62,8 +62,8 @@ namespace detail {
         std::function<void(interact_command&)> interactor = nullptr;
         std::function<void(draw_command&)> drawer = nullptr;
 #if BUNGEEGUM_USE_HOTSWAP
-        std::function<void(reloaded_loader&)> loader = nullptr;
-        std::function<void(reloaded_saver&)> saver = nullptr;
+        std::function<void(swapped_load_guard&)> loader = nullptr;
+        std::function<void(swapped_save_guard&)> saver = nullptr;
         std::function<std::uintptr_t()> true_ptr = nullptr;
         std::function<std::size_t()> true_sizeof = nullptr;
 #endif
@@ -104,7 +104,7 @@ namespace detail {
         std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> interactables = {};
         std::unordered_map<std::uintptr_t, std::reference_wrapper<widget_update_data>> drawables = {};
 #if BUNGEEGUM_USE_HOTSWAP
-        std::unique_ptr<reloader> hotswap_reloader = nullptr;
+        std::unique_ptr<swapper_handle> hotswap_reloader = nullptr;
 #endif
     };
 

@@ -28,8 +28,6 @@ set(bungeegum_runtime_source
 	"source/glue/console.cpp"
 	"source/glue/dialog.cpp"
 	"source/glue/hotswap.cpp"
-	"source/glue/hotswap2.cpp"
-	"source/glue/serialize.cpp"
 	"source/glue/string.cpp"
 	"source/glue/theme.cpp"
 	"source/glue/time.cpp"

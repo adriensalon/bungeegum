@@ -76,7 +76,7 @@ namespace detail {
     }
 
     template <typename value_t>
-    swapped<value_t> reloader::allocate()
+    swapped<value_t> swapper_handle::allocate()
     {
         return _manager.get()->operator->()->Allocate<value_t>();
     }
@@ -88,13 +88,13 @@ namespace detail {
     }
 
     template <typename value_t>
-    void reloaded_loader::load(const swapped<value_t>& value)
+    void swapped_load_guard::load(const swapped<value_t>& value)
     {
         _archive(value.get());
     }
 
     template <typename value_t>
-    void reloaded_saver::save(const swapped<value_t>& value)
+    void swapped_save_guard::save(const swapped<value_t>& value)
     {
         _archive(value.get());
     }
