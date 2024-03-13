@@ -14,6 +14,7 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 		set(NFD_INSTALL ON CACHE BOOL "" FORCE)
 		add_subdirectory("nfdext")
 		set_target_properties(nfd PROPERTIES LINKER_LANGUAGE CXX)
+		target_include_directories(nfd PUBLIC "${CMAKE_CURRENT_LIST_DIR}/nfdext/src/include")
 
 		add_subdirectory("hscpp")
 		set(HSCPP_EXAMPLES OFF)

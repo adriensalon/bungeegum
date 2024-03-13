@@ -46,7 +46,6 @@ set(bungeegum_runtime_source
 	
 	"source/overlay/build.cpp"
 	"source/overlay/hierarchy.cpp"
-	"source/overlay/gobuild.cpp"
 	"source/overlay/menu.cpp"
 	"source/overlay/output.cpp"
 	"source/overlay/profiling.cpp"
@@ -99,7 +98,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
 endif()
 
 if(BUNGEEGUM_ENABLE_HOTSWAP AND BUNGEEGUM_ENABLE_OVERLAY AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-	# target_link_libraries(bungeegum_runtime nfd)
+	target_link_libraries(bungeegum_runtime nfd)
 endif()
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")

@@ -18,7 +18,6 @@ namespace detail {
 	
     extern void draw_build_overlay();
     extern void draw_hierarchy_overlay();
-    extern void draw_hotswap_overlay();
     extern void draw_output_overlay();
     extern void draw_profiling_overlay();
 
@@ -119,9 +118,11 @@ namespace detail {
         void draw_footer()
         {
             ImGuiViewportP* _viewport = (ImGuiViewportP*)(void*)ImGui::GetMainViewport();
-            ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+            ImGuiWindowFlags _window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground;
             style_guard _sg0(ImGuiStyleVar_FramePadding, { ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y });
-            color_guard _cg1(ImGuiCol_MenuBarBg, { 0.878f, 0.878f, 0.878f, 1.f });
+            color_guard _cg1(ImGuiCol_MenuBarBg, { 0.878f, 0.878f, 0.878f, 0.3f });
+            color_guard _cg2(ImGuiCol_WindowBg, { 0.878f, 0.878f, 0.878f, 0.3f });
+            color_guard _cg3(ImGuiCol_Button, { 0.878f, 0.878f, 0.878f, 0.f });
             if (ImGui::BeginViewportSideBar("##MainFooterBar", _viewport, ImGuiDir_Down, footer_height, _window_flags)) {
 
                 if (ImGui::BeginMenuBar()) {
@@ -131,8 +132,6 @@ namespace detail {
                     draw_footer_button(show_build_overlay, "build");
                     ImGui::SameLine();
                     draw_footer_button(show_hierarchy_overlay, "hierarchy");
-                    ImGui::SameLine();
-                    draw_footer_button(show_hotswap_overlay, "hotswap");
                     ImGui::SameLine();
                     draw_footer_button(show_output_overlay, "output");
                     ImGui::SameLine();
@@ -179,9 +178,6 @@ namespace detail {
 				}
 				if (show_hierarchy_overlay) {
 					draw_hierarchy_overlay();
-				}
-				if (show_hotswap_overlay) {
-					draw_hotswap_overlay();
 				}
 				if (show_output_overlay) {
 					draw_output_overlay();
