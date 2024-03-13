@@ -1,7 +1,6 @@
 #pragma once
 
-#include <bungeegum/config/backend.hpp>
-#include <bungeegum/config/misc.hpp>
+#include <bungeegum/config/config.hpp>
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/glue/window.hpp>
 

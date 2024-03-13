@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/config/misc.hpp>
+#include <bungeegum/config/config.hpp>
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/glue/dialog.hpp>
 #include <bungeegum/glue/time.hpp>

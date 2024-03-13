@@ -36,12 +36,12 @@ namespace detail {
     void setup_global_if_required(); // This has to be called before doing anything else (inside embed(), launch(), hotswap::xxx() etc)
 
 #if BUNGEEGUM_USE_HOTSWAP
-    inline swapped_manager_data& swapped_global() // This has to be inline for reload (?)
+    inline swapped_manager_data& get_swapped_global() // This has to be inline for reload (?)
     {
         return get_global_data<swapped_manager_data>();
     }
 #else
-    swapped_manager_data& swapped_global();
+    swapped_manager_data& get_swapped_global();
 #endif
 
 }

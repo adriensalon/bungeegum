@@ -23,7 +23,7 @@ namespace detail {
     }
 
 #if !BUNGEEGUM_USE_HOTSWAP
-    swapped_manager_data& swapped_global()
+    swapped_manager_data& get_swapped_global()
     {
         return __bungeegum_swapped_manager;
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/config/feature.hpp>
+#include <bungeegum/config/config.hpp>
 #include <bungeegum/glue/serialize.hpp>
 
 #if BUNGEEGUM_USE_HOTSWAP

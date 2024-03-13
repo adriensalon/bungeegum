@@ -51,14 +51,14 @@ set(bungeegum_runtime_source
 	"source/overlay/output.cpp"
 	"source/overlay/profiling.cpp"
 	
-	"static/inter_extrabold.cpp"
-	"static/inter_regular.cpp"
+	"source/static/inter_extrabold.cpp"
+	"source/static/inter_regular.cpp"
 )
 
 add_library(bungeegum_runtime ${bungeegum_runtime_source})
 
+target_include_directories(bungeegum_runtime PRIVATE "source/static/")
 target_include_directories(bungeegum_runtime PUBLIC "include/")
-target_include_directories(bungeegum_runtime PUBLIC "static/")
 target_include_directories(bungeegum_runtime PUBLIC "${CMAKE_SOURCE_DIR}/external/diligentcore/")
 
 set_property(TARGET bungeegum_runtime PROPERTY CXX_STANDARD 17)

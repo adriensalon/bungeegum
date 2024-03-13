@@ -199,7 +199,7 @@ void resolve_command::resize(const float2 size)
 
 float2 resolve_command::resolve_child(const widget_id child_id, const float2 min_size, const float2 max_size) const
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
     detail::widget_update_data& _child_updatable = _swapped.widgets.updatables[_child_raw];
     // detail::widget_update_data& _updatable = _data.get();
@@ -222,7 +222,7 @@ float2 resolve_command::resolve_child(const widget_id child_id, const float2 min
 
 void resolve_command::position_child(const widget_id child_id, const float2 position, const bool absolute)
 {
-    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
     detail::widget_update_data& _child_updatable = _manager.updatables[_child_raw];
     if (absolute) {
@@ -389,7 +389,7 @@ void use_shader_callback(const ImDrawList* parent_list, const ImDrawCmd* cmd)
 {
     detail::shader_handle _shader;
     _shader.emplace(cmd->UserCallbackData);    
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     _swapped.rasterizers.at(_swapped.current).get().use_shader(_shader);
 }
 
@@ -402,13 +402,13 @@ void draw_command::use_shader_custom(const shader& user_shader)
 
 void draw_command::use_shader_default()
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     _data.draw_list->AddCallback(use_shader_callback, _swapped.default_shader.value().get().get());
 }
 
 void draw_command::use_shader_mask()
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     _data.draw_list->AddCallback(use_shader_callback, _swapped.mask_shader.value().get().get());
 }
 
@@ -457,7 +457,7 @@ widget_id::widget_id(const detail::widget_id_data& data)
 
 void adopt(const widget_id parent_id, const widget_id child_id)
 {
-    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
     const std::uintptr_t _parent_raw = detail::widget_id_access::get_data(parent_id);
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
     detail::widget_update_data& _parent_updatable = _manager.updatables[_parent_raw];
@@ -468,7 +468,7 @@ void adopt(const widget_id parent_id, const widget_id child_id)
 
 void abandon(const widget_id parent_id, const widget_id child_id)
 {
-    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
     const std::uintptr_t _parent_raw = detail::widget_id_access::get_data(parent_id);
     const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
     detail::widget_update_data& _parent_updatable = _manager.updatables[_parent_raw];
@@ -505,7 +505,7 @@ void destroy(const widget_id& widget)
 
 widget_id get_parent(const widget_id id)
 {
-    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
     if (!_updatable.parent.has_value()) {
@@ -518,7 +518,7 @@ widget_id get_parent(const widget_id id)
 
 bool has_parent(const widget_id id)
 {
-    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
     return _updatable.parent.has_value();
@@ -526,7 +526,7 @@ bool has_parent(const widget_id id)
 
 void must_resolve(const widget_id id)
 {
-    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
     if (_manager.resolvables.find(_raw) != _manager.resolvables.end()) {
@@ -536,7 +536,7 @@ void must_resolve(const widget_id id)
 
 void must_draw(const widget_id id)
 {
-    detail::widget_manager_data& _manager = detail::swapped_global().widgets;
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
     const std::uintptr_t _raw = detail::widget_id_access::get_data(id);
     detail::widget_update_data& _updatable = _manager.updatables[_raw];
 	if (_manager.drawables.find(_raw) != _manager.drawables.end()) {

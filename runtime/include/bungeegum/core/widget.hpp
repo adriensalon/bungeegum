@@ -431,6 +431,9 @@ void abandon(const widget_id parent_id, const widget_id child_id);
 void destroy(const widget_id id);
 
 /// @brief
+void exit_run();
+
+/// @brief
 /// @param id
 /// @return
 [[nodiscard]] std::vector<widget_id> get_children(const widget_id id);

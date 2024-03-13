@@ -117,7 +117,7 @@ namespace detail {
         creation_fragment = other.creation_fragment;
         creation_blend = other.creation_blend;
         if (is_compiled) {
-            detail::swapped_manager_data& _swapped = detail::swapped_global();
+            detail::swapped_manager_data& _swapped = detail::get_swapped_global();
             for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
                 shaders[_pipeline.first].emplace(
                     _pipeline.second.get(),
@@ -156,7 +156,7 @@ shader::shader(const std::string& fragment, const shader_blend_options& blend)
     detail::reset_shaders(_data);
     _data.creation_fragment = fragment;
     _data.creation_blend = detail::convert_to_blend_options(blend);
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
         _data.shaders[_pipeline.first].emplace(
             _pipeline.second.get(),

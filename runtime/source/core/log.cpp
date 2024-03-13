@@ -79,7 +79,7 @@ namespace detail {
 
 void log_error(const std::string& what, const bool must_throw)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     detail::backtraced_exception _exception(what, 1u);
     if (_swapped.current == 0u) {
         detail::console_log_error(_exception);
@@ -102,7 +102,7 @@ void log_error(const std::string& what, const bool must_throw)
 
 void log_error(const std::wstring& what, const bool must_throw)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     detail::backtraced_exception _exception(what, 1u);
     if (_swapped.current == 0u) {
         detail::console_log_error(_exception);
@@ -125,7 +125,7 @@ void log_error(const std::wstring& what, const bool must_throw)
 
 void log_warning(const std::string& what)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     detail::backtraced_exception _exception(what, 1u);
     if (_swapped.current == 0u) {
         detail::console_log_warning(_exception);
@@ -145,7 +145,7 @@ void log_warning(const std::string& what)
 
 void log_warning(const std::wstring& what)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     detail::backtraced_exception _exception(what, 1u);
     if (_swapped.current == 0u) {
         detail::console_log_warning(_exception);
@@ -165,7 +165,7 @@ void log_warning(const std::wstring& what)
 
 void log_message(const std::string& what)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     detail::backtraced_exception _exception(what, 1u);
     if (_swapped.current == 0u) {
         detail::console_log_message(_exception);
@@ -185,7 +185,7 @@ void log_message(const std::string& what)
 
 void log_message(const std::wstring& what)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     detail::backtraced_exception _exception(what, 1u);
     if (_swapped.current == 0u) {
         detail::console_log_message(_exception);

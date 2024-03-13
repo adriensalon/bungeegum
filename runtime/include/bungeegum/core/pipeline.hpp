@@ -106,8 +106,5 @@ private:
 /// @brief Gets a modifiable list of the libraries for recompilation.
 [[nodiscard]] std::vector<std::filesystem::path>& get_hotswap_libraries();
 
-/// @brief
-void exit_run();
-
 
 }

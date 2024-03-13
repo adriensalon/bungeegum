@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <bungeegum/config/misc.hpp>
+#include <bungeegum/config/config.hpp>
 
 namespace bungeegum {
 namespace detail {

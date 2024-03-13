@@ -419,7 +419,7 @@ namespace detail {
 
         void draw_async_events_tab()
         {
-            const events_manager_data& _events_manager = swapped_global().events;
+            const events_manager_data& _events_manager = get_swapped_global().events;
             std::string _title = "async events (" + std::to_string(_events_manager.updatables.size()) + ")";
             if (ImGui::BeginTabItem((_title + tag("async_events_tab")).c_str())) {
 
@@ -455,7 +455,7 @@ namespace detail {
 
         void draw_running_animations_tab()
         {
-            const animations_manager_data& _animations_manager = swapped_global().animations;
+            const animations_manager_data& _animations_manager = get_swapped_global().animations;
             std::string _title = "running animations (" + std::to_string(_animations_manager.updatables.size()) + ")";
             if (ImGui::BeginTabItem((_title + tag("running_animations_tab")).c_str())) {
                 static ImGuiTableFlags _table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;

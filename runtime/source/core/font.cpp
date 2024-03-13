@@ -39,7 +39,7 @@ namespace detail {
         creation_count = other.creation_count;
         creation_size = other.creation_size;
         if (is_compiled) {
-            // swapped_manager_data& _swapped = swapped_global();
+            // swapped_manager_data& _swapped = get_swapped_global();
             // for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
             //     fonts[_pipeline.first].emplace(
             //         _pipeline.second.get(),
@@ -77,7 +77,7 @@ namespace detail {
 
 font::font(const std::filesystem::path& filename, const float size)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
         _data.fonts[_pipeline.first].emplace(
             _pipeline.second.get(),
@@ -88,7 +88,7 @@ font::font(const std::filesystem::path& filename, const float size)
 
 font::font(const void* ttf, const std::size_t count, const float size)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     for (std::pair<const std::uintptr_t, std::reference_wrapper<detail::rasterizer_handle>> _pipeline : _swapped.rasterizers) { 
         _data.fonts[_pipeline.first].emplace(
             _pipeline.second.get(),

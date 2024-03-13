@@ -99,7 +99,7 @@ namespace detail {
         futures = std::move(other.futures);
         shared_futures = std::move(other.shared_futures);
         (_data.update_data.kinds.push_back(typeid(values_t)), ...);
-        swapped_manager_data& _swapped = swapped_global();
+        swapped_manager_data& _swapped = get_swapped_global();
         if (_swapped.events.updatables.find(raw) != _swapped.events.updatables.end()) {
             _swapped.events.updatables.at(raw) = std::ref(update_data);
             assign_ticker(*this);
@@ -110,7 +110,7 @@ namespace detail {
     template <typename... values_t>
     event_data<values_t...>::~event_data()
     {
-        swapped_manager_data& _swapped = swapped_global();
+        swapped_manager_data& _swapped = get_swapped_global();
         if (_swapped.events.updatables.find(raw) != _swapped.events.updatables.end()) {
             _swapped.events.updatables_to_erase.push_back(raw);
         }
@@ -173,7 +173,7 @@ event<values_t...>& event<values_t...>::trigger(values_t&&... values) const
 template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& future_value)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     if (_swapped.events.updatables.find(_data.raw) != _swapped.events.updatables.end()) {
         // error because event is being waited on already
     }
@@ -191,7 +191,7 @@ event<values_t...>& event<values_t...>::trigger(std::future<future_values>&& fut
 template <typename... values_t>
 event<values_t...>& event<values_t...>::trigger(const std::shared_future<future_values>& shared_future_value)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     if (_swapped.events.updatables(_data.raw) != _swapped.events.updatables.end()) {
         // error because event is being waited on already
     }

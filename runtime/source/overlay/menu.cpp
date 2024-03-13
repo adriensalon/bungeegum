@@ -1,4 +1,4 @@
-#include <bungeegum/config/feature.hpp>
+#include <bungeegum/config/config.hpp>
 #if BUNGEEGUM_USE_OVERLAY
 
 #include <imgui.h>

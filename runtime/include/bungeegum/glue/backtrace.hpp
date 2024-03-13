@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bungeegum/config/feature.hpp>
+#include <bungeegum/config/config.hpp>
 
 #include <cstddef>
 #include <exception>

@@ -3,9 +3,7 @@
 #include <optional>
 #include <unordered_map>
 
-#include <bungeegum/config/backend.hpp>
-#include <bungeegum/config/feature.hpp>
-#include <bungeegum/config/misc.hpp>
+#include <bungeegum/config/config.hpp>
 #include <bungeegum/core/font.hpp>
 #include <bungeegum/core/math.hpp>
 #include <bungeegum/core/shader.hpp>

@@ -119,7 +119,7 @@ namespace detail {
 
     void resolve_widgets(const float2 viewport_size, widget_update_data& root_updatable)
     {
-        swapped_manager_data& _swapped = swapped_global();
+        swapped_manager_data& _swapped = get_swapped_global();
 
         // pipeline_manager_data& _pipeline_manager = global().pipelines;
         // widget_manager_data& _widget_manager = global().widgets;
@@ -166,7 +166,7 @@ namespace detail {
 
     void draw_widgets(ImDrawList* imgui_drawlist)
     {
-        swapped_manager_data& _swapped = swapped_global();
+        swapped_manager_data& _swapped = get_swapped_global();
         bool _draw_done = false;
         std::vector<std::uintptr_t> _ids;
         const std::uintptr_t _raw_pipeline = _swapped.current; // get from func args
@@ -234,7 +234,7 @@ namespace detail {
 
     bool process_widgets(const float2 viewport_size, const std::chrono::milliseconds& delta_time, widget_update_data& root_updatable)
     {
-        swapped_manager_data& _swapped = swapped_global();
+        swapped_manager_data& _swapped = get_swapped_global();
 
         // _global.pipelines.current.value().get().steps_chronometer.begin_task("animations");
         process_animations(_swapped.animations, delta_time);
@@ -354,7 +354,7 @@ namespace detail {
     void update_hotswap_frame(const std::filesystem::path& serialize_path, widget_update_data& root_updatable)
     {
 #if BUNGEEGUM_USE_HOTSWAP
-        swapped_manager_data& _swapped = swapped_global();
+        swapped_manager_data& _swapped = get_swapped_global();
         std::wstringstream _update_stream;
         swapper_state _reload_result = _swapped.widgets.hotswap_reloader->update(_update_stream.rdbuf());
         std::string _update_str = narrow(_update_stream.str());
@@ -398,7 +398,7 @@ namespace detail {
 
     void update_process_frame(pipeline_data& data, const float2 viewport_size, const BUNGEEGUM_USE_TIME_UNIT& delta_time, const bool force_rendering, const bool exclusive_rendering)
     {
-        swapped_manager_data& _swapped = swapped_global();
+        swapped_manager_data& _swapped = get_swapped_global();
         // _pipeline.steps_chronometer.new_frame();
         // _pipeline.widgets_chronometer.new_frame();
 
@@ -443,7 +443,7 @@ namespace detail {
 #endif
         data.user_rasterizer.emplace(data.renderer);
 
-        swapped_manager_data& _swapped = swapped_global();
+        swapped_manager_data& _swapped = get_swapped_global();
         _swapped.rasterizers.insert({ data.raw, std::ref(data.user_rasterizer) });
 
         detail::setup_shaders(data);
@@ -510,7 +510,7 @@ template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>:
 template <renderer_backend backend_t>
 pipeline<backend_t>& pipeline<backend_t>::root(const widget_id root_id)
 {
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     const std::uintptr_t _raw = detail::widget_id_access::get_data(root_id);
     _data.root_updatable = _swapped.widgets.updatables.at(_raw);
     return *this;
@@ -530,9 +530,9 @@ void pipeline<backend_t>::run(const std::optional<unsigned int> frames_per_secon
         detail::protect_library([this, &delta_time, force_rendering]() {
 
             // ICI SET LOOP RUN    
-            detail::swapped_global().current = _data.raw;
-            detail::swapped_global().default_shader = _data.default_shader;
-            detail::swapped_global().mask_shader = _data.mask_shader;
+            detail::get_swapped_global().current = _data.raw;
+            detail::get_swapped_global().default_shader = _data.default_shader;
+            detail::get_swapped_global().mask_shader = _data.mask_shader;
 
 
             detail::update_input_frame(_data);
@@ -557,9 +557,9 @@ pipeline<backend_t>& pipeline<backend_t>::run_once(const bool force_rendering)
         detail::protect_library([this, &delta_time, force_rendering]() {
             
             // ICI SET LOOP RUN    
-            detail::swapped_global().current = _data.raw;
-            detail::swapped_global().default_shader = _data.default_shader;
-            detail::swapped_global().mask_shader = _data.mask_shader;
+            detail::get_swapped_global().current = _data.raw;
+            detail::get_swapped_global().default_shader = _data.default_shader;
+            detail::get_swapped_global().mask_shader = _data.mask_shader;
 
             detail::update_input_frame(_data);
             float2 _viewport_size = _data.window.get_size();
@@ -592,7 +592,7 @@ std::vector<std::string>& get_hotswap_defines()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader->defines();
 }
 
@@ -600,7 +600,7 @@ std::vector<std::filesystem::path>& get_hotswap_include_directories()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader->include_directories();
 }
 
@@ -608,7 +608,7 @@ std::vector<std::filesystem::path>& get_hotswap_source_directories()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader->source_directories();
 }
 
@@ -616,7 +616,7 @@ std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader->force_compiled_source_files();
 }
 
@@ -624,7 +624,7 @@ std::vector<std::filesystem::path>& get_hotswap_libraries()
 {
     static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_global_if_required();
-    detail::swapped_manager_data& _swapped = detail::swapped_global();
+    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader->libraries();
 }
 

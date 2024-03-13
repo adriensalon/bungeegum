@@ -1,0 +1,50 @@
+#pragma once
+
+// Seek documentation in "config.inl"
+
+// Backends
+#if !defined(BUNGEEGUM_ENABLE_DIRECTX)
+#define BUNGEEGUM_ENABLE_DIRECTX 1
+#endif
+#if !defined(BUNGEEGUM_ENABLE_VULKAN)
+#define BUNGEEGUM_ENABLE_VULKAN 0
+#endif
+#if !defined(BUNGEEGUM_ENABLE_OPENGL)
+#define BUNGEEGUM_ENABLE_OPENGL 1
+#endif
+
+// Features
+#if !defined(BUNGEEGUM_ENABLE_BACKTRACE)
+#define BUNGEEGUM_ENABLE_BACKTRACE 1
+#endif
+#if !defined(BUNGEEGUM_ENABLE_HOTSWAP)
+#define BUNGEEGUM_ENABLE_HOTSWAP 1
+#endif
+#if !defined(BUNGEEGUM_ENABLE_OVERLAY)
+#define BUNGEEGUM_ENABLE_OVERLAY 1
+#endif
+
+// Misc
+#if !defined(BUNGEEGUM_SET_BACKTRACE_SIZE)
+#define BUNGEEGUM_SET_BACKTRACE_SIZE 10
+#endif
+#if !defined(BUNGEEGUM_SET_TIME_UNIT)
+#define BUNGEEGUM_SET_TIME_UNIT std::chrono::milliseconds
+#endif
+#if !defined(BUNGEEGUM_SET_INITIAL_WINDOW_WIDTH)
+#define BUNGEEGUM_SET_INITIAL_WINDOW_WIDTH 1280u
+#endif
+#if !defined(BUNGEEGUM_SET_INITIAL_WINDOW_HEIGHT)
+#define BUNGEEGUM_SET_INITIAL_WINDOW_HEIGHT 720u
+#endif
+#if !defined(BUNGEEGUM_SET_INITIAL_WINDOW_TITLE)
+#define BUNGEEGUM_SET_INITIAL_WINDOW_TITLE "bungeegum instance"
+#endif
+#if !defined(BUNGEEGUM_SET_INITIAL_VERTICES_SIZE)
+#define BUNGEEGUM_SET_INITIAL_VERTICES_SIZE 1024u
+#endif
+#if !defined(BUNGEEGUM_SET_INITIAL_INDICES_SIZE)
+#define BUNGEEGUM_SET_INITIAL_INDICES_SIZE 2048u
+#endif
+
+#include <bungeegum/config/config.inl>

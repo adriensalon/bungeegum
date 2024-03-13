@@ -135,9 +135,9 @@ namespace detail {
         }
         ImGui::End();
 
-        transfer_to_map(swapped_global().logs.userspace_errors, error_logs);
-        transfer_to_map(swapped_global().logs.userspace_warnings, warning_logs);
-        transfer_to_map(swapped_global().logs.userspace_messages, message_logs);
+        transfer_to_map(get_swapped_global().logs.userspace_errors, error_logs);
+        transfer_to_map(get_swapped_global().logs.userspace_warnings, warning_logs);
+        transfer_to_map(get_swapped_global().logs.userspace_messages, message_logs);
     }
 }
 }
