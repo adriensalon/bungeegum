@@ -10,8 +10,6 @@
 namespace bungeegum {
 namespace detail {
 
-#if TOOLCHAIN_PLATFORM_DESKTOP
-
     /// @brief Instances of this struct represent filters to use with desktop OS file picker
     struct dialog_extensions_filter {
 
@@ -21,6 +19,8 @@ namespace detail {
         /// @brief List of extensions, for example { "lib", "dll" }
         std::vector<std::string> extensions = {};
     };
+
+#if TOOLCHAIN_PLATFORM_DESKTOP
 
     /// @brief Blocks the thread and gets a file path using desktop OS file picker
     /// @param filters

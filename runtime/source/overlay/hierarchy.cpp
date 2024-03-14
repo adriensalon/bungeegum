@@ -426,9 +426,9 @@ namespace detail {
                 // GO ALGORITHM
                 //
                 std::size_t _args_count = 0;
-                for (const std::pair<const uintptr_t, event_update_data>& _event_data : _events_manager.updatables) {
-                    _args_count = std::max(_args_count, _event_data.second.clean_typenames.size());
-                }
+                // for (const std::pair<const uintptr_t, event_update_data>& _event_data : _events_manager.updatables) {
+                //     _args_count = std::max(_args_count, _event_data.second.clean_typenames.size());
+                // }
                 //
                 //
 

@@ -24,8 +24,8 @@ void EMSCRIPTEN_KEEPALIVE bungegum_emscripten_catch_from_js(int catch_cpp_functi
     const std::function<void(bungeegum::detail::backtraced_exception&&)>& _catch_cpp_function = *(const std::function<void(bungeegum::detail::backtraced_exception&&)>*)(catch_cpp_function);
     std::string _what_full(what);
     
-    bungeegum::detail::backtraced_exception _exception("extracted_tag", _what_full, 0, 0)
-    _catch_cpp_function(_what);
+    bungeegum::detail::backtraced_exception _exception("extracted_tag", _what_full, 0, 0);
+    _catch_cpp_function(std::move(_exception));
 }
 }
 
@@ -56,7 +56,7 @@ namespace detail {
             }
         });
 
-        void catch_cpp_wrapper(const std::string&const std::function<void(bungeegum::detail::backtraced_exception&&)>& catch_cpp_function)
+        // void catch_cpp_wrapper(const std::string&const std::function<void(bungeegum::detail::backtraced_exception&&)>& catch_cpp_function)
 
 #endif
 
@@ -92,6 +92,7 @@ namespace detail {
 
         std::string get_what(const std::string& tag, const std::string& what, std::vector<backtraced_step>& tracing, const std::size_t tracing_offset, const std::size_t tracing_size)
         {
+            emplace_traces(tracing, tracing_offset, tracing_size);
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
             char* _cstack_trace = emscripten_get_stacktrace();
             std::string _stack_trace(_cstack_trace);
@@ -99,7 +100,6 @@ namespace detail {
             // std::cout << "trace = " << _stack_trace << std::endl;
             return tag + "!" + what + "!" + _stack_trace;
 #else
-            emplace_traces(tracing, tracing_offset, tracing_size);
             return what;
 #endif
         }

@@ -94,7 +94,9 @@ font::font(const void* ttf, const std::size_t count, const float size)
             _pipeline.second.get(),
             ttf,
             count,
-            size);
+            size,
+			std::nullopt,
+			nullptr);
     }
 }
 

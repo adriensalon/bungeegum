@@ -6,8 +6,10 @@
 
 #include <stb_image.h>
 
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <SDL.h>
 #include <backends/imgui_impl_sdl2.h>
+#endif
 
 #include <Graphics/GraphicsTools/interface/MapHelper.hpp>
 

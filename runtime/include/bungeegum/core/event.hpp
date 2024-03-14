@@ -59,7 +59,7 @@ struct event {
 
 
 private:
-    template <typename... values_t>
+    template <typename...>
     friend struct detail::event_access;
     detail::event_data<values_t...> _data;
 };

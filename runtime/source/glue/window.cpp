@@ -82,7 +82,7 @@ namespace detail {
         {
             if (result != EMSCRIPTEN_RESULT_SUCCESS) {
                 std::string _error_message = emscripten_result_to_string(result);
-                throw backtraced_exception(_error_message);
+                throw backtraced_exception("glue/window", _error_message);
             }
         }
 

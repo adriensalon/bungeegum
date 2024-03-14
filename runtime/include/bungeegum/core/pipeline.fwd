@@ -47,7 +47,7 @@ namespace detail {
         shader_handle mask_shader = {};
         stopwatch profiling_stopwatch; // move to window for non emscripten update loop with fps
 #if BUNGEEGUM_USE_OVERLAY
-        rasterizer_handle overlay_context = {};
+        rasterizer_handle overlay_rasterizer = {};
         shader_handle overlay_shader = {};
         log_data_map errors = {};
         log_data_map warnings = {};

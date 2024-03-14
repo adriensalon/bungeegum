@@ -186,7 +186,7 @@ namespace detail {
 
     private:
         bool _has_value = false;
-        bool _is_running = false;
+        // bool _is_running = false;
         float2 _display_size = { 0, 0 };
         stopwatch _loop_watch = {};
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN

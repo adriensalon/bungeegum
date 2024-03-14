@@ -98,7 +98,7 @@ namespace detail {
         callbacks = std::move(other.callbacks);
         futures = std::move(other.futures);
         shared_futures = std::move(other.shared_futures);
-        (_data.update_data.kinds.push_back(typeid(values_t)), ...);
+        (update_data.kinds.push_back(typeid(values_t)), ...);
         swapped_manager_data& _swapped = get_swapped_global();
         if (_swapped.events.updatables.find(raw) != _swapped.events.updatables.end()) {
             _swapped.events.updatables.at(raw) = std::ref(update_data);

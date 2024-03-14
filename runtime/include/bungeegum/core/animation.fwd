@@ -48,7 +48,7 @@ namespace detail {
         float duration_seconds = 0.f;
         bool is_playing = false;
         float playing_cursor_seconds = 0.f;
-		animation_mode mode = animation_mode::forward;
+		animation_mode mode = {};
         animation_update_data update_data = {};
     };
 

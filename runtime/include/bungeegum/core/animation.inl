@@ -44,7 +44,7 @@ namespace detail {
     animation_data<value_t>::animation_data()
     {        
         raw = raw_cast(this); // create a new id
-        (update_data.kinds.push_back(typeid(values_t)), ...);
+        update_data.kind = std::make_unique<std::type_index>(typeid(value_t));
     }
 
     template <typename value_t>
@@ -142,17 +142,17 @@ animation<value_t>& animation<value_t>::on_value_changed(const on_value_changed_
 template <typename value_t>
 animation<value_t>& animation<value_t>::start()
 {
-    std::uintptr_t _raw_animation = detail::raw_cast<animation<value_t>>(this);
-    if (!detail::get_swapped_global().animations.contains(_raw_animation)) {
-        detail::animation_update_data& _update_data = detail::get_swapped_global().animations[_raw_animation];
-        _data.raw_animation = _raw_animation;
-        _update_data.kind = std::make_unique<std::type_index>(typeid(value_t));
-        detail::assign_ticker(_data, _update_data);
-#if BUNGEEGUM_USE_OVERLAY
-        // _update_data.clean_typename = detail::pipeline_manager_data::to_clean_typename(_update_data.kind->name());
-#endif
-    }
-    _data.is_playing = true;
+//     std::uintptr_t _raw_animation = detail::raw_cast<animation<value_t>>(this);
+//     if (!detail::get_swapped_global().animations.animations find(_raw_animation)) {
+//         detail::animation_update_data& _update_data = detail::get_swapped_global().animations[_raw_animation];
+//         _data.raw_animation = _raw_animation;
+//         _update_data.kind = std::make_unique<std::type_index>(typeid(value_t));
+//         detail::assign_ticker(_data, _update_data);
+// #if BUNGEEGUM_USE_OVERLAY
+//         // _update_data.clean_typename = detail::pipeline_manager_data::to_clean_typename(_update_data.kind->name());
+// #endif
+//     }
+//     _data.is_playing = true;
     return *this;
 }
 

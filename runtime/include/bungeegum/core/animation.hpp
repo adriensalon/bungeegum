@@ -95,7 +95,7 @@ struct animation {
     animation& warp(const unsigned int count);
 
 private:
-    template <typename value_t>
+    template <typename>
     friend struct detail::animation_access;
     detail::animation_data<value_t> _data;
 };

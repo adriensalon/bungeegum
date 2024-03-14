@@ -9,7 +9,7 @@ namespace detail {
 
 
     struct log_data {
-        log_data() = default;
+        log_data() = delete;
         log_data(const log_data& other) = delete;
         log_data& operator=(const log_data& other) = delete;
         log_data(log_data&& other) = default;

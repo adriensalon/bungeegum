@@ -29,7 +29,6 @@ namespace detail {
 
         bool show_build_overlay = false;
         bool show_hierarchy_overlay = false;
-        bool show_hotswap_overlay = false;
         bool show_output_overlay = false;
         bool show_profiling_overlay = false;
 

@@ -9,31 +9,43 @@ struct access {
     template <typename widget_t>
     constexpr static std::uintptr_t get_raw(widget_t& widget)
     {
+#if BUNGEEGUM_USE_HOTSWAP
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
             return detail::swapped_access::get_object_reference(widget);
         } else {
             return detail::raw_cast<widget_t>(widget);
         }
+#else
+		return detail::raw_cast<widget_t>(widget);
+#endif
     }
 
     template <typename widget_t>
     constexpr static std::uintptr_t get_sizeof(widget_t& widget)
     {
+#if BUNGEEGUM_USE_HOTSWAP
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
             return detail::swapped_access::get_sizeof(widget);
         } else {
             return sizeof(widget_t);
         }
+#else
+		return sizeof(widget_t);
+#endif
     }
 
     template <typename widget_t>
     constexpr static std::uintptr_t get_this(widget_t& widget)
     {
+#if BUNGEEGUM_USE_HOTSWAP
         if constexpr (detail::traits::is_reloadable_v<widget_t>) {
             return detail::swapped_access::get_this(widget);
         } else {
             return detail::raw_cast<widget_t>(widget);
         }
+#else
+		return detail::raw_cast<widget_t>(widget);
+#endif
     }
 
     template <typename widget_t>

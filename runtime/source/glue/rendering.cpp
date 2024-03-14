@@ -40,7 +40,7 @@ namespace bungeegum {
 namespace detail {
 
     namespace {
-        constexpr std::string_view default_imgui_backend_name = "bungeegum backend";
+        // constexpr std::string_view default_imgui_backend_name = "bungeegum backend";
     }
 
 #if BUNGEEGUM_USE_DIRECTX
@@ -143,29 +143,29 @@ namespace detail {
 
     void renderer_handle::emplace_new_opengl(window_handle& existing_window, std::streambuf* info)
     {
-//         if (_has_value) {
-//             throw backtraced_exception("[rendering] Impossible to emplace renderer because this instance already has a value");
-//         }
-// #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-//         // sdl_window = existing_window->get_sdl();
-// #endif
-//         Diligent::SwapChainDesc _swap_chain_descriptor;
-//         _swap_chain_descriptor.DefaultStencilValue = 0u;
-//         Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
-//         Diligent::EngineGLCreateInfo _engine_create_info;
-//         // _engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1); marche meme pas
-// #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-//         _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
-// #else
-//         _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
-// #endif
-//         _factory->CreateDeviceAndSwapChainGL(
-//             _engine_create_info,
-//             &_diligent_render_device,
-//             &_diligent_device_context,
-//             _swap_chain_descriptor,
-//             &_diligent_swap_chain);
-// 		_has_value = true;
+		reset();
+        Diligent::SwapChainDesc _swap_chain_descriptor;
+        Diligent::IEngineFactoryOpenGL* _factory = Diligent::GetEngineFactoryOpenGL();
+        Diligent::EngineGLCreateInfo _engine_create_info;
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
+#else
+        // _engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1); marche meme pas
+        _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
+#endif
+		{			
+            redirect_guard _console_redirect(info);
+			_factory->CreateDeviceAndSwapChainGL(
+				_engine_create_info,
+				&_diligent_render_device,
+				&_diligent_device_context,
+				_swap_chain_descriptor,
+				&_diligent_swap_chain);
+		}
+#if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
+        sdl_window = existing_window->get_sdl();
+#endif
+		_has_value = true;
     }
 
 #if BUNGEEGUM_USE_VULKAN
@@ -242,8 +242,8 @@ namespace detail {
         _implot_context = ImPlot::CreateContext();
         ImGui::SetCurrentContext(_imgui_context);
 
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         ImGuiIO& _io = ImGui::GetIO();
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         _io.KeyMap[ImGuiKey_Tab] = DOM_VK_TAB;
         _io.KeyMap[ImGuiKey_LeftArrow] = DOM_VK_LEFT;
         _io.KeyMap[ImGuiKey_RightArrow] = DOM_VK_RIGHT;
@@ -267,7 +267,6 @@ namespace detail {
         ImGui_ImplSDL2_InitForOpenGL(renderer._sdl_window, nullptr);
 #endif
         
-        ImGuiIO& _io = ImGui::GetIO();
 
         // create uniform buffer
         {

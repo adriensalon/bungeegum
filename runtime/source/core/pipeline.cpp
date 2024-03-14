@@ -239,7 +239,7 @@ namespace detail {
     void setup_window(window_handle& window, const pipeline_bindings& provider)
     {
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        window.attach_emscripten(provider.emscripten_canvas_id);
+        window.emplace_existing_emscripten(provider.emscripten_canvas_id);
 #else
         if (provider.native_window_ptr) {
             window.emplace_existing_native(provider.native_window_ptr);
@@ -251,56 +251,73 @@ namespace detail {
 
     void setup_renderer_directx11(pipeline_data& data, const pipeline_bindings& provider)
     {
-#if !BUNGEEGUM_USE_DIRECTX
-        throw backtraced_exception("");
+#if BUNGEEGUM_USE_DIRECTX
+		std::stringstream _info_stream;
+		if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
+			// data.renderer.attach_directx11(data.window,
+			//     provider.directx_device_ptr,
+			//     provider.directx_swapchain_ptr, _info_stream.rdbuf());
+		} else {
+			data.renderer.emplace_new_directx11(data.window, _info_stream.rdbuf());
+		}
+		std::string _info = _info_stream.str();
+		std::cout << _info;
 #else
-        std::stringstream _info_stream;
-        if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
-            // data.renderer.attach_directx11(data.window,
-            //     provider.directx_device_ptr,
-            //     provider.directx_swapchain_ptr);
-        } else {
-            data.renderer.emplace_new_directx11(data.window, _info_stream.rdbuf());
-        }
-        std::string _info = _info_stream.str();
-        std::cout << _info;
+		(void)data;
+		(void)provider;
 #endif
     }
 
     void setup_renderer_directx12(pipeline_data& data, const pipeline_bindings& provider)
     {
-#if !BUNGEEGUM_USE_DIRECTX
-        throw backtraced_exception("");
-#else
+#if BUNGEEGUM_USE_DIRECTX
+		std::stringstream _info_stream;
         if (provider.directx_device_ptr && provider.directx_swapchain_ptr) {
             // data.renderer.attach_directx12(data.window,
             //     provider.directx_device_ptr,
-            //     provider.directx_swapchain_ptr);
+            //     provider.directx_swapchain_ptr, _info_stream.rdbuf());
         } else {
-            data.renderer.emplace_new_directx12(data.window);
+            data.renderer.emplace_new_directx12(data.window, _info_stream.rdbuf());
         }
+		std::string _info = _info_stream.str();
+		std::cout << _info;
+#else
+		(void)data;
+		(void)provider;
 #endif
     }
 
     void setup_renderer_opengl(pipeline_data& data, const pipeline_bindings& provider)
     {
-#if !BUNGEEGUM_USE_OPENGL
-        throw backtraced_exception("");
-#else
+#if BUNGEEGUM_USE_OPENGL
+        std::stringstream _info_stream;
         if (provider.opengl_attach_to_existing) {
             // data.renderer.attach_opengl(data.window);
         } else {
-            data.renderer.emplace_new_opengl(data.window);
+            data.renderer.emplace_new_opengl(data.window, _info_stream.rdbuf());
         }
+        std::string _info = _info_stream.str();
+        std::cout << _info;
+#else
+		(void)data;
+		(void)provider;
 #endif
     }
 
     void setup_renderer_vulkan(pipeline_data& data, const pipeline_bindings& provider)
     {
-#if !BUNGEEGUM_USE_VULKAN
-        throw backtraced_exception("");
+#if BUNGEEGUM_USE_VULKAN
+        // std::stringstream _info_stream;
+        // if (provider.opengl_attach_to_existing) {
+        //     // data.renderer.attach_opengl(data.window);
+        // } else {
+        //     data.renderer.emplace_new_opengl(data.window, _info_stream.rdbuf());
+        // }
+        // std::string _info = _info_stream.str();
+        // std::cout << _info;
 #else
-        // todo
+		(void)data;
+		(void)provider;
 #endif
     }
 
@@ -325,7 +342,7 @@ namespace detail {
         // _overlay_depth.enable = true;
         // _overlay_depth.enable_write = false;
         // _mask_depth.function = Diligent::COMPARISON_FUNC_ALWAYS;
-        data.overlay_shader.emplace(data.overlay_context, shader_fragment_default(), {}, _overlay_depth);
+        data.overlay_shader.emplace(data.overlay_rasterizer, shader_fragment_default(), {}, _overlay_depth);
 #endif
     }
 
@@ -358,9 +375,9 @@ namespace detail {
         data.user_rasterizer.consume_emscripten_mouse_events(data.window.get_emscripten_mouse_events());
         data.user_rasterizer.consume_emscripten_wheel_events(data.window.get_emscripten_wheel_events());
 #if BUNGEEGUM_USE_OVERLAY
-        data.overlay_context->consume_emscripten_key_events(data.window.get_emscripten_key_events());
-        data.overlay_context->consume_emscripten_mouse_events(data.window.get_emscripten_mouse_events());
-        data.overlay_context->consume_emscripten_wheel_events(data.window.get_emscripten_wheel_events());
+        data.overlay_rasterizer.consume_emscripten_key_events(data.window.get_emscripten_key_events());
+        data.overlay_rasterizer.consume_emscripten_mouse_events(data.window.get_emscripten_mouse_events());
+        data.overlay_rasterizer.consume_emscripten_wheel_events(data.window.get_emscripten_wheel_events());
 #endif
         data.window.get_emscripten_key_events().clear();
         data.window.get_emscripten_mouse_events().clear();
@@ -368,7 +385,7 @@ namespace detail {
 #else
         data.user_rasterizer.consume_sdl_events(data.window.get_sdl_events());
 #if BUNGEEGUM_USE_OVERLAY
-        data.overlay_context.consume_sdl_events(data.window.get_sdl_events());
+        data.overlay_rasterizer.consume_sdl_events(data.window.get_sdl_events());
 #endif
         data.window.get_sdl_events().clear();
 #endif
@@ -399,11 +416,11 @@ namespace detail {
             data.user_rasterizer.render();
 
 #if BUNGEEGUM_USE_OVERLAY
-            data.overlay_context.new_frame();
-            data.overlay_context.use_projection_orthographic();
-            data.overlay_context.use_shader(data.overlay_shader);
+            data.overlay_rasterizer.new_frame();
+            data.overlay_rasterizer.use_projection_orthographic();
+            data.overlay_rasterizer.use_shader(data.overlay_shader);
             draw_overlay();
-            data.overlay_context.render();
+            data.overlay_rasterizer.render();
 #endif
 
             if (exclusive_rendering) {
@@ -416,8 +433,8 @@ namespace detail {
     void setup_pipeline(pipeline_data& data)
     {
 #if BUNGEEGUM_USE_OVERLAY
-        data.overlay_context.emplace(data.renderer);
-        detail::setup_overlay(data.overlay_context);
+        data.overlay_rasterizer.emplace(data.renderer);
+        detail::setup_overlay(data.overlay_rasterizer);
 #endif
         data.user_rasterizer.emplace(data.renderer);
 
@@ -432,7 +449,7 @@ namespace detail {
 template <>
 pipeline<renderer_backend::directx11>::pipeline(const pipeline_bindings& provider)
 {
-    static_assert(BUNGEEGUM_USE_DIRECTX, "AAAAAAAAA");
+    // static_assert(BUNGEEGUM_USE_DIRECTX, "AAAAAAAAA");
     _data.raw = detail::raw_cast(this);
     detail::setup_swapped_global_if_required();
     detail::setup_window(_data.window, provider);
@@ -443,7 +460,7 @@ pipeline<renderer_backend::directx11>::pipeline(const pipeline_bindings& provide
 template <>
 pipeline<renderer_backend::directx12>::pipeline(const pipeline_bindings& provider)
 {
-    static_assert(BUNGEEGUM_USE_DIRECTX, "AAAAAAAAA");
+    // static_assert(BUNGEEGUM_USE_DIRECTX, "AAAAAAAAA");
     _data.raw = detail::raw_cast(this);
     detail::setup_swapped_global_if_required();
     detail::setup_window(_data.window, provider);
@@ -465,7 +482,7 @@ pipeline<renderer_backend::opengl>::pipeline(const pipeline_bindings& provider)
 template <>
 pipeline<renderer_backend::vulkan>::pipeline(const pipeline_bindings& provider)
 {
-    static_assert(BUNGEEGUM_USE_VULKAN, "AAAAAAAAA");
+    // static_assert(BUNGEEGUM_USE_VULKAN, "AAAAAAAAA");
     _data.raw = detail::raw_cast(this);
     detail::setup_swapped_global_if_required();
     detail::setup_window(_data.window, provider);
@@ -576,9 +593,11 @@ template pipeline<renderer_backend::directx12>& pipeline<renderer_backend::direc
 template pipeline<renderer_backend::opengl>& pipeline<renderer_backend::opengl>::title(const std::string& description);
 template pipeline<renderer_backend::vulkan>& pipeline<renderer_backend::vulkan>::title(const std::string& description);
 
+#if BUNGEEGUM_USE_HOTSWAP
+
 std::vector<std::string>& get_hotswap_defines()
 {
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    // static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader.defines();
@@ -586,7 +605,7 @@ std::vector<std::string>& get_hotswap_defines()
 
 std::vector<std::filesystem::path>& get_hotswap_include_directories()
 {
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    // static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader.include_directories();
@@ -594,7 +613,7 @@ std::vector<std::filesystem::path>& get_hotswap_include_directories()
 
 std::vector<std::filesystem::path>& get_hotswap_source_directories()
 {
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    // static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader.source_directories();
@@ -602,7 +621,7 @@ std::vector<std::filesystem::path>& get_hotswap_source_directories()
 
 std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files()
 {
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    // static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader.force_compiled_source_files();
@@ -610,11 +629,12 @@ std::vector<std::filesystem::path>& get_hotswap_force_compiled_source_files()
 
 std::vector<std::filesystem::path>& get_hotswap_libraries()
 {
-    static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
+    // static_assert(BUNGEEGUM_USE_HOTSWAP, "AAAAAAAAAA");
     detail::setup_swapped_global_if_required();
     detail::swapped_manager_data& _swapped = detail::get_swapped_global();
     return _swapped.widgets.hotswap_reloader.libraries();
 }
 
+#endif
 
 }

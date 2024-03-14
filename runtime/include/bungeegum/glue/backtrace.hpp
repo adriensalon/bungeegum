@@ -69,10 +69,10 @@ namespace detail {
         std::vector<backtraced_step> tracing;
 
     private:
-        const std::string _tag;
-        const std::string _what;
+        std::string _tag;
+        std::string _what;
 #if BUNGEEGUM_USE_OVERLAY
-        const std::string _key;
+        std::string _key;
 #endif
     };
 

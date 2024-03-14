@@ -60,7 +60,7 @@ namespace detail {
         }
         chronometer_task<unit_t>& _task = _tasks.at(_task_names.at(name));
         if (_task._is_running) {
-            throw backtraced_exception("This chronometer task has already been started with the "
+            throw backtraced_exception("glue/time", "This chronometer task has already been started with the "
                                        "begin_task() method. Please use the end_task() method "
                                        "before starting it again.");
         }
@@ -73,7 +73,7 @@ namespace detail {
     {
         chronometer_task<unit_t>& _task = _tasks.at(_task_names.at(name));
         if (!_task._is_running) {
-            throw backtraced_exception("This chronometer task has already been ended with the "
+            throw backtraced_exception("glue/time", "This chronometer task has already been ended with the "
                                        "end_task() method. Please use the begin_task() method "
                                        "before ending it again.");
         }
