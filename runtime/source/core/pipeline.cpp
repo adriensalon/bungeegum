@@ -25,31 +25,6 @@ namespace detail {
     extern void draw_overlay();
 #endif
 
-    void protect_library(const std::function<void()>& try_callback)
-    {
-        protect(try_callback, [](const std::string& _what) {
-            log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", log_color::red);
-#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-
-#else
-                std::terminate();
-#endif
-        });
-    }
-
-    void protect_userspace(std::vector<log_data>& container, const std::function<void()>& try_callback)
-    {
-        protect(try_callback, [&container](const std::string& _what) {
-            // uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
-#if BUNGEEGUM_USE_OVERLAY
-            // container.push_back(_exception);
-#else
-                console_log_error(_exception);
-                (void)container;
-#endif
-        });
-    }
-
     void save_widgets(const std::filesystem::path& archive_path, widget_update_data& root_updatable)
     {
 #if BUNGEEGUM_USE_HOTSWAP
@@ -144,7 +119,7 @@ namespace detail {
 //                 _pipeline_manager.current.value().get().widgets_chronometer.begin_task(_updatable.clean_typename);
 // #endif
 
-                protect_userspace(_swapped.logs.userspace_errors, [&_updatable]() {
+                protect_dispatch([&_updatable]() {
                     resolve_command_data _data = { _updatable };
                     resolve_command _command = detail::resolve_command_access::make_from_data(_data);
                     _updatable.resolver(_command);
@@ -188,7 +163,7 @@ namespace detail {
                 //                         std::string _clean_typename = global().pipelines.to_clean_typename(_updatable.inplace_data.type().name());
                 //                         global().pipelines.profiler_draw_chronometer.begin_task(_clean_typename);
                 // #endif
-                protect_userspace(_swapped.logs.userspace_errors, [&_updatable, _raw_updatable, imgui_drawlist, _raw_pipeline]() {
+                protect_dispatch([&_updatable, _raw_updatable, imgui_drawlist, _raw_pipeline]() {
                     draw_command_data _data = { _raw_updatable, _raw_pipeline, imgui_drawlist };
                     draw_command _command = detail::draw_command_access::make_from_data(_data);
                     _updatable.drawer(_command);
@@ -530,12 +505,17 @@ void pipeline<backend_t>::run(const std::optional<unsigned int> frames_per_secon
         // throw
     }
     _data.window.update_loop(frames_per_second, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
-        detail::protect_library([this, &delta_time, force_rendering]() {
+        detail::protect_dispatch([this, &delta_time, force_rendering]() {
 
             // ICI SET LOOP RUN    
             detail::get_swapped_global().current = _data.raw;
             detail::get_swapped_global().default_shader = _data.default_shader;
             detail::get_swapped_global().mask_shader = _data.mask_shader;
+#if BUNGEEGUM_USE_OVERLAY
+            detail::get_swapped_global().errors = _data.errors;
+            detail::get_swapped_global().warnings = _data.warnings;
+            detail::get_swapped_global().messages = _data.messages;
+#endif
 
 
             detail::update_input_frame(_data);
@@ -557,12 +537,17 @@ pipeline<backend_t>& pipeline<backend_t>::run_once(const bool force_rendering)
         // throw
     }
     _data.window.update_once(9999u, [this, force_rendering](const BUNGEEGUM_USE_TIME_UNIT& delta_time) {
-        detail::protect_library([this, &delta_time, force_rendering]() {
+        detail::protect_dispatch([this, &delta_time, force_rendering]() {
             
             // ICI SET LOOP RUN    
             detail::get_swapped_global().current = _data.raw;
             detail::get_swapped_global().default_shader = _data.default_shader;
             detail::get_swapped_global().mask_shader = _data.mask_shader;
+#if BUNGEEGUM_USE_OVERLAY
+            detail::get_swapped_global().errors = _data.errors;
+            detail::get_swapped_global().warnings = _data.warnings;
+            detail::get_swapped_global().messages = _data.messages;
+#endif
 
             detail::update_input_frame(_data);
             float2 _viewport_size = _data.window.get_size();

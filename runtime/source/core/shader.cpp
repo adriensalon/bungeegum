@@ -42,8 +42,7 @@ namespace detail {
                 return Diligent::BLEND_FACTOR_INV_DEST_ALPHA;
             
             default:
-                throw backtraced_exception("[runtime/core/shader.cpp] invalid enum value"); 
-                // return Diligent::BLEND_FACTOR_ZERO;               
+                throw backtraced_exception("core/shader", "Impossible to convert to diligent blend factor.");       
             }
         }
 
@@ -67,8 +66,7 @@ namespace detail {
                 return Diligent::BLEND_OPERATION_MAX;
             
             default:
-                throw backtraced_exception("[runtime/core/shader.cpp] invalid enum value");
-                // return Diligent::BLEND_OPERATION_ADD;
+                throw backtraced_exception("core/shader", "Impossible to convert to diligent blend operation."); 
             }
         }
 

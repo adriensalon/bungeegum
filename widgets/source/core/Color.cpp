@@ -80,7 +80,7 @@ namespace widgets {
             backAlpha = static_cast<uint8_t>(_integerDivision(backAlpha * invAlpha, 0xff));
             int outAlpha = alpha + backAlpha;
             if (outAlpha == 0x00)
-                log_error("Error askip");
+                log_error("Color", "Error askip");
             return fromARGB(
                 outAlpha,
                 _integerDivision(foreground.red() * alpha + background.red() * backAlpha, outAlpha),
@@ -146,9 +146,9 @@ namespace widgets {
     Color Color::withOpacity(const float opacity)
     {
         if (opacity < 0.f)
-            log_error("Invalid opacity < 0.f");
+            log_error("Color", "Invalid opacity < 0.f");
         if (opacity > 1.f)
-            log_error("Invalid opacity > 1.f");
+            log_error("Color", "Invalid opacity > 1.f");
         return withAlpha(static_cast<uint32_t>(glm::round(255.f * opacity)));
     }
 

@@ -23,7 +23,6 @@ namespace detail {
         animations_manager_data animations = {};
         events_manager_data events = {};
         fonts_manager_data fonts = {};
-        logs_manager_data logs = {};
         textures_manager_data textures = {};
         widget_manager_data widgets = {};
 
@@ -31,6 +30,11 @@ namespace detail {
         std::unordered_map<std::uintptr_t, std::reference_wrapper<rasterizer_handle>> rasterizers = {};
         std::optional<std::reference_wrapper<shader_handle>> default_shader = std::nullopt;
         std::optional<std::reference_wrapper<shader_handle>> mask_shader = std::nullopt;
+#if BUNGEEGUM_USE_OVERLAY
+        std::optional<std::reference_wrapper<log_data_map>> errors = {};
+        std::optional<std::reference_wrapper<log_data_map>> warnings = {};
+        std::optional<std::reference_wrapper<log_data_map>> messages = {}; 
+#endif
     };
 
     void setup_swapped_global_if_required();

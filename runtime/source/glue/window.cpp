@@ -191,7 +191,7 @@ namespace detail {
             std::string _error_message = SDL_GetError();
             SDL_ClearError();
             if (!_error_message.empty()) {
-                throw backtraced_exception(_error_message);
+                throw backtraced_exception("glue/window", _error_message);
             }
         }
 

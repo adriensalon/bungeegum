@@ -134,10 +134,10 @@ namespace widgets {
         float _width = size.width();
         float _height = size.height();
         if (_width <= 0.f) {
-            log_error("Error TODO");
+            log_error("BoxConstraints", "Impossible to constrain size and attempt to preserve aspect ratio because of illegal width <= 0.f.");
         }
         if (_height <= 0.f) {
-            log_error("Error TODO");
+            log_error("BoxConstraints", "Impossible to constrain size and attempt to preserve aspect ratio because of illegal height <= 0.f.");
         }
         float _aspectRatio = _width / _height;
         if (_width > _maxSize.x) {

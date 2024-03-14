@@ -104,7 +104,7 @@ namespace detail {
         unsigned short* ranges)
     {
         if (!rasterizer.has_value()) {
-            throw backtraced_exception { "[rendering] Impossible to create font because rasterizer has no value" };
+            throw backtraced_exception("glue/rendering", "Impossible to create font because rasterizer has no value.");
         }
         reset();
 
@@ -148,7 +148,7 @@ namespace detail {
         unsigned short* ranges)
     {
         if (!rasterizer.has_value()) {
-            throw backtraced_exception { "[rendering] Impossible to create font because rasterizer has no value" };
+            throw backtraced_exception("glue/rendering", "Impossible to create font because rasterizer has no value.");
         }
         reset();
 
@@ -208,16 +208,15 @@ namespace detail {
         const std::filesystem::path filename)
     {
         if (!rasterizer.has_value()) {
-            throw backtraced_exception { "[rendering exception] impossible to create texture because rasterizer has no value" };
+            throw backtraced_exception("glue/rendering", "Impossible to create texture because rasterizer has no value.");
         }
         reset();
-
         std::string _spath = filename.generic_string();
         const char* _cpath = _spath.c_str();
         int _width, _height, _channels;
         unsigned char* _data = stbi_load(_cpath, &_width, &_height, &_channels, 4);
         if (_channels < 3 || _channels > 4) {
-            throw backtraced_exception("invalid channels");
+            throw backtraced_exception("glue/rendering", "Impossible to create texture because channels count is invalid (expecting 3 or 4).");
         }
         std::vector<unsigned char> _pixels(_data, _data + 4 * _width * _height);
         stbi_image_free(_data);
@@ -244,7 +243,7 @@ namespace detail {
         const std::size_t height)
     {
         if (!rasterizer.has_value()) {
-            throw backtraced_exception { "[rendering exception] impossible to create texture because rasterizer has no value" };
+            throw backtraced_exception("glue/rendering", "Impossible to create texture because rasterizer has no value.");
         }
         reset();
         Diligent::TextureDesc _texture_desc;
@@ -292,7 +291,7 @@ namespace detail {
         const shader_stencil_descriptor& stencil)
     {
         if (!rasterizer.has_value()) {
-            throw backtraced_exception { "[rendering exception] impossible to create shader because rasterizer has no value" };
+            throw backtraced_exception("glue/rendering", "Impossible to create shader because rasterizer has no value.");
         }
         reset();
 
@@ -393,7 +392,7 @@ namespace detail {
     void shader_handle::emplace(void* data)
     {
         if (!data) {
-            throw backtraced_exception { "[rendering exception] impossible to create shader because rasterizer data is nullptr" };
+            throw backtraced_exception("glue/rendering", "Impossible to create shader because void data is nullptr.");
         }
         reset();
         _diligent_pipeline_state = reinterpret_cast<Diligent::IPipelineState*>(data);

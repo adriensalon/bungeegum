@@ -2,24 +2,28 @@
 
 #include <bungeegum/glue/backtrace.hpp>
 
+#include <unordered_map>
+
 namespace bungeegum { 
 namespace detail {
 
 
     struct log_data {
+        log_data() = default;
+        log_data(const log_data& other) = delete;
+        log_data& operator=(const log_data& other) = delete;
+        log_data(log_data&& other) = default;
+        log_data& operator=(log_data&& other) = default;
+
+        log_data(backtraced_exception&& caught_exception);
+
+        backtraced_exception exception;
         std::size_t count = 0u;
-        std::string tag = "bungeegum";
-        std::string what = {};
-        std::string widget = {};
-        std::vector<backtraced_step> steps = {};
     };
 
+    using log_data_map = std::unordered_map<std::string, log_data>;
 
-    struct logs_manager_data {        
-        std::vector<log_data> userspace_errors = {};
-        std::vector<log_data> userspace_warnings = {};
-        std::vector<log_data> userspace_messages = {}; 
-    };
+    void protect_dispatch(const std::function<void()>& try_callback);
 
 }
 }

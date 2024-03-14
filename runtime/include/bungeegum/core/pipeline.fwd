@@ -49,6 +49,9 @@ namespace detail {
 #if BUNGEEGUM_USE_OVERLAY
         rasterizer_handle overlay_context = {};
         shader_handle overlay_shader = {};
+        log_data_map errors = {};
+        log_data_map warnings = {};
+        log_data_map messages = {}; 
         frames_chronometer widgets_chronometer = {};
         std::string renderer_info = {};
         BUNGEEGUM_USE_TIME_UNIT lifetime_duration = {};

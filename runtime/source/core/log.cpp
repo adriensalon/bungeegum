@@ -8,7 +8,7 @@ namespace bungeegum {
 namespace detail {
     namespace {
 
-        void console_log_exception(const backtraced_exception& exception, const log_color color)
+        void dispatch_log(const backtraced_exception& exception, const log_color color)
         {
             log("\"" + std::string(exception.what()) + "\"", log_color::black_or_white);
             log(" occured", color);
@@ -30,176 +30,105 @@ namespace detail {
 #endif
         }
 
-        void console_log_error(const backtraced_exception& exception)
+        void dispatch_overlay(std::optional<std::reference_wrapper<log_data_map>>& map, backtraced_exception&& exception)
         {
+#if BUNGEEGUM_USE_OVERLAY
+            if (map.has_value()) {
+                log_data_map& _map = map.value().get();
+                std::string _key = exception.key();
+                if (_map.find(_key) != _map.end()) {
+                    log_data& _log = _map.at(_key);
+                    if (_log.count < 1000) { // harcoded go config
+                        _map.at(_key).count++;
+                    }
+                } else {
+                    _map.insert({ _key, std::move(exception) });
+                }
+            }
+#endif
+        }
+
+        void dispatch_error(backtraced_exception&& exception)
+        {
+            swapped_manager_data& _swapped = get_swapped_global();
             log("Error ", log_color::red);
-            console_log_exception(exception, log_color::red);
+            dispatch_log(exception, log_color::red);
+            dispatch_overlay(_swapped.errors, std::move(exception));
         }
 
-        void console_log_warning(const backtraced_exception& exception)
+        void dispatch_warning(backtraced_exception&& exception)
         {
+            swapped_manager_data& _swapped = get_swapped_global();
             log("Warning ", log_color::yellow);
-            console_log_exception(exception, log_color::yellow);
+            dispatch_log(exception, log_color::yellow);
+            dispatch_overlay(_swapped.warnings, std::move(exception));
         }
 
-        void console_log_message(const backtraced_exception& exception)
+        void dispatch_message(backtraced_exception&& exception)
         {
+            swapped_manager_data& _swapped = get_swapped_global();
             log("Message ", log_color::blue);
-            console_log_exception(exception, log_color::blue);
+            dispatch_log(exception, log_color::blue);
+            dispatch_overlay(_swapped.messages, std::move(exception));
         }
 
     }
+    
+    log_data::log_data(backtraced_exception&& caught_exception)
+        : exception(std::move(caught_exception))
+        , count(1u)
+    {
+    }
 
-    //     void protect_library(const std::function<void()>& try_callback)
-    //     {
-    // 		protect(try_callback, [] (const std::string& _what) {
-    //        	 	log("GALERE C UNE ERREUR DANS MON CODE qui nest pas backtracee", log_color::red);
-    // #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
-
-    // #else
-    // 			std::terminate();
-    // #endif
-    // 		});
-    //     }
-
-    //     void protect_userspace(std::vector<backtraced_exception>& container, const std::function<void()>& try_callback)
-    //     {
-    // 		protect(try_callback, [&container] (const std::string& _what) {
-    // 			// uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
-    // 			backtraced_exception _exception(_what, 0, 0);
-    // #if BUNGEEGUM_USE_OVERLAY
-    //             container.push_back(_exception);
-    // #else
-    //             console_log_error(_exception);
-    //             (void)container;
-    // #endif
-    // 		});
-    //     }
+    void protect_dispatch(const std::function<void()>& try_callback)
+    {
+        protect(try_callback, [](backtraced_exception&& exception) {
+            dispatch_error(std::move(exception));
+        });
+    }
 }
 
-void log_error(const std::string& what, const bool must_throw)
+void log_error(const std::string& tag, const std::string& what, const bool must_throw)
 {
-    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    detail::backtraced_exception _exception(what, 1u);
-    if (_swapped.current == 0u) {
-        detail::console_log_error(_exception);
-    } else {
-#if BUNGEEGUM_USE_OVERLAY
-        _swapped.logs.userspace_errors.push_back(detail::log_data {
-            1u,
-            "tag",
-            _exception.what(),
-            "_swapped.widgets.current",
-            _exception.tracing });
-#else
-        detail::console_log_error(_exception);
-#endif
-    }
+    detail::backtraced_exception _exception(tag, what, 1u);
     if (must_throw) {
         throw _exception;
+    } else {
+        detail::dispatch_error(std::move(_exception));
     }
 }
 
-void log_error(const std::wstring& what, const bool must_throw)
+void log_error(const std::string& tag, const std::wstring& what, const bool must_throw)
 {
-    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    detail::backtraced_exception _exception(what, 1u);
-    if (_swapped.current == 0u) {
-        detail::console_log_error(_exception);
-    } else {
-#if BUNGEEGUM_USE_OVERLAY
-        _swapped.logs.userspace_errors.push_back(detail::log_data {
-            1u,
-            "tag",
-            _exception.what(),
-            "_swapped.widgets.current",
-            _exception.tracing });
-#else
-        detail::console_log_error(_exception);
-#endif
-    }
+    detail::backtraced_exception _exception(tag, what, 1u);
     if (must_throw) {
         throw _exception;
+    } else {
+        detail::dispatch_error(std::move(_exception));
     }
 }
 
-void log_warning(const std::string& what)
+void log_warning(const std::string& tag, const std::string& what)
 {
-    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    detail::backtraced_exception _exception(what, 1u);
-    if (_swapped.current == 0u) {
-        detail::console_log_warning(_exception);
-    } else {
-#if BUNGEEGUM_USE_OVERLAY
-        _swapped.logs.userspace_warnings.push_back(detail::log_data {
-            1u,
-            "tag",
-            _exception.what(),
-            "_swapped.widgets.current",
-            _exception.tracing });
-#else
-        detail::console_log_warning(_exception);
-#endif
-    }
+    detail::backtraced_exception _exception(tag, what, 1u);
+    detail::dispatch_warning(std::move(_exception));
 }
 
-void log_warning(const std::wstring& what)
+void log_warning(const std::string& tag, const std::wstring& what)
 {
-    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    detail::backtraced_exception _exception(what, 1u);
-    if (_swapped.current == 0u) {
-        detail::console_log_warning(_exception);
-    } else {
-#if BUNGEEGUM_USE_OVERLAY
-        _swapped.logs.userspace_warnings.push_back(detail::log_data {
-            1u,
-            "tag",
-            _exception.what(),
-            "_swapped.widgets.current",
-            _exception.tracing });
-#else
-        detail::console_log_warning(_exception);
-#endif
-    }
+    detail::backtraced_exception _exception(tag, what, 1u);
+    detail::dispatch_warning(std::move(_exception));
 }
 
-void log_message(const std::string& what)
+void log_message(const std::string& tag, const std::string& what)
 {
-    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    detail::backtraced_exception _exception(what, 1u);
-    if (_swapped.current == 0u) {
-        detail::console_log_message(_exception);
-    } else {
-#if BUNGEEGUM_USE_OVERLAY
-        _swapped.logs.userspace_messages.push_back(detail::log_data {
-            1u,
-            "tag",
-            _exception.what(),
-            "_swapped.widgets.current",
-            _exception.tracing });
-#else
-        detail::console_log_message(_exception);
-#endif
-    }
+    detail::backtraced_exception _exception(tag, what, 1u);
+    detail::dispatch_message(std::move(_exception));
 }
 
-void log_message(const std::wstring& what)
+void log_message(const std::string& tag, const std::wstring& what)
 {
-    detail::swapped_manager_data& _swapped = detail::get_swapped_global();
-    detail::backtraced_exception _exception(what, 1u);
-    if (_swapped.current == 0u) {
-        detail::console_log_message(_exception);
-    } else {
-#if BUNGEEGUM_USE_OVERLAY
-        _swapped.logs.userspace_messages.push_back(detail::log_data {
-            1u,
-            "tag",
-            _exception.what(),
-            "_swapped.widgets.current",
-            _exception.tracing });
-#else
-        detail::console_log_message(_exception);
-#endif
-    }
+    detail::backtraced_exception _exception(tag, what, 1u);
+    detail::dispatch_message(std::move(_exception));
 }
 }

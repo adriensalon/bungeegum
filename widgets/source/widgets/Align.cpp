@@ -63,7 +63,7 @@ namespace widgets {
                 _alignChildWidget(command, _childWidget.value(), _childSize, _biggest, _alignment);
             }
         } else if (!_childWidget.has_value()) {
-            log_error("Error TODO");
+            log_error("Align", "Error TODO");
         } else {
             // je pense qu'il faut avoir le parent de la taille biggest
             // et ajuster plutot la taille du child avec les if else

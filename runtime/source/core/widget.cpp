@@ -7,19 +7,19 @@
 namespace bungeegum {
 namespace detail {
     namespace {
-        void protect_userspace(std::vector<backtraced_exception>& container, const std::function<void()>& try_callback)
-        {
-            protect(try_callback, [&container](const std::string& _what) {
-                // uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
-                backtraced_exception _exception(_what, 0, 0);
-#if BUNGEEGUM_USE_OVERLAY
-                container.push_back(_exception);
-#else
-                    console_log_error(_exception);
-                    (void)container;
-#endif
-            });
-        }
+//         void protect_userspace(std::vector<backtraced_exception>& container, const std::function<void()>& try_callback)
+//         {
+//             protect(try_callback, [&container](const std::string& _what) {
+//                 // uncaught error in widget ... with message ... Please use the log_error() function to detect misconfiguration etc
+//                 backtraced_exception _exception(_what, 0, 0);
+// #if BUNGEEGUM_USE_OVERLAY
+//                 container.push_back(_exception);
+// #else
+//                     console_log_error(_exception);
+//                     (void)container;
+// #endif
+//             });
+//         }
     }
 
     widget_id widget_id_access::make_from_data(const std::uintptr_t& data)

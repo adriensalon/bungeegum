@@ -9,54 +9,22 @@
 #include <bungeegum/glue/theme.hpp>
 #include <bungeegum/glue/string.hpp>
 
-#define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGE_LENGTH 300u
-#define BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGES 999u
-
 namespace bungeegum {
 namespace detail {
 
     namespace {
-        using backtraced_results = std::vector<backtraced_step>;
-        using counted_backtraced_results = std::pair<std::size_t, backtraced_results>;
 
-        static std::unordered_map<std::string, counted_backtraced_results> error_logs = {};
-        static std::unordered_map<std::string, counted_backtraced_results> warning_logs = {};
-        static std::unordered_map<std::string, counted_backtraced_results> message_logs = {};
-
-        static std::string filter_text = "";
         static bool filter_enabled = true;
-
+        static std::string filter_text = "";
+        
         std::string tag(const std::string& name)
         {
-            return "###__bungeegum_overlay_logger_" + name + "__";
+            return "###__bungeegum_overlay_output_" + name + "__";
         }
 
-        std::string truncate_to_key(
-            const std::string str,
-            const std::size_t max_length = BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGE_LENGTH)
+        void draw_map(const std::string& name, log_data_map& map)
         {
-            return str.substr(0, std::max(str.length(), max_length));
-        }
-
-        void transfer_to_map(
-            std::vector<log_data>& from,
-            std::unordered_map<std::string, counted_backtraced_results>& to,
-            const std::size_t max_count = BUNGEEGUM_USE_OVERLAY_LOGGER_MAX_MESSAGES)
-        {
-            // for (backtraced_exception& _exception : from) {
-            //     std::string _key = truncate_to_key(_exception.what());
-            //     if (to.find(_key) == to.end()) {
-            //         to.emplace(_key, std::make_pair<std::size_t, backtraced_results>(1u, std::move(_exception.tracing)));
-            //     } else if (to.at(_key).first < max_count) {
-            //         to.at(_key).first++;
-            //     }
-            // }
-            from.clear();
-        }
-
-        void draw_map(const std::string& name, const std::size_t count, std::unordered_map<std::string, counted_backtraced_results>& map)
-        {
-            std::string _title = name + " (" + std::to_string(count) + ")" + tag(name + "_tab");
+            std::string _title = name + " (" + std::to_string(map.size()) + ")";
             if (ImGui::BeginTabItem(_title.c_str())) {
 
                 static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize;
@@ -67,11 +35,11 @@ namespace detail {
 
                 if (ImGui::BeginTable(tag(name + "_table").c_str(), 5, flags, outer_size)) {
 
-                    for (std::pair<const std::string, counted_backtraced_results>& _log : map) {
-                        const std::string& _log_description = _log.first;
+                    for (std::pair<const std::string, log_data>& _log : map) {
+                        const std::string& _log_description = _log.second.exception.what();
                         if (!filter_enabled || (contains(_log_description, filter_text))) {
-                            std::size_t& _log_count = _log.second.first;
-                            const std::vector<backtraced_step>& _results = _log.second.second;
+                            std::size_t& _log_count = _log.second.count;
+                            const std::vector<backtraced_step>& _results = _log.second.exception.tracing;
 
                             ImGui::TableNextRow();
                             ImGui::TableSetColumnIndex(0);
@@ -118,9 +86,10 @@ namespace detail {
 
             ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
             if (ImGui::BeginTabBar(tag("tab_bar").c_str(), tab_bar_flags)) {
-                draw_map("errors", error_logs.size(), error_logs);
-                draw_map("warnings", warning_logs.size(), warning_logs);
-                draw_map("messages", message_logs.size(), message_logs);
+                swapped_manager_data& _swapped = get_swapped_global();
+                draw_map("errors", _swapped.errors.value().get());
+                draw_map("warnings", _swapped.warnings.value().get());
+                draw_map("messages", _swapped.messages.value().get());
             }
             ImGui::EndTabBar();
 
@@ -135,9 +104,9 @@ namespace detail {
         }
         ImGui::End();
 
-        transfer_to_map(get_swapped_global().logs.userspace_errors, error_logs);
-        transfer_to_map(get_swapped_global().logs.userspace_warnings, warning_logs);
-        transfer_to_map(get_swapped_global().logs.userspace_messages, message_logs);
+        // transfer_to_map(get_swapped_global().errors, error_logs);
+        // transfer_to_map(get_swapped_global().warnings, warning_logs);
+        // transfer_to_map(get_swapped_global().messages, message_logs);
     }
 }
 }
