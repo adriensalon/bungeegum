@@ -81,7 +81,7 @@ namespace detail {
 	/// @param catch_callback 
 	void protect(
 		const std::function<void()>& try_callback,
-		const std::function<void(backtraced_exception&&)>& catch_callback = nullptr);
+		const std::function<void(backtraced_exception&&)>& catch_callback = nullptr) noexcept;
 
 }
 }
