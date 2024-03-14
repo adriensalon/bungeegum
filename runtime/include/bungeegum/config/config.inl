@@ -21,7 +21,7 @@
 /// log_warning() or log_message(). Traces containing function names, files and lines will be added
 /// to the console output or to the log window of the overlay. Backtrace is only available on non 
 /// Emscripten platforms for debug builds.
-#define BUNGEEGUM_USE_BACKTRACE (BUNGEEGUM_ENABLE_BACKTRACE && TOOLCHAIN_BUILD_DEBUG)
+#define BUNGEEGUM_USE_BACKTRACE (BUNGEEGUM_ENABLE_BACKTRACE && TOOLCHAIN_BUILD_DEBUG && (TOOLCHAIN_PLATFORM_DESKTOP || TOOLCHAIN_PLATFORM_EMSCRIPTEN))
 
 // hotswap is only available on desktop platforms
 #define BUNGEEGUM_USE_HOTSWAP (BUNGEEGUM_ENABLE_HOTSWAP && TOOLCHAIN_PLATFORM_DESKTOP)

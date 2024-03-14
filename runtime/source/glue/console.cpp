@@ -18,7 +18,7 @@ namespace detail {
         void console_print(const string_t& message, const log_color color)
         {
             static_assert(std::is_same_v<string_t, std::string> || std::is_same_v<string_t, std::wstring>, "String type must be one of : std::string, std::wstring.");
-#if (TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP)
+#if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
             HANDLE _handle = GetStdHandle(STD_OUTPUT_HANDLE);
             int _color = 7;
             if (color == log_color::blue)
@@ -34,7 +34,7 @@ namespace detail {
             else if (color == log_color::yellow)
                 _color = 6;
             SetConsoleTextAttribute(_handle, static_cast<WORD>(_color));
-#elif TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_MACOS
+#elif TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_EMSCRIPTEN
             std::string _color = "\033[0m";
             if (color == log_color::blue)
                 _color = "\033[0;34m";
@@ -57,7 +57,7 @@ namespace detail {
             }
 #if TOOLCHAIN_PLATFORM_WIN32 || TOOLCHAIN_PLATFORM_UWP
             SetConsoleTextAttribute(_handle, 7);
-#elif TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_MACOS
+#elif TOOLCHAIN_PLATFORM_LINUX || TOOLCHAIN_PLATFORM_MACOS || TOOLCHAIN_PLATFORM_EMSCRIPTEN
             std::cout << "\033[0m";
 #endif
         }

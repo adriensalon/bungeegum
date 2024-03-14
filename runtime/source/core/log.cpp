@@ -38,7 +38,7 @@ namespace detail {
                 std::string _key = exception.key();
                 if (_map.find(_key) != _map.end()) {
                     log_data& _log = _map.at(_key);
-                    if (_log.count < 1000) { // harcoded go config
+                    if (_log.count < 999) { // harcoded go config
                         _map.at(_key).count++;
                     }
                 } else {
