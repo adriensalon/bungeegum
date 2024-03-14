@@ -10,7 +10,8 @@
 #endif
 #endif
 
-#if (BUNGEEGUM_USE_BACKTRACE && TOOLCHAIN_PLATFORM_EMSCRIPTEN)
+#if BUNGEEGUM_USE_BACKTRACE && TOOLCHAIN_PLATFORM_EMSCRIPTEN
+
 extern "C" {
 void EMSCRIPTEN_KEEPALIVE bungegum_emscripten_try_from_js(int try_cpp_function)
 {
@@ -20,11 +21,14 @@ void EMSCRIPTEN_KEEPALIVE bungegum_emscripten_try_from_js(int try_cpp_function)
 
 void EMSCRIPTEN_KEEPALIVE bungegum_emscripten_catch_from_js(int catch_cpp_function, const char* what)
 {
-    const std::function<void(const std::string&)>& _catch_cpp_function = *(const std::function<void(const std::string&)>*)(catch_cpp_function);
-    std::string _what(what);
+    const std::function<void(bungeegum::detail::backtraced_exception&&)>& _catch_cpp_function = *(const std::function<void(bungeegum::detail::backtraced_exception&&)>*)(catch_cpp_function);
+    std::string _what_full(what);
+    
+    bungeegum::detail::backtraced_exception _exception("extracted_tag", _what_full, 0, 0)
     _catch_cpp_function(_what);
 }
 }
+
 #endif
 
 namespace bungeegum {
@@ -52,6 +56,8 @@ namespace detail {
             }
         });
 
+        void catch_cpp_wrapper(const std::string&const std::function<void(bungeegum::detail::backtraced_exception&&)>& catch_cpp_function)
+
 #endif
 
         void emplace_traces(std::vector<backtraced_step>& tracing, const std::size_t tracing_offset, const std::size_t tracing_size)
@@ -60,12 +66,7 @@ namespace detail {
             (void)tracing;
             (void)tracing_offset;
             (void)tracing_size;
-#elif TOOLCHAIN_PLATFORM_EMSCRIPTEN
-            char* _cstack_trace = emscripten_get_stacktrace();
-            std::string _stack_trace(_cstack_trace);
-            free(_cstack_trace);
-            std::cout << "trace = " << _stack_trace << std::endl;
-#else
+#elif !TOOLCHAIN_PLATFORM_EMSCRIPTEN
             backward::StackTrace _stack_trace;
             backward::TraceResolver _trace_resolver;
             std::size_t _offset = 3u + tracing_offset; // Escape backwardcpp calls + optionnaly defined count
@@ -74,7 +75,7 @@ namespace detail {
             tracing.resize(tracing_size);
             for (std::size_t _i = 0; _i < tracing_size; _i++) {
                 backward::ResolvedTrace _trace = _trace_resolver.resolve(_stack_trace[_i + _offset]);
-                
+
                 tracing[_i].address = _trace.addr;
                 tracing[_i].file = _trace.source.filename;
                 tracing[_i].function = _trace.source.function;
@@ -84,30 +85,46 @@ namespace detail {
 #endif
         }
 
+        std::string get_key(const std::string& tag, const std::string& what)
+        {
+            return tag + what;
+        }
+
+        std::string get_what(const std::string& tag, const std::string& what, std::vector<backtraced_step>& tracing, const std::size_t tracing_offset, const std::size_t tracing_size)
+        {
+#if TOOLCHAIN_PLATFORM_EMSCRIPTEN
+            char* _cstack_trace = emscripten_get_stacktrace();
+            std::string _stack_trace(_cstack_trace);
+            free(_cstack_trace);
+            // std::cout << "trace = " << _stack_trace << std::endl;
+            return tag + "!" + what + "!" + _stack_trace;
+#else
+            emplace_traces(tracing, tracing_offset, tracing_size);
+            return what;
+#endif
+        }
+
     }
 
     backtraced_exception::backtraced_exception(const std::string& tag, const std::string& what, const std::size_t tracing_offset, const std::size_t tracing_size)
         : _tag(tag)
-        , _what(what)
-        , _key(_tag + _what)
+        , _what(get_what(tag, what, tracing, tracing_offset, tracing_size))
+        , _key(get_key(tag, what))
     {
-        emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
     backtraced_exception::backtraced_exception(const std::string& tag, const std::wstring& what, const std::size_t tracing_offset, const std::size_t tracing_size)
         : _tag(tag)
-        , _what(narrow(what))
-        , _key(_tag + _what)
+        , _what(get_what(tag, narrow(what), tracing, tracing_offset, tracing_size))
+        , _key(get_key(tag, narrow(what)))
     {
-        emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
     backtraced_exception::backtraced_exception(const std::string& tag, const std::exception& existing, const std::size_t tracing_offset, const std::size_t tracing_size)
         : _tag(tag)
-        , _what(existing.what())
-        , _key(_tag + _what)
+        , _what(get_what(tag, existing.what(), tracing, tracing_offset, tracing_size))
+        , _key(get_key(tag, existing.what()))
     {
-        emplace_traces(tracing, tracing_offset, tracing_size);
     }
 
     const char* backtraced_exception::tag() const noexcept
