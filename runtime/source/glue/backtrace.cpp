@@ -57,7 +57,6 @@ namespace detail {
         }
 
         std::string emscripten_get_tracing(
-            std::vector<backtraced_step>& tracing, 
             const std::size_t tracing_offset, 
             const std::size_t tracing_size)
         {
@@ -84,7 +83,7 @@ namespace detail {
         {
             backward::StackTrace _stack_trace;
             backward::TraceResolver _trace_resolver;
-            std::size_t _offset = 3u + tracing_offset; // Escape backwardcpp calls + optionnaly defined count
+            std::size_t _offset = 4u + tracing_offset; // Escape backwardcpp calls + optionnaly defined count
             _stack_trace.load_here(tracing_size + _offset);
             _trace_resolver.load_stacktrace(_stack_trace);
             tracing.resize(tracing_size); // plutot go stop on bungeegum:: boundary
@@ -217,7 +216,7 @@ namespace detail {
                 std::string _trace = emscripten_get_tracing(tracing_offset, tracing_size);
                 return tag + "!" + what + "!" + _trace;
             } else {
-                emscripten_emplace_tracing(tracing, js_tracing.value())
+                emscripten_emplace_tracing(tracing, js_tracing.value());
                 return what;
             }
 #elif BUNGEEGUM_USE_BACKTRACE && TOOLCHAIN_PLATFORM_DESKTOP
