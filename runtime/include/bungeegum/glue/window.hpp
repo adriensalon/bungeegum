@@ -186,12 +186,12 @@ namespace detail {
 
     private:
         bool _has_value = false;
-        // bool _is_running = false;
         float2 _display_size = { 0, 0 };
         stopwatch _loop_watch = {};
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
         std::optional<std::string> _canvas_id = std::nullopt;
 #else
+        bool _is_running = false;
         std::shared_ptr<std::vector<SDL_Event>> _sdl_events = nullptr;
         SDL_Window* _sdl_window = nullptr;
 #endif

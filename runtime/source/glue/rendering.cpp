@@ -141,7 +141,7 @@ namespace detail {
 // 		_has_value = true;
     }
 
-    void renderer_handle::emplace_new_opengl(window_handle& existing_window, std::streambuf* info)
+    void renderer_handle::emplace_new_opengl(window_handle& window, std::streambuf* info)
     {
 		reset();
         Diligent::SwapChainDesc _swap_chain_descriptor;
@@ -151,7 +151,7 @@ namespace detail {
         _engine_create_info.Window = Diligent::EmscriptenNativeWindow("#canvas");
 #else
         // _engine_create_info.GraphicsAPIVersion = Diligent::Version(3, 1); marche meme pas
-        _engine_create_info.Window = Diligent::NativeWindow(existing_window.get_native());
+        _engine_create_info.Window = Diligent::NativeWindow(window.get_native());
 #endif
 		{			
             redirect_guard _console_redirect(info);
@@ -163,7 +163,7 @@ namespace detail {
 				&_diligent_swap_chain);
 		}
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
-        sdl_window = existing_window->get_sdl();
+        _sdl_window = window.get_sdl();
 #endif
 		_has_value = true;
     }
