@@ -185,6 +185,31 @@ namespace detail {
             }
         }
 
+        std::string get_serialized_widget(const widget_update_data& update_data)
+        {
+            if (update_data.saver) {
+                std::stringstream _serialized_stream;
+                {
+                    swapped_save_guard _archiver(_serialized_stream);
+                    update_data.saver(_archiver);
+                }
+                return _serialized_stream.str();
+            } 
+            return {};
+        }
+
+        void set_serialized_widget(widget_update_data& update_data, const std::string& serialized)
+        {
+            if (update_data.loader) {
+                std::stringstream _serialized_stream;
+                _serialized_stream << serialized;
+                {
+                    swapped_load_guard _archiver(_serialized_stream);
+                    update_data.loader(_archiver);
+                }
+            } 
+        }
+
         void draw_inspected_widget_memory_tab(widget_update_data& update_data)
         {
             std::string _title = "memory" + tag("widget_memory_tab");
@@ -216,26 +241,24 @@ namespace detail {
                         _memory_editor.DrawContents(_void_ptr, _raw_size, _display_address);
                         ImGui::EndTabItem();
                     }
-                    // backend_manager& _backend_manager = get_swapped_global().backend;
-                    // std::optional<std::string> _serialized = _backend_manager.inspect_reloadable_widget(update_data);
-                    // static ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_CollapsingHeader;
-                    // if (_serialized.has_value()) {
-
-                    //     if (ImGui::BeginTabItem(("serialized" + tag("widget_memory_serialized_tab")).c_str())) {
-                    //         ImGui::Spacing();
-                    //         rapidjson::Document _document;
-                    //         _document.Parse(_serialized.value().c_str());
-                    //         rapidjson::Value& _root_value = _document.GetObject()["value0"];
-                    //         draw_json(_document, _root_value, "_root");
-                    //         rapidjson::StringBuffer _json_strbuf;
-                    //         _json_strbuf.Clear();
-                    //         rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
-                    //         _document.Accept(_json_writer);
-                    //         std::string _modified = _json_strbuf.GetString();
-                    //         _backend_manager.update_reloadable_widget(update_data, _modified);
-                    //         ImGui::EndTabItem();
-                    //     }
-                    // }
+                    std::string _serialized = get_serialized_widget(update_data);
+                    static ImGuiTreeNodeFlags _node_flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_CollapsingHeader;
+                    if (!_serialized.empty()) {
+                        if (ImGui::BeginTabItem(("serialized" + tag("widget_memory_serialized_tab")).c_str())) {
+                            ImGui::Spacing();
+                            rapidjson::Document _document;
+                            _document.Parse(_serialized.c_str());
+                            rapidjson::Value& _root_value = _document.GetObject()["value0"];
+                            draw_json(_document, _root_value, "_root");
+                            rapidjson::StringBuffer _json_strbuf;
+                            _json_strbuf.Clear();
+                            rapidjson::Writer<rapidjson::StringBuffer> _json_writer(_json_strbuf);
+                            _document.Accept(_json_writer);
+                            std::string _modified = _json_strbuf.GetString();
+                            set_serialized_widget(update_data, _modified);
+                            ImGui::EndTabItem();
+                        }
+                    }
                 }
                 ImGui::EndTabBar();
 

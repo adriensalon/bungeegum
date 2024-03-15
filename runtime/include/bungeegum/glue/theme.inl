@@ -52,12 +52,12 @@ namespace detail {
         value = static_cast<value_t>(_int_value);
     }
 
-    template <typename value_t>
-    void edit_field(const std::string& name, value_t& value)
-    {
-        (void)value;
-        ImGui::Text(name);
-    }
+    // template <typename value_t>
+    // void edit_field(const std::string& name, value_t& value)
+    // {
+    //     (void)value;
+    //     ImGui::Text(name);
+    // }
 
 }
 }

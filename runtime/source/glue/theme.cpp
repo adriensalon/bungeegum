@@ -146,6 +146,12 @@ namespace detail {
     }
 
     template <>
+    void edit_field<bool>(const std::string& name, bool& value)
+    {
+        ImGui::Checkbox(name.c_str(), &value);
+    }
+
+    template <>
     void edit_field<float>(const std::string& name, float& value)
     {
         ImGui::DragFloat(name.c_str(), &value);
