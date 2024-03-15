@@ -34,7 +34,7 @@ namespace detail {
                 if (contains(_line, "Diligent Engine: ")) {
                     std::size_t _index = _line.find("Info: ") + 6u;
                     std::string _shortened = _line.substr(_index, _line.length() - _index);
-                    backtraced_exception _exception("Rendering", _shortened);
+                    backtraced_exception _exception("Rendering", _shortened, 0u, 0u);
                     log_message(_exception);                        
                 }
             }
@@ -49,10 +49,10 @@ namespace detail {
     {
         std::vector<std::string> _lines = split(narrow(info), '\n');
         for (const std::string& _line : _lines) {
-                if (!_line.empty()) {
+            if (!_line.empty() && (_line.find(".") == _line.length() - 1)) {
                 std::size_t _index = _line.find(": ") + 2u;
                 std::string _shortened = _line.substr(_index, _line.length() - _index);
-                backtraced_exception _exception("Hotswap", _shortened);
+                backtraced_exception _exception("Hotswap", _shortened, 0u, 0u);
                 log_message(_exception);    
             }
         }

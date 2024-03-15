@@ -229,9 +229,10 @@ namespace detail {
 	
     void rasterizer_handle::emplace(renderer_handle& renderer)
     {
-        if (_has_value) {
-            reset();
+        if (!renderer.has_value()) {
+            throw backtraced_exception("Rendering", "Impossible to create rasterizer because renderer has no value.")
         }
+        reset();
 
         _diligent_render_device = renderer._diligent_render_device;
         _diligent_device_context = renderer._diligent_device_context;

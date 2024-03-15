@@ -15,7 +15,7 @@ namespace detail {
             if (!_line.empty()) {
                 std::size_t _index = _line.find(": ") + 2u;
                 std::string _shortened = _line.substr(_index, _line.length() - _index);
-                backtraced_exception _exception("Hotswap", _shortened);
+                backtraced_exception _exception("Hotswap", _shortened, 0u, 0u);
                 log_message(_exception);    
             }
         }
