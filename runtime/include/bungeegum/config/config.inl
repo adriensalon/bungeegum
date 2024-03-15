@@ -17,8 +17,8 @@
 
 // Features
 
-/// @brief This enables backtracing for errors, warnings and messages emitted with the log_error(), 
-/// log_warning() or log_message(). Traces containing function names, files and lines will be added
+/// @brief This enables backtracing for errors, warnings and messages emitted with the error(), 
+/// warning() or message(). Traces containing function names, files and lines will be added
 /// to the console output or to the log window of the overlay. Backtrace is only available on non 
 /// Emscripten platforms for debug builds.
 #define BUNGEEGUM_USE_BACKTRACE (BUNGEEGUM_ENABLE_BACKTRACE && TOOLCHAIN_BUILD_DEBUG && (TOOLCHAIN_PLATFORM_DESKTOP || TOOLCHAIN_PLATFORM_EMSCRIPTEN))

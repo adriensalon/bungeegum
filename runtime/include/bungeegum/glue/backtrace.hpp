@@ -43,14 +43,29 @@ namespace detail {
         backtraced_exception& operator=(backtraced_exception&& other) = default;
 
         /// @brief Creates an instance from an error message and the count of calls to backtrace.
-        backtraced_exception(const std::string& tag, const std::string& what, const std::size_t tracing_offset = 0u, const std::size_t tracing_size = BUNGEEGUM_USE_BACKTRACE_SIZE);
+        backtraced_exception(
+            const std::string& tag, 
+            const std::string& what, 
+            const std::size_t tracing_offset = 0u, 
+            const std::size_t tracing_size = BUNGEEGUM_USE_BACKTRACE_SIZE, 
+            const bool stop_at_library = true);
 
         /// @brief Creates an instance from an error message and the count of calls to backtrace.
-        backtraced_exception(const std::string& tag, const std::wstring& what, const std::size_t tracing_offset = 0u, const std::size_t tracing_size = BUNGEEGUM_USE_BACKTRACE_SIZE);
+        backtraced_exception(
+            const std::string& tag, 
+            const std::wstring& what, 
+            const std::size_t tracing_offset = 0u, 
+            const std::size_t tracing_size = BUNGEEGUM_USE_BACKTRACE_SIZE, 
+            const bool stop_at_library = true);
 
         /// @brief Creates an instance from an existing exception and the count of calls to
         /// backtrace.
-        backtraced_exception(const std::string& tag, const std::exception& existing, const std::size_t tracing_offset = 0u, const std::size_t tracing_size = BUNGEEGUM_USE_BACKTRACE_SIZE);
+        backtraced_exception(
+            const std::string& tag, 
+            const std::exception& existing, 
+            const std::size_t tracing_offset = 0u, 
+            const std::size_t tracing_size = BUNGEEGUM_USE_BACKTRACE_SIZE, 
+            const bool stop_at_library = true);
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
 
@@ -82,6 +97,18 @@ namespace detail {
         std::string _key;
 #endif
     };
+
+    /// @brief 
+    /// @param exception 
+    void log_error(const backtraced_exception& exception);
+
+    /// @brief 
+    /// @param exception 
+    void log_warning(const backtraced_exception& exception);
+
+    /// @brief 
+    /// @param exception 
+    void log_message(const backtraced_exception& exception);
 
 	/// @brief 
 	/// @param try_callback 

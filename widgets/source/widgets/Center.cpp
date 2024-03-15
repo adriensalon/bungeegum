@@ -53,7 +53,7 @@ namespace widgets {
                 _centerChildWidget(command, _childWidget.value(), _childSize, _biggest);
             }
         } else if (!_childWidget.has_value()) {
-            log_error("Center", "Error TODO");
+            error("Center", "Error TODO");
         } else {
             float2 _childSize = command.resolve_child(_childWidget.value(), zero<float2>, _biggest);
             float2 _alignSize = zero<float2>;

@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include <bungeegum/core/log.hpp>
 #include <bungeegum/core/global.fwd>
 #include <bungeegum/core/pipeline.hpp>
 #include <bungeegum/core/widget.hpp>
@@ -23,6 +24,40 @@ namespace detail {
 #if BUNGEEGUM_USE_OVERLAY
     extern void setup_overlay(rasterizer_handle& context);
     extern void draw_overlay();
+#endif
+
+    void log_diligent(const std::string& info)
+    {
+        if (!info.empty()) {
+            std::vector<std::string> _lines = split(info, '\n');
+            for (const std::string& _line : _lines) {
+                if (contains(_line, "Diligent Engine: ")) {
+                    std::size_t _index = _line.find("Info: ") + 6u;
+                    std::string _shortened = _line.substr(_index, _line.length() - _index);
+                    backtraced_exception _exception("Rendering", _shortened);
+                    log_message(_exception);                        
+                }
+            }
+        }
+        // std::cout << info;
+    }
+
+
+#if BUNGEEGUM_USE_HOTSWAP
+
+    void log_hscpp(const std::wstring& info)
+    {
+        std::vector<std::string> _lines = split(narrow(info), '\n');
+        for (const std::string& _line : _lines) {
+                if (!_line.empty()) {
+                std::size_t _index = _line.find(": ") + 2u;
+                std::string _shortened = _line.substr(_index, _line.length() - _index);
+                backtraced_exception _exception("Hotswap", _shortened);
+                log_message(_exception);    
+            }
+        }
+    }
+
 #endif
 
     void save_widgets(const std::filesystem::path& archive_path, widget_update_data& root_updatable)
@@ -260,8 +295,7 @@ namespace detail {
 		} else {
 			data.renderer.emplace_new_directx11(data.window, _info_stream.rdbuf());
 		}
-		std::string _info = _info_stream.str();
-		std::cout << _info;
+        log_diligent(_info_stream.str());
 #else
 		(void)data;
 		(void)provider;
@@ -279,8 +313,7 @@ namespace detail {
         } else {
             data.renderer.emplace_new_directx12(data.window, _info_stream.rdbuf());
         }
-		std::string _info = _info_stream.str();
-		std::cout << _info;
+        log_diligent(_info_stream.str());
 #else
 		(void)data;
 		(void)provider;
@@ -296,8 +329,7 @@ namespace detail {
         } else {
             data.renderer.emplace_new_opengl(data.window, _info_stream.rdbuf());
         }
-        std::string _info = _info_stream.str();
-        std::cout << _info;
+        log_diligent(_info_stream.str());
 #else
 		(void)data;
 		(void)provider;
@@ -313,8 +345,7 @@ namespace detail {
         // } else {
         //     data.renderer.emplace_new_opengl(data.window, _info_stream.rdbuf());
         // }
-        // std::string _info = _info_stream.str();
-        // std::cout << _info;
+        // log_diligent(_info_stream.str());
 #else
 		(void)data;
 		(void)provider;
@@ -350,12 +381,9 @@ namespace detail {
     {
 #if BUNGEEGUM_USE_HOTSWAP
         swapped_manager_data& _swapped = get_swapped_global();
-        std::wstringstream _update_stream;
-        swapper_state _reload_result = _swapped.widgets.hotswap_reloader.update(_update_stream.rdbuf());
-        std::string _update_str = narrow(_update_stream.str());
-        (void)_update_str;
-        std::cout << _update_str; // << std::endl;
-        // _global.pipelines.current.value().get().userspace_messages.push_back(std::move(_update_str));
+        std::wstringstream _info_stream;
+        swapper_state _reload_result = _swapped.widgets.hotswap_reloader.update(_info_stream.rdbuf());
+        log_hscpp(_info_stream.str());
         if (_reload_result == swapper_state::started_compiling) {
             save_widgets(serialize_path, root_updatable);
         } else if (_reload_result == swapper_state::performed_swap) {

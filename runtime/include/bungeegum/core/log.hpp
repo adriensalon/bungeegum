@@ -8,36 +8,36 @@ namespace bungeegum {
 /// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the error will be sent to the overlay, otherwise
 /// it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the error will
 /// include stack trace information.
-void log_error(const std::string& tag, const std::string& what, const bool must_throw = true);
+void error(const std::string& tag, const std::string& what, const bool must_throw = true);
 
 /// @brief Logs an error and exits userspace without crashing the program.
 /// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the error will be sent to the overlay, otherwise
 /// it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the error will
 /// include stack trace information.
-void log_error(const std::string& tag, const std::wstring& what, const bool must_throw = true);
+void error(const std::string& tag, const std::wstring& what, const bool must_throw = true);
 
 /// @brief Logs a warning and exits userspace without crashing the program.
 /// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the warning will be sent to the overlay,
 /// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
 /// warning will include stack trace information.
-void log_warning(const std::string& tag, const std::string& what);
+void warning(const std::string& tag, const std::string& what);
 
 /// @brief Logs a warning and exits userspace without crashing the program.
 /// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the warning will be sent to the overlay,
 /// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
 /// warning will include stack trace information.
-void log_warning(const std::string& tag, const std::wstring& what);
+void warning(const std::string& tag, const std::wstring& what);
 
 /// @brief Logs a message and exits userspace without crashing the program.
 /// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the message will be sent to the overlay,
 /// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
 /// message will include stack trace information.
-void log_message(const std::string& tag, const std::string& what);
+void message(const std::string& tag, const std::string& what);
 
 /// @brief Logs a message and exits userspace without crashing the program.
 /// @details If BUNGEEGUM_ENABLE_OVERLAY equals 1 the message will be sent to the overlay,
 /// otherwise it will be printed to the OS console. If BUNGEEGUM_ENABLE_BACKTRACE equals 1 the
 /// message will include stack trace information.
-void log_message(const std::string& tag, const std::wstring& what);
+void message(const std::string& tag, const std::wstring& what);
 
 }

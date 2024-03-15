@@ -27,22 +27,22 @@ namespace widgets {
 
 #if defined(__HOTRELOADING__)
         // std::cout << "oui" << std::endl;
-        // log_message("from hotreload");
+        // message("from hotreload");
 #endif
         // std::cout << bungeegum::detail::animations_manager::stat_test++ << std::endl;
         // std::cout << bungeegum::detail::global().animations.stat_test++ << std::endl;
 
         // auto gg = bungeegum::runtime_widget(this);
         // (void)gg;
-        // log_message("has parent = " + std::to_string(bungeegum::has_parent(this)));
+        // message("has parent = " + std::to_string(bungeegum::has_parent(this)));
         // std::cout << "ok n";
 
-        // log_message("hey this is a message");
+        // message("hey this is a message");
 
         // auto& pp = bungeegum::make<Padding>();
         // must_resolve(pp);
 
-        // log_message("is contextual = " + std::to_string(bungeegum::is_contextual<float>("myfloat")));
+        // message("is contextual = " + std::to_string(bungeegum::is_contextual<float>("myfloat")));
 
         // bungeegum::adopt(this, bungeegum::make<Padding>().padding(EdgeInsets::fromLTRB(0.f, 100.f, 0.f, 50.f)));
         // bungeegum::adopt(this, bungeegum::make<int>());

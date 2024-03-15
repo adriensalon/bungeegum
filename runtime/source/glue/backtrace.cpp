@@ -1,5 +1,6 @@
 #include <bungeegum/glue/backtrace.hpp>
 #include <bungeegum/glue/string.hpp>
+#include <bungeegum/glue/console.hpp>
 
 #if BUNGEEGUM_USE_BACKTRACE
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN
@@ -58,10 +59,11 @@ namespace detail {
 
         std::string emscripten_get_tracing(
             const std::size_t tracing_offset, 
-            const std::size_t tracing_size)
+            const std::size_t tracing_size,
+            const bool stop_at_library)
         {
             std::string _js_tracing = emscripten_get_stracktrace_str();
-            // todo
+            // todo clean stop and format
             return _js_tracing;
         }
 
@@ -69,7 +71,7 @@ namespace detail {
             std::vector<backtraced_step>& tracing, 
             const std::string& js_tracing)
         {
-            // todo
+            // todo just convert to vector<backtrace_step>
         }
         
 #endif
@@ -79,14 +81,15 @@ namespace detail {
         void desktop_emplace_tracing(
             std::vector<backtraced_step>& tracing, 
             const std::size_t tracing_offset, 
-            const std::size_t tracing_size)
+            const std::size_t tracing_size,
+            const bool stop_at_library)
         {
             backward::StackTrace _stack_trace;
             backward::TraceResolver _trace_resolver;
-            std::size_t _offset = 4u + tracing_offset; // Escape backwardcpp calls + optionnaly defined count
+            const std::size_t _offset = 4u + tracing_offset;
             _stack_trace.load_here(tracing_size + _offset);
             _trace_resolver.load_stacktrace(_stack_trace);
-            tracing.resize(tracing_size); // plutot go stop on bungeegum:: boundary
+            tracing.resize(tracing_size);
             for (std::size_t _i = 0; _i < tracing_size; _i++) {
                 backward::ResolvedTrace _trace = _trace_resolver.resolve(_stack_trace[_i + _offset]);
                 tracing[_i].address = _trace.addr;
@@ -94,6 +97,14 @@ namespace detail {
                 tracing[_i].function = _trace.source.function;
                 tracing[_i].line = _trace.source.line;
                 tracing[_i].column = _trace.source.col;
+                if (stop_at_library && contains(tracing[_i].function, "bungeegum::")) {
+                    // tracing.resize(_i);
+                    tracing.resize(_i + 1);
+                    break;
+                } else if (tracing[_i].function == "main") {
+                    tracing.resize(_i + 1u);
+                    break;
+                }
             }
         }
 
@@ -195,9 +206,6 @@ namespace detail {
 
 #endif
 
-
-
-
         std::string get_key(const std::string& tag, const std::string& what)
         {
             return tag + what;
@@ -209,11 +217,12 @@ namespace detail {
             std::vector<backtraced_step>& tracing, 
             const std::size_t tracing_offset, 
             const std::size_t tracing_size, 
+            const bool stop_at_library, 
             const std::optional<std::string>& js_tracing = std::nullopt)
         {
 #if BUNGEEGUM_USE_BACKTRACE && TOOLCHAIN_PLATFORM_EMSCRIPTEN
             if (!js_tracing.has_value()) {
-                std::string _trace = emscripten_get_tracing(tracing_offset, tracing_size);
+                std::string _trace = emscripten_get_tracing(tracing_offset, tracing_size, stop_at_library);
                 return tag + "!" + what + "!" + _trace;
             } else {
                 emscripten_emplace_tracing(tracing, js_tracing.value());
@@ -221,7 +230,7 @@ namespace detail {
             }
 #elif BUNGEEGUM_USE_BACKTRACE && TOOLCHAIN_PLATFORM_DESKTOP
             (void)js_tracing;
-            desktop_emplace_tracing(tracing, tracing_offset, tracing_size);
+            desktop_emplace_tracing(tracing, tracing_offset, tracing_size, stop_at_library);
             return what;
 #else 
             (void)tag;
@@ -232,26 +241,59 @@ namespace detail {
             return what;
 #endif
         }
+        
+        void log_exception(const backtraced_exception& exception, const log_color color, const std::string& label)
+        {
+            // heure ou elapsed time
+            log("[", log_color::black_or_white);
+            log(exception.tag(), log_color::black_or_white);
+            log("] ", log_color::black_or_white);
+            log(label, color);
+            if (!exception.tracing.empty()) {
+                std::string _trace_location = " at " + exception.tracing.front().file.filename().generic_string();
+                _trace_location += ", Ln " + std::to_string(exception.tracing.front().line);
+                // _trace_location += ", " + exception.tracing.front().function;
+                log(_trace_location, color);
+            }
+            log(": ", color);
+            log(exception.what(), log_color::black_or_white);
+            log("\n", log_color::black_or_white);
+        }
 
     }
-
-    backtraced_exception::backtraced_exception(const std::string& tag, const std::string& what, const std::size_t tracing_offset, const std::size_t tracing_size)
+        
+    backtraced_exception::backtraced_exception(
+        const std::string& tag, 
+        const std::string& what, 
+        const std::size_t tracing_offset, 
+        const std::size_t tracing_size, 
+        const bool stop_at_library)
         : _tag(tag)
-        , _what(get_what_and_emplace_tracing(tag, what, tracing, tracing_offset, tracing_size))
+        , _what(get_what_and_emplace_tracing(tag, what, tracing, tracing_offset, tracing_size, stop_at_library))
         , _key(get_key(tag, what))
     {
     }
 
-    backtraced_exception::backtraced_exception(const std::string& tag, const std::wstring& what, const std::size_t tracing_offset, const std::size_t tracing_size)
+    backtraced_exception::backtraced_exception(
+        const std::string& tag, 
+        const std::wstring& what, 
+        const std::size_t tracing_offset, 
+        const std::size_t tracing_size, 
+        const bool stop_at_library)
         : _tag(tag)
-        , _what(get_what_and_emplace_tracing(tag, narrow(what), tracing, tracing_offset, tracing_size))
+        , _what(get_what_and_emplace_tracing(tag, narrow(what), tracing, tracing_offset, tracing_size, stop_at_library))
         , _key(get_key(tag, narrow(what)))
     {
     }
 
-    backtraced_exception::backtraced_exception(const std::string& tag, const std::exception& existing, const std::size_t tracing_offset, const std::size_t tracing_size)
+    backtraced_exception::backtraced_exception(
+        const std::string& tag, 
+        const std::exception& existing, 
+        const std::size_t tracing_offset, 
+        const std::size_t tracing_size, 
+        const bool stop_at_library)
         : _tag(tag)
-        , _what(get_what_and_emplace_tracing(tag, existing.what(), tracing, tracing_offset, tracing_size))
+        , _what(get_what_and_emplace_tracing(tag, existing.what(), tracing, tracing_offset, tracing_size, stop_at_library))
         , _key(get_key(tag, existing.what()))
     {
     }
@@ -260,7 +302,7 @@ namespace detail {
 
     backtraced_exception::backtraced_exception(const std::string& tag, const std::string& what, const std::string& js_tracing)
         : _tag(tag)
-        , _what(get_what_and_emplace_tracing(tag, what, tracing, 0, 0, js_tracing))
+        , _what(get_what_and_emplace_tracing(tag, what, tracing, 0, 0, true, js_tracing))
         , _key(get_key(tag, what))
     {
     }
@@ -286,6 +328,21 @@ namespace detail {
 
 #endif
 
+    void log_error(const backtraced_exception& exception)
+    {
+        log_exception(exception, log_color::red, "Error");
+    }
+
+    void log_warning(const backtraced_exception& exception)
+    {
+        log_exception(exception, log_color::yellow, "Warning");
+    }
+
+    void log_message(const backtraced_exception& exception)
+    {
+        log_exception(exception, log_color::blue, "Message");
+    }
+
     void protect(
         const std::function<void()>& try_callback,
         const std::function<void(backtraced_exception&&)>& catch_callback)
@@ -301,7 +358,7 @@ namespace detail {
 #else
         native_protect(try_callback, catch_callback);
 #endif
-    }
+    }    
 
 }
 }

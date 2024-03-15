@@ -8,28 +8,6 @@ namespace bungeegum {
 namespace detail {
     namespace {
 
-        void dispatch_log(const backtraced_exception& exception, const log_color color)
-        {
-            log("\"" + std::string(exception.what()) + "\"", log_color::black_or_white);
-            log(" occured", color);
-#if BUNGEEGUM_USE_BACKTRACE
-            if (exception.tracing.empty()) {
-                log(". \n", color);
-            } else {
-                log(" with trace : \n", color);
-                for (const backtraced_step& _result : exception.tracing) {
-                    std::string _trace_location = "[" + _result.file.filename().generic_string();
-                    _trace_location += ", Ln " + std::to_string(_result.line);
-                    _trace_location += ", Col " + std::to_string(_result.column) + "] ";
-                    log(_trace_location, log_color::black_or_white);
-                    log(_result.function + "\n", log_color::black_or_white);
-                }
-            }
-#else
-            log(". \n", color);
-#endif
-        }
-
         void dispatch_overlay(std::optional<std::reference_wrapper<log_data_map>>& map, backtraced_exception&& exception)
         {
 #if BUNGEEGUM_USE_OVERLAY
@@ -38,7 +16,7 @@ namespace detail {
                 std::string _key = exception.key();
                 if (_map.find(_key) != _map.end()) {
                     log_data& _log = _map.at(_key);
-                    if (_log.count < 999) { // harcoded go config
+                    if (_log.count < SIZE_MAX - 1) {
                         _map.at(_key).count++;
                     }
                 } else {
@@ -51,24 +29,21 @@ namespace detail {
         void dispatch_error(backtraced_exception&& exception)
         {
             swapped_manager_data& _swapped = get_swapped_global();
-            log("Error ", log_color::red);
-            dispatch_log(exception, log_color::red);
+            log_error(exception);
             dispatch_overlay(_swapped.errors, std::move(exception));
         }
 
         void dispatch_warning(backtraced_exception&& exception)
         {
             swapped_manager_data& _swapped = get_swapped_global();
-            log("Warning ", log_color::yellow);
-            dispatch_log(exception, log_color::yellow);
+            log_warning(exception);
             dispatch_overlay(_swapped.warnings, std::move(exception));
         }
 
         void dispatch_message(backtraced_exception&& exception)
         {
             swapped_manager_data& _swapped = get_swapped_global();
-            log("Message ", log_color::blue);
-            dispatch_log(exception, log_color::blue);
+            log_message(exception);
             dispatch_overlay(_swapped.messages, std::move(exception));
         }
 
@@ -88,7 +63,7 @@ namespace detail {
     }
 }
 
-void log_error(const std::string& tag, const std::string& what, const bool must_throw)
+void error(const std::string& tag, const std::string& what, const bool must_throw)
 {
     detail::backtraced_exception _exception(tag, what, 1u);
     if (must_throw) {
@@ -98,7 +73,7 @@ void log_error(const std::string& tag, const std::string& what, const bool must_
     }
 }
 
-void log_error(const std::string& tag, const std::wstring& what, const bool must_throw)
+void error(const std::string& tag, const std::wstring& what, const bool must_throw)
 {
     detail::backtraced_exception _exception(tag, what, 1u);
     if (must_throw) {
@@ -108,25 +83,25 @@ void log_error(const std::string& tag, const std::wstring& what, const bool must
     }
 }
 
-void log_warning(const std::string& tag, const std::string& what)
+void warning(const std::string& tag, const std::string& what)
 {
     detail::backtraced_exception _exception(tag, what, 1u);
     detail::dispatch_warning(std::move(_exception));
 }
 
-void log_warning(const std::string& tag, const std::wstring& what)
+void warning(const std::string& tag, const std::wstring& what)
 {
     detail::backtraced_exception _exception(tag, what, 1u);
     detail::dispatch_warning(std::move(_exception));
 }
 
-void log_message(const std::string& tag, const std::string& what)
+void message(const std::string& tag, const std::string& what)
 {
     detail::backtraced_exception _exception(tag, what, 1u);
     detail::dispatch_message(std::move(_exception));
 }
 
-void log_message(const std::string& tag, const std::wstring& what)
+void message(const std::string& tag, const std::wstring& what)
 {
     detail::backtraced_exception _exception(tag, what, 1u);
     detail::dispatch_message(std::move(_exception));
