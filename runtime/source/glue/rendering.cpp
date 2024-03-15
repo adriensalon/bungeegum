@@ -230,7 +230,7 @@ namespace detail {
     void rasterizer_handle::emplace(renderer_handle& renderer)
     {
         if (!renderer.has_value()) {
-            throw backtraced_exception("Rendering", "Impossible to create rasterizer because renderer has no value.")
+            throw backtraced_exception("Rendering", "Impossible to create rasterizer because renderer has no value.");
         }
         reset();
 
@@ -292,6 +292,24 @@ namespace detail {
             static_cast<std::size_t>(_raw_width),
             static_cast<std::size_t>(_raw_height));
         _io.Fonts->TexID = _font_texture.get();
+    }
+
+    void rasterizer_handle::reset()
+    {
+        if (_has_value) {
+            ImGui::DestroyContext(_imgui_context);
+            ImPlot::DestroyContext(_implot_context);
+            _diligent_device_context.Release();
+            _diligent_render_device.Release();
+            _diligent_swap_chain.Release();
+            _diligent_vertex_buffer.Release();
+            _diligent_index_buffer.Release();
+            _diligent_uniform_buffer.Release();
+            _font_texture.reset();
+            _diligent_shader_resource.Release();
+            _diligent_texture_variable = nullptr;
+            _has_value = false;
+        }
     }
 
 #if TOOLCHAIN_PLATFORM_EMSCRIPTEN

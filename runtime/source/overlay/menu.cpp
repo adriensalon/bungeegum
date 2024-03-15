@@ -8,6 +8,7 @@
 
 #include <bungeegum/glue/theme.hpp>
 #include <bungeegum/glue/rendering.hpp>
+#include <bungeegum/core/widget.hpp>
 
 // #include "static/font_awesome.hpp"
 #include <inter_extrabold.cpp>
@@ -17,7 +18,7 @@ namespace bungeegum {
 namespace detail {
 	
     extern void draw_build_overlay();
-    extern void draw_hierarchy_overlay();
+    extern void draw_hierarchy_overlay(const widget_update_data& root);
     extern void draw_output_overlay();
     extern void draw_profiling_overlay();
 
@@ -166,17 +167,17 @@ namespace detail {
         }
     }
 
-    void draw_overlay()
+    void draw_overlay(const widget_update_data& root)
     {
-		with_theme([] () {
+		with_theme([&root] () {
 			update_stats();
 			draw_footer();
-			with_additional_theme([] () {
+			with_additional_theme([&root] () {
         		if (show_build_overlay) {
 					draw_build_overlay();
 				}
 				if (show_hierarchy_overlay) {
-					draw_hierarchy_overlay();
+					draw_hierarchy_overlay(root);
 				}
 				if (show_output_overlay) {
 					draw_output_overlay();

@@ -69,6 +69,8 @@ namespace widgets {
 
         // ff += 0.0001f;
         // std::cout << "color box  = " << ff << std::endl;
+
+        command.draw_children();
     }
 
 }

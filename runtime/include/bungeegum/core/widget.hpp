@@ -373,13 +373,13 @@ struct widget_id {
 
     /// @brief
     /// @tparam widget_t
-    template <typename widget_t>
-    widget_id(widget_t* widget);
+    template <typename widget_t, typename = typename std::enable_if_t<!std::is_same_v<widget_t, widget_id>>>
+    widget_id(widget_t& widget);
 
     /// @brief
     /// @tparam widget_t
     template <typename widget_t>
-    widget_id(widget_t& widget);
+    widget_id(widget_t* widget);
 
     /// @brief
     /// @tparam widget_t

@@ -23,7 +23,7 @@ namespace detail {
 
 #if BUNGEEGUM_USE_OVERLAY
     extern void setup_overlay(rasterizer_handle& context);
-    extern void draw_overlay();
+    extern void draw_overlay(const widget_update_data& root);
 #endif
 
     void log_diligent(const std::string& info)
@@ -447,7 +447,7 @@ namespace detail {
             data.overlay_rasterizer.new_frame();
             data.overlay_rasterizer.use_projection_orthographic();
             data.overlay_rasterizer.use_shader(data.overlay_shader);
-            draw_overlay();
+            draw_overlay(data.root_updatable.value().get());
             data.overlay_rasterizer.render();
 #endif
 

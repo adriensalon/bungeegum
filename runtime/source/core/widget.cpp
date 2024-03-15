@@ -259,6 +259,13 @@ void draw_command::draw_child(const widget_id child_id)
 
 void draw_command::draw_children()
 {
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
+    const detail::widget_update_data& _updatable = _manager.updatables.at(_data.raw_updatable);
+    for (const detail::widget_update_data& _child_updatable : _updatable.children) {
+        detail::draw_command_data _command_data = { _child_updatable.raw, _data.raw_pipeline, _data.draw_list };
+        draw_command _command = detail::draw_command_access::make_from_data(_command_data);
+        _child_updatable.drawer(_command);
+    }
 }
 
 void draw_command::draw_curve()

@@ -244,9 +244,9 @@ widget_ref<widget_t>::widget_ref(const detail::widget_ref_data<widget_t>& data)
 {
 }
 
-template <typename widget_t>
-widget_id::widget_id(widget_t* widget)
-    : _data(access::get_raw(*widget))
+template <typename widget_t, typename>
+widget_id::widget_id(widget_t& widget)
+    : _data(access::get_raw(widget))
 {
     // if (!detail::global().widgets.updatables.contains(_data)) {
     //     throw detail::backtraced_exception("Errorlol");
@@ -254,8 +254,8 @@ widget_id::widget_id(widget_t* widget)
 }
 
 template <typename widget_t>
-widget_id::widget_id(widget_t& widget)
-    : _data(access::get_raw(widget))
+widget_id::widget_id(widget_t* widget)
+    : _data(access::get_raw(*widget))
 {
     // if (!detail::global().widgets.updatables.contains(_data)) {
     //     throw detail::backtraced_exception("Errorlol");
@@ -282,7 +282,7 @@ widget_ref<widget_t> make_reference()
     if constexpr (detail::traits::is_reloadable_v<widget_t>) {
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>(
             detail::get_swapped_global().widgets.hotswap_reloader.allocate<widget_t>()));
-        _raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
+        _raw_widget = detail::raw_cast<widget_t>(_widget_ptr->get());
         detail::swapped_access::get_object_reference(_widget_ptr->get()) = _raw_widget;
     } else {
         _widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>());
@@ -292,10 +292,10 @@ widget_ref<widget_t> make_reference()
 	_widget_ptr = &(_inplace_data.emplace<detail::value_type_t<widget_t>>());
 	_raw_widget = detail::raw_cast<detail::value_type_t<widget_t>>(_widget_ptr);
 #endif
+    widget_ref<widget_t> _reference = detail::widget_ref_access<widget_t>::make_from_data(*_widget_ptr);
     detail::widget_update_data& _updatable = detail::get_swapped_global().widgets.updatables[_raw_widget];
     _updatable.raw = _raw_widget;
     _updatable.inplace_data = std::move(_inplace_data);
-    widget_ref<widget_t> _reference = detail::widget_ref_access<widget_t>::make_from_data(*_widget_ptr);
     detail::install_on_draw<widget_t>(_reference, _updatable);
     detail::install_on_interact<widget_t>(_reference, _updatable);
     detail::install_on_resolve<widget_t>(_reference, _updatable);

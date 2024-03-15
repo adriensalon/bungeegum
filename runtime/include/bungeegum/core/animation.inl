@@ -166,7 +166,7 @@ animation<value_t>& animation<value_t>::stop()
 template <typename value_t>
 animation<value_t>& animation<value_t>::shape(const curve& curved_shape)
 {
-    _data.eval_curve = curved_shape;
+    _data.bspline = curved_shape._data;
     return *this;
 }
 

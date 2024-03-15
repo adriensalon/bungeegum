@@ -1,4 +1,4 @@
-#include <bungeegum/Rendering.hpp>
+#include <bungeegum/glue/rendering.hpp>
 #include <bungeegum/glue/string.hpp>
 
 #include <imgui.h>
@@ -420,22 +420,6 @@ namespace detail {
             _diligent_pipeline_state.Release();
             _has_value = false;
         }
-    }
-
-    void rasterizer_handle::reset()
-    {
-        ImGui::DestroyContext(_imgui_context);
-        ImPlot::DestroyContext(_implot_context);
-        _diligent_device_context.Release();
-        _diligent_render_device.Release();
-        _diligent_swap_chain.Release();
-        _diligent_vertex_buffer.Release();
-        _diligent_index_buffer.Release();
-        _diligent_uniform_buffer.Release();
-        _font_texture.reset();
-        _diligent_shader_resource.Release();
-        _diligent_texture_variable = nullptr;
-        _has_value = false;
     }
 
     bool rasterizer_handle::has_value() const
