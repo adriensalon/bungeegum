@@ -1,3 +1,4 @@
+add_subdirectory("farsitype")
 add_subdirectory("glm")
 add_subdirectory("imgui")
 add_subdirectory("implot")

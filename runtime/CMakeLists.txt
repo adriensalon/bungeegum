@@ -62,6 +62,7 @@ target_include_directories(bungeegum_runtime PUBLIC "${CMAKE_SOURCE_DIR}/externa
 
 set_property(TARGET bungeegum_runtime PROPERTY CXX_STANDARD 17)
 
+target_link_libraries(bungeegum_runtime farsitype)
 target_link_libraries(bungeegum_runtime glm)
 target_link_libraries(bungeegum_runtime imgui)
 target_link_libraries(bungeegum_runtime stb_image)

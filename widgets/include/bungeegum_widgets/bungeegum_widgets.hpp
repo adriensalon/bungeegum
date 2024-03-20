@@ -20,9 +20,12 @@
 #include <bungeegum_widgets/widgets/Flex.hpp>
 #include <bungeegum_widgets/widgets/FutureBuilder.hpp>
 #include <bungeegum_widgets/widgets/LayoutId.hpp>
+#include <bungeegum_widgets/widgets/ListView.hpp>
 #include <bungeegum_widgets/widgets/LimitedBox.hpp>
+#include <bungeegum_widgets/widgets/Opacity.hpp>
 #include <bungeegum_widgets/widgets/OverflowBox.hpp>
 #include <bungeegum_widgets/widgets/Padding.hpp>
+#include <bungeegum_widgets/widgets/RotatedBox.hpp>
 #include <bungeegum_widgets/widgets/SizedBox.hpp>
 #include <bungeegum_widgets/widgets/StreamBuilder.hpp>
 #include <bungeegum_widgets/widgets/Title.hpp>

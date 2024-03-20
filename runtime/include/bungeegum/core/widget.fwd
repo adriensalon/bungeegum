@@ -59,8 +59,10 @@ namespace detail {
         float2 local_max_size = infinity<float2>;
 		float3 local_position = zero<float3>;
 		float3 local_rotation = zero<float3>;
+        float local_opacity = 1.f;
 		float2 resolved_size = zero<float2>;
 		float4x4 resolved_transform = identity<float4x4>;
+        float resolved_opacity = 1.f;
         std::function<void(resolve_command&)> resolver = nullptr;
         std::function<void(interact_command&)> interactor = nullptr;
         std::function<void(draw_command&)> drawer = nullptr;
@@ -85,9 +87,10 @@ namespace detail {
 	using resolve_command_data = std::reference_wrapper<widget_update_data>;
 	
 	struct draw_command_data {
-		std::uintptr_t raw_updatable;
+		std::uintptr_t raw_updatable; // replace by children list direct
 		std::uintptr_t raw_pipeline;
 		ImDrawList* draw_list = nullptr;
+        float opacity = 1.f;
 	};
 
     using widget_id_data = std::uintptr_t;

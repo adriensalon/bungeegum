@@ -1,5 +1,8 @@
 #pragma once
 
+#include <bungeegum_widgets/core/TextOverflow.hpp>
+#include <bungeegum_widgets/core/TextStyle.hpp>
+
 namespace bungeegum {
 namespace widgets {
 
@@ -13,7 +16,22 @@ namespace widgets {
     /// while using the default font family and size.
     struct Text {
 
+        Text& data(const std::optional<std::string>& value);
+
+        // locale
+
+        Text& maxLines(const std::optional<std::size_t> value);
+
+        /// @brief How visual overflow should be handled.
+        /// @details If this is null TextStyle.overflow will be used, otherwise the value from the 
+        /// nearest DefaultTextStyle ancestor will be used.
+        Text& overflow(const std::optional<TextOverflow> value);
+
+
+        Text& style(const TextStyle& value);
+
     private:
+        TextOverflow
     };
 }
 

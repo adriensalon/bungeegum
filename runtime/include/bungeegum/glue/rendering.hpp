@@ -192,6 +192,9 @@ namespace detail {
         float glyph_min_advance = 0.f;
     };
 
+    /// @brief
+    [[nodiscard]] std::string get_farsi_arabic_rtl(const std::string& text);
+
     ///
     struct font_handle {
         font_handle() = default;

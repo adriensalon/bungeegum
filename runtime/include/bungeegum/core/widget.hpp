@@ -260,7 +260,7 @@ struct draw_command {
     /// @param position 
     /// @param color 
     /// @param text 
-    void draw_text(const font& user_font, const float font_size, const float2 position, const float4 color, const std::string& text);
+    void draw_text(const font& user_font, const float font_size, const float2 position, const float4 color, const std::string& text, const bool rtl = false);
 
     /// @brief
     /// @param first_point
@@ -325,6 +325,9 @@ struct draw_command {
     /// @param color
     void draw_triangle_filled(const float2 first_corner, const float2 second_corner, const float2 third_corner, const float4 color);
     
+    ///
+    void use_opacity(const float opacity);
+
     /// @brief
     /// @param user_shader
     void use_shader_custom(const shader& user_shader);

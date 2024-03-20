@@ -9,10 +9,10 @@ namespace widgets {
     struct ImageChunkEvent {
 
 		/// @brief 
-		const int cumulativeBytesLoaded;
+		const std::size_t cumulativeBytesLoaded;
 
 		/// @brief 
-		const int expectedTotalBytes;
+		const std::size_t expectedTotalBytes;
     };
 
 }

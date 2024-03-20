@@ -1,17 +1,15 @@
 #include <bungeegum/glue/rendering.hpp>
 #include <bungeegum/glue/string.hpp>
 
+#include <FarsiType.h>
+#include <Graphics/GraphicsTools/interface/MapHelper.hpp>
 #include <imgui.h>
 #include <implot.h>
-
 #include <stb_image.h>
-
 #if !TOOLCHAIN_PLATFORM_EMSCRIPTEN
 #include <SDL.h>
 #include <backends/imgui_impl_sdl2.h>
 #endif
-
-#include <Graphics/GraphicsTools/interface/MapHelper.hpp>
 
 namespace bungeegum {
 namespace detail {
@@ -96,6 +94,11 @@ namespace detail {
             }
             )";
         return _fragment.data();
+    }
+
+    std::string get_farsi_arabic_rtl(const std::string& text)
+    {
+        return FarsiType::ConvertToFAGlyphs(text);
     }
 
     void font_handle::emplace(

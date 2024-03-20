@@ -200,8 +200,12 @@ namespace detail {
                 // #endif
                 protect_dispatch([&_updatable, _raw_updatable, imgui_drawlist, _raw_pipeline]() {
                     draw_command_data _data = { _raw_updatable, _raw_pipeline, imgui_drawlist };
+                    if (_updatable.parent.has_value()) {
+                        _data.opacity = _updatable.parent.value().get().local_opacity;
+                    }
                     draw_command _command = detail::draw_command_access::make_from_data(_data);
                     _updatable.drawer(_command);
+                    _updatable.local_opacity = detail::draw_command_access::get_data(_command).opacity;
                 });
                 // #if BUNGEEGUM_USE_OVERLAY
                 //                         global().pipelines.profiler_draw_chronometer.end_task(_clean_typename);
@@ -383,7 +387,8 @@ namespace detail {
         swapped_manager_data& _swapped = get_swapped_global();
         std::wstringstream _info_stream;
         swapper_state _reload_result = _swapped.widgets.hotswap_reloader.update(_info_stream.rdbuf());
-        log_hscpp(_info_stream.str());
+        // log_hscpp(_info_stream.str());
+        std::wcout << _info_stream.str();
         if (_reload_result == swapper_state::started_compiling) {
             save_widgets(serialize_path, root_updatable);
         } else if (_reload_result == swapper_state::performed_swap) {

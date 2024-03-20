@@ -60,16 +60,11 @@ namespace widgets {
 
     void ColoredBox::draw(draw_command& command)
     {
-        _color = Color(0xFF8888FF);
-        float2 _min_point = {10.f, 100.f};
-        float2 _max_point = {50.f, 500.f};
-        command.draw_rect_filled(_min_point, _max_point, _color);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-        // ff += 0.0001f;
-        // std::cout << "color box  = " << ff << std::endl;
-
+        command.draw_rect_filled(zero<float2>, command.get_size(), _color);
+        // if (_childWidget.has_value()) {
+        //     command.draw_child(_childWidget.value());
+        // }
+        
         command.draw_children();
     }
 

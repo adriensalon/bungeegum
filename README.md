@@ -20,6 +20,137 @@
 
 ### __Flutter widgets implemented in C++__
 
+
+Lists all widgets specified here : https://docs.flutter.dev/ui/widgets/
+Few widgets can't be implemented as for now and don't appear in this list
+
+__Accessibility__
+- 📕 ExcludeSemantics  
+- 📕 MergeSemantics  
+- 📕 Semantics  
+
+__Animation and motion__
+- 📙 AnimatedAlign
+- 📙 AnimatededBuilder
+- 📙 AnimatedContainer
+- 📙 AnimatedCrossFade
+- 📕 AnimatedDefaultTextStyle
+- 📕 AnimatedList
+- 📕 AnimatedModalBarrier
+- 📕 AnimatedOpacity
+- 📕 AnimatedPositioned
+- 📕 AnimatedSize
+- 📕 AnimatedWidget
+- 📕 DecoratedBoxTransition
+- 📕 FadeTransition
+- 📕 Hero
+- 📕 PositionedTransition
+- 📕 RotationTransition
+- 📕 ScaleTransition
+- 📕 SizeTransition
+- 📕 SlideTransition
+- 📙 TweenAnimationBuilder
+
+__Assets, Images and Icons__
+- 📕 AssetBundle ?
+- 📕 Icon
+- 📙 Image
+- 📕 RawImage
+
+__Async__
+- 📗 FutureBuilder
+- 📗 StreamBuilder
+
+__Basics__
+- 📙 Container
+- 📙 MediaQuery
+- 📙 Placeholder
+- 📙 SafeArea
+
+__Input__
+- 📙 Form
+- 📙 FormField
+- 📕 RawKeyboardListener
+
+__Interaction model__
+- 📙 AbsorbPointer
+- 📙 Dismissible
+- 📕 DragTarget
+- 📕 Draggable
+- 📙 GestureDetector
+- 📕 IgnorePointer
+- 📕 InteractiveViewer
+- 📕 LongPressDraggable
+- 📙 Listener
+- 📙 MouseRegion
+
+__Layout__ (Single child)
+- 📙 Align
+- 📙 AspectRatio
+- 📕 Baseline ?
+- 📙 Center
+- 📗 ConstrainedBox
+- 📗 CustomSingleChildLayout
+- 📙 Expanded
+- 📙 FittedBox
+- 📕 FractionnalySizedBox
+- 📕 IntrinsicHeight
+- 📕 IntrinsicWidth
+- 📗 LimitedBox
+- 📕 Offstage
+- 📗 OverflowBox
+- 📗 Padding
+- 📗 SizedBox
+- 📕 SizedOverflowBox
+
+__Layout__ (Multi child)
+- 📕 Column
+- 📙 CustomMultiChildLayout
+- 📕 Flow
+- 📕 GridView
+- 📕 IndexedStack
+- 📕 LayoutBuilder
+- 📕 ListBody
+- 📕 ListView
+- 📕 Row
+- 📕 Stack
+- 📕 Table
+- 📕 Wrap
+
+__Layout__ (Sliver)
+- 📕 CustomScrollView
+- 📕 SliverChildBuilderDelegate
+- 📕 SliverChildListDelegate
+- 📕 SliverFixedExtentList
+- 📕 SliverGrid
+- 📕 SliverList
+- 📕 SliverPadding
+- 📕 SliverPersistentHeader
+- 📕 SliverToBoxAdapter
+
+__Painting__
+- 📗 ColoredBox
+- 📕 Canvas
+- 📕 DecoratedBox
+- 📕 FractionalTranslation
+- 📙 Opacity
+- 📕 RotatedBox
+- 📙 Transform
+
+__Scrolling__
+- 📕 CustomScrollView
+- 📕 DraggableScrollableSheet
+- 📕 NestedScrollView
+- 📕 NotificationListener
+- 📕 ScrollConfiguration
+- 📕 Scrollable
+- 📕 SingleChildScrollView
+
+__Text__
+- 📕 DefaultTextStyle
+- 📕 RichText
+- 📕 Text
+
 ### __Hot reload__
 
 ### __Overlay__

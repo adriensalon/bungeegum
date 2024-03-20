@@ -247,14 +247,26 @@ draw_command::draw_command(const detail::draw_command_data& data)
 }
 
 float2 draw_command::get_size() const
-{
-    // return _data.updatable.get().resolved_size;
-    return {0, 0};
+{    
+    detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
+    const detail::widget_update_data& _updatable = _manager.updatables.at(_data.raw_updatable);
+    return _updatable.resolved_size;
 }
 
 void draw_command::draw_child(const widget_id child_id)
 {
-    
+    // detail::widget_manager_data& _manager = detail::get_swapped_global().widgets;
+    // const detail::widget_update_data& _updatable = _manager.updatables.at(_data.raw_updatable);
+    // const std::uintptr_t _child_raw = detail::widget_id_access::get_data(child_id);
+    // for 
+
+    // if (_updatable.children.find(detail::widget_id_access::get_data(child_id)) != _updatable.children.end()) {
+    //     detail::draw_command_data _command_data = { _child_updatable.raw, _data.raw_pipeline, _data.draw_list };
+    //     draw_command _command = detail::draw_command_access::make_from_data(_command_data);
+    //     _child_updatable.drawer(_command);
+    // } else {
+    //     error("Draw", "Invalid child provided to draw. This widget is not a child.");
+    // }
 }
 
 void draw_command::draw_children()
@@ -308,14 +320,15 @@ void draw_command::draw_texture_rounded(texture& user_texture, const float2 min_
     _data.draw_list->AddImageRounded(_id, _min_point, _max_point, ImVec2(0.f, 0.f), ImVec2(0.f, 0.f), 4294967295U, rounding, ImDrawCornerFlags_All);
 }
 
-void draw_command::draw_text(const font& user_font, const float font_size, const float2 position, const float4 color, const std::string& text)
+void draw_command::draw_text(const font& user_font, const float font_size, const float2 position, const float4 color, const std::string& text, const bool rtl)
 {
     const detail::font_data& _font_data = detail::font_access::get_data(user_font);
     const detail::font_handle& _font_handle = _font_data.fonts.at(_data.raw_pipeline);
     ImFont* _font = _font_handle.get();
-    const char* _ctext = text.c_str();
+    const std::string _processed = rtl ? detail::get_farsi_arabic_rtl(text) : text;
+    const char* _ctext = _processed.c_str();
     ImVec2 _position { position.x, position.y };
-    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w * _data.opacity });
     _data.draw_list->AddText(_font, font_size, _position, _color, _ctext);
 }
 
@@ -323,7 +336,7 @@ void draw_command::draw_line(const float2 first_point, const float2 second_point
 {
     ImVec2 _first_point { first_point.x, first_point.y };
     ImVec2 _second_point { second_point.x, second_point.y };
-    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w * _data.opacity });
     _data.draw_list->AddLine(_first_point, _second_point, _color, thickness);
 }
 
@@ -331,7 +344,7 @@ void draw_command::draw_rect(const float2 min_point, const float2 max_point, con
 {
     ImVec2 _min_point { min_point.x, min_point.y };
     ImVec2 _max_point { max_point.x, max_point.y };
-    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w * _data.opacity });
     _data.draw_list->AddRect(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All, thickness);
 }
 
@@ -339,7 +352,7 @@ void draw_command::draw_rect_filled(const float2 min_point, const float2 max_poi
 {
     ImVec2 _min_point { min_point.x, min_point.y };
     ImVec2 _max_point { max_point.x, max_point.y };
-    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w * _data.opacity });
     _data.draw_list->AddRectFilled(_min_point, _max_point, _color, rounding, ImDrawCornerFlags_All);
 }
 
@@ -360,7 +373,7 @@ void draw_command::draw_quad(const float2 top_left_corner, const float2 top_righ
     ImVec2 _top_right_corner { top_right_corner.x, top_right_corner.y };
     ImVec2 _bottom_left_corner { bottom_left_corner.x, bottom_left_corner.y };
     ImVec2 _bottom_right_corner { bottom_right_corner.x, bottom_right_corner.y };
-    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });    
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w * _data.opacity });    
     _data.draw_list->AddQuad(_top_left_corner, _top_right_corner, _bottom_right_corner, _bottom_left_corner, _color, thickness);
 }
 
@@ -370,7 +383,7 @@ void draw_command::draw_quad_filled(const float2 top_left_corner, const float2 t
     ImVec2 _top_right_corner { top_right_corner.x, top_right_corner.y };
     ImVec2 _bottom_left_corner { bottom_left_corner.x, bottom_left_corner.y };
     ImVec2 _bottom_right_corner { bottom_right_corner.x, bottom_right_corner.y };
-    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });    
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w * _data.opacity });    
     _data.draw_list->AddQuadFilled(_top_left_corner, _top_right_corner, _bottom_right_corner, _bottom_left_corner, _color);
 }
 
@@ -379,7 +392,7 @@ void draw_command::draw_triangle(const float2 first_corner, const float2 second_
     ImVec2 _first_corner { first_corner.x, first_corner.y };
     ImVec2 _second_corner { second_corner.x, second_corner.y };
     ImVec2 _third_corner { third_corner.x, third_corner.y };
-    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });    
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w * _data.opacity });    
     _data.draw_list->AddTriangle(_first_corner, _second_corner, _third_corner, _color, thickness);
 }
 
@@ -388,8 +401,13 @@ void draw_command::draw_triangle_filled(const float2 first_corner, const float2 
     ImVec2 _first_corner { first_corner.x, first_corner.y };
     ImVec2 _second_corner { second_corner.x, second_corner.y };
     ImVec2 _third_corner { third_corner.x, third_corner.y };
-    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w });    
+    ImU32 _color = ImGui::ColorConvertFloat4ToU32({ color.x, color.y, color.z, color.w * _data.opacity });    
     _data.draw_list->AddTriangleFilled(_first_corner, _second_corner, _third_corner, _color);
+}
+
+void draw_command::use_opacity(const float opacity)
+{
+    _data.opacity = math::clamp(opacity, 0.f, 1.f);
 }
 
 void use_shader_callback(const ImDrawList* parent_list, const ImDrawCmd* cmd) 
